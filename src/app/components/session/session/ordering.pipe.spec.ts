@@ -1,6 +1,6 @@
 import { OrderingPipe } from './ordering.pipe';
-import {Session} from '../../../models/session';
-import {AwsIamUserSession} from '../../../models/aws-iam-user-session';
+import {Session} from '../../../../../core/models/session';
+import {AwsIamUserSession} from '../../../../../core/models/aws-iam-user-session';
 
 let sessions: Session[] = [];
 

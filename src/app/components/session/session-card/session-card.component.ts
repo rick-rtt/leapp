@@ -1,11 +1,11 @@
 import {Component, Input, OnInit, TemplateRef, ViewChild} from '@angular/core';
-import {Session} from '../../../models/session';
+import {Session} from '../../../../../core/models/session';
 import {AwsSessionService} from '../../../services/session/aws/aws-session.service';
 import {AppService, LoggerLevel, ToastLevel} from '../../../services/app.service';
 import {Router} from '@angular/router';
-import {AwsIamRoleFederatedSession} from '../../../models/aws-iam-role-federated-session';
+import {AwsIamRoleFederatedSession} from '../../../../../core/models/aws-iam-role-federated-session';
 import {SsmService} from '../../../services/ssm.service';
-import {SessionType} from '../../../models/session-type';
+import {SessionType} from '../../../../../core/models/session-type';
 import {WorkspaceService} from '../../../services/workspace.service';
 import {environment} from '../../../../environments/environment';
 import {KeychainService} from '../../../services/keychain.service';
@@ -13,9 +13,9 @@ import * as uuid from 'uuid';
 import {BsModalRef, BsModalService} from 'ngx-bootstrap/modal';
 import {FileService} from '../../../services/file.service';
 import {SessionFactoryService} from '../../../services/session-factory.service';
-import {SessionStatus} from '../../../models/session-status';
+import {SessionStatus} from '../../../../../core/models/session-status';
 import {SessionService} from '../../../services/session.service';
-import {Constants} from '../../../models/constants';
+import {Constants} from '../../../../../core/models/constants';
 import {AwsIamUserService} from '../../../services/session/aws/methods/aws-iam-user.service';
 import {LoggingService} from '../../../services/logging.service';
 

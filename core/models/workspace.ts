@@ -1,6 +1,6 @@
 import {Session} from './session';
 import * as uuid from 'uuid';
-import {environment} from '../../environments/environment';
+import {environment} from '../../src/environments/environment';
 import {Type} from 'class-transformer';
 import {Constants} from './constants';
 

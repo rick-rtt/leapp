@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {ExecuteService} from './execute.service';
 import {AppService, LoggerLevel} from './app.service';
 import {LeappBaseError} from '../errors/leapp-base-error';
-import {CredentialsInfo} from '../models/credentials-info';
+import {CredentialsInfo} from '../../../core/models/credentials-info';
 import {LoggingService} from './logging.service';
 
 const AWS = require('aws-sdk');

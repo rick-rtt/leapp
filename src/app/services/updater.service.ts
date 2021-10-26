@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {BsModalRef, BsModalService} from 'ngx-bootstrap/modal';
 import {AppService} from './app.service';
-import {Constants} from '../models/constants';
+import {Constants} from '../../../core/models/constants';
 import {environment} from '../../environments/environment';
 import {UpdateDialogComponent} from '../components/shared/update-dialog/update-dialog.component';
 import compareVersions from 'compare-versions';

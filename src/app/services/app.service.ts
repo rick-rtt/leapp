@@ -4,7 +4,7 @@ import {ConfirmationDialogComponent} from '../components/shared/confirmation-dia
 import {FormControl, FormGroup} from '@angular/forms';
 import {environment} from '../../environments/environment';
 import {InputDialogComponent} from '../components/shared/input-dialog/input-dialog.component';
-import {Constants} from '../models/constants';
+import {Constants} from '../../../core/models/constants';
 import {BsModalService} from 'ngx-bootstrap/modal';
 import {ElectronService} from './electron.service';
 import {LoggingService} from './logging.service';

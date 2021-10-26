@@ -3,7 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { SessionService } from './session.service';
 import {mustInjected} from '../../base-injectables';
 import {serialize} from 'class-transformer';
-import {Workspace} from '../models/workspace';
+import {Workspace} from '../../../core/models/workspace';
 import {AppService} from './app.service';
 import SpyObj = jasmine.SpyObj;
 import {WorkspaceService} from './workspace.service';

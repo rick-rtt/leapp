@@ -4,7 +4,7 @@ import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {AppService} from '../../services/app.service';
 import {WorkspaceService} from '../../services/workspace.service';
 import {AwsSsoRoleService, SsoRoleSession} from '../../services/session/aws/methods/aws-sso-role.service';
-import {Constants} from '../../models/constants';
+import {Constants} from '../../../../core/models/constants';
 import {AwsSsoOidcService, BrowserWindowClosing} from '../../services/aws-sso-oidc.service';
 
 @Component({

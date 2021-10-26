@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
-import {SessionStatus} from '../models/session-status';
-import {Session} from '../models/session';
+import {SessionStatus} from '../../../core/models/session-status';
+import {Session} from '../../../core/models/session';
 import {WorkspaceService} from './workspace.service';
 
 @Injectable({

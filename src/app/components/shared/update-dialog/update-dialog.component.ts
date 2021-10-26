@@ -1,5 +1,5 @@
 import {Component, Input, OnInit, ViewEncapsulation} from '@angular/core';
-import {Constants} from '../../../models/constants';
+import {Constants} from '../../../../../core/models/constants';
 import {BsModalRef} from 'ngx-bootstrap/modal';
 
 @Component({

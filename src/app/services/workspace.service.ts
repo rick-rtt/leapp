@@ -1,8 +1,8 @@
 import {Injectable} from '@angular/core';
 import {FileService} from './file.service';
 import {AppService} from './app.service';
-import {Session} from '../models/session';
-import {Workspace} from '../models/workspace';
+import {Session} from '../../../core/models/session';
+import {Workspace} from '../../../core/models/workspace';
 import {environment} from '../../environments/environment';
 import {deserialize, serialize} from 'class-transformer';
 import {BehaviorSubject, Observable} from 'rxjs';

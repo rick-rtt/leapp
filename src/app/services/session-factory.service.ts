@@ -3,7 +3,7 @@ import {WorkspaceService} from './workspace.service';
 import {KeychainService} from './keychain.service';
 import {AppService} from './app.service';
 import {FileService} from './file.service';
-import {SessionType} from '../models/session-type';
+import {SessionType} from '../../../core/models/session-type';
 import {AwsIamUserService} from './session/aws/methods/aws-iam-user.service';
 import {AwsIamRoleChainedService} from './session/aws/methods/aws-iam-role-chained.service';
 import {AwsIamRoleFederatedService} from './session/aws/methods/aws-iam-role-federated.service';

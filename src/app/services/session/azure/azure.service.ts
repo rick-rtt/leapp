@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {WorkspaceService} from '../../workspace.service';
-import {AzureSession} from '../../../models/azure-session';
+import {AzureSession} from '../../../../../core/models/azure-session';
 import {FileService} from '../../file.service';
 import {environment} from '../../../../environments/environment';
 import {AppService} from '../../app.service';

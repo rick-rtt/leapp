@@ -2,16 +2,16 @@ import {Component, OnDestroy, OnInit} from '@angular/core';
 import {WorkspaceService} from '../../../services/workspace.service';
 import {FileService} from '../../../services/file.service';
 import {AppService, LoggerLevel} from '../../../services/app.service';
-import {Session} from '../../../models/session';
-import {SessionType} from '../../../models/session-type';
+import {Session} from '../../../../../core/models/session';
+import {SessionType} from '../../../../../core/models/session-type';
 import {environment} from '../../../../environments/environment';
-import {SessionStatus} from '../../../models/session-status';
-import {AwsIamRoleChainedSession} from '../../../models/aws-iam-role-chained-session';
-import {AwsIamRoleFederatedSession} from '../../../models/aws-iam-role-federated-session';
+import {SessionStatus} from '../../../../../core/models/session-status';
+import {AwsIamRoleChainedSession} from '../../../../../core/models/aws-iam-role-chained-session';
+import {AwsIamRoleFederatedSession} from '../../../../../core/models/aws-iam-role-federated-session';
 import {UpdaterService} from '../../../services/updater.service';
 import {SessionService} from '../../../services/session.service';
 import {SessionFactoryService} from '../../../services/session-factory.service';
-import {Constants} from '../../../models/constants';
+import {Constants} from '../../../../../core/models/constants';
 import {LoggingService} from '../../../services/logging.service';
 
 @Component({

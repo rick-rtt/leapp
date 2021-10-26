@@ -2,16 +2,16 @@ import {Injectable} from '@angular/core';
 import {AppService} from './app.service';
 import {environment} from '../../environments/environment';
 import {FileService} from './file.service';
-import {Workspace} from '../models/workspace';
+import {Workspace} from '../../../core/models/workspace';
 import {serialize} from 'class-transformer';
 import {KeychainService} from './keychain.service';
-import {AwsIamRoleFederatedSession} from '../models/aws-iam-role-federated-session';
-import {AwsIamRoleChainedSession} from '../models/aws-iam-role-chained-session';
-import {AwsIamUserSession} from '../models/aws-iam-user-session';
-import {AwsSsoRoleSession} from '../models/aws-sso-role-session';
-import {AzureSession} from '../models/azure-session';
+import {AwsIamRoleFederatedSession} from '../../../core/models/aws-iam-role-federated-session';
+import {AwsIamRoleChainedSession} from '../../../core/models/aws-iam-role-chained-session';
+import {AwsIamUserSession} from '../../../core/models/aws-iam-user-session';
+import {AwsSsoRoleSession} from '../../../core/models/aws-sso-role-session';
+import {AzureSession} from '../../../core/models/azure-session';
 import {WorkspaceService} from './workspace.service';
-import {Constants} from '../models/constants';
+import {Constants} from '../../../core/models/constants';
 
 @Injectable({
   providedIn: 'root'

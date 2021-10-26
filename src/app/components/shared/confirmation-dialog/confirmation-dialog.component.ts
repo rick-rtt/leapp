@@ -1,6 +1,6 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {BsModalRef} from 'ngx-bootstrap/modal';
-import {Constants} from '../../../models/constants';
+import {Constants} from '../../../../../core/models/constants';
 
 @Component({
   selector: 'app-confirmation-dialog',

@@ -4,7 +4,7 @@ import {ProxyService} from './proxy.service';
 import {mustInjected} from '../../base-injectables';
 import {WorkspaceService} from './workspace.service';
 import {serialize} from 'class-transformer';
-import {Workspace} from '../models/workspace';
+import {Workspace} from '../../../core/models/workspace';
 import {AppService} from './app.service';
 
 import SpyObj = jasmine.SpyObj;

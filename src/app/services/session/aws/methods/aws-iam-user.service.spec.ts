@@ -5,18 +5,18 @@ import {TestBed} from '@angular/core/testing';
 import {AwsIamUserService} from './aws-iam-user.service';
 import {mustInjected} from '../../../../../base-injectables';
 import {serialize} from 'class-transformer';
-import {Workspace} from '../../../../models/workspace';
+import {Workspace} from '../../../../../../core/models/workspace';
 import {AppService} from '../../../app.service';
 import {FileService} from '../../../file.service';
 import {WorkspaceService} from '../../../workspace.service';
-import {Session} from '../../../../models/session';
+import {Session} from '../../../../../../core/models/session';
 import {KeychainService} from '../../../keychain.service';
 import {environment} from '../../../../../environments/environment';
 import {LeappBaseError} from '../../../../errors/leapp-base-error';
 
 import * as AWSMock from 'aws-sdk-mock';
 import * as AWS from 'aws-sdk';
-import {AwsIamUserSession} from '../../../../models/aws-iam-user-session';
+import {AwsIamUserSession} from '../../../../../../core/models/aws-iam-user-session';
 
 let spyAppService;
 let spyFileService;

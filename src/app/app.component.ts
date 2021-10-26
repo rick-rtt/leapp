@@ -4,7 +4,7 @@ import {FileService} from './services/file.service';
 import {AppService, LoggerLevel} from './services/app.service';
 import {Router} from '@angular/router';
 import {WorkspaceService} from './services/workspace.service';
-import {Workspace} from './models/workspace';
+import {Workspace} from '../../core/models/workspace';
 import {setTheme} from 'ngx-bootstrap/utils';
 import {TimerService} from './services/timer.service';
 import {RotationService} from './services/rotation.service';
@@ -14,7 +14,7 @@ import compareVersions from 'compare-versions';
 import {RetrocompatibilityService} from './services/retrocompatibility.service';
 import {LoggingService} from './services/logging.service';
 import {LeappParseError} from './errors/leapp-parse-error';
-import {Constants} from './models/constants';
+import {Constants} from '../../core/models/constants';
 
 @Component({
   selector: 'app-root',

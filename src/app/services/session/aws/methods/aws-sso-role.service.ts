@@ -1,9 +1,9 @@
 import {Injectable} from '@angular/core';
 import {AwsSessionService} from '../aws-session.service';
 import {WorkspaceService} from '../../../workspace.service';
-import {CredentialsInfo} from '../../../../models/credentials-info';
+import {CredentialsInfo} from '../../../../../../core/models/credentials-info';
 
-import {AwsSsoRoleSession} from '../../../../models/aws-sso-role-session';
+import {AwsSsoRoleSession} from '../../../../../../core/models/aws-sso-role-session';
 import {FileService} from '../../../file.service';
 import {AppService, ToastLevel} from '../../../app.service';
 
@@ -19,7 +19,7 @@ import SSO, {
 
 import {environment} from '../../../../../environments/environment';
 import {KeychainService} from '../../../keychain.service';
-import {SessionType} from '../../../../models/session-type';
+import {SessionType} from '../../../../../../core/models/session-type';
 import {AwsSsoOidcService, BrowserWindowClosing} from "../../../aws-sso-oidc.service";
 
 export interface AwsSsoRoleSessionRequest {

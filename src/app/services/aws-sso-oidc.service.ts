@@ -9,7 +9,7 @@ import SSOOIDC, {
   StartDeviceAuthorizationRequest
 } from 'aws-sdk/clients/ssooidc';
 import {Injectable} from '@angular/core';
-import {Constants} from '../models/constants';
+import {Constants} from '../../../core/models/constants';
 import {WorkspaceService} from './workspace.service';
 import {AppService, LoggerLevel} from './app.service';
 import {ElectronService} from './electron.service';

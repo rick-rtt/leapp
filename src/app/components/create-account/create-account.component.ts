@@ -4,7 +4,7 @@ import {AppService, LoggerLevel} from '../../services/app.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {AwsSessionService} from '../../services/session/aws/aws-session.service';
 import {WorkspaceService} from '../../services/workspace.service';
-import {SessionType} from '../../models/session-type';
+import {SessionType} from '../../../../core/models/session-type';
 import {environment} from '../../../environments/environment';
 import * as uuid from 'uuid';
 import {AwsIamUserSessionRequest, AwsIamUserService} from '../../services/session/aws/methods/aws-iam-user.service';

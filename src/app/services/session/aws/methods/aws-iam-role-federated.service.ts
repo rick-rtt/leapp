@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
 import {AwsSessionService} from '../aws-session.service';
-import {CredentialsInfo} from '../../../../models/credentials-info';
+import {CredentialsInfo} from '../../../../../../core/models/credentials-info';
 import {WorkspaceService} from '../../../workspace.service';
 import {KeychainService} from '../../../keychain.service';
 import {AppService} from '../../../app.service';
 import {FileService} from '../../../file.service';
-import {AwsIamRoleFederatedSession} from '../../../../models/aws-iam-role-federated-session';
+import {AwsIamRoleFederatedSession} from '../../../../../../core/models/aws-iam-role-federated-session';
 import {LeappSamlError} from '../../../../errors/leapp-saml-error';
 import {LeappParseError} from '../../../../errors/leapp-parse-error';
 import {environment} from '../../../../../environments/environment';

@@ -1,17 +1,17 @@
 import {Component, OnInit, ViewEncapsulation} from '@angular/core';
-import {Workspace} from '../../../models/workspace';
+import {Workspace} from '../../../../../core/models/workspace';
 import {FormControl, FormGroup} from '@angular/forms';
 import {AppService, LoggerLevel, ToastLevel} from '../../../services/app.service';
 import {FileService} from '../../../services/file.service';
 import {Router} from '@angular/router';
-import {Constants} from '../../../models/constants';
+import {Constants} from '../../../../../core/models/constants';
 import {environment} from '../../../../environments/environment';
 import * as uuid from 'uuid';
-import {AwsIamRoleFederatedSession} from '../../../models/aws-iam-role-federated-session';
+import {AwsIamRoleFederatedSession} from '../../../../../core/models/aws-iam-role-federated-session';
 import {WorkspaceService} from '../../../services/workspace.service';
-import {SessionStatus} from '../../../models/session-status';
+import {SessionStatus} from '../../../../../core/models/session-status';
 import {SessionFactoryService} from '../../../services/session-factory.service';
-import {SessionType} from '../../../models/session-type';
+import {SessionType} from '../../../../../core/models/session-type';
 import {AwsSessionService} from '../../../services/session/aws/aws-session.service';
 import {LoggingService} from '../../../services/logging.service';
 

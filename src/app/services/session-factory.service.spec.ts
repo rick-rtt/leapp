@@ -3,13 +3,13 @@ import {TestBed} from '@angular/core/testing';
 import {SessionFactoryService} from './session-factory.service';
 import {mustInjected} from '../../base-injectables';
 import {AwsSessionService} from './session/aws/aws-session.service';
-import {SessionType} from '../models/session-type';
+import {SessionType} from '../../../core/models/session-type';
 import {AwsIamUserService} from './session/aws/methods/aws-iam-user.service';
 import {WorkspaceService} from './workspace.service';
 import {KeychainService} from './keychain.service';
 import {AppService} from './app.service';
 import {FileService} from './file.service';
-import {Workspace} from '../models/workspace';
+import {Workspace} from '../../../core/models/workspace';
 
 describe('SessionProviderService', () => {
   let sessionFactoryService: SessionFactoryService;
