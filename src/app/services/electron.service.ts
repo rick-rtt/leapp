@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import * as Keytar from 'keytar';
+import NativeService from '../../../core/services/native-service';
 
 @Injectable({
   providedIn: 'root'
@@ -36,42 +37,40 @@ export class ElectronService {
   notification: any;
   process: any;
 
-  get isElectron(): boolean {
-    return !!(window && window.process && (window.process as any).type);
-  }
-
   constructor() {
-    if (this.isElectron) {
-      this.log = window.require('electron-log');
-      this.fs = window.require('fs-extra');
-      this.rimraf = window.require('rimraf');
-      this.os = window.require('os');
-      this.ini = window.require('ini');
-      this.md5File = window.require('md5-file');
-      this.path = window.require('path');
-      this.exec = window.require('child_process').exec;
-      this.url = window.require('url');
-      this.unzip = window.require('extract-zip');
-      this.copydir = window.require('copy-dir');
-      this.sudo = window.require('sudo-prompt');
-      this.semver = window.require('semver');
-      this.shell = window.require('electron').shell;
-      this.machineId = window.require('node-machine-id').machineIdSync();
-      this.keytar = window.require('keytar');
-      this.followRedirects = window.require('follow-redirects');
-      this.httpProxyAgent = window.require('http-proxy-agent');
-      this.httpsProxyAgent = window.require('https-proxy-agent');
-      this.app = window.require('@electron/remote').app;
-      this.session = window.require('@electron/remote').session;
-      this.dialog = window.require('@electron/remote').dialog;
-      this.browserWindow = window.require('@electron/remote').BrowserWindow;
-      this.currentWindow = window.require('@electron/remote').getCurrentWindow();
-      this.menu = window.require('@electron/remote').Menu;
-      this.tray = window.require('@electron/remote').Tray;
-      this.ipcRenderer = window.require('electron').ipcRenderer;
-      this.nativeTheme = window.require('@electron/remote').nativeTheme;
-      this.notification = window.require('@electron/remote').Notification;
-      this.process = (window as any).process;
+    const nativeService = new NativeService();
+
+    if (nativeService.isElectron) {
+      this.log = nativeService.log;
+      this.fs = nativeService.fs;
+      this.rimraf = nativeService.rimraf;
+      this.os = nativeService.os;
+      this.ini = nativeService.ini;
+      this.md5File = nativeService.md5File;
+      this.path = nativeService.path;
+      this.exec = nativeService.exec;
+      this.url = nativeService.url;
+      this.unzip = nativeService.unzip;
+      this.copydir = nativeService.copydir;
+      this.sudo = nativeService.sudo;
+      this.semver = nativeService.semver;
+      this.shell = nativeService.shell;
+      this.machineId = nativeService.machineId;
+      this.keytar = nativeService.keytar;
+      this.followRedirects = nativeService.followRedirects;
+      this.httpProxyAgent = nativeService.httpProxyAgent;
+      this.httpsProxyAgent = nativeService.httpsProxyAgent;
+      this.app = nativeService.app;
+      this.session = nativeService.session;
+      this.dialog = nativeService.dialog;
+      this.browserWindow = nativeService.browserWindow;
+      this.currentWindow = nativeService.currentWindow;
+      this.menu = nativeService.menu;
+      this.tray = nativeService.tray;
+      this.ipcRenderer = nativeService.ipcRenderer;
+      this.nativeTheme = nativeService.nativeTheme;
+      this.notification = nativeService.notification;
+      this.process = nativeService.process;
     }
   }
 }
