@@ -298,7 +298,7 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
 
       const awsSsoSession = {
         email: accountInfo.emailAddress,
-        region: oldSession?.region || this.workspaceService.get().defaultRegion || environment.defaultRegion,
+        region: oldSession?.region || this.workspaceService.getDefaultRegion() || environment.defaultRegion,
         roleArn: `arn:aws:iam::${accountInfo.accountId}/${accountRole.roleName}`,
         sessionName: accountInfo.accountName,
         profileId: oldSession?.profileId || this.workspaceService.getDefaultProfileId()

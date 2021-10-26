@@ -128,6 +128,10 @@ export class WorkspaceService {
     this.persist(workspace);
   }
 
+  getDefaultRegion() {
+    return this.get().defaultRegion;
+  }
+
   getProfileName(profileId): string {
     const workspace = this.get();
     const profileFiltered = workspace.profiles.find(profile => profile.id === profileId);
@@ -179,6 +183,10 @@ export class WorkspaceService {
 
   getAwsSsoConfiguration(): {region: string; portalUrl: string; browserOpening: string; expirationTime: string} {
     return this.get().awsSsoConfiguration;
+  }
+
+  getProfiles(): any {
+    return this.get().profiles;
   }
 
   setAwsSsoConfiguration(region: string, portalUrl: string, browserOpening: string, expirationTime: string) {
