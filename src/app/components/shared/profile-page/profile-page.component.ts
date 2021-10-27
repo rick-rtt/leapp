@@ -36,8 +36,6 @@ export class ProfilePageComponent implements OnInit {
   proxyUsername;
   proxyPassword;
 
-  workspace: Workspace;
-
   locations: { location: string }[];
   regions: { region: string }[];
   selectedLocation: string;
@@ -62,23 +60,23 @@ export class ProfilePageComponent implements OnInit {
   private sessionService: any;
 
   constructor(
+    public workspaceService: WorkspaceService,
     private appService: AppService,
     private loggingService: LoggingService,
     private fileService: FileService,
     private sessionProviderService: SessionFactoryService,
     private awsSessionService: AwsSessionService,
-    private workspaceService: WorkspaceService,
     private router: Router
   ) {}
 
   ngOnInit() {
-    this.workspace = this.workspaceService.get();
+    const proxyConfiguration = this.workspaceService.getProxyConfiguration();
     this.idpUrlValue = '';
-    this.proxyProtocol = this.workspace.proxyConfiguration.proxyProtocol;
-    this.proxyUrl = this.workspace.proxyConfiguration.proxyUrl;
-    this.proxyPort = this.workspace.proxyConfiguration.proxyPort;
-    this.proxyUsername = this.workspace.proxyConfiguration.username || '';
-    this.proxyPassword = this.workspace.proxyConfiguration.password || '';
+    this.proxyProtocol = proxyConfiguration.proxyProtocol;
+    this.proxyUrl = proxyConfiguration.proxyUrl;
+    this.proxyPort = proxyConfiguration.proxyPort;
+    this.proxyUsername = proxyConfiguration.username || '';
+    this.proxyPassword = proxyConfiguration.password || '';
 
     this.form.controls['idpUrl'].setValue(this.idpUrlValue);
     this.form.controls['proxyUrl'].setValue(this.proxyUrl);
@@ -87,8 +85,8 @@ export class ProfilePageComponent implements OnInit {
     this.form.controls['proxyUsername'].setValue(this.proxyUsername);
     this.form.controls['proxyPassword'].setValue(this.proxyPassword);
 
-    const isProxyUrl = this.workspace.proxyConfiguration.proxyUrl && this.workspace.proxyConfiguration.proxyUrl !== 'undefined';
-    this.proxyUrl = isProxyUrl ? this.workspace.proxyConfiguration.proxyUrl : '';
+    const isProxyUrl = proxyConfiguration.proxyUrl && proxyConfiguration.proxyUrl !== 'undefined';
+    this.proxyUrl = isProxyUrl ? proxyConfiguration.proxyUrl : '';
 
     if (this.proxyUsername || this.proxyPassword) {
       this.showProxyAuthentication = true;
@@ -96,9 +94,9 @@ export class ProfilePageComponent implements OnInit {
 
     this.regions = this.appService.getRegions();
     this.locations = this.appService.getLocations();
-    this.selectedRegion   = this.workspace.defaultRegion || environment.defaultRegion;
-    this.selectedLocation = this.workspace.defaultLocation || environment.defaultLocation;
-    this.selectedBrowserOpening = this.workspace.awsSsoConfiguration.browserOpening || Constants.inApp.toString();
+    this.selectedRegion   = this.workspaceService.getDefaultRegion() || environment.defaultRegion;
+    this.selectedLocation = this.workspaceService.getDefaultLocation() || environment.defaultLocation;
+    this.selectedBrowserOpening = this.workspaceService.getAwsSsoConfiguration().browserOpening || Constants.inApp.toString();
 
     this.appService.validateAllFormFields(this.form);
   }
@@ -108,20 +106,16 @@ export class ProfilePageComponent implements OnInit {
    */
   saveOptions() {
     if (this.form.valid) {
-      this.workspace.proxyConfiguration.proxyUrl = this.form.controls['proxyUrl'].value;
-      this.workspace.proxyConfiguration.proxyProtocol = this.form.controls['proxyProtocol'].value;
-      this.workspace.proxyConfiguration.proxyPort = this.form.controls['proxyPort'].value;
-      this.workspace.proxyConfiguration.username = this.form.controls['proxyUsername'].value;
-      this.workspace.proxyConfiguration.password = this.form.controls['proxyPassword'].value;
-      this.workspaceService.updateProxyConfiguration(this.workspace.proxyConfiguration);
+      const proxyConfiguration = this.workspaceService.getProxyConfiguration();
+      proxyConfiguration.proxyUrl = this.form.controls['proxyUrl'].value;
+      proxyConfiguration.proxyProtocol = this.form.controls['proxyProtocol'].value;
+      proxyConfiguration.proxyPort = this.form.controls['proxyPort'].value;
+      proxyConfiguration.username = this.form.controls['proxyUsername'].value;
+      proxyConfiguration.password = this.form.controls['proxyPassword'].value;
+      this.workspaceService.updateProxyConfiguration(proxyConfiguration);
 
-      this.workspace.defaultRegion = this.selectedRegion;
-      this.workspaceService.updateDefaultRegion(this.workspace.defaultRegion);
-
-      this.workspace.defaultLocation = this.selectedLocation;
-      this.workspaceService.updateDefaultLocation(this.workspace.defaultLocation);
-
-      this.workspace.awsSsoConfiguration.browserOpening = this.selectedBrowserOpening;
+      this.workspaceService.updateDefaultRegion(this.selectedRegion);
+      this.workspaceService.updateDefaultLocation(this.selectedLocation);
       this.workspaceService.updateBrowserOpening(this.selectedBrowserOpening);
 
       if (this.checkIfNeedDialogBox()) {
@@ -172,11 +166,10 @@ export class ProfilePageComponent implements OnInit {
     this.editingIdpUrl = false;
     this.idpUrlValue = undefined;
     this.form.get('idpUrl').setValue('');
-    this.workspace = this.workspaceService.get();
   }
 
   editIdpUrl(id) {
-    const idpUrl = this.workspace.idpUrls.filter(u => u.id === id)[0];
+    const idpUrl = this.workspaceService.getIdpUrls().filter(u => u.id === id)[0];
     this.idpUrlValue = idpUrl;
     this.form.get('idpUrl').setValue(idpUrl.url);
     this.editingIdpUrl = true;
@@ -209,15 +202,13 @@ export class ProfilePageComponent implements OnInit {
         sessions.forEach(session => {
           this.sessionService.delete(session.sessionId);
         });
-
-        this.workspace = this.workspaceService.get();
       }
     });
   }
 
   async manageAwsProfile(id: string | number) {
 
-    const profileIndex = this.workspaceService.get().profiles.findIndex(p => p.id === id.toString());
+    const profileIndex = this.workspaceService.getProfiles().findIndex(p => p.id === id.toString());
     if (this.form.get('awsProfile').value !== '') {
       if (profileIndex === -1) {
         this.workspaceService.addProfile({ id: uuid.v4(), name: this.form.get('awsProfile').value });
@@ -240,11 +231,10 @@ export class ProfilePageComponent implements OnInit {
     this.editingAwsProfile = false;
     this.awsProfileValue = undefined;
     this.form.get('awsProfile').setValue('');
-    this.workspace = this.workspaceService.get();
   }
 
   editAwsProfile(id: string) {
-    const profile = this.workspace.profiles.filter(u => u.id === id)[0];
+    const profile = this.workspaceService.getProfiles().filter(u => u.id === id)[0];
     this.awsProfileValue = profile;
     this.form.get('awsProfile').setValue(profile.name);
     this.editingAwsProfile = true;
@@ -283,8 +273,6 @@ export class ProfilePageComponent implements OnInit {
             this.sessionService.start(sess.sessionId);
           }
         }
-
-        this.workspace = this.workspaceService.get();
       }
     });
   }
