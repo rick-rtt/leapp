@@ -197,6 +197,12 @@ export class WorkspaceService {
     return this.get().defaultLocation;
   }
 
+  setBrowserOpening(browserOpening: string) {
+    const workspace = this.get();
+    workspace.awsSsoConfiguration.browserOpening = browserOpening;
+    this.persist(workspace);
+  }
+
   setAwsSsoConfiguration(region: string, portalUrl: string, browserOpening: string, expirationTime: string) {
     const workspace = this.get();
     workspace.awsSsoConfiguration = { region, portalUrl, browserOpening, expirationTime };
@@ -234,6 +240,4 @@ export class WorkspaceService {
     workspace.sessions = sessions;
     this.persist(workspace);
   }
-
-
 }

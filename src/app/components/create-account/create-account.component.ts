@@ -90,13 +90,9 @@ export class CreateAccountComponent implements OnInit {
   ngOnInit() {
 
     this.activatedRoute.queryParams.subscribe(params => {
-
-      // Get the workspace and the accounts you need
-      const workspace = this.workspaceService.get();
-
       // We get all the applicable idp urls
-      if (workspace.idpUrls && workspace.idpUrls.length > 0) {
-        workspace.idpUrls.forEach(idp => {
+      if (this.workspaceService.getIdpUrls() && this.workspaceService.getIdpUrls().length > 0) {
+        this.workspaceService.getIdpUrls().forEach(idp => {
           if (idp !== null) {
             this.idpUrls.push({value: idp.id, label: idp.url});
           }
@@ -105,14 +101,14 @@ export class CreateAccountComponent implements OnInit {
 
       // We got all the applicable profiles
       // Note: we don't use azure profile so we remove default azure profile from the list
-      workspace.profiles.forEach(idp => {
+      this.workspaceService.getProfiles().forEach(idp => {
           if (idp !== null && idp.name !== environment.defaultAzureProfileName) {
             this.profiles.push({value: idp.id, label: idp.name});
           }
       });
 
       // This way we also fix potential incongruences when you have half saved setup
-      this.hasOneGoodSession = workspace.sessions.length > 0;
+      this.hasOneGoodSession = this.workspaceService.sessions.length > 0;
       this.firstTime = params['firstTime'] || !this.hasOneGoodSession;
 
       // Show the assumable accounts
@@ -131,9 +127,9 @@ export class CreateAccountComponent implements OnInit {
       this.locations = this.appService.getLocations();
 
       // Select default values
-      this.selectedRegion = workspace.defaultRegion || environment.defaultRegion || this.regions[0].region;
-      this.selectedLocation = workspace.defaultLocation || environment.defaultLocation || this.locations[0].location;
-      this.selectedProfile = workspace.profiles.filter(p => p.name === 'default').map(p => ({ value: p.id, label: p.name }))[0];
+      this.selectedRegion = this.workspaceService.getDefaultRegion() || environment.defaultRegion || this.regions[0].region;
+      this.selectedLocation = this.workspaceService.getDefaultLocation() || environment.defaultLocation || this.locations[0].location;
+      this.selectedProfile = this.workspaceService.getProfiles().filter(p => p.name === 'default').map(p => ({ value: p.id, label: p.name }))[0];
     });
   }
 

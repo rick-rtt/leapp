@@ -11,16 +11,16 @@ export class ProxyService {
   constructor(private appService: AppService, private workspaceService: WorkspaceService) {}
 
   configureBrowserWindow(browserWindow: any): void {
-    const workspace = this.workspaceService.get();
+    const proxyConfiguration = this.workspaceService.getProxyConfiguration();
 
     let proxyUrl;
     let proxyPort;
     let proxyProtocol;
 
-    if (workspace.proxyConfiguration) {
-      proxyUrl = workspace.proxyConfiguration.proxyUrl;
-      proxyPort = workspace.proxyConfiguration.proxyPort;
-      proxyProtocol = workspace.proxyConfiguration.proxyProtocol;
+    if (proxyConfiguration) {
+      proxyUrl = proxyConfiguration.proxyUrl;
+      proxyPort = proxyConfiguration.proxyPort;
+      proxyProtocol = proxyConfiguration.proxyProtocol;
     }
 
     if (proxyUrl !== undefined && proxyUrl !== null && proxyUrl !== '') {
@@ -33,7 +33,7 @@ export class ProxyService {
 
   getHttpClientOptions(url: string): any {
     const options = this.appService.getUrl().parse(url);
-    const workspace = this.workspaceService.get();
+    const proxyConfiguration = this.workspaceService.getProxyConfiguration();
 
     let proxyUrl;
     let proxyPort;
@@ -41,12 +41,12 @@ export class ProxyService {
     let proxyUsername;
     let proxyPassword;
 
-    if (workspace && workspace.proxyConfiguration) {
-      proxyUrl = workspace.proxyConfiguration.proxyUrl;
-      proxyProtocol = workspace.proxyConfiguration.proxyProtocol;
-      proxyPort = workspace.proxyConfiguration.proxyPort;
-      proxyUsername = workspace.proxyConfiguration.username;
-      proxyPassword = workspace.proxyConfiguration.password;
+    if (proxyConfiguration) {
+      proxyUrl = proxyConfiguration.proxyUrl;
+      proxyProtocol = proxyConfiguration.proxyProtocol;
+      proxyPort = proxyConfiguration.proxyPort;
+      proxyUsername = proxyConfiguration.username;
+      proxyPassword = proxyConfiguration.password;
     }
 
     if (proxyUrl !== undefined && proxyUrl !== null && proxyUrl !== '') {

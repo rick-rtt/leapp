@@ -63,24 +63,20 @@ export class AppComponent implements OnInit {
       await this.retrocompatibilityService.adaptOldWorkspaceFile();
     }
 
-    let workspace;
     try {
-      workspace = this.workspaceService.get();
-
-      if (!workspace.awsSsoConfiguration.browserOpening) {
-        workspace.awsSsoConfiguration.browserOpening = Constants.inApp.toString();
-        this.workspaceService.persist(workspace);
+      if (!this.workspaceService.getAwsSsoConfiguration().browserOpening) {
+        this.workspaceService.setBrowserOpening(Constants.inApp.toString());
       }
     } catch {
       throw new LeappParseError(this, 'We had trouble parsing your Leapp-lock.json file. It is either corrupt, obsolete, or with an error.');
     }
 
     // Check the existence of a pre-Leapp credential file and make a backup
-    this.showCredentialBackupMessageIfNeeded(workspace);
+    this.showCredentialBackupMessageIfNeeded();
 
     // All sessions start stopped when app is launched
-    if (workspace.sessions.length > 0) {
-      workspace.sessions.forEach(sess => {
+    if (this.workspaceService.sessions.length > 0) {
+      this.workspaceService.sessions.forEach(sess => {
         const concreteSessionService = this.sessionProviderService.getService(sess.type);
         concreteSessionService.stop(sess.sessionId);
       });
@@ -94,7 +90,7 @@ export class AppComponent implements OnInit {
 
     // Go to initial page if no sessions are already created or
     // go to the list page if is your second visit
-    if (workspace.sessions.length > 0) {
+    if (this.workspaceService.sessions.length > 0) {
       await this.router.navigate(['/sessions', 'session-selected']);
     } else {
       await this.router.navigate(['/start', 'start-page']);
@@ -123,10 +119,10 @@ export class AppComponent implements OnInit {
   /**
    * Show that we created a copy of original credential file if present in the system
    */
-  private showCredentialBackupMessageIfNeeded(workspace: Workspace) {
+  private showCredentialBackupMessageIfNeeded() {
     const oldAwsCredentialsPath = this.app.getOS().homedir() + '/' + environment.credentialsDestination;
     const newAwsCredentialsPath = oldAwsCredentialsPath + '.leapp.bkp';
-    const check = workspace.sessions.length === 0 &&
+    const check = this.workspaceService.sessions.length === 0 &&
                   this.app.getFs().existsSync(oldAwsCredentialsPath) &&
                   !this.app.getFs().existsSync(newAwsCredentialsPath);
 
