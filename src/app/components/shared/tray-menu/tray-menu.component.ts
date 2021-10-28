@@ -1,6 +1,5 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {WorkspaceService} from '../../../services/workspace.service';
-import {FileService} from '../../../services/file.service';
 import {AppService, LoggerLevel} from '../../../services/app.service';
 import {Session} from '../../../../../core/models/session';
 import {SessionType} from '../../../../../core/models/session-type';
@@ -28,7 +27,6 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
 
   constructor(
     private workspaceService: WorkspaceService,
-    private fileService: FileService,
     private sessionService: SessionService,
     private updaterService: UpdaterService,
     private loggingService: LoggingService,

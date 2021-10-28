@@ -1,11 +1,10 @@
 import {Component, OnInit} from '@angular/core';
 import {environment} from '../environments/environment';
-import {FileService} from './services/file.service';
 import {AppService, LoggerLevel} from './services/app.service';
 import {Router} from '@angular/router';
 import {WorkspaceService} from './services/workspace.service';
 import {setTheme} from 'ngx-bootstrap/utils';
-import {TimerService} from './services/timer.service';
+import {TimerService} from '../../core/services/timer.service';
 import {RotationService} from './services/rotation.service';
 import {SessionFactoryService} from './services/session-factory.service';
 import {UpdaterService} from './services/updater.service';
@@ -15,6 +14,7 @@ import {LoggingService} from './services/logging.service';
 import {LeappParseError} from './errors/leapp-parse-error';
 import {Constants} from '../../core/models/constants';
 import Repository from '../../core/services/repository';
+import {FileService} from '../../core/services/file-service';
 
 @Component({
   selector: 'app-root',
@@ -28,11 +28,9 @@ export class AppComponent implements OnInit {
     private app: AppService,
     private workspaceService: WorkspaceService,
     private retrocompatibilityService: RetrocompatibilityService,
-    private fileService: FileService,
     private rotationService: RotationService,
     private sessionProviderService: SessionFactoryService,
     private router: Router,
-    private timerService: TimerService,
     private updaterService: UpdaterService,
     private loggingService: LoggingService
   ) {}
@@ -84,7 +82,7 @@ export class AppComponent implements OnInit {
     }
 
     // Start Global Timer (1s)
-    this.timerService.start(this.rotationService.rotate.bind(this.rotationService));
+    TimerService.getInstance().start(this.rotationService.rotate.bind(this.rotationService));
 
     // Launch Auto Updater Routines
     this.manageAutoUpdate();
@@ -137,8 +135,8 @@ export class AppComponent implements OnInit {
         icon: __dirname + '/assets/images/Leapp.png',
         message: 'You had a previous credential file. We made a backup of the old one in the same directory before starting.'
       });
-    } else if(!this.fileService.exists(this.app.awsCredentialPath())) {
-      this.fileService.writeFileSync(this.app.awsCredentialPath(), '');
+    } else if(!FileService.getInstance().exists(this.app.awsCredentialPath())) {
+      FileService.getInstance().writeFileSync(this.app.awsCredentialPath(), '');
     }
   }
 

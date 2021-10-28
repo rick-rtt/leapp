@@ -2,9 +2,7 @@ import {Injectable} from '@angular/core';
 import {AwsSessionService} from '../aws-session.service';
 import {WorkspaceService} from '../../../workspace.service';
 import {CredentialsInfo} from '../../../../../../core/models/credentials-info';
-
 import {AwsSsoRoleSession} from '../../../../../../core/models/aws-sso-role-session';
-import {FileService} from '../../../file.service';
 import {AppService} from '../../../app.service';
 
 import SSO, {
@@ -22,6 +20,7 @@ import {KeychainService} from '../../../keychain.service';
 import {SessionType} from '../../../../../../core/models/session-type';
 import {AwsSsoOidcService, BrowserWindowClosing} from '../../../aws-sso-oidc.service';
 import Repository from '../../../../../../core/services/repository';
+import {FileService} from '../../../../../../core/services/file-service';
 
 export interface AwsSsoRoleSessionRequest {
   sessionName: string;
@@ -81,7 +80,6 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
 
   constructor(
     protected workspaceService: WorkspaceService,
-    private fileService: FileService,
     private appService: AppService,
     private keychainService: KeychainService,
     private awsSsoOidcService: AwsSsoOidcService
@@ -140,15 +138,15 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
       aws_session_token: credentialsInfo.sessionToken.aws_session_token,
       region: session.region
     };
-    return await this.fileService.iniWriteSync(this.appService.awsCredentialPath(), credentialObject);
+    return await FileService.getInstance().iniWriteSync(this.appService.awsCredentialPath(), credentialObject);
   }
 
   async deApplyCredentials(sessionId: string): Promise<void> {
     const session = this.get(sessionId);
     const profileName = Repository.getInstance().getProfileName((session as AwsSsoRoleSession).profileId);
-    const credentialsFile = await this.fileService.iniParseSync(this.appService.awsCredentialPath());
+    const credentialsFile = await FileService.getInstance().iniParseSync(this.appService.awsCredentialPath());
     delete credentialsFile[profileName];
-    await this.fileService.replaceWriteSync(this.appService.awsCredentialPath(), credentialsFile);
+    await FileService.getInstance().replaceWriteSync(this.appService.awsCredentialPath(), credentialsFile);
   }
 
   async generateCredentials(sessionId: string): Promise<CredentialsInfo> {

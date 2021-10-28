@@ -1,8 +1,6 @@
 import {Component, OnInit, ViewEncapsulation} from '@angular/core';
-import {Workspace} from '../../../../../core/models/workspace';
 import {FormControl, FormGroup} from '@angular/forms';
 import {AppService, LoggerLevel, ToastLevel} from '../../../services/app.service';
-import {FileService} from '../../../services/file.service';
 import {Router} from '@angular/router';
 import {Constants} from '../../../../../core/models/constants';
 import {environment} from '../../../../environments/environment';
@@ -66,7 +64,6 @@ export class ProfilePageComponent implements OnInit {
     public workspaceService: WorkspaceService,
     private appService: AppService,
     private loggingService: LoggingService,
-    private fileService: FileService,
     private sessionProviderService: SessionFactoryService,
     private awsSessionService: AwsSessionService,
     private router: Router

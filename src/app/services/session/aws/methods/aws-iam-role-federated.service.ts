@@ -4,7 +4,6 @@ import {CredentialsInfo} from '../../../../../../core/models/credentials-info';
 import {WorkspaceService} from '../../../workspace.service';
 import {KeychainService} from '../../../keychain.service';
 import {AppService} from '../../../app.service';
-import {FileService} from '../../../file.service';
 import {AwsIamRoleFederatedSession} from '../../../../../../core/models/aws-iam-role-federated-session';
 import {LeappSamlError} from '../../../../errors/leapp-saml-error';
 import {LeappParseError} from '../../../../errors/leapp-parse-error';
@@ -12,6 +11,7 @@ import {environment} from '../../../../../environments/environment';
 import * as AWS from 'aws-sdk';
 import {LeappAwsStsError} from '../../../../errors/leapp-aws-sts-error';
 import Repository from '../../../../../../core/services/repository';
+import {FileService} from '../../../../../../core/services/file-service';
 
 export interface AwsIamRoleFederatedSessionRequest {
   accountName: string;
@@ -33,8 +33,7 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
   constructor(
     protected workspaceService: WorkspaceService,
     private keychainService: KeychainService,
-    private appService: AppService,
-    private fileService: FileService
+    private appService: AppService
   ) {
     super(workspaceService);
   }
@@ -84,15 +83,15 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
       aws_session_token: credentialsInfo.sessionToken.aws_session_token,
       region: session.region
     };
-    return await this.fileService.iniWriteSync(this.appService.awsCredentialPath(), credentialObject);
+    return await FileService.getInstance().iniWriteSync(this.appService.awsCredentialPath(), credentialObject);
   }
 
   async deApplyCredentials(sessionId: string): Promise<void> {
     const session = this.get(sessionId);
     const profileName = Repository.getInstance().getProfileName((session as AwsIamRoleFederatedSession).profileId);
-    const credentialsFile = await this.fileService.iniParseSync(this.appService.awsCredentialPath());
+    const credentialsFile = await FileService.getInstance().iniParseSync(this.appService.awsCredentialPath());
     delete credentialsFile[profileName];
-    return await this.fileService.replaceWriteSync(this.appService.awsCredentialPath(), credentialsFile);
+    return await FileService.getInstance().replaceWriteSync(this.appService.awsCredentialPath(), credentialsFile);
   }
 
   async generateCredentials(sessionId: string): Promise<CredentialsInfo> {

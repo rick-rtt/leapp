@@ -2,7 +2,6 @@ import {Injectable} from '@angular/core';
 import {AwsSessionService} from '../aws-session.service';
 import {CredentialsInfo} from '../../../../../../core/models/credentials-info';
 import {WorkspaceService} from '../../../workspace.service';
-import {FileService} from '../../../file.service';
 import {AppService} from '../../../app.service';
 import {LeappNotFoundError} from '../../../../errors/leapp-not-found-error';
 import {Session} from '../../../../../../core/models/session';
@@ -18,6 +17,7 @@ import {ElectronService} from '../../../electron.service';
 import {AwsSsoOidcService} from '../../../aws-sso-oidc.service';
 import { AssumeRoleResponse } from 'aws-sdk/clients/sts';
 import Repository from '../../../../../../core/services/repository';
+import {FileService} from '../../../../../../core/services/file-service';
 
 export interface AwsIamRoleChainedSessionRequest {
   accountName: string;
@@ -35,7 +35,6 @@ export class AwsIamRoleChainedService extends AwsSessionService {
   constructor(
     protected workspaceService: WorkspaceService,
     private appService: AppService,
-    private fileService: FileService,
     private keychainService: KeychainService,
     private electronService: ElectronService,
     private awsSsoOidcService: AwsSsoOidcService
@@ -74,15 +73,15 @@ export class AwsIamRoleChainedService extends AwsSessionService {
       aws_session_token: credentialsInfo.sessionToken.aws_session_token,
       region: session.region
     };
-    return await this.fileService.iniWriteSync(this.appService.awsCredentialPath(), credentialObject);
+    return await FileService.getInstance().iniWriteSync(this.appService.awsCredentialPath(), credentialObject);
   }
 
   async deApplyCredentials(sessionId: string): Promise<void> {
     const session = this.get(sessionId);
     const profileName = Repository.getInstance().getProfileName((session as AwsIamRoleChainedSession).profileId);
-    const credentialsFile = await this.fileService.iniParseSync(this.appService.awsCredentialPath());
+    const credentialsFile = await FileService.getInstance().iniParseSync(this.appService.awsCredentialPath());
     delete credentialsFile[profileName];
-    return await this.fileService.replaceWriteSync(this.appService.awsCredentialPath(), credentialsFile);
+    return await FileService.getInstance().replaceWriteSync(this.appService.awsCredentialPath(), credentialsFile);
   }
 
   async generateCredentials(sessionId: string): Promise<CredentialsInfo> {
@@ -100,11 +99,11 @@ export class AwsIamRoleChainedService extends AwsSessionService {
     // Generate a credential set from Parent Session
     let parentSessionService;
     if(parentSession.type === SessionType.awsIamRoleFederated) {
-      parentSessionService = new AwsIamRoleFederatedService(this.workspaceService, this.keychainService, this.appService, this.fileService) as AwsSessionService;
+      parentSessionService = new AwsIamRoleFederatedService(this.workspaceService, this.keychainService, this.appService) as AwsSessionService;
     } else if(parentSession.type === SessionType.awsIamUser) {
-      parentSessionService = new AwsIamUserService(this.workspaceService, this.keychainService, this.appService, this.fileService) as AwsSessionService;
+      parentSessionService = new AwsIamUserService(this.workspaceService, this.keychainService, this.appService) as AwsSessionService;
     } else if(parentSession.type === SessionType.awsSsoRole) {
-      parentSessionService = new AwsSsoRoleService(this.workspaceService, this.fileService, this.appService, this.keychainService, this.awsSsoOidcService) as AwsSessionService;
+      parentSessionService = new AwsSsoRoleService(this.workspaceService, this.appService, this.keychainService, this.awsSsoOidcService) as AwsSessionService;
     }
 
     const parentCredentialsInfo = await parentSessionService.generateCredentials(parentSession.sessionId);

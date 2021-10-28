@@ -6,13 +6,13 @@ import {serialize} from 'class-transformer';
 import {Workspace} from '../../../core/models/workspace';
 import {AppService} from './app.service';
 import SpyObj = jasmine.SpyObj;
-import {FileService} from './file.service';
-import {WorkspaceService} from './workspace.service';
 import {KeychainService} from './keychain.service';
+import {FileService} from '../../../core/services/file-service';
+import Repository from '../../../core/services/repository';
 
 describe('RetrocompatibilityService', () => {
   let service: RetrocompatibilityService;
-  let workspaceService: WorkspaceService;
+  let workspaceService: Repository;
 
   let spyAppService: SpyObj<AppService>;
   let spyFileService;
@@ -183,7 +183,7 @@ describe('RetrocompatibilityService', () => {
     });
 
     service = TestBed.inject(RetrocompatibilityService);
-    workspaceService = TestBed.inject(WorkspaceService);
+    workspaceService = TestBed.inject(Repository);
   });
 
   it('should be created', () => {
@@ -212,14 +212,14 @@ describe('RetrocompatibilityService', () => {
     });
 
     it('should return a default workspace if false', () => {
-      workspaceService = TestBed.inject(WorkspaceService);
+      workspaceService = TestBed.inject(Repository);
 
       const retroService = TestBed.inject(RetrocompatibilityService);
       spyFileService.decryptText.and.callFake((text: string) => JSON.stringify({}));
       expect(retroService.isRetroPatchNecessary()).toEqual(false);
 
       const workspace = new Workspace();
-      workspace.profiles = workspaceService.get().profiles;
+      workspace.profiles = workspaceService.getProfiles();
 
       expect(JSON.stringify(workspace)).toEqual(JSON.stringify(workspaceService.get()));
     });

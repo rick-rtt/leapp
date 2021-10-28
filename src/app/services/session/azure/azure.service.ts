@@ -1,13 +1,13 @@
 import {Injectable} from '@angular/core';
 import {WorkspaceService} from '../../workspace.service';
 import {AzureSession} from '../../../../../core/models/azure-session';
-import {FileService} from '../../file.service';
 import {environment} from '../../../../environments/environment';
 import {AppService} from '../../app.service';
 import {ExecuteService} from '../../execute.service';
 import {SessionService} from '../../session.service';
 import {LeappExecuteError} from '../../../errors/leapp-execute-error';
 import {LeappParseError} from '../../../errors/leapp-parse-error';
+import {FileService} from '../../../../../core/services/file-service';
 
 export interface AzureSessionRequest {
   sessionName: string;
@@ -37,7 +37,6 @@ export class AzureService extends SessionService {
 
   constructor(
     protected workspaceService: WorkspaceService,
-    private fileService: FileService,
     private appService: AppService,
     private executeService: ExecuteService
   ) {
@@ -131,13 +130,13 @@ export class AzureService extends SessionService {
   }
 
   private deleteRefreshToken(): void {
-    const accessTokensString = this.fileService.readFileSync(`${this.appService.getOS().homedir()}/${environment.azureAccessTokens}`);
+    const accessTokensString = FileService.getInstance().readFileSync(`${this.appService.getOS().homedir()}/${environment.azureAccessTokens}`);
     let azureSessionTokens = JSON.parse(accessTokensString) as AzureSessionToken[];
     azureSessionTokens = azureSessionTokens.map(azureSessionToken => {
       delete azureSessionToken.refreshToken;
       return azureSessionToken;
     });
-    this.fileService.writeFileSync(`${this.appService.getOS().homedir()}/${environment.azureAccessTokens}`, JSON.stringify(azureSessionTokens));
+    FileService.getInstance().writeFileSync(`${this.appService.getOS().homedir()}/${environment.azureAccessTokens}`, JSON.stringify(azureSessionTokens));
   }
 
   private parseAccessTokens(): AzureSessionToken[] {
@@ -145,11 +144,11 @@ export class AzureService extends SessionService {
       return undefined;
     }
 
-    const accessTokensString = this.fileService.readFileSync(`${this.appService.getOS().homedir()}/${environment.azureAccessTokens}`);
+    const accessTokensString = FileService.getInstance().readFileSync(`${this.appService.getOS().homedir()}/${environment.azureAccessTokens}`);
     return JSON.parse(accessTokensString) as AzureSessionToken[];
   }
 
   private accessTokenFileExists(): boolean {
-    return this.fileService.exists(`${this.appService.getOS().homedir()}/${environment.azureAccessTokens}`);
+    return FileService.getInstance().exists(`${this.appService.getOS().homedir()}/${environment.azureAccessTokens}`);
   }
 }

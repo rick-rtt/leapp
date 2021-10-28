@@ -1,5 +1,4 @@
 import {EventEmitter, Injectable} from '@angular/core';
-import {FileService} from './file.service';
 import {ConfirmationDialogComponent} from '../components/shared/confirmation-dialog/confirmation-dialog.component';
 import {FormControl, FormGroup} from '@angular/forms';
 import {environment} from '../../environments/environment';
@@ -67,7 +66,6 @@ export class AppService {
   private newWin: any;
 
   constructor(
-    private fileService: FileService,
     private modalService: BsModalService,
     private electronService: ElectronService,
     private loggingService: LoggingService

@@ -1,7 +1,6 @@
 import {Injectable} from '@angular/core';
 import {AppService} from './app.service';
 import {environment} from '../../environments/environment';
-import {FileService} from './file.service';
 import {Workspace} from '../../../core/models/workspace';
 import {serialize} from 'class-transformer';
 import {KeychainService} from './keychain.service';
@@ -12,6 +11,7 @@ import {AwsSsoRoleSession} from '../../../core/models/aws-sso-role-session';
 import {AzureSession} from '../../../core/models/azure-session';
 import {WorkspaceService} from './workspace.service';
 import {Constants} from '../../../core/models/constants';
+import {FileService} from '../../../core/services/file-service';
 
 @Injectable({
   providedIn: 'root'
@@ -20,7 +20,6 @@ export class RetrocompatibilityService {
 
   constructor(
     private appService: AppService,
-    private fileService: FileService,
     private keychainService: KeychainService,
     private workspaceService: WorkspaceService
   ) { }
@@ -92,7 +91,7 @@ export class RetrocompatibilityService {
   }
 
   isRetroPatchNecessary(): boolean {
-    if (this.fileService.exists(this.appService.getOS().homedir() + '/' + environment.lockFileDestination)) {
+    if (FileService.getInstance().exists(this.appService.getOS().homedir() + '/' + environment.lockFileDestination)) {
       const workspaceParsed = this.parseWorkspaceFile();
       // use a never more used property to check if workspace has changed to new version
       return workspaceParsed.defaultWorkspace === 'default';
@@ -129,17 +128,17 @@ export class RetrocompatibilityService {
   }
 
   private parseWorkspaceFile(): any {
-    const workspaceJSON = this.fileService.decryptText(
-      this.fileService.readFileSync(this.appService.getOS().homedir() + '/' + environment.lockFileDestination)
+    const workspaceJSON = FileService.getInstance().decryptText(
+      FileService.getInstance().readFileSync(this.appService.getOS().homedir() + '/' + environment.lockFileDestination)
     );
     return JSON.parse(workspaceJSON);
   }
 
   private persists(workspace: Workspace): void {
     // this.appService.getFs().unlinkSync(this.appService.getOS().homedir() + '/' + environment.lockFileDestination);
-    this.fileService.writeFileSync(
+    FileService.getInstance().writeFileSync(
       this.appService.getOS().homedir() + '/' + environment.lockFileDestination,
-      this.fileService.encryptText(serialize(workspace))
+      FileService.getInstance().encryptText(serialize(workspace))
     );
   }
 

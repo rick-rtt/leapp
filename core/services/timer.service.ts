@@ -1,13 +1,17 @@
-import {Injectable} from '@angular/core';
-
-@Injectable({
-  providedIn: 'root'
-})
 export class TimerService {
+
+  private static instance: TimerService;
   private _timer: NodeJS.Timeout;
   private timeInterval = 10000;
 
-  constructor() { }
+  private constructor() { }
+
+  static getInstance(): TimerService {
+    if(!this.instance) {
+      this.instance = new TimerService();
+    }
+    return this.instance;
+  }
 
   set timer(value: NodeJS.Timeout) {
     this._timer = value;

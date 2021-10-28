@@ -7,7 +7,7 @@ import {Workspace} from '../../../core/models/workspace';
 import {AppService} from './app.service';
 import SpyObj = jasmine.SpyObj;
 import {WorkspaceService} from './workspace.service';
-import {FileService} from './file.service';
+import {FileService} from '../../../core/services/file-service';
 
 describe('SessionService', () => {
   let service: SessionService;

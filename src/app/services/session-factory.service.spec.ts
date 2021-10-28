@@ -8,8 +8,8 @@ import {AwsIamUserService} from './session/aws/methods/aws-iam-user.service';
 import {WorkspaceService} from './workspace.service';
 import {KeychainService} from './keychain.service';
 import {AppService} from './app.service';
-import {FileService} from './file.service';
 import {Workspace} from '../../../core/models/workspace';
+import {FileService} from '../../../core/services/file-service';
 
 describe('SessionProviderService', () => {
   let sessionFactoryService: SessionFactoryService;

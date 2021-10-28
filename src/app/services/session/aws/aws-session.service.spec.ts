@@ -7,7 +7,6 @@ import {mustInjected} from '../../../../base-injectables';
 import {serialize} from 'class-transformer';
 import {Workspace} from '../../../../../core/models/workspace';
 import {AppService} from '../../app.service';
-import {FileService} from '../../file.service';
 import {Session} from '../../../../../core/models/session';
 import {WorkspaceService} from '../../workspace.service';
 import {SessionType} from '../../../../../core/models/session-type';
@@ -15,6 +14,7 @@ import {AwsIamUserService} from './methods/aws-iam-user.service';
 import {LeappNotFoundError} from '../../../errors/leapp-not-found-error';
 import {SessionStatus} from '../../../../../core/models/session-status';
 import {AwsIamUserSession} from '../../../../../core/models/aws-iam-user-session';
+import {FileService} from '../../../../../core/services/file-service';
 
 let spyAppService;
 let spyFileService;

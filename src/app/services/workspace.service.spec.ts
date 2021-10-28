@@ -6,10 +6,12 @@ import {Session} from '../../../core/models/session';
 import {AwsIamUserSession} from '../../../core/models/aws-iam-user-session';
 import {serialize} from 'class-transformer';
 import {AppService} from './app.service';
-import {FileService} from './file.service';
 import SpyObj = jasmine.SpyObj;
+import {FileService} from '../../../core/services/file-service';
+import Repository from '../../../core/services/repository';
 
 describe('WorkspaceService', () => {
+  let repository: Repository;
   let workspaceService: WorkspaceService;
   let workspace;
   let mockedSession;
@@ -31,14 +33,16 @@ describe('WorkspaceService', () => {
 
     TestBed.configureTestingModule({
       providers: [
+        Repository,
         WorkspaceService,
         { provide: AppService, useValue: spyAppService },
         { provide: FileService, useValue: spyFileService }
       ].concat(mustInjected())
     });
 
+    repository = TestBed.inject(Repository) as Repository;
+    repository.create();
     workspaceService = TestBed.inject(WorkspaceService) as WorkspaceService;
-    workspaceService.create();
 
     mockedSession = new AwsIamUserSession('a', 'eu-west-1', 'profile', '');
   });
@@ -54,27 +58,27 @@ describe('WorkspaceService', () => {
       spyFileService.exists.and.returnValue(false);
       spyFileService.newDir.and.returnValue(false);
       // Call create
-      workspaceService.create();
+      repository.create();
       expect((workspaceService as any).persist).toHaveBeenCalled();
     });
 
     it('should not create a second instance of Workspace after first one', () => {
       spyFileService.readFileSync.and.callFake((_: string) => serialize(new Workspace()));
-      workspaceService.create();
-      const workspace1 = workspaceService.get();
+      repository.create();
+      const workspace1 = repository.get();
       workspace1.sessions.push(mockedSession);
       spyFileService.readFileSync.and.callFake((_: string) => serialize(workspace1) );
       (workspaceService as any).updatePersistedSessions(workspace1.sessions);
 
-      workspaceService.create();
-      const workspace2 = workspaceService.get();
+      repository.create();
+      const workspace2 = repository.get();
       expect(serialize(workspace1)).toEqual(serialize(workspace2));
     });
   });
 
   describe('get()', () => {
     it('should return a workspace object', () => {
-      workspace = workspaceService.get();
+      workspace = repository.get();
 
       expect(workspace).toBeDefined();
       expect(workspace).toBeInstanceOf(Workspace);
@@ -86,7 +90,7 @@ describe('WorkspaceService', () => {
       workspace = new Workspace();
 
       spyFileService.readFileSync.and.callFake((_: string) => serialize(workspace));
-      workspaceService.get();
+      repository.get();
 
       workspace.sessions.push(mockedSession);
 
@@ -133,11 +137,11 @@ describe('WorkspaceService', () => {
     it('should return a profile name when an id matches', () => {
       workspace = new Workspace();
       spyFileService.readFileSync.and.callFake((_: string) => serialize(workspace));
-      expect(workspaceService.getProfileName(workspaceService.get().profiles[0].id)).toEqual('default');
+      expect(repository.getProfileName(repository.get().profiles[0].id)).toEqual('default');
     });
 
     it('should return null  when an id NOT matches', () => {
-      expect(workspaceService.getProfileName('fakeid')).toEqual(null);
+      expect(repository.getProfileName('fakeid')).toEqual(null);
     });
   });
 

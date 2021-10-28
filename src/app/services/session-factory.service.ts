@@ -2,7 +2,6 @@ import {Injectable} from '@angular/core';
 import {WorkspaceService} from './workspace.service';
 import {KeychainService} from './keychain.service';
 import {AppService} from './app.service';
-import {FileService} from './file.service';
 import {SessionType} from '../../../core/models/session-type';
 import {AwsIamUserService} from './session/aws/methods/aws-iam-user.service';
 import {AwsIamRoleChainedService} from './session/aws/methods/aws-iam-role-chained.service';
@@ -27,7 +26,6 @@ export class SessionFactoryService {
     private appService: AppService,
     private executeService: ExecuteService,
     private electronService: ElectronService,
-    private fileService: FileService,
     private awsSsoOidcService: AwsSsoOidcService) {
 
     this.sessionServiceCache = [];
@@ -52,31 +50,31 @@ export class SessionFactoryService {
   }
 
   private getAwsIamRoleFederatedSessionService(accountType: SessionType) {
-    const service = new AwsIamRoleFederatedService(this.workspaceService, this.keychainService, this.appService, this.fileService);
+    const service = new AwsIamRoleFederatedService(this.workspaceService, this.keychainService, this.appService);
     this.sessionServiceCache[accountType.toString()] = service;
     return service;
   }
 
   private getAwsIamUserSessionService(accountType: SessionType): AwsIamUserService {
-    const service = new AwsIamUserService(this.workspaceService, this.keychainService, this.appService, this.fileService);
+    const service = new AwsIamUserService(this.workspaceService, this.keychainService, this.appService);
     this.sessionServiceCache[accountType.toString()] = service;
     return service;
   }
 
   private getAwsIamRoleChainedSessionService(accountType: SessionType) {
-    const service = new AwsIamRoleChainedService(this.workspaceService, this.appService, this.fileService, this.keychainService, this.electronService, this.awsSsoOidcService);
+    const service = new AwsIamRoleChainedService(this.workspaceService, this.appService, this.keychainService, this.electronService, this.awsSsoOidcService);
     this.sessionServiceCache[accountType.toString()] = service;
     return service;
   }
 
   private getAwsSsoRoleSessionService(accountType: SessionType) {
-    const service = new AwsSsoRoleService(this.workspaceService, this.fileService, this.appService, this.keychainService, this.awsSsoOidcService);
+    const service = new AwsSsoRoleService(this.workspaceService, this.appService, this.keychainService, this.awsSsoOidcService);
     this.sessionServiceCache[accountType.toString()] = service;
     return service;
   }
 
   private getAzureSessionService(accountType: SessionType) {
-    const service = new AzureService(this.workspaceService, this.fileService, this.appService, this.executeService);
+    const service = new AzureService(this.workspaceService, this.appService, this.executeService);
     this.sessionServiceCache[accountType.toString()] = service;
     return service;
   }

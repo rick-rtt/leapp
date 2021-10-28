@@ -11,7 +11,7 @@ import {environment} from '../../../../environments/environment';
 import {KeychainService} from '../../../services/keychain.service';
 import * as uuid from 'uuid';
 import {BsModalRef, BsModalService} from 'ngx-bootstrap/modal';
-import {FileService} from '../../../services/file.service';
+
 import {SessionFactoryService} from '../../../services/session-factory.service';
 import {SessionStatus} from '../../../../../core/models/session-status';
 import {SessionService} from '../../../services/session.service';
@@ -65,7 +65,6 @@ export class SessionCardComponent implements OnInit {
     private workspaceService: WorkspaceService,
     private keychainService: KeychainService,
     private appService: AppService,
-    private fileService: FileService,
     private router: Router,
     private ssmService: SsmService,
     private sessionProviderService: SessionFactoryService,
