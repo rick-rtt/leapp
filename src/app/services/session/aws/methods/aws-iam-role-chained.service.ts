@@ -17,6 +17,7 @@ import {AwsSsoRoleService} from './aws-sso-role.service';
 import {ElectronService} from '../../../electron.service';
 import {AwsSsoOidcService} from '../../../aws-sso-oidc.service';
 import { AssumeRoleResponse } from 'aws-sdk/clients/sts';
+import Repository from '../../../../../../core/services/repository';
 
 export interface AwsIamRoleChainedSessionRequest {
   accountName: string;
@@ -62,7 +63,7 @@ export class AwsIamRoleChainedService extends AwsSessionService {
 
   async applyCredentials(sessionId: string, credentialsInfo: CredentialsInfo): Promise<void> {
     const session = this.get(sessionId);
-    const profileName = this.workspaceService.getProfileName((session as AwsIamRoleChainedSession).profileId);
+    const profileName = Repository.getInstance().getProfileName((session as AwsIamRoleChainedSession).profileId);
     const credentialObject = {};
     credentialObject[profileName] = {
       // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -78,7 +79,7 @@ export class AwsIamRoleChainedService extends AwsSessionService {
 
   async deApplyCredentials(sessionId: string): Promise<void> {
     const session = this.get(sessionId);
-    const profileName = this.workspaceService.getProfileName((session as AwsIamRoleChainedSession).profileId);
+    const profileName = Repository.getInstance().getProfileName((session as AwsIamRoleChainedSession).profileId);
     const credentialsFile = await this.fileService.iniParseSync(this.appService.awsCredentialPath());
     delete credentialsFile[profileName];
     return await this.fileService.replaceWriteSync(this.appService.awsCredentialPath(), credentialsFile);

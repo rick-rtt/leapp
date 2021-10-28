@@ -13,6 +13,7 @@ import {LeappParseError} from '../../errors/leapp-parse-error';
 import {AwsIamRoleFederatedSessionRequest, AwsIamRoleFederatedService} from '../../services/session/aws/methods/aws-iam-role-federated.service';
 import {AzureService, AzureSessionRequest} from '../../services/session/azure/azure.service';
 import {LoggingService} from '../../services/logging.service';
+import Repository from '../../../../core/services/repository';
 
 @Component({
   selector: 'app-create-account',
@@ -91,8 +92,8 @@ export class CreateAccountComponent implements OnInit {
 
     this.activatedRoute.queryParams.subscribe(params => {
       // We get all the applicable idp urls
-      if (this.workspaceService.getIdpUrls() && this.workspaceService.getIdpUrls().length > 0) {
-        this.workspaceService.getIdpUrls().forEach(idp => {
+      if (Repository.getInstance().getIdpUrls() && Repository.getInstance().getIdpUrls().length > 0) {
+        Repository.getInstance().getIdpUrls().forEach(idp => {
           if (idp !== null) {
             this.idpUrls.push({value: idp.id, label: idp.url});
           }
@@ -101,7 +102,7 @@ export class CreateAccountComponent implements OnInit {
 
       // We got all the applicable profiles
       // Note: we don't use azure profile so we remove default azure profile from the list
-      this.workspaceService.getProfiles().forEach(idp => {
+      Repository.getInstance().getProfiles().forEach(idp => {
           if (idp !== null && idp.name !== environment.defaultAzureProfileName) {
             this.profiles.push({value: idp.id, label: idp.name});
           }
@@ -127,9 +128,9 @@ export class CreateAccountComponent implements OnInit {
       this.locations = this.appService.getLocations();
 
       // Select default values
-      this.selectedRegion = this.workspaceService.getDefaultRegion() || environment.defaultRegion || this.regions[0].region;
-      this.selectedLocation = this.workspaceService.getDefaultLocation() || environment.defaultLocation || this.locations[0].location;
-      this.selectedProfile = this.workspaceService.getProfiles().filter(p => p.name === 'default').map(p => ({ value: p.id, label: p.name }))[0];
+      this.selectedRegion = Repository.getInstance().getDefaultRegion() || environment.defaultRegion || this.regions[0].region;
+      this.selectedLocation = Repository.getInstance().getDefaultLocation() || environment.defaultLocation || this.locations[0].location;
+      this.selectedProfile = Repository.getInstance().getProfiles().filter(p => p.name === 'default').map(p => ({ value: p.id, label: p.name }))[0];
     });
   }
 
@@ -280,8 +281,8 @@ export class CreateAccountComponent implements OnInit {
     if(this.sessionType === SessionType.awsIamRoleFederated) {
       try {
         const ipdUrl = { id: this.selectedIdpUrl.value, url: this.selectedIdpUrl.label };
-        if(!this.workspaceService.getIdpUrl(ipdUrl.id)) {
-          this.workspaceService.addIdpUrl(ipdUrl);
+        if(!Repository.getInstance().getIdpUrl(ipdUrl.id)) {
+          Repository.getInstance().addIdpUrl(ipdUrl);
         }
       } catch(err) {
         throw new LeappParseError(this, err.message);
@@ -297,8 +298,8 @@ export class CreateAccountComponent implements OnInit {
   private addProfileToWorkspace() {
     try {
       const profile = { id: this.selectedProfile.value, name: this.selectedProfile.label };
-      if(!this.workspaceService.getProfileName(profile.id)) {
-        this.workspaceService.addProfile(profile);
+      if(!Repository.getInstance().getProfileName(profile.id)) {
+        Repository.getInstance().addProfile(profile);
       }
     } catch(err) {
       throw new LeappParseError(this, err.message);

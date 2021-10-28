@@ -13,6 +13,7 @@ import {SessionService} from '../../../services/session.service';
 import {SessionFactoryService} from '../../../services/session-factory.service';
 import {Constants} from '../../../../../core/models/constants';
 import {LoggingService} from '../../../services/logging.service';
+import Repository from '../../../../../core/services/repository';
 
 @Component({
   selector: 'app-tray-menu',
@@ -25,14 +26,15 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
   currentTray;
   subscribed;
 
-  constructor(private workspaceService: WorkspaceService,
-              private fileService: FileService,
-              private sessionService: SessionService,
-              private updaterService: UpdaterService,
-              private loggingService: LoggingService,
-              private sessionProviderService: SessionFactoryService,
-              private appService: AppService) {
-  }
+  constructor(
+    private workspaceService: WorkspaceService,
+    private fileService: FileService,
+    private sessionService: SessionService,
+    private updaterService: UpdaterService,
+    private loggingService: LoggingService,
+    private sessionProviderService: SessionFactoryService,
+    private appService: AppService
+  ) {}
 
   ngOnInit() {
     this.subscribed = this.workspaceService.sessions$.subscribe(() => {
@@ -58,7 +60,7 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
     allSessions.forEach((session: Session) => {
       let icon = '';
       let label = '';
-      const profile = this.workspaceService.getProfiles().filter(p => p.id === this.getProfileId(session))[0];
+      const profile = Repository.getInstance().getProfiles().filter(p => p.id === this.getProfileId(session))[0];
       const iconValue = (profile && profile.name === 'default') ? 'home' : 'user';
 
       switch (session.type) {

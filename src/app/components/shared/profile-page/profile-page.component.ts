@@ -14,6 +14,7 @@ import {SessionFactoryService} from '../../../services/session-factory.service';
 import {SessionType} from '../../../../../core/models/session-type';
 import {AwsSessionService} from '../../../services/session/aws/aws-session.service';
 import {LoggingService} from '../../../services/logging.service';
+import Repository from '../../../../../core/services/repository';
 
 @Component({
   selector: 'app-profile-page',
@@ -56,6 +57,8 @@ export class ProfilePageComponent implements OnInit {
     defaultBrowserOpening: new FormControl('')
   });
 
+  repository: Repository;
+
   /* Simple profile page: shows the Idp Url and the workspace json */
   private sessionService: any;
 
@@ -67,10 +70,12 @@ export class ProfilePageComponent implements OnInit {
     private sessionProviderService: SessionFactoryService,
     private awsSessionService: AwsSessionService,
     private router: Router
-  ) {}
+  ) {
+    this.repository = Repository.getInstance();
+  }
 
   ngOnInit() {
-    const proxyConfiguration = this.workspaceService.getProxyConfiguration();
+    const proxyConfiguration = Repository.getInstance().getProxyConfiguration();
     this.idpUrlValue = '';
     this.proxyProtocol = proxyConfiguration.proxyProtocol;
     this.proxyUrl = proxyConfiguration.proxyUrl;
@@ -94,9 +99,9 @@ export class ProfilePageComponent implements OnInit {
 
     this.regions = this.appService.getRegions();
     this.locations = this.appService.getLocations();
-    this.selectedRegion   = this.workspaceService.getDefaultRegion() || environment.defaultRegion;
-    this.selectedLocation = this.workspaceService.getDefaultLocation() || environment.defaultLocation;
-    this.selectedBrowserOpening = this.workspaceService.getAwsSsoConfiguration().browserOpening || Constants.inApp.toString();
+    this.selectedRegion   = Repository.getInstance().getDefaultRegion() || environment.defaultRegion;
+    this.selectedLocation = Repository.getInstance().getDefaultLocation() || environment.defaultLocation;
+    this.selectedBrowserOpening = Repository.getInstance().getAwsSsoConfiguration().browserOpening || Constants.inApp.toString();
 
     this.appService.validateAllFormFields(this.form);
   }
@@ -106,17 +111,17 @@ export class ProfilePageComponent implements OnInit {
    */
   saveOptions() {
     if (this.form.valid) {
-      const proxyConfiguration = this.workspaceService.getProxyConfiguration();
+      const proxyConfiguration = Repository.getInstance().getProxyConfiguration();
       proxyConfiguration.proxyUrl = this.form.controls['proxyUrl'].value;
       proxyConfiguration.proxyProtocol = this.form.controls['proxyProtocol'].value;
       proxyConfiguration.proxyPort = this.form.controls['proxyPort'].value;
       proxyConfiguration.username = this.form.controls['proxyUsername'].value;
       proxyConfiguration.password = this.form.controls['proxyPassword'].value;
-      this.workspaceService.updateProxyConfiguration(proxyConfiguration);
+      Repository.getInstance().updateProxyConfiguration(proxyConfiguration);
 
-      this.workspaceService.updateDefaultRegion(this.selectedRegion);
-      this.workspaceService.updateDefaultLocation(this.selectedLocation);
-      this.workspaceService.updateBrowserOpening(this.selectedBrowserOpening);
+      Repository.getInstance().updateDefaultRegion(this.selectedRegion);
+      Repository.getInstance().updateDefaultLocation(this.selectedLocation);
+      Repository.getInstance().updateBrowserOpening(this.selectedBrowserOpening);
 
       if (this.checkIfNeedDialogBox()) {
 
@@ -155,12 +160,12 @@ export class ProfilePageComponent implements OnInit {
   }
 
   manageIdpUrl(id) {
-    const idpUrl = this.workspaceService.getIdpUrl(id);
+    const idpUrl = Repository.getInstance().getIdpUrl(id);
     if (this.form.get('idpUrl').value !== '') {
       if (!idpUrl) {
-        this.workspaceService.addIdpUrl({ id: uuid.v4(), url: this.form.get('idpUrl').value });
+        Repository.getInstance().addIdpUrl({ id: uuid.v4(), url: this.form.get('idpUrl').value });
       } else {
-        this.workspaceService.updateIdpUrl(id, this.form.get('idpUrl').value);
+        Repository.getInstance().updateIdpUrl(id, this.form.get('idpUrl').value);
       }
     }
     this.editingIdpUrl = false;
@@ -169,7 +174,7 @@ export class ProfilePageComponent implements OnInit {
   }
 
   editIdpUrl(id) {
-    const idpUrl = this.workspaceService.getIdpUrls().filter(u => u.id === id)[0];
+    const idpUrl = Repository.getInstance().getIdpUrls().filter(u => u.id === id)[0];
     this.idpUrlValue = idpUrl;
     this.form.get('idpUrl').setValue(idpUrl.url);
     this.editingIdpUrl = true;
@@ -197,7 +202,7 @@ export class ProfilePageComponent implements OnInit {
       if (res !== Constants.confirmClosed) {
         this.loggingService.logger(`Removing idp url with id: ${id}`, LoggerLevel.info, this);
 
-        this.workspaceService.removeIdpUrl(id);
+        Repository.getInstance().removeIdpUrl(id);
 
         sessions.forEach(session => {
           this.sessionService.delete(session.sessionId);
@@ -208,12 +213,12 @@ export class ProfilePageComponent implements OnInit {
 
   async manageAwsProfile(id: string | number) {
 
-    const profileIndex = this.workspaceService.getProfiles().findIndex(p => p.id === id.toString());
+    const profileIndex = Repository.getInstance().getProfiles().findIndex(p => p.id === id.toString());
     if (this.form.get('awsProfile').value !== '') {
       if (profileIndex === -1) {
-        this.workspaceService.addProfile({ id: uuid.v4(), name: this.form.get('awsProfile').value });
+        Repository.getInstance().addProfile({ id: uuid.v4(), name: this.form.get('awsProfile').value });
       } else {
-        this.workspaceService.updateProfile(id.toString(), this.form.get('awsProfile').value);
+        Repository.getInstance().updateProfile(id.toString(), this.form.get('awsProfile').value);
 
         for(let i = 0; i < this.workspaceService.sessions.length; i++) {
           const sess = this.workspaceService.sessions[i];
@@ -234,7 +239,7 @@ export class ProfilePageComponent implements OnInit {
   }
 
   editAwsProfile(id: string) {
-    const profile = this.workspaceService.getProfiles().filter(u => u.id === id)[0];
+    const profile = Repository.getInstance().getProfiles().filter(u => u.id === id)[0];
     this.awsProfileValue = profile;
     this.form.get('awsProfile').setValue(profile.name);
     this.editingAwsProfile = true;
@@ -254,7 +259,7 @@ export class ProfilePageComponent implements OnInit {
     this.appService.confirmDialog(`Deleting this profile will set default to these sessions: <br><ul>${sessionsNames.join('')}</ul>Do you want to proceed?`, async (res) => {
       if (res !== Constants.confirmClosed) {
         this.loggingService.logger(`Reverting to default profile with id: ${id}`, LoggerLevel.info, this);
-        this.workspaceService.removeProfile(id);
+        Repository.getInstance().removeProfile(id);
         // Reverting all sessions to default profile
         for(let i = 0; i < sessions.length; i++) {
           const sess = sessions[i];
@@ -266,7 +271,7 @@ export class ProfilePageComponent implements OnInit {
             await this.sessionService.stop(sess.sessionId);
           }
 
-          (sess as any).profileId = this.workspaceService.getDefaultProfileId();
+          (sess as any).profileId = Repository.getInstance().getDefaultProfileId();
           this.sessionService.update(sess.sessionId, sess);
 
           if(wasActive) {

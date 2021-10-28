@@ -1,4 +1,7 @@
 export default class NativeService {
+
+  private static instance: NativeService;
+
   url: any;
   log: any;
   fs: any;
@@ -30,7 +33,7 @@ export default class NativeService {
   notification: any;
   process: any;
 
-  constructor() {
+  private constructor() {
     if (this.isElectron) {
       this.log = window.require('electron-log');
       this.fs = window.require('fs-extra');
@@ -63,6 +66,13 @@ export default class NativeService {
       this.notification = window.require('@electron/remote').Notification;
       this.process = (window as any).process;
     }
+  }
+
+  static getInstance() {
+    if (!this.instance) {
+      this.instance = new NativeService();
+    }
+    return this.instance;
   }
 
   get isElectron(): boolean {

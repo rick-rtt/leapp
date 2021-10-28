@@ -1,17 +1,19 @@
 import {Injectable} from '@angular/core';
 import {environment} from '../../environments/environment';
 import {AppService} from './app.service';
-import {WorkspaceService} from './workspace.service';
+import Repository from '../../../core/services/repository';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ProxyService {
 
-  constructor(private appService: AppService, private workspaceService: WorkspaceService) {}
+  constructor(
+    private appService: AppService
+  ) {}
 
   configureBrowserWindow(browserWindow: any): void {
-    const proxyConfiguration = this.workspaceService.getProxyConfiguration();
+    const proxyConfiguration = Repository.getInstance().getProxyConfiguration();
 
     let proxyUrl;
     let proxyPort;
@@ -33,7 +35,7 @@ export class ProxyService {
 
   getHttpClientOptions(url: string): any {
     const options = this.appService.getUrl().parse(url);
-    const proxyConfiguration = this.workspaceService.getProxyConfiguration();
+    const proxyConfiguration = Repository.getInstance().getProxyConfiguration();
 
     let proxyUrl;
     let proxyPort;

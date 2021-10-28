@@ -5,7 +5,7 @@ import {CredentialsInfo} from '../../../../../../core/models/credentials-info';
 
 import {AwsSsoRoleSession} from '../../../../../../core/models/aws-sso-role-session';
 import {FileService} from '../../../file.service';
-import {AppService, ToastLevel} from '../../../app.service';
+import {AppService} from '../../../app.service';
 
 import SSO, {
   AccountInfo,
@@ -20,7 +20,8 @@ import SSO, {
 import {environment} from '../../../../../environments/environment';
 import {KeychainService} from '../../../keychain.service';
 import {SessionType} from '../../../../../../core/models/session-type';
-import {AwsSsoOidcService, BrowserWindowClosing} from "../../../aws-sso-oidc.service";
+import {AwsSsoOidcService, BrowserWindowClosing} from '../../../aws-sso-oidc.service';
+import Repository from '../../../../../../core/services/repository';
 
 export interface AwsSsoRoleSessionRequest {
   sessionName: string;
@@ -128,7 +129,7 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
 
   async applyCredentials(sessionId: string, credentialsInfo: CredentialsInfo): Promise<void> {
     const session = this.get(sessionId);
-    const profileName = this.workspaceService.getProfileName((session as AwsSsoRoleSession).profileId);
+    const profileName = Repository.getInstance().getProfileName((session as AwsSsoRoleSession).profileId);
     const credentialObject = {};
     credentialObject[profileName] = {
       // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -144,15 +145,15 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
 
   async deApplyCredentials(sessionId: string): Promise<void> {
     const session = this.get(sessionId);
-    const profileName = this.workspaceService.getProfileName((session as AwsSsoRoleSession).profileId);
+    const profileName = Repository.getInstance().getProfileName((session as AwsSsoRoleSession).profileId);
     const credentialsFile = await this.fileService.iniParseSync(this.appService.awsCredentialPath());
     delete credentialsFile[profileName];
     await this.fileService.replaceWriteSync(this.appService.awsCredentialPath(), credentialsFile);
   }
 
   async generateCredentials(sessionId: string): Promise<CredentialsInfo> {
-    const region = this.workspaceService.getAwsSsoConfiguration().region;
-    const portalUrl = this.workspaceService.getAwsSsoConfiguration().portalUrl;
+    const region = Repository.getInstance().getAwsSsoConfiguration().region;
+    const portalUrl = Repository.getInstance().getAwsSsoConfiguration().portalUrl;
     const roleArn = (this.get(sessionId) as AwsSsoRoleSession).roleArn;
 
     const accessToken = await this.getAccessToken(region, portalUrl);
@@ -172,8 +173,8 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
   }
 
   async sync(): Promise<SsoRoleSession[]> {
-    const region = this.workspaceService.getAwsSsoConfiguration().region;
-    const portalUrl = this.workspaceService.getAwsSsoConfiguration().portalUrl;
+    const region = Repository.getInstance().getAwsSsoConfiguration().region;
+    const portalUrl = Repository.getInstance().getAwsSsoConfiguration().portalUrl;
 
     const accessToken = await this.getAccessToken(region, portalUrl);
 
@@ -188,7 +189,7 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
 
   async logout(): Promise<void> {
     // Obtain region and access token
-    const region = this.workspaceService.getAwsSsoConfiguration().region;
+    const region = Repository.getInstance().getAwsSsoConfiguration().region;
     const savedAccessToken = await this.getAccessTokenFromKeychain();
 
     // Configure Sso Portal Client
@@ -203,7 +204,7 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
 
       // Delete access token and remove sso configuration info from workspace
       this.keychainService.deletePassword(environment.appName, 'aws-sso-access-token');
-      this.workspaceService.removeExpirationTimeFromAwsSsoConfiguration();
+      Repository.getInstance().removeExpirationTimeFromAwsSsoConfiguration();
 
       this.removeSsoSessionsFromWorkspace();
     });
@@ -244,7 +245,7 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
   }
 
   private ssoExpired(): boolean {
-    const expirationTime = this.workspaceService.getAwsSsoConfiguration().expirationTime;
+    const expirationTime = Repository.getInstance().getAwsSsoConfiguration().expirationTime;
     return !expirationTime || Date.parse(expirationTime) < Date.now();
   }
 
@@ -298,10 +299,10 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
 
       const awsSsoSession = {
         email: accountInfo.emailAddress,
-        region: oldSession?.region || this.workspaceService.getDefaultRegion() || environment.defaultRegion,
+        region: oldSession?.region || Repository.getInstance().getDefaultRegion() || environment.defaultRegion,
         roleArn: `arn:aws:iam::${accountInfo.accountId}/${accountRole.roleName}`,
         sessionName: accountInfo.accountName,
-        profileId: oldSession?.profileId || this.workspaceService.getDefaultProfileId()
+        profileId: oldSession?.profileId || Repository.getInstance().getDefaultProfileId()
       };
 
       awsSsoSessions.push(awsSsoSession);
@@ -366,7 +367,7 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
   }
 
   private configureAwsSso(region: string, portalUrl: string, expirationTime: string, accessToken: string) {
-    this.workspaceService.configureAwsSso(region, portalUrl, expirationTime);
+    Repository.getInstance().configureAwsSso(region, portalUrl, expirationTime);
     this.keychainService.saveSecret(environment.appName, 'aws-sso-access-token', accessToken).then(_ => {});
   }
 

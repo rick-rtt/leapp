@@ -14,6 +14,7 @@ import {WorkspaceService} from './workspace.service';
 import {AppService, LoggerLevel} from './app.service';
 import {ElectronService} from './electron.service';
 import {LeappBaseError} from '../errors/leapp-base-error';
+import Repository from '../../../core/services/repository';
 
 export interface BrowserWindowClosing {
   catchClosingBrowserWindow(): void;
@@ -42,8 +43,7 @@ export class AwsSsoOidcService {
 
   constructor(
     private appService: AppService,
-    private electronService: ElectronService,
-    private workspaceService: WorkspaceService
+    private electronService: ElectronService
   ) {
     this.listeners = [];
     this.ssoOidc = null;
@@ -154,7 +154,7 @@ export class AwsSsoOidcService {
   }
 
   private async openVerificationBrowserWindow(registerClientResponse: RegisterClientResponse, startDeviceAuthorizationResponse: StartDeviceAuthorizationResponse): Promise<VerificationResponse> {
-    if(this.workspaceService.getAwsSsoConfiguration().browserOpening === Constants.inApp.toString()) {
+    if(Repository.getInstance().getAwsSsoConfiguration().browserOpening === Constants.inApp.toString()) {
       const pos = this.electronService.currentWindow.getPosition();
 
       this.ssoWindow = null;
@@ -241,7 +241,7 @@ export class AwsSsoOidcService {
 
     let createTokenResponse;
 
-    if(this.workspaceService.getAwsSsoConfiguration().browserOpening === Constants.inApp) {
+    if(Repository.getInstance().getAwsSsoConfiguration().browserOpening === Constants.inApp) {
       createTokenResponse = await this.getAwsSsoOidcClient().createToken(createTokenRequest).promise();
     } else {
       createTokenResponse = await this.waitForToken(createTokenRequest);

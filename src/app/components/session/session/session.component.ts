@@ -4,6 +4,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {AppService} from '../../../services/app.service';
 import {HttpClient} from '@angular/common/http';
 import {BsModalService} from 'ngx-bootstrap/modal';
+import Repository from '../../../../../core/services/repository';
 
 @Component({
   selector: 'app-session',
@@ -31,6 +32,8 @@ export class SessionComponent implements OnInit {
 
   workspace;
 
+  repository: Repository;
+
   constructor(
     private router: Router,
     private route: ActivatedRoute,
@@ -38,7 +41,9 @@ export class SessionComponent implements OnInit {
     private httpClient: HttpClient,
     private modalService: BsModalService,
     private appService: AppService
-  ) {}
+  ) {
+    this.repository = Repository.getInstance();
+  }
 
   ngOnInit() {
     // Set regions for ssm

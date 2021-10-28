@@ -38,7 +38,7 @@ export class ElectronService {
   process: any;
 
   constructor() {
-    const nativeService = new NativeService();
+    const nativeService = NativeService.getInstance();
 
     if (nativeService.isElectron) {
       this.log = nativeService.log;

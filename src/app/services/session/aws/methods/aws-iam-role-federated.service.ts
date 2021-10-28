@@ -11,6 +11,7 @@ import {LeappParseError} from '../../../../errors/leapp-parse-error';
 import {environment} from '../../../../../environments/environment';
 import * as AWS from 'aws-sdk';
 import {LeappAwsStsError} from '../../../../errors/leapp-aws-sts-error';
+import Repository from '../../../../../../core/services/repository';
 
 export interface AwsIamRoleFederatedSessionRequest {
   accountName: string;
@@ -29,10 +30,12 @@ export interface ResponseHookDetails {
 })
 export class AwsIamRoleFederatedService extends AwsSessionService {
 
-  constructor(protected workspaceService: WorkspaceService,
-              private keychainService: KeychainService,
-              private appService: AppService,
-              private fileService: FileService) {
+  constructor(
+    protected workspaceService: WorkspaceService,
+    private keychainService: KeychainService,
+    private appService: AppService,
+    private fileService: FileService
+  ) {
     super(workspaceService);
   }
 
@@ -70,7 +73,7 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
 
   async applyCredentials(sessionId: string, credentialsInfo: CredentialsInfo): Promise<void> {
     const session = this.get(sessionId);
-    const profileName = this.workspaceService.getProfileName((session as AwsIamRoleFederatedSession).profileId);
+    const profileName = Repository.getInstance().getProfileName((session as AwsIamRoleFederatedSession).profileId);
     const credentialObject = {};
     credentialObject[profileName] = {
       // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -86,7 +89,7 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
 
   async deApplyCredentials(sessionId: string): Promise<void> {
     const session = this.get(sessionId);
-    const profileName = this.workspaceService.getProfileName((session as AwsIamRoleFederatedSession).profileId);
+    const profileName = Repository.getInstance().getProfileName((session as AwsIamRoleFederatedSession).profileId);
     const credentialsFile = await this.fileService.iniParseSync(this.appService.awsCredentialPath());
     delete credentialsFile[profileName];
     return await this.fileService.replaceWriteSync(this.appService.awsCredentialPath(), credentialsFile);
@@ -97,7 +100,7 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
     const session = this.get(sessionId);
 
     // Get idpUrl
-    const idpUrl = this.workspaceService.getIdpUrl((session as AwsIamRoleFederatedSession).idpUrlId);
+    const idpUrl = Repository.getInstance().getIdpUrl((session as AwsIamRoleFederatedSession).idpUrlId);
 
     // Check if we need to authenticate
     let needToAuthenticate;

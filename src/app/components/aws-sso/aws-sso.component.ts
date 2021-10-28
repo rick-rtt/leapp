@@ -6,6 +6,7 @@ import {WorkspaceService} from '../../services/workspace.service';
 import {AwsSsoRoleService, SsoRoleSession} from '../../services/session/aws/methods/aws-sso-role.service';
 import {Constants} from '../../../../core/models/constants';
 import {AwsSsoOidcService, BrowserWindowClosing} from '../../services/aws-sso-oidc.service';
+import Repository from '../../../../core/services/repository';
 
 @Component({
   selector: 'app-aws-sso',
@@ -53,17 +54,17 @@ export class AwsSsoComponent implements OnInit, BrowserWindowClosing {
       this.loadingInBrowser = (this.selectedBrowserOpening === Constants.inBrowser.toString());
       this.loadingInApp = (this.selectedBrowserOpening === Constants.inApp.toString());
 
-      this.workspaceService.setAwsSsoConfiguration(
+      Repository.getInstance().setAwsSsoConfiguration(
         this.selectedRegion,
         this.form.value.portalUrl,
         this.selectedBrowserOpening,
-        this.workspaceService.getAwsSsoConfiguration().expirationTime
+        Repository.getInstance().getAwsSsoConfiguration().expirationTime
       );
 
       try {
         const ssoRoleSessions: SsoRoleSession[] = await this.awsSsoRoleService.sync();
         ssoRoleSessions.forEach(ssoRoleSession => {
-          this.awsSsoRoleService.create(ssoRoleSession, this.workspaceService.getDefaultProfileId());
+          this.awsSsoRoleService.create(ssoRoleSession, Repository.getInstance().getDefaultProfileId());
         });
         this.router.navigate(['/sessions', 'session-selected']);
         this.loadingInBrowser = false;
@@ -110,9 +111,9 @@ export class AwsSsoComponent implements OnInit, BrowserWindowClosing {
 
   setValues() {
     this.regions = this.appService.getRegions();
-    const region = this.workspaceService.getAwsSsoConfiguration().region;
-    const portalUrl = this.workspaceService.getAwsSsoConfiguration().portalUrl;
-    this.selectedBrowserOpening = this.workspaceService.getAwsSsoConfiguration().browserOpening || Constants.inApp;
+    const region = Repository.getInstance().getAwsSsoConfiguration().region;
+    const portalUrl = Repository.getInstance().getAwsSsoConfiguration().portalUrl;
+    this.selectedBrowserOpening = Repository.getInstance().getAwsSsoConfiguration().browserOpening || Constants.inApp;
 
     this.selectedRegion = region || this.regions[0].region;
     this.portalUrl = portalUrl;

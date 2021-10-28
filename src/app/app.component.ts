@@ -4,7 +4,6 @@ import {FileService} from './services/file.service';
 import {AppService, LoggerLevel} from './services/app.service';
 import {Router} from '@angular/router';
 import {WorkspaceService} from './services/workspace.service';
-import {Workspace} from '../../core/models/workspace';
 import {setTheme} from 'ngx-bootstrap/utils';
 import {TimerService} from './services/timer.service';
 import {RotationService} from './services/rotation.service';
@@ -15,6 +14,7 @@ import {RetrocompatibilityService} from './services/retrocompatibility.service';
 import {LoggingService} from './services/logging.service';
 import {LeappParseError} from './errors/leapp-parse-error';
 import {Constants} from '../../core/models/constants';
+import Repository from '../../core/services/repository';
 
 @Component({
   selector: 'app-root',
@@ -22,6 +22,7 @@ import {Constants} from '../../core/models/constants';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
+
   /* Main app file: launches the Angular framework inside Electron app */
   constructor(
     private app: AppService,
@@ -64,8 +65,8 @@ export class AppComponent implements OnInit {
     }
 
     try {
-      if (!this.workspaceService.getAwsSsoConfiguration().browserOpening) {
-        this.workspaceService.setBrowserOpening(Constants.inApp.toString());
+      if (!Repository.getInstance().getAwsSsoConfiguration().browserOpening) {
+        Repository.getInstance().setBrowserOpening(Constants.inApp.toString());
       }
     } catch {
       throw new LeappParseError(this, 'We had trouble parsing your Leapp-lock.json file. It is either corrupt, obsolete, or with an error.');
