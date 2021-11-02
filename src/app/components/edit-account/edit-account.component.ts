@@ -6,7 +6,7 @@ import {Workspace} from '../../../../core/models/workspace';
 import {SessionType} from '../../../../core/models/session-type';
 import {AwsIamUserSession} from '../../../../core/models/aws-iam-user-session';
 import {WorkspaceService} from '../../services/workspace.service';
-import {KeychainService} from '../../services/keychain.service';
+import {KeychainService} from '../../../../core/services/keychain-service';
 import {environment} from '../../../environments/environment';
 import {SessionService} from '../../services/session.service';
 
@@ -43,7 +43,6 @@ export class EditAccountComponent implements OnInit {
     private router: Router,
     private activatedRoute: ActivatedRoute,
     private workspaceService: WorkspaceService,
-    private keychainService: KeychainService,
     private sessionService: SessionService
   ) {}
 
@@ -70,8 +69,8 @@ export class EditAccountComponent implements OnInit {
       this.selectedSession.sessionName =  this.form.controls['name'].value;
       this.selectedSession.region      =  this.selectedRegion;
       this.selectedSession.mfaDevice   =  this.form.controls['mfaDevice'].value;
-      this.keychainService.saveSecret(environment.appName, `${this.selectedSession.sessionId}-iam-user-aws-session-access-key-id`, this.form.controls['accessKey'].value).then(_ => {});
-      this.keychainService.saveSecret(environment.appName, `${this.selectedSession.sessionId}-iam-user-aws-session-secret-access-key`, this.form.controls['secretKey'].value).then(_ => {});
+      KeychainService.getInstance().saveSecret(environment.appName, `${this.selectedSession.sessionId}-iam-user-aws-session-access-key-id`, this.form.controls['accessKey'].value).then(_ => {});
+      KeychainService.getInstance().saveSecret(environment.appName, `${this.selectedSession.sessionId}-iam-user-aws-session-secret-access-key`, this.form.controls['secretKey'].value).then(_ => {});
 
       this.workspaceService.update(this.selectedSession.sessionId, this.selectedSession);
       this.appService.toast('Session updated correctly.', ToastLevel.success, 'Session Update');

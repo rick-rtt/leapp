@@ -3,7 +3,7 @@ import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {AwsSsoComponent} from './aws-sso.component';
 import {mustInjected} from '../../../base-injectables';
 import {RouterTestingModule} from '@angular/router/testing';
-import {KeychainService} from '../../services/keychain.service';
+import {KeychainService} from '../../../../core/services/keychain-service';
 
 describe('AwsSsoComponent', () => {
   let component: AwsSsoComponent;

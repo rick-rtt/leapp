@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import {CredentialsInfo} from '../../../../../../core/models/credentials-info';
 import {WorkspaceService} from '../../../workspace.service';
-import {KeychainService} from '../../../keychain.service';
+import {KeychainService} from '../../../../../../core/services/keychain-service';
 import {AppService} from '../../../app.service';
 import {AwsIamRoleFederatedSession} from '../../../../../../core/models/aws-iam-role-federated-session';
 import {LeappSamlError} from '../../../../errors/leapp-saml-error';
@@ -32,7 +32,6 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
 
   constructor(
     protected workspaceService: WorkspaceService,
-    private keychainService: KeychainService,
     private appService: AppService
   ) {
     super(workspaceService);

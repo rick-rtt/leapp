@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {WorkspaceService} from './workspace.service';
-import {KeychainService} from './keychain.service';
+import {KeychainService} from '../../../core/services/keychain-service';
 import {AppService} from './app.service';
 import {SessionType} from '../../../core/models/session-type';
 import AwsIamUserService from '../../../core/services/session/aws/method/aws-iam-user-service';
@@ -22,7 +22,6 @@ export class SessionFactoryService {
 
   constructor(
     private workspaceService: WorkspaceService,
-    private keychainService: KeychainService,
     private appService: AppService,
     private executeService: ExecuteService,
     private electronService: ElectronService,
@@ -50,25 +49,25 @@ export class SessionFactoryService {
   }
 
   private getAwsIamRoleFederatedSessionService(accountType: SessionType) {
-    const service = new AwsIamRoleFederatedService(this.workspaceService, this.keychainService, this.appService);
+    const service = new AwsIamRoleFederatedService(this.workspaceService, this.appService);
     this.sessionServiceCache[accountType.toString()] = service;
     return service;
   }
 
   private getAwsIamUserSessionService(accountType: SessionType): AwsIamUserService {
-    const service = AwsIamUserService.getInstance(this.workspaceService, this.keychainService, this.appService);
+    const service = AwsIamUserService.getInstance(this.workspaceService, this.appService);
     this.sessionServiceCache[accountType.toString()] = service;
     return service;
   }
 
   private getAwsIamRoleChainedSessionService(accountType: SessionType) {
-    const service = new AwsIamRoleChainedService(this.workspaceService, this.appService, this.keychainService, this.electronService, this.awsSsoOidcService);
+    const service = new AwsIamRoleChainedService(this.workspaceService, this.appService, this.electronService, this.awsSsoOidcService);
     this.sessionServiceCache[accountType.toString()] = service;
     return service;
   }
 
   private getAwsSsoRoleSessionService(accountType: SessionType) {
-    const service = new AwsSsoRoleService(this.workspaceService, this.appService, this.keychainService, this.awsSsoOidcService);
+    const service = new AwsSsoRoleService(this.workspaceService, this.appService, this.awsSsoOidcService);
     this.sessionServiceCache[accountType.toString()] = service;
     return service;
   }

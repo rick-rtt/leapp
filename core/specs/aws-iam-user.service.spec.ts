@@ -7,7 +7,7 @@ import {Workspace} from '../models/workspace';
 import {AppService} from '../../src/app/services/app.service';
 import {WorkspaceService} from '../../src/app/services/workspace.service';
 import {Session} from '../models/session';
-import {KeychainService} from '../../src/app/services/keychain.service';
+import {KeychainService} from '../services/keychain-service';
 import {environment} from '../../src/environments/environment';
 import {LeappBaseError} from '../../src/app/errors/leapp-base-error';
 

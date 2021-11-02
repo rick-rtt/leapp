@@ -6,7 +6,7 @@ import {serialize} from 'class-transformer';
 import {Workspace} from '../../../core/models/workspace';
 import {AppService} from './app.service';
 import SpyObj = jasmine.SpyObj;
-import {KeychainService} from './keychain.service';
+import {KeychainService} from '../../../core/services/keychain-service';
 import {FileService} from '../../../core/services/file-service';
 import Repository from '../../../core/services/repository';
 

@@ -1,10 +1,16 @@
-import {Injectable} from '@angular/core';
-import {ElectronService} from './electron.service';
+import NativeService from './native-service';
 
-@Injectable({ providedIn: 'root' })
 export class KeychainService {
+  private static instance: KeychainService;
 
-  constructor(private electronService: ElectronService) {}
+  private constructor() {}
+
+  static getInstance() {
+    if(!this.instance) {
+      this.instance = new KeychainService();
+    }
+    return this.instance;
+  }
 
   /**
    * Save your secret in the keychain
@@ -14,7 +20,7 @@ export class KeychainService {
    * @param password - secret
    */
   saveSecret(service: string, account: string, password: string) {
-    return this.electronService.keytar.setPassword(service, account, password);
+    return NativeService.getInstance().keytar.setPassword(service, account, password);
   }
 
   /**
@@ -25,7 +31,7 @@ export class KeychainService {
    * @returns the secret
    */
   getSecret(service: string, account: string): any {
-    return this.electronService.keytar.getPassword(service, account);
+    return NativeService.getInstance().keytar.getPassword(service, account);
   }
 
   /**
@@ -35,6 +41,6 @@ export class KeychainService {
    * @param account - unique identifier
    */
   deletePassword(service: string, account: string) {
-    return this.electronService.keytar.deletePassword(service, account);
+    return NativeService.getInstance().keytar.deletePassword(service, account);
   }
 }

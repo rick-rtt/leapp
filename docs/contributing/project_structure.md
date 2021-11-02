@@ -170,7 +170,6 @@ To allow using other services to construct our logic we define them in the const
 ```tsx
 constructor(
     protected workspaceService: WorkspaceService,
-    private keychainService: KeychainService,
     private appService: AppService,
     private fileService: FileService) {
     super(workspaceService);

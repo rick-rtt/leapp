@@ -8,7 +8,6 @@ import {SsmService} from '../../../services/ssm.service';
 import {SessionType} from '../../../../../core/models/session-type';
 import {WorkspaceService} from '../../../services/workspace.service';
 import {environment} from '../../../../environments/environment';
-import {KeychainService} from '../../../services/keychain.service';
 import * as uuid from 'uuid';
 import {BsModalRef, BsModalService} from 'ngx-bootstrap/modal';
 
@@ -63,7 +62,6 @@ export class SessionCardComponent implements OnInit {
 
   constructor(
     private workspaceService: WorkspaceService,
-    private keychainService: KeychainService,
     private appService: AppService,
     private router: Router,
     private ssmService: SsmService,

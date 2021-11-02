@@ -15,7 +15,7 @@ import SSO, {
 } from 'aws-sdk/clients/sso';
 
 import {environment} from '../../../../../environments/environment';
-import {KeychainService} from '../../../keychain.service';
+import {KeychainService} from '../../../../../../core/services/keychain-service';
 import {SessionType} from '../../../../../../core/models/session-type';
 import {AwsSsoOidcService, BrowserWindowClosing} from '../../../aws-sso-oidc.service';
 import Repository from '../../../../../../core/services/repository';
@@ -81,7 +81,6 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
   constructor(
     protected workspaceService: WorkspaceService,
     private appService: AppService,
-    private keychainService: KeychainService,
     private awsSsoOidcService: AwsSsoOidcService
   ) {
     super(workspaceService);
@@ -201,7 +200,7 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
       this.ssoPortal = null;
 
       // Delete access token and remove sso configuration info from workspace
-      this.keychainService.deletePassword(environment.appName, 'aws-sso-access-token');
+      KeychainService.getInstance().deletePassword(environment.appName, 'aws-sso-access-token');
       Repository.getInstance().removeExpirationTimeFromAwsSsoConfiguration();
 
       this.removeSsoSessionsFromWorkspace();
@@ -366,7 +365,7 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
 
   private configureAwsSso(region: string, portalUrl: string, expirationTime: string, accessToken: string) {
     Repository.getInstance().configureAwsSso(region, portalUrl, expirationTime);
-    this.keychainService.saveSecret(environment.appName, 'aws-sso-access-token', accessToken).then(_ => {});
+    KeychainService.getInstance().saveSecret(environment.appName, 'aws-sso-access-token', accessToken).then(_ => {});
   }
 
   private getSsoPortalClient(region: string): void {
@@ -376,7 +375,7 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
   }
 
   private async getAccessTokenFromKeychain(): Promise<string> {
-    return this.keychainService.getSecret(environment.appName, 'aws-sso-access-token');
+    return KeychainService.getInstance().getSecret(environment.appName, 'aws-sso-access-token');
   }
 
   private findOldSession(accountInfo: SSO.AccountInfo, accountRole: SSO.RoleInfo): { region: string; profileId: string } {

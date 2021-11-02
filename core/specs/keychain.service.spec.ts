@@ -1,6 +1,6 @@
 import {TestBed} from '@angular/core/testing';
 
-import {KeychainService} from './keychain.service';
+import {KeychainService} from '../services/keychain-service';
 
 describe('KeychainService', () => {
   beforeEach(() => TestBed.configureTestingModule({}));

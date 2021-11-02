@@ -3,7 +3,7 @@ import {AppService} from './app.service';
 import {environment} from '../../environments/environment';
 import {Workspace} from '../../../core/models/workspace';
 import {serialize} from 'class-transformer';
-import {KeychainService} from './keychain.service';
+import {KeychainService} from '../../../core/services/keychain-service';
 import {AwsIamRoleFederatedSession} from '../../../core/models/aws-iam-role-federated-session';
 import {AwsIamRoleChainedSession} from '../../../core/models/aws-iam-role-chained-session';
 import {AwsIamUserSession} from '../../../core/models/aws-iam-user-session';
@@ -20,7 +20,6 @@ export class RetrocompatibilityService {
 
   constructor(
     private appService: AppService,
-    private keychainService: KeychainService,
     private workspaceService: WorkspaceService
   ) { }
 
@@ -173,9 +172,9 @@ export class RetrocompatibilityService {
         let expirationTime;
         let browserOpening;
         try {
-          region = await this.keychainService.getSecret(environment.appName, 'AWS_SSO_REGION');
-          portalUrl = await this.keychainService.getSecret(environment.appName, 'AWS_SSO_PORTAL_URL');
-          expirationTime = await this.keychainService.getSecret(environment.appName, 'AWS_SSO_EXPIRATION_TIME');
+          region = await KeychainService.getInstance().getSecret(environment.appName, 'AWS_SSO_REGION');
+          portalUrl = await KeychainService.getInstance().getSecret(environment.appName, 'AWS_SSO_PORTAL_URL');
+          expirationTime = await KeychainService.getInstance().getSecret(environment.appName, 'AWS_SSO_EXPIRATION_TIME');
           browserOpening = Constants.inApp.toString();
         } catch(err) {
           // we need all or nothing, otherwise it means that configuration is incomplete so its better
@@ -208,14 +207,14 @@ export class RetrocompatibilityService {
     );
     iamUserSession.sessionId = session.id;
 
-    const accessKey = await this.keychainService.getSecret(
+    const accessKey = await KeychainService.getInstance().getSecret(
       environment.appName, `${session.account.accountName}___${session.account.user}___accessKey`);
 
-    const secretKey = await this.keychainService.getSecret(
+    const secretKey = await KeychainService.getInstance().getSecret(
       environment.appName, `${session.account.accountName}___${session.account.user}___secretKey`);
 
-    await this.keychainService.saveSecret(environment.appName, `${session.id}-iam-user-aws-session-access-key-id`, accessKey);
-    await this.keychainService.saveSecret(environment.appName, `${session.id}-iam-user-aws-session-secret-access-key`, secretKey);
+    await KeychainService.getInstance().saveSecret(environment.appName, `${session.id}-iam-user-aws-session-access-key-id`, accessKey);
+    await KeychainService.getInstance().saveSecret(environment.appName, `${session.id}-iam-user-aws-session-secret-access-key`, secretKey);
 
     workspace.sessions.push(iamUserSession);
   }
