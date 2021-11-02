@@ -4,7 +4,6 @@ import {AwsIamUserSession} from '../../../../models/aws-iam-user-session';
 import {KeychainService} from '../../../keychain-service';
 import {environment} from '../../../../../src/environments/environment';
 import {Session} from '../../../../models/session';
-import {AppService} from '../../../../../src/app/services/app.service';
 import * as AWS from 'aws-sdk';
 import {GetSessionTokenResponse} from 'aws-sdk/clients/sts';
 import {Constants} from '../../../../models/constants';
@@ -14,6 +13,9 @@ import {LeappMissingMfaTokenError} from '../../../../../src/app/errors/leapp-mis
 import Repository from '../../../repository';
 import {FileService} from '../../../file-service';
 import AwsSessionService from '../aws-session-service';
+import {LeappBaseError} from '../../../../../src/app/errors/leapp-base-error';
+import {LoggerLevel} from '../../../logging-service';
+import AppService2 from '../../../app-service2';
 
 export interface AwsIamUserSessionRequest {
   accountName: string;
@@ -23,22 +25,40 @@ export interface AwsIamUserSessionRequest {
   mfaDevice?: string;
 }
 
+export interface IMfaCodePrompter {
+  promptForMFACode(sessionName: string, callback: any): void;
+}
+
 export default class AwsIamUserService extends AwsSessionService {
 
   private static instance: AwsIamUserService;
+  protected workspaceService: WorkspaceService;
+  private mfaCodePrompter: IMfaCodePrompter;
 
   private constructor(
-    protected workspaceService: WorkspaceService,
-    private appService: AppService
+    workspaceService: WorkspaceService,
+    mfaCodePrompter: IMfaCodePrompter
   ) {
     super(workspaceService);
+    this.mfaCodePrompter = mfaCodePrompter;
   }
 
-  static getInstance(workspaceService: WorkspaceService, appService: AppService) {
+  static getInstance() {
     if(!this.instance) {
-      this.instance = new AwsIamUserService(workspaceService, appService);
+      // TODO: understand if we need to move Leapp Errors in a core folder
+      throw new LeappBaseError('Not initialized service error', this, LoggerLevel.error,
+        'Service needs to be initialized');
     }
     return this.instance;
+  }
+
+  static init(workspaceService: WorkspaceService, mfaCodePrompter: IMfaCodePrompter) {
+    if(this.instance) {
+      // TODO: understand if we need to move Leapp Errors in a core folder
+      throw new LeappBaseError('Already initialized service error', this, LoggerLevel.error,
+        'Service already initialized');
+    }
+    this.instance = new AwsIamUserService(workspaceService, mfaCodePrompter);
   }
 
   static isTokenExpired(tokenExpiration: string): boolean {
@@ -83,15 +103,15 @@ export default class AwsIamUserService extends AwsSessionService {
       aws_session_token: credentialsInfo.sessionToken.aws_session_token,
       region: session.region
     };
-    return await FileService.getInstance().iniWriteSync(this.appService.awsCredentialPath(), credentialObject);
+    return await FileService.getInstance().iniWriteSync(AppService2.getInstance().awsCredentialPath(), credentialObject);
   }
 
   async deApplyCredentials(sessionId: string): Promise<void> {
     const session = this.workspaceService.get(sessionId);
     const profileName = Repository.getInstance().getProfileName((session as AwsIamUserSession).profileId);
-    const credentialsFile = await FileService.getInstance().iniParseSync(this.appService.awsCredentialPath());
+    const credentialsFile = await FileService.getInstance().iniParseSync(AppService2.getInstance().awsCredentialPath());
     delete credentialsFile[profileName];
-    return await FileService.getInstance().replaceWriteSync(this.appService.awsCredentialPath(), credentialsFile);
+    return await FileService.getInstance().replaceWriteSync(AppService2.getInstance().awsCredentialPath(), credentialsFile);
   }
 
   async generateCredentials(sessionId: string): Promise<CredentialsInfo> {
@@ -109,7 +129,7 @@ export default class AwsIamUserService extends AwsSessionService {
         // https://docs.aws.amazon.com/STS/latest/APIReference/API_GetSessionToken.html
         AWS.config.update({ accessKeyId, secretAccessKey });
         // Configure sts client options
-        const sts = new AWS.STS(this.appService.stsOptions(session));
+        const sts = new AWS.STS(AppService2.getInstance().stsOptions(session));
         // Configure sts get-session-token api call params
         // eslint-disable-next-line @typescript-eslint/naming-convention
         const params = { DurationSeconds: environment.sessionTokenDuration };
@@ -138,7 +158,7 @@ export default class AwsIamUserService extends AwsSessionService {
     AWS.config.update({ accessKeyId: credentials.sessionToken.aws_access_key_id, secretAccessKey: credentials.sessionToken.aws_secret_access_key, sessionToken: credentials.sessionToken.aws_session_token });
     // Configure sts client options
     try {
-      const sts = new AWS.STS(this.appService.stsOptions(session));
+      const sts = new AWS.STS(AppService2.getInstance().stsOptions(session));
       const response = await sts.getCallerIdentity({}).promise();
       return response.Account;
     } catch (err) {
@@ -161,8 +181,21 @@ export default class AwsIamUserService extends AwsSessionService {
   }
 
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  private generateSessionTokenCallingMfaModal( session: Session, sts: AWS.STS, params: { DurationSeconds: number }): Promise<CredentialsInfo> {
+  private generateSessionTokenCallingMfaModal(session: Session, sts: AWS.STS, params: { DurationSeconds: number }): Promise<CredentialsInfo> {
     return new Promise((resolve, reject) => {
+      // TODO: think about timeout management
+      // TODO: handle condition in which mfaCodePrompter is null
+      this.mfaCodePrompter.promptForMFACode(session.sessionName, (value) => {
+        if (value !== Constants.confirmClosed) {
+          params['SerialNumber'] = (session as AwsIamUserSession).mfaDevice;
+          params['TokenCode'] = value;
+          // Return session token in the form of CredentialsInfo
+          resolve(this.generateSessionToken(session, sts, params));
+        } else {
+          reject(new LeappMissingMfaTokenError(this, 'Missing Multi Factor Authentication code'));
+        }
+      });
+      /*
       this.appService.inputDialog('MFA Code insert', 'Insert MFA Code', `please insert MFA code from your app or device for ${session.sessionName}`, (value) => {
         if (value !== Constants.confirmClosed) {
           params['SerialNumber'] = (session as AwsIamUserSession).mfaDevice;
@@ -173,6 +206,7 @@ export default class AwsIamUserService extends AwsSessionService {
           reject(new LeappMissingMfaTokenError(this, 'Missing Multi Factor Authentication code'));
         }
       });
+      */
     });
   }
 

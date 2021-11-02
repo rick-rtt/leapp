@@ -81,7 +81,6 @@ export class CreateAccountComponent implements OnInit {
     private activatedRoute: ActivatedRoute,
     private workspaceService: WorkspaceService,
     private awsIamRoleFederatedService: AwsIamRoleFederatedService,
-    private awsIamUserService: AwsIamUserService,
     private awsIamRoleChainedService: AwsIamRoleChainedService,
     private awsSessionService: AwsSessionService,
     private azureService: AzureService
@@ -247,7 +246,7 @@ export class CreateAccountComponent implements OnInit {
           secretKey: this.form.value.secretKey.trim(),
           mfaDevice: this.form.value.mfaDevice.trim()
         };
-        this.awsIamUserService.create(awsIamUserSessionRequest, this.selectedProfile.value);
+        AwsIamUserService.getInstance().create(awsIamUserSessionRequest, this.selectedProfile.value);
         break;
       case (SessionType.awsIamRoleChained):
         const awsIamRoleChainedAccountRequest: AwsIamRoleChainedSessionRequest = {

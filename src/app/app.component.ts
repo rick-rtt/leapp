@@ -15,6 +15,8 @@ import {LeappParseError} from './errors/leapp-parse-error';
 import {Constants} from '../../core/models/constants';
 import Repository from '../../core/services/repository';
 import {FileService} from '../../core/services/file-service';
+import AwsIamUserService from '../../core/services/session/aws/method/aws-iam-user-service';
+import {MfaCodePromptService} from './services/mfa-code-prompt.service';
 
 @Component({
   selector: 'app-root',
@@ -31,10 +33,13 @@ export class AppComponent implements OnInit {
     private rotationService: RotationService,
     private sessionProviderService: SessionFactoryService,
     private router: Router,
-    private updaterService: UpdaterService
+    private updaterService: UpdaterService,
+    private mfaCodePromptService: MfaCodePromptService
   ) {}
 
   async ngOnInit() {
+    AwsIamUserService.init(this.workspaceService, this.mfaCodePromptService);
+
     // We get the right moment to set an hook to app close
     const ipc = this.app.getIpcRenderer();
     ipc.on('app-close', () => {

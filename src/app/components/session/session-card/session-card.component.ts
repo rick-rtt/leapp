@@ -163,7 +163,7 @@ export class SessionCardComponent implements OnInit {
         // Special conditions for IAM Users
         if (session.type === SessionType.awsIamUser) {
           // Get Account from Caller Identity
-          text = await (this.sessionService as AwsIamUserService).getAccountNumberFromCallerIdentity(session);
+          text = await AwsIamUserService.getInstance().getAccountNumberFromCallerIdentity(session);
         }
 
         this.appService.copyToClipboard(text);
