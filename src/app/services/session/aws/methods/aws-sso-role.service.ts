@@ -1,5 +1,4 @@
 import {Injectable} from '@angular/core';
-import {AwsSessionService} from '../aws-session.service';
 import {WorkspaceService} from '../../../workspace.service';
 import {CredentialsInfo} from '../../../../../../core/models/credentials-info';
 import {AwsSsoRoleSession} from '../../../../../../core/models/aws-sso-role-session';
@@ -21,6 +20,7 @@ import {SessionType} from '../../../../../../core/models/session-type';
 import {AwsSsoOidcService, BrowserWindowClosing} from '../../../aws-sso-oidc.service';
 import Repository from '../../../../../../core/services/repository';
 import {FileService} from '../../../../../../core/services/file-service';
+import AwsSessionService from '../../../../../../core/services/session/aws/aws-session-service';
 
 export interface AwsSsoRoleSessionRequest {
   sessionName: string;

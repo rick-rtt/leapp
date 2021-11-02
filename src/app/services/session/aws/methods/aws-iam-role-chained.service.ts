@@ -1,5 +1,4 @@
 import {Injectable} from '@angular/core';
-import {AwsSessionService} from '../aws-session.service';
 import {CredentialsInfo} from '../../../../../../core/models/credentials-info';
 import {WorkspaceService} from '../../../workspace.service';
 import {AppService} from '../../../app.service';
@@ -11,13 +10,14 @@ import * as AWS from 'aws-sdk';
 import {SessionType} from '../../../../../../core/models/session-type';
 import {AwsIamRoleFederatedService} from './aws-iam-role-federated.service';
 import {KeychainService} from '../../../keychain.service';
-import {AwsIamUserService} from './aws-iam-user.service';
 import {AwsSsoRoleService} from './aws-sso-role.service';
 import {ElectronService} from '../../../electron.service';
 import {AwsSsoOidcService} from '../../../aws-sso-oidc.service';
 import { AssumeRoleResponse } from 'aws-sdk/clients/sts';
 import Repository from '../../../../../../core/services/repository';
 import {FileService} from '../../../../../../core/services/file-service';
+import AwsSessionService from '../../../../../../core/services/session/aws/aws-session-service';
+import AwsIamUserService from '../../../../../../core/services/session/aws/method/aws-iam-user-service';
 
 export interface AwsIamRoleChainedSessionRequest {
   accountName: string;
@@ -101,7 +101,7 @@ export class AwsIamRoleChainedService extends AwsSessionService {
     if(parentSession.type === SessionType.awsIamRoleFederated) {
       parentSessionService = new AwsIamRoleFederatedService(this.workspaceService, this.keychainService, this.appService) as AwsSessionService;
     } else if(parentSession.type === SessionType.awsIamUser) {
-      parentSessionService = new AwsIamUserService(this.workspaceService, this.keychainService, this.appService) as AwsSessionService;
+      parentSessionService = AwsIamUserService.getInstance(this.workspaceService, this.keychainService, this.appService) as AwsSessionService;
     } else if(parentSession.type === SessionType.awsSsoRole) {
       parentSessionService = new AwsSsoRoleService(this.workspaceService, this.appService, this.keychainService, this.awsSsoOidcService) as AwsSessionService;
     }

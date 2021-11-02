@@ -1,22 +1,21 @@
 // noinspection DuplicatedCode
-
 import {TestBed} from '@angular/core/testing';
 
-import {AwsIamUserService} from './aws-iam-user.service';
-import {mustInjected} from '../../../../../base-injectables';
+import {mustInjected} from '../../src/base-injectables';
 import {serialize} from 'class-transformer';
-import {Workspace} from '../../../../../../core/models/workspace';
-import {AppService} from '../../../app.service';
-import {WorkspaceService} from '../../../workspace.service';
-import {Session} from '../../../../../../core/models/session';
-import {KeychainService} from '../../../keychain.service';
-import {environment} from '../../../../../environments/environment';
-import {LeappBaseError} from '../../../../errors/leapp-base-error';
+import {Workspace} from '../models/workspace';
+import {AppService} from '../../src/app/services/app.service';
+import {WorkspaceService} from '../../src/app/services/workspace.service';
+import {Session} from '../models/session';
+import {KeychainService} from '../../src/app/services/keychain.service';
+import {environment} from '../../src/environments/environment';
+import {LeappBaseError} from '../../src/app/errors/leapp-base-error';
 
 import * as AWSMock from 'aws-sdk-mock';
 import * as AWS from 'aws-sdk';
-import {AwsIamUserSession} from '../../../../../../core/models/aws-iam-user-session';
-import {FileService} from '../../../../../../core/services/file-service';
+import {AwsIamUserSession} from '../models/aws-iam-user-session';
+import {FileService} from '../services/file-service';
+import AwsIamUserService from '../services/session/aws/method/aws-iam-user-service';
 
 let spyAppService;
 let spyFileService;
@@ -103,7 +102,7 @@ describe('AwsIamUserService', () => {
       mockedSessions = [];
       awsIamUserService.create({accountName: 'fakeaccount', region: 'eu-west-1', accessKey: 'access-key', secretKey: 'secret-key'}, 'default');
 
-      spyOn(awsIamUserService, 'get').and.callFake((_: string) => mockedSessions[0]);
+      spyOn(spyWorkspaceService, 'get').and.callFake((_: string) => mockedSessions[0]);
 
       const credentialsInfo = {
         sessionToken: {
@@ -119,7 +118,7 @@ describe('AwsIamUserService', () => {
       awsIamUserService.applyCredentials(mockedSessions[0].sessionId, credentialsInfo);
 
       const caller = setTimeout(()=> {
-        expect(awsIamUserService.get).toHaveBeenCalled();
+        expect(spyWorkspaceService.get).toHaveBeenCalled();
         expect(spyFileService.iniWriteSync).toHaveBeenCalledTimes(1);
         expect(spyFileService.iniWriteSync).toHaveBeenCalledWith('~/.aws', {
           default: {
@@ -143,7 +142,7 @@ describe('AwsIamUserService', () => {
       mockedSessions = [];
       awsIamUserService.create({accountName: 'fakeaccount', region: 'eu-west-1', accessKey: 'access-key', secretKey: 'secret-key'}, 'default');
 
-      spyOn(awsIamUserService, 'get').and.callFake((_: string) => mockedSessions[0]);
+      spyOn(spyWorkspaceService, 'get').and.callFake((_: string) => mockedSessions[0]);
 
       const credentialsInfo = {
         sessionToken: {
@@ -174,7 +173,7 @@ describe('AwsIamUserService', () => {
       awsIamUserService.deApplyCredentials(mockedSessions[0].sessionId);
 
       const caller = setTimeout(()=> {
-        expect(awsIamUserService.get).toHaveBeenCalled();
+        expect(spyWorkspaceService.get).toHaveBeenCalled();
         expect(spyFileService.iniParseSync).toHaveBeenCalledTimes(1);
         expect(spyFileService.replaceWriteSync).toHaveBeenCalledWith('~/.aws', {});
         done();
@@ -206,7 +205,7 @@ describe('AwsIamUserService', () => {
       awsIamUserService.create({accountName: 'fakeaccount', region: 'eu-west-1', accessKey: 'access-key', secretKey: 'secret-key'}, 'default');
       (mockedSessions[0] as AwsIamUserSession).sessionTokenExpiration = new Date(Date.now() - environment.sessionTokenDuration - 1000).toISOString();
 
-      spyOn(awsIamUserService, 'get').and.callFake((_: string) => mockedSessions[0]);
+      spyOn(spyWorkspaceService, 'get').and.callFake((_: string) => mockedSessions[0]);
       spyOn(awsIamUserService, 'generateCredentials').and.callThrough();
       spyOn<any>(awsIamUserService, 'saveSessionTokenResponseInTheSession').and.callFake(() => true);
 
@@ -248,7 +247,7 @@ describe('AwsIamUserService', () => {
       (mockedSessions[0] as AwsIamUserSession).mfaDevice = 'fake-device-arn';
       (mockedSessions[0] as AwsIamUserSession).sessionTokenExpiration = new Date(Date.now() - 10000).toISOString();
 
-      spyOn(awsIamUserService, 'get').and.callFake((_: string) => mockedSessions[0]);
+      spyOn(spyWorkspaceService, 'get').and.callFake((_: string) => mockedSessions[0]);
       spyOn(awsIamUserService, 'generateCredentials').and.callThrough();
       spyOn<any>(awsIamUserService, 'generateSessionToken').and.callFake(() => true);
 
@@ -285,7 +284,7 @@ describe('AwsIamUserService', () => {
       // Fake date in the future to prevent token expiration
       (mockedSessions[0] as AwsIamUserSession).sessionTokenExpiration = new Date(Date.now() + 1000).toISOString();
 
-      spyOn(awsIamUserService, 'get').and.callFake((_: string) => mockedSessions[0]);
+      spyOn(spyWorkspaceService, 'get').and.callFake((_: string) => mockedSessions[0]);
       spyOn(awsIamUserService, 'generateCredentials').and.callThrough();
 
       // We need to spy on iniParseFile
@@ -322,7 +321,7 @@ describe('AwsIamUserService', () => {
       mockedSessions = [];
       awsIamUserService.create({accountName: 'fakeaccount', region: 'eu-west-1', accessKey: 'access-key', secretKey: 'secret-key'}, 'default');
 
-      spyOn(awsIamUserService, 'get').and.callFake((_: string) => mockedSessions[0]);
+      spyOn(spyWorkspaceService, 'get').and.callFake((_: string) => mockedSessions[0]);
       spyOn(awsIamUserService, 'generateCredentials').and.callThrough();
 
       // Trick to test throwing error: basically we catch the error and confront it instead of checking throwError

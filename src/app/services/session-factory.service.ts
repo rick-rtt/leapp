@@ -3,7 +3,7 @@ import {WorkspaceService} from './workspace.service';
 import {KeychainService} from './keychain.service';
 import {AppService} from './app.service';
 import {SessionType} from '../../../core/models/session-type';
-import {AwsIamUserService} from './session/aws/methods/aws-iam-user.service';
+import AwsIamUserService from '../../../core/services/session/aws/method/aws-iam-user-service';
 import {AwsIamRoleChainedService} from './session/aws/methods/aws-iam-role-chained.service';
 import {AwsIamRoleFederatedService} from './session/aws/methods/aws-iam-role-federated.service';
 import {AwsSsoRoleService} from './session/aws/methods/aws-sso-role.service';
@@ -56,7 +56,7 @@ export class SessionFactoryService {
   }
 
   private getAwsIamUserSessionService(accountType: SessionType): AwsIamUserService {
-    const service = new AwsIamUserService(this.workspaceService, this.keychainService, this.appService);
+    const service = AwsIamUserService.getInstance(this.workspaceService, this.keychainService, this.appService);
     this.sessionServiceCache[accountType.toString()] = service;
     return service;
   }

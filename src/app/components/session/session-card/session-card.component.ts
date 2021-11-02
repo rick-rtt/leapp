@@ -1,6 +1,6 @@
 import {Component, Input, OnInit, TemplateRef, ViewChild} from '@angular/core';
 import {Session} from '../../../../../core/models/session';
-import {AwsSessionService} from '../../../services/session/aws/aws-session.service';
+import AwsSessionService from '../../../../../core/services/session/aws/aws-session-service';
 import {AppService, ToastLevel} from '../../../services/app.service';
 import {Router} from '@angular/router';
 import {AwsIamRoleFederatedSession} from '../../../../../core/models/aws-iam-role-federated-session';
@@ -16,7 +16,7 @@ import {SessionFactoryService} from '../../../services/session-factory.service';
 import {SessionStatus} from '../../../../../core/models/session-status';
 import {SessionService} from '../../../services/session.service';
 import {Constants} from '../../../../../core/models/constants';
-import {AwsIamUserService} from '../../../services/session/aws/methods/aws-iam-user.service';
+import AwsIamUserService from '../../../../../core/services/session/aws/method/aws-iam-user-service';
 import {LoggerLevel, LoggingService} from '../../../../../core/services/logging-service';
 import Repository from '../../../../../core/services/repository';
 

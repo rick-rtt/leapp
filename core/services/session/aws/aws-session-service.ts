@@ -1,18 +1,11 @@
-import {Injectable} from '@angular/core';
-import {Session} from '../../../../../core/models/session';
-import {WorkspaceService} from '../../workspace.service';
-import {CredentialsInfo} from '../../../../../core/models/credentials-info';
-import {SessionType} from '../../../../../core/models/session-type';
-import {SessionStatus} from '../../../../../core/models/session-status';
-import {AwsIamRoleChainedSession} from '../../../../../core/models/aws-iam-role-chained-session';
-import {SessionService} from '../../session.service';
-import {LeappBaseError} from '../../../errors/leapp-base-error';
-import {LoggerLevel} from '../../../../../core/services/logging-service';
+import {WorkspaceService} from '../../../../src/app/services/workspace.service';
+import {CredentialsInfo} from '../../../models/credentials-info';
+import {SessionStatus} from '../../../models/session-status';
+import {SessionService} from '../../../../src/app/services/session.service';
+import {LeappBaseError} from '../../../../src/app/errors/leapp-base-error';
+import {LoggerLevel} from '../../logging-service';
 
-@Injectable({
-  providedIn: 'root'
-})
-export abstract class AwsSessionService extends SessionService {
+export default abstract class AwsSessionService extends SessionService {
 
   /* This service manage the session manipulation as we need top generate credentials and maintain them for a specific duration */
   protected constructor(protected workspaceService: WorkspaceService) {

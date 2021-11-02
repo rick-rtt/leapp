@@ -2,9 +2,9 @@ import {TestBed} from '@angular/core/testing';
 
 import {SessionFactoryService} from './session-factory.service';
 import {mustInjected} from '../../base-injectables';
-import {AwsSessionService} from './session/aws/aws-session.service';
+import {AwsSessionService} from '../../../core/services/session/aws/aws-session-service';
 import {SessionType} from '../../../core/models/session-type';
-import {AwsIamUserService} from './session/aws/methods/aws-iam-user.service';
+import {AwsIamUserService} from '../../../core/services/session/aws/method/aws-iam-user-service';
 import {WorkspaceService} from './workspace.service';
 import {KeychainService} from './keychain.service';
 import {AppService} from './app.service';

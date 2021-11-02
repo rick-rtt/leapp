@@ -3,8 +3,8 @@ import {Session} from '../../../core/models/session';
 import {BehaviorSubject, Observable} from 'rxjs';
 import Repository from '../../../core/services/repository';
 import {SessionStatus} from '../../../core/models/session-status';
-import {SessionType} from "../../../core/models/session-type";
-import {AwsIamRoleChainedSession} from "../../../core/models/aws-iam-role-chained-session";
+import {SessionType} from '../../../core/models/session-type';
+import {AwsIamRoleChainedSession} from '../../../core/models/aws-iam-role-chained-session';
 
 @Injectable({
   providedIn: 'root'

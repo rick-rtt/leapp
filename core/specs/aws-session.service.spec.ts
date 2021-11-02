@@ -2,19 +2,19 @@
 
 import {TestBed} from '@angular/core/testing';
 
-import {AwsSessionService} from './aws-session.service';
-import {mustInjected} from '../../../../base-injectables';
+import {mustInjected} from '../../src/base-injectables';
 import {serialize} from 'class-transformer';
-import {Workspace} from '../../../../../core/models/workspace';
-import {AppService} from '../../app.service';
-import {Session} from '../../../../../core/models/session';
-import {WorkspaceService} from '../../workspace.service';
-import {SessionType} from '../../../../../core/models/session-type';
-import {AwsIamUserService} from './methods/aws-iam-user.service';
-import {LeappNotFoundError} from '../../../errors/leapp-not-found-error';
-import {SessionStatus} from '../../../../../core/models/session-status';
-import {AwsIamUserSession} from '../../../../../core/models/aws-iam-user-session';
-import {FileService} from '../../../../../core/services/file-service';
+import {Workspace} from '../models/workspace';
+import {AppService} from '../../src/app/services/app.service';
+import {Session} from '../models/session';
+import {WorkspaceService} from '../../src/app/services/workspace.service';
+import {SessionType} from '../models/session-type';
+import {LeappNotFoundError} from '../../src/app/errors/leapp-not-found-error';
+import {SessionStatus} from '../models/session-status';
+import {AwsIamUserSession} from '../models/aws-iam-user-session';
+import {FileService} from '../services/file-service';
+import AwsSessionService from '../services/session/aws/aws-session-service';
+import AwsIamUserService from '../services/session/aws/method/aws-iam-user-service';
 
 let spyAppService;
 let spyFileService;
@@ -67,15 +67,15 @@ describe('AwsSessionService', () => {
     it('should return a session given the id', () => {
       const service: AwsSessionService = TestBed.inject(AwsSessionService);
 
-      expect(service.get('fakeid')).toBeInstanceOf(Session);
-      expect(service.get('fakeid').sessionId).toEqual('fakeid');
-      expect(service.get('fakeid').sessionName).toEqual('fakeaccount');
+      expect(spyWorkspaceService.get('fakeid')).toBeInstanceOf(Session);
+      expect(spyWorkspaceService.get('fakeid').sessionId).toEqual('fakeid');
+      expect(spyWorkspaceService.get('fakeid').sessionName).toEqual('fakeaccount');
     });
 
     it('should return null if session is not found given the id', () => {
       const service: AwsSessionService = TestBed.inject(AwsSessionService);
 
-      expect(service.get('notfoundid')).toBe(null);
+      expect(spyWorkspaceService.get('notfoundid')).toBe(null);
     });
   });
 
@@ -83,8 +83,8 @@ describe('AwsSessionService', () => {
     it('should return a session list retrieved from workspace', () => {
       const service: AwsSessionService = TestBed.inject(AwsSessionService);
 
-      expect(service.list()).toBeInstanceOf(Array);
-      expect(service.list().length).toBeDefined();
+      expect(spyWorkspaceService.list()).toBeInstanceOf(Array);
+      expect(spyWorkspaceService.list().length).toBeDefined();
       expect(spyWorkspaceService.sessions).toEqual(mockedSessions);
     });
   });
@@ -93,23 +93,23 @@ describe('AwsSessionService', () => {
     it('should return a session list composed only of IAM Role Chained accounts', () => {
       const service: AwsSessionService = TestBed.inject(AwsSessionService);
 
-      expect(service.listIamRoleChained()).toBeInstanceOf(Array);
-      expect(service.listIamRoleChained().filter(c => c.type === SessionType.awsIamRoleChained)).toEqual([]);
+      expect(spyWorkspaceService.listIamRoleChained()).toBeInstanceOf(Array);
+      expect(spyWorkspaceService.listIamRoleChained().filter(c => c.type === SessionType.awsIamRoleChained)).toEqual([]);
 
       const mockedSession2 = new AwsIamUserSession('fakeaccount2', 'eu-west-2', 'fakeprofile2');
       mockedSession2.type = SessionType.awsIamRoleChained;
       mockedSessions.push(mockedSession2);
 
-      expect(service.listIamRoleChained()).toBeInstanceOf(Array);
-      expect(service.listIamRoleChained().filter(c => c.type === SessionType.awsIamRoleChained)).toEqual([mockedSession2]);
+      expect(spyWorkspaceService.listIamRoleChained()).toBeInstanceOf(Array);
+      expect(spyWorkspaceService.listIamRoleChained().filter(c => c.type === SessionType.awsIamRoleChained)).toEqual([mockedSession2]);
     });
 
     it('should call list() under the hood', () => {
       const service: AwsSessionService = TestBed.inject(AwsSessionService);
 
-      spyOn(service, 'list').and.callThrough();
-      service.listIamRoleChained();
-      expect(service.list).toHaveBeenCalled();
+      spyOn(spyWorkspaceService, 'list').and.callThrough();
+      spyWorkspaceService.listIamRoleChained();
+      expect(spyWorkspaceService.list).toHaveBeenCalled();
     });
   });
 
@@ -117,23 +117,23 @@ describe('AwsSessionService', () => {
     it('should return a session list of active sessins only', () => {
       const service: AwsSessionService = TestBed.inject(AwsSessionService);
 
-      expect(service.listActive()).toBeInstanceOf(Array);
-      expect(service.listActive().filter(c => c.status === SessionStatus.active)).toEqual([]);
+      expect(spyWorkspaceService.listActive()).toBeInstanceOf(Array);
+      expect(spyWorkspaceService.listActive().filter(c => c.status === SessionStatus.active)).toEqual([]);
 
       const mockedSession2 = new AwsIamUserSession('fakeaccount2', 'eu-west-2', 'fakeprofile2');
       mockedSession2.status = SessionStatus.active;
       mockedSessions.push(mockedSession2);
 
-      expect(service.listActive()).toBeInstanceOf(Array);
-      expect(service.listActive().filter(c => c.status === SessionStatus.active)).toEqual([mockedSession2]);
+      expect(spyWorkspaceService.listActive()).toBeInstanceOf(Array);
+      expect(spyWorkspaceService.listActive().filter(c => c.status === SessionStatus.active)).toEqual([mockedSession2]);
     });
 
     it('should call list() under the hood', () => {
       const service: AwsSessionService = TestBed.inject(AwsSessionService);
 
-      spyOn(service, 'list').and.callThrough();
-      service.listActive();
-      expect(service.list).toHaveBeenCalled();
+      spyOn(spyWorkspaceService, 'list').and.callThrough();
+      spyWorkspaceService.listActive();
+      expect(spyWorkspaceService.list).toHaveBeenCalled();
     });
   });
 
@@ -286,8 +286,8 @@ describe('AwsSessionService', () => {
           expect((service as any).sessionRotated).toHaveBeenCalled();
 
           expect(mockedSession.status).toBe(SessionStatus.active);
-          expect(service.get('fakeid').startDateTime).not.toBe(previousStartDateTime);
-          expect(new Date(service.get('fakeid').startDateTime).getTime()).toBeGreaterThan(new Date(previousStartDateTime).getTime());
+          expect(spyWorkspaceService.get('fakeid').startDateTime).not.toBe(previousStartDateTime);
+          expect(new Date(spyWorkspaceService.get('fakeid').startDateTime).getTime()).toBeGreaterThan(new Date(previousStartDateTime).getTime());
 
           done();
           clearTimeout(caller);

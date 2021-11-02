@@ -1,20 +1,19 @@
-import {Injectable} from '@angular/core';
-import {CredentialsInfo} from '../../../../../../core/models/credentials-info';
-import {AwsSessionService} from '../aws-session.service';
-import {WorkspaceService} from '../../../workspace.service';
-import {AwsIamUserSession} from '../../../../../../core/models/aws-iam-user-session';
-import {KeychainService} from '../../../keychain.service';
-import {environment} from '../../../../../environments/environment';
-import {Session} from '../../../../../../core/models/session';
-import {AppService} from '../../../app.service';
+import {CredentialsInfo} from '../../../../models/credentials-info';
+import {WorkspaceService} from '../../../../../src/app/services/workspace.service';
+import {AwsIamUserSession} from '../../../../models/aws-iam-user-session';
+import {KeychainService} from '../../../../../src/app/services/keychain.service';
+import {environment} from '../../../../../src/environments/environment';
+import {Session} from '../../../../models/session';
+import {AppService} from '../../../../../src/app/services/app.service';
 import * as AWS from 'aws-sdk';
 import {GetSessionTokenResponse} from 'aws-sdk/clients/sts';
-import {Constants} from '../../../../../../core/models/constants';
-import {LeappAwsStsError} from '../../../../errors/leapp-aws-sts-error';
-import {LeappParseError} from '../../../../errors/leapp-parse-error';
-import {LeappMissingMfaTokenError} from '../../../../errors/leapp-missing-mfa-token-error';
-import Repository from '../../../../../../core/services/repository';
-import {FileService} from '../../../../../../core/services/file-service';
+import {Constants} from '../../../../models/constants';
+import {LeappAwsStsError} from '../../../../../src/app/errors/leapp-aws-sts-error';
+import {LeappParseError} from '../../../../../src/app/errors/leapp-parse-error';
+import {LeappMissingMfaTokenError} from '../../../../../src/app/errors/leapp-missing-mfa-token-error';
+import Repository from '../../../repository';
+import {FileService} from '../../../file-service';
+import AwsSessionService from '../aws-session-service';
 
 export interface AwsIamUserSessionRequest {
   accountName: string;
@@ -24,17 +23,23 @@ export interface AwsIamUserSessionRequest {
   mfaDevice?: string;
 }
 
-@Injectable({
-  providedIn: 'root'
-})
-export class AwsIamUserService extends AwsSessionService {
+export default class AwsIamUserService extends AwsSessionService {
 
-  constructor(
+  private static instance: AwsIamUserService;
+
+  private constructor(
     protected workspaceService: WorkspaceService,
     private keychainService: KeychainService,
     private appService: AppService
   ) {
     super(workspaceService);
+  }
+
+  static getInstance(workspaceService: WorkspaceService, keychainService: KeychainService, appService: AppService) {
+    if(!this.instance) {
+      this.instance = new AwsIamUserService(workspaceService, keychainService, appService);
+    }
+    return this.instance;
   }
 
   static isTokenExpired(tokenExpiration: string): boolean {
@@ -143,8 +148,8 @@ export class AwsIamUserService extends AwsSessionService {
   }
 
   removeSecrets(sessionId: string): void {
-    this.removeAccessKeyFromKeychain(sessionId).then( res1 => {
-      this.removeSecretKeyFromKeychain(sessionId).then( res2 => {
+    this.removeAccessKeyFromKeychain(sessionId).then( _ => {
+      this.removeSecretKeyFromKeychain(sessionId).then( __ => {
         this.removeSessionTokenFromKeychain(sessionId).catch(err => {
           throw err;
         });

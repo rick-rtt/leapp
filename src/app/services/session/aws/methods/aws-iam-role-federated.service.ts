@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import {AwsSessionService} from '../aws-session.service';
 import {CredentialsInfo} from '../../../../../../core/models/credentials-info';
 import {WorkspaceService} from '../../../workspace.service';
 import {KeychainService} from '../../../keychain.service';
@@ -12,6 +11,7 @@ import * as AWS from 'aws-sdk';
 import {LeappAwsStsError} from '../../../../errors/leapp-aws-sts-error';
 import Repository from '../../../../../../core/services/repository';
 import {FileService} from '../../../../../../core/services/file-service';
+import AwsSessionService from '../../../../../../core/services/session/aws/aws-session-service';
 
 export interface AwsIamRoleFederatedSessionRequest {
   accountName: string;
