@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
-import {AppService, LoggerLevel} from '../../../services/app.service';
-import {LoggingService} from '../../../services/logging.service';
+import {AppService} from '../../../services/app.service';
+import {LoggerLevel, LoggingService} from '../../../../../core/services/logging.service';
 
 @Component({
   selector: 'app-profile',
@@ -13,8 +13,7 @@ export class ProfileComponent implements OnInit {
 
   /* The header that we shows on the app */
   constructor(
-    private appService: AppService,
-    private loggingService: LoggingService
+    private appService: AppService
   ) {}
 
   ngOnInit() {
@@ -27,6 +26,6 @@ export class ProfileComponent implements OnInit {
   toggleProfile() {
     this.profileIsOpen = !this.profileIsOpen; // Toggle status
     this.appService.profileOpen.emit(this.profileIsOpen); // Emit event for screen
-    this.loggingService.logger(`Profile open emitting: ${this.profileIsOpen}`, LoggerLevel.info, this);
+    LoggingService.getInstance().logger(`Profile open emitting: ${this.profileIsOpen}`, LoggerLevel.info, this);
   }
 }

@@ -1,7 +1,7 @@
 import {Component, Input, OnInit, TemplateRef, ViewChild} from '@angular/core';
 import {Session} from '../../../../../core/models/session';
 import {AwsSessionService} from '../../../services/session/aws/aws-session.service';
-import {AppService, LoggerLevel, ToastLevel} from '../../../services/app.service';
+import {AppService} from '../../../services/app.service';
 import {Router} from '@angular/router';
 import {AwsIamRoleFederatedSession} from '../../../../../core/models/aws-iam-role-federated-session';
 import {SsmService} from '../../../services/ssm.service';
@@ -17,7 +17,7 @@ import {SessionStatus} from '../../../../../core/models/session-status';
 import {SessionService} from '../../../services/session.service';
 import {Constants} from '../../../../../core/models/constants';
 import {AwsIamUserService} from '../../../services/session/aws/methods/aws-iam-user.service';
-import {LoggingService} from '../../../services/logging.service';
+import {LoggerLevel, LoggingService, ToastLevel} from '../../../../../core/services/logging.service';
 import Repository from '../../../../../core/services/repository';
 
 @Component({
@@ -68,7 +68,6 @@ export class SessionCardComponent implements OnInit {
     private router: Router,
     private ssmService: SsmService,
     private sessionProviderService: SessionFactoryService,
-    private loggingService: LoggingService,
     private modalService: BsModalService
   ) {}
 
@@ -170,11 +169,11 @@ export class SessionCardComponent implements OnInit {
         }
 
         this.appService.copyToClipboard(text);
-        this.loggingService.toast('Your information have been successfully copied!', ToastLevel.success, 'Information copied!');
+        this.appService.toast('Your information have been successfully copied!', ToastLevel.success, 'Information copied!');
       }
     } catch (err) {
-      this.loggingService.toast(err, ToastLevel.warn);
-      this.loggingService.logger(err, LoggerLevel.error, this, err.stack);
+      this.appService.toast(err, ToastLevel.warn);
+      LoggingService.getInstance().logger(err, LoggerLevel.error, this, err.stack);
     }
   }
 
@@ -251,7 +250,7 @@ export class SessionCardComponent implements OnInit {
         this.startSession();
       }
 
-      this.loggingService.toast('Default region has been changed!', ToastLevel.success, 'Region changed!');
+      this.appService.toast('Default region has been changed!', ToastLevel.success, 'Region changed!');
       this.modalRef.hide();
     }
   }
@@ -330,7 +329,7 @@ export class SessionCardComponent implements OnInit {
         this.startSession();
       }
 
-      this.loggingService.toast('Profile has been changed!', ToastLevel.success, 'Profile changed!');
+      this.appService.toast('Profile has been changed!', ToastLevel.success, 'Profile changed!');
       this.modalRef.hide();
     }
   }
@@ -350,7 +349,7 @@ export class SessionCardComponent implements OnInit {
   }
 
   private logSessionData(session: Session, message: string): void {
-    this.loggingService.logger(
+    LoggingService.getInstance().logger(
       message,
       LoggerLevel.info,
       this,

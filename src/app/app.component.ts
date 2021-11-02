@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {environment} from '../environments/environment';
-import {AppService, LoggerLevel} from './services/app.service';
+import {AppService} from './services/app.service';
 import {Router} from '@angular/router';
 import {WorkspaceService} from './services/workspace.service';
 import {setTheme} from 'ngx-bootstrap/utils';
@@ -10,7 +10,7 @@ import {SessionFactoryService} from './services/session-factory.service';
 import {UpdaterService} from './services/updater.service';
 import compareVersions from 'compare-versions';
 import {RetrocompatibilityService} from './services/retrocompatibility.service';
-import {LoggingService} from './services/logging.service';
+import {LoggerLevel, LoggingService} from '../../core/services/logging.service';
 import {LeappParseError} from './errors/leapp-parse-error';
 import {Constants} from '../../core/models/constants';
 import Repository from '../../core/services/repository';

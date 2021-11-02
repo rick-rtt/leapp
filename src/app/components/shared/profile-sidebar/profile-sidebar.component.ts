@@ -1,11 +1,11 @@
 import {Component, OnInit, Renderer2} from '@angular/core';
-import {AppService, LoggerLevel} from '../../../services/app.service';
+import {AppService} from '../../../services/app.service';
 import {Router} from '@angular/router';
 import {HttpClient} from '@angular/common/http';
 import {ExecuteService} from '../../../services/execute.service';
 import {ProxyService} from '../../../services/proxy.service';
 import {WorkspaceService} from '../../../services/workspace.service';
-import {LoggingService} from '../../../services/logging.service';
+import {LoggerLevel, LoggingService} from '../../../../../core/services/logging.service';
 
 @Component({
   selector: 'app-profile-sidebar',
@@ -25,7 +25,6 @@ export class ProfileSidebarComponent implements OnInit {
     private executeService: ExecuteService,
     private proxyService: ProxyService,
     private workspaceService: WorkspaceService,
-    private loggingService: LoggingService,
     private renderer: Renderer2
   ) {}
 
@@ -55,7 +54,7 @@ export class ProfileSidebarComponent implements OnInit {
   closeProfile() {
     this.profileOpen = false;
     this.appService.profileOpen.emit(false);
-    this.loggingService.logger(`Profile open emitting: ${this.profileOpen}`, LoggerLevel.info, this);
+    LoggingService.getInstance().logger(`Profile open emitting: ${this.profileOpen}`, LoggerLevel.info, this);
     this.renderer.removeClass(document.body, 'moved');
   }
 

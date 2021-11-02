@@ -3,7 +3,7 @@ import {ExecuteService} from './execute.service';
 import {AppService, LoggerLevel} from './app.service';
 import {LeappBaseError} from '../errors/leapp-base-error';
 import {CredentialsInfo} from '../../../core/models/credentials-info';
-import {LoggingService} from './logging.service';
+import {LoggingService} from '../../../core/services/logging.service';
 
 const AWS = require('aws-sdk');
 

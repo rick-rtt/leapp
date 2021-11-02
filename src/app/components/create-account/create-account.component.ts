@@ -1,6 +1,6 @@
 import {Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
-import {AppService, LoggerLevel} from '../../services/app.service';
+import {AppService} from '../../services/app.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {AwsSessionService} from '../../services/session/aws/aws-session.service';
 import {WorkspaceService} from '../../services/workspace.service';
@@ -12,7 +12,7 @@ import {AwsIamRoleChainedSessionRequest, AwsIamRoleChainedService} from '../../s
 import {LeappParseError} from '../../errors/leapp-parse-error';
 import {AwsIamRoleFederatedSessionRequest, AwsIamRoleFederatedService} from '../../services/session/aws/methods/aws-iam-role-federated.service';
 import {AzureService, AzureSessionRequest} from '../../services/session/azure/azure.service';
-import {LoggingService} from '../../services/logging.service';
+import {LoggerLevel, LoggingService} from '../../../../core/services/logging.service';
 import Repository from '../../../../core/services/repository';
 
 @Component({
@@ -84,8 +84,7 @@ export class CreateAccountComponent implements OnInit {
     private awsIamUserService: AwsIamUserService,
     private awsIamRoleChainedService: AwsIamRoleChainedService,
     private awsSessionService: AwsSessionService,
-    private azureService: AzureService,
-    private loggingService: LoggingService
+    private azureService: AzureService
   ) {}
 
   ngOnInit() {
@@ -156,7 +155,7 @@ export class CreateAccountComponent implements OnInit {
    * Save the first account in the workspace
    */
   saveSession() {
-    this.loggingService.logger(`Saving account...`, LoggerLevel.info, this);
+    LoggingService.getInstance().logger(`Saving account...`, LoggerLevel.info, this);
     this.addProfileToWorkspace();
     this.saveNewSsoRolesToWorkspace();
     this.createSession();

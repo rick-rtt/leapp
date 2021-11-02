@@ -1,6 +1,6 @@
 import {Component, OnInit, ViewEncapsulation} from '@angular/core';
 import {FormControl, FormGroup} from '@angular/forms';
-import {AppService, LoggerLevel, ToastLevel} from '../../../services/app.service';
+import {AppService} from '../../../services/app.service';
 import {Router} from '@angular/router';
 import {Constants} from '../../../../../core/models/constants';
 import {environment} from '../../../../environments/environment';
@@ -11,7 +11,7 @@ import {SessionStatus} from '../../../../../core/models/session-status';
 import {SessionFactoryService} from '../../../services/session-factory.service';
 import {SessionType} from '../../../../../core/models/session-type';
 import {AwsSessionService} from '../../../services/session/aws/aws-session.service';
-import {LoggingService} from '../../../services/logging.service';
+import {LoggerLevel, LoggingService, ToastLevel} from '../../../../../core/services/logging.service';
 import Repository from '../../../../../core/services/repository';
 
 @Component({
@@ -63,7 +63,6 @@ export class ProfilePageComponent implements OnInit {
   constructor(
     public workspaceService: WorkspaceService,
     private appService: AppService,
-    private loggingService: LoggingService,
     private sessionProviderService: SessionFactoryService,
     private awsSessionService: AwsSessionService,
     private router: Router
@@ -124,13 +123,13 @@ export class ProfilePageComponent implements OnInit {
 
         this.appService.confirmDialog('You\'ve set a proxy url: the app must be restarted to update the configuration.', (res) => {
           if (res !== Constants.confirmClosed) {
-            this.loggingService.logger('User have set a proxy url: the app must be restarted to update the configuration.', LoggerLevel.info, this);
+            LoggingService.getInstance().logger('User have set a proxy url: the app must be restarted to update the configuration.', LoggerLevel.info, this);
             this.appService.restart();
           }
         });
       } else {
-        this.loggingService.logger('Option saved.', LoggerLevel.info, this, JSON.stringify(this.form.getRawValue(), null, 3));
-        this.loggingService.toast('Option saved.', ToastLevel.info, 'Options');
+        LoggingService.getInstance().logger('Option saved.', LoggerLevel.info, this, JSON.stringify(this.form.getRawValue(), null, 3));
+        this.appService.toast('Option saved.', ToastLevel.info, 'Options');
         this.router.navigate(['/sessions', 'session-selected']).then(_ => {});
       }
     }
@@ -197,7 +196,7 @@ export class ProfilePageComponent implements OnInit {
     // Ask for deletion
     this.appService.confirmDialog(`Deleting this Idp url will also remove these sessions: <br><ul>${sessionsNames.join('')}</ul>Do you want to proceed?`, (res) => {
       if (res !== Constants.confirmClosed) {
-        this.loggingService.logger(`Removing idp url with id: ${id}`, LoggerLevel.info, this);
+        LoggingService.getInstance().logger(`Removing idp url with id: ${id}`, LoggerLevel.info, this);
 
         Repository.getInstance().removeIdpUrl(id);
 
@@ -255,7 +254,7 @@ export class ProfilePageComponent implements OnInit {
     // Ask for deletion
     this.appService.confirmDialog(`Deleting this profile will set default to these sessions: <br><ul>${sessionsNames.join('')}</ul>Do you want to proceed?`, async (res) => {
       if (res !== Constants.confirmClosed) {
-        this.loggingService.logger(`Reverting to default profile with id: ${id}`, LoggerLevel.info, this);
+        LoggingService.getInstance().logger(`Reverting to default profile with id: ${id}`, LoggerLevel.info, this);
         Repository.getInstance().removeProfile(id);
         // Reverting all sessions to default profile
         for(let i = 0; i < sessions.length; i++) {

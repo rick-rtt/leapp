@@ -6,26 +6,8 @@ import {InputDialogComponent} from '../components/shared/input-dialog/input-dial
 import {Constants} from '../../../core/models/constants';
 import {BsModalService} from 'ngx-bootstrap/modal';
 import {ElectronService} from './electron.service';
-import {LoggingService} from './logging.service';
-
-/*
-* External enum to the logger level so we can use this to define the type of log
-*/
-export enum LoggerLevel {
-  info,
-  warn,
-  error
-}
-
-/*
-* External enum to the toast level so we can use this to define the type of log
-*/
-export enum ToastLevel {
-  info,
-  warn,
-  error,
-  success
-}
+import {LoggerLevel, LoggingService, ToastLevel} from '../../../core/services/logging.service';
+import {ToastrService} from 'ngx-toastr';
 
 @Injectable({
   providedIn: 'root'
@@ -68,7 +50,7 @@ export class AppService {
   constructor(
     private modalService: BsModalService,
     private electronService: ElectronService,
-    private loggingService: LoggingService
+    private toastr: ToastrService
   ) {
 
     // Global Configure logger
@@ -264,15 +246,15 @@ export class AppService {
       // Clean localStorage
       localStorage.clear();
 
-      this.loggingService.toast('Cache and configuration file cleaned.', ToastLevel.success, 'Cleaning configuration file');
+      this.toast('Cache and configuration file cleaned.', ToastLevel.success, 'Cleaning configuration file');
 
       // Restart
       setTimeout(() => {
         this.restart();
       }, 2000);
     } catch (err) {
-      this.loggingService.logger(`Leapp has an error re-creating your configuration file and cache.`, LoggerLevel.error, this, err.stack);
-      this.loggingService.toast(`Leapp has an error re-creating your configuration file and cache.`, ToastLevel.error, 'Cleaning configuration file');
+      LoggingService.getInstance().logger(`Leapp has an error re-creating your configuration file and cache.`, LoggerLevel.error, this, err.stack);
+      this.toast(`Leapp has an error re-creating your configuration file and cache.`, ToastLevel.error, 'Cleaning configuration file');
     }
   }
 
@@ -383,6 +365,23 @@ export class AppService {
         this.validateAllFormFields(control);
       }
     });
+  }
+
+  /**
+   * Show a toast message with different styles for different type of toast
+   *
+   * @param message - the message to show
+   * @param type - the type of message from Toast Level
+   * @param title - [optional]
+   */
+  toast(message: string, type: ToastLevel | LoggerLevel, title?: string): void {
+    switch (type) {
+      case ToastLevel.success: this.toastr.success(message, title); break;
+      case ToastLevel.info || LoggerLevel.info: this.toastr.info(message, title); break;
+      case ToastLevel.warn || LoggerLevel.warn: this.toastr.warning(message, title); break;
+      case ToastLevel.error || LoggerLevel.error: this.toastr.error(message, title ? title : 'Invalid Action!'); break;
+      default: this.toastr.error(message, title); break;
+    }
   }
 
   /**
@@ -555,9 +554,5 @@ export class AppService {
         this.currentBrowserWindow().webContents.closeDevTools();
       }
     });
-  }
-
-  toast(message: string, level: ToastLevel, title: string) {
-    this.loggingService.toast(message, level, title);
   }
 }

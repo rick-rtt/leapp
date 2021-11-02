@@ -1,6 +1,6 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {WorkspaceService} from '../../../services/workspace.service';
-import {AppService, LoggerLevel} from '../../../services/app.service';
+import {AppService} from '../../../services/app.service';
 import {Session} from '../../../../../core/models/session';
 import {SessionType} from '../../../../../core/models/session-type';
 import {environment} from '../../../../environments/environment';
@@ -11,7 +11,7 @@ import {UpdaterService} from '../../../services/updater.service';
 import {SessionService} from '../../../services/session.service';
 import {SessionFactoryService} from '../../../services/session-factory.service';
 import {Constants} from '../../../../../core/models/constants';
-import {LoggingService} from '../../../services/logging.service';
+import {LoggerLevel, LoggingService} from '../../../../../core/services/logging.service';
 import Repository from '../../../../../core/services/repository';
 
 @Component({
@@ -29,7 +29,6 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
     private workspaceService: WorkspaceService,
     private sessionService: SessionService,
     private updaterService: UpdaterService,
-    private loggingService: LoggingService,
     private sessionProviderService: SessionFactoryService,
     private appService: AppService
   ) {}
@@ -173,7 +172,7 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
    */
   async cleanBeforeExit() {
     // Check if we are here
-    this.loggingService.logger('Closing app with cleaning process...', LoggerLevel.info, this);
+    LoggingService.getInstance().logger('Closing app with cleaning process...', LoggerLevel.info, this);
 
     // We need the Try/Catch as we have a the possibility to call the method without sessions
     try {
@@ -187,7 +186,7 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
       // Clean the config file
       this.appService.cleanCredentialFile();
     } catch (err) {
-      this.loggingService.logger('No sessions to stop, skipping...', LoggerLevel.error, this, err.stack);
+      LoggingService.getInstance().logger('No sessions to stop, skipping...', LoggerLevel.error, this, err.stack);
     }
 
     // Finally quit

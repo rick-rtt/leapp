@@ -1,6 +1,6 @@
 import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
-import {AppService, ToastLevel} from '../../services/app.service';
+import {AppService} from '../../services/app.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {Workspace} from '../../../../core/models/workspace';
 import {SessionType} from '../../../../core/models/session-type';
@@ -9,7 +9,7 @@ import {WorkspaceService} from '../../services/workspace.service';
 import {KeychainService} from '../../services/keychain.service';
 import {environment} from '../../../environments/environment';
 import {SessionService} from '../../services/session.service';
-import {LoggingService} from '../../services/logging.service';
+import {ToastLevel} from '../../../../core/services/logging.service';
 
 @Component({
   selector: 'app-edit-account',
@@ -45,8 +45,7 @@ export class EditAccountComponent implements OnInit {
     private activatedRoute: ActivatedRoute,
     private workspaceService: WorkspaceService,
     private keychainService: KeychainService,
-    private sessionService: SessionService,
-    private loggingService: LoggingService
+    private sessionService: SessionService
   ) {}
 
   ngOnInit() {
@@ -76,7 +75,7 @@ export class EditAccountComponent implements OnInit {
       this.keychainService.saveSecret(environment.appName, `${this.selectedSession.sessionId}-iam-user-aws-session-secret-access-key`, this.form.controls['secretKey'].value).then(_ => {});
 
       this.sessionService.update(this.selectedSession.sessionId, this.selectedSession);
-      this.loggingService.toast('Session updated correctly.', ToastLevel.success, 'Session Update');
+      this.appService.toast('Session updated correctly.', ToastLevel.success, 'Session Update');
 
       this.router.navigate(['/sessions', 'session-selected']).then(_ => {});
     }
