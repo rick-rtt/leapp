@@ -1,6 +1,5 @@
 import {Injectable} from '@angular/core';
 import {WorkspaceService} from './workspace.service';
-import {KeychainService} from '../../../core/services/keychain-service';
 import {AppService} from './app.service';
 import {SessionType} from '../../../core/models/session-type';
 import AwsIamUserService from '../../../core/services/session/aws/method/aws-iam-user-service';
@@ -25,8 +24,8 @@ export class SessionFactoryService {
     private appService: AppService,
     private executeService: ExecuteService,
     private electronService: ElectronService,
-    private awsSsoOidcService: AwsSsoOidcService) {
-
+    private awsSsoOidcService: AwsSsoOidcService
+  ) {
     this.sessionServiceCache = [];
   }
 
@@ -55,7 +54,7 @@ export class SessionFactoryService {
   }
 
   private getAwsIamUserSessionService(accountType: SessionType): AwsIamUserService {
-    const service = AwsIamUserService.getInstance(this.workspaceService, this.appService);
+    const service = AwsIamUserService.getInstance();
     this.sessionServiceCache[accountType.toString()] = service;
     return service;
   }

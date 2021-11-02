@@ -9,7 +9,6 @@ import {LeappAwsStsError} from '../../../../errors/leapp-aws-sts-error';
 import * as AWS from 'aws-sdk';
 import {SessionType} from '../../../../../../core/models/session-type';
 import {AwsIamRoleFederatedService} from './aws-iam-role-federated.service';
-import {KeychainService} from '../../../../../../core/services/keychain-service';
 import {AwsSsoRoleService} from './aws-sso-role.service';
 import {ElectronService} from '../../../electron.service';
 import {AwsSsoOidcService} from '../../../aws-sso-oidc.service';
@@ -36,7 +35,7 @@ export class AwsIamRoleChainedService extends AwsSessionService {
     protected workspaceService: WorkspaceService,
     private appService: AppService,
     private electronService: ElectronService,
-    private awsSsoOidcService: AwsSsoOidcService
+    private awsSsoOidcService: AwsSsoOidcService,
   ) {
     super(workspaceService);
   }
@@ -100,7 +99,7 @@ export class AwsIamRoleChainedService extends AwsSessionService {
     if(parentSession.type === SessionType.awsIamRoleFederated) {
       parentSessionService = new AwsIamRoleFederatedService(this.workspaceService, this.appService) as AwsSessionService;
     } else if(parentSession.type === SessionType.awsIamUser) {
-      parentSessionService = AwsIamUserService.getInstance(this.workspaceService, this.appService) as AwsSessionService;
+      parentSessionService = AwsIamUserService.getInstance() as AwsSessionService;
     } else if(parentSession.type === SessionType.awsSsoRole) {
       parentSessionService = new AwsSsoRoleService(this.workspaceService, this.appService, this.awsSsoOidcService) as AwsSessionService;
     }
