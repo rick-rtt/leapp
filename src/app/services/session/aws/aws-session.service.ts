@@ -19,23 +19,6 @@ export abstract class AwsSessionService extends SessionService {
     super(workspaceService);
   }
 
-  // TODO: are they assumable (maybe assumer) or generic aws sessions?
-  listAssumable(): Session[] {
-    return (this.list().length > 0) ? this.list().filter( (session) => session.type !== SessionType.azure ) : [];
-  }
-
-  listIamRoleChained(parentSession?: Session): Session[] {
-    let childSession = (this.list().length > 0) ? this.list().filter( (session) => session.type === SessionType.awsIamRoleChained ) : [];
-    if (parentSession) {
-      childSession = childSession.filter(session => (session as AwsIamRoleChainedSession).parentSessionId === parentSession.sessionId );
-    }
-    return childSession;
-  }
-
-  listAwsSsoRoles() {
-    return (this.list().length > 0) ? this.list().filter((session) => session.type === SessionType.awsSsoRole) : [];
-  }
-
   async start(sessionId: string): Promise<void> {
     try {
       if (this.isThereAnotherPendingSessionWithSameNamedProfile(sessionId)) {
@@ -73,10 +56,10 @@ export abstract class AwsSessionService extends SessionService {
 
   async delete(sessionId: string): Promise<void> {
     try {
-      if (this.get(sessionId).status === SessionStatus.active) {
+      if (this.workspaceService.get(sessionId).status === SessionStatus.active) {
         await this.stop(sessionId);
       }
-      this.listIamRoleChained(this.get(sessionId)).forEach(sess => {
+      this.workspaceService.listIamRoleChained(this.workspaceService.get(sessionId)).forEach(sess => {
         if (sess.status === SessionStatus.active) {
           this.stop(sess.sessionId);
         }
@@ -90,9 +73,9 @@ export abstract class AwsSessionService extends SessionService {
   }
 
   private isThereAnotherPendingSessionWithSameNamedProfile(sessionId: string) {
-    const session = this.get(sessionId);
+    const session = this.workspaceService.get(sessionId);
     const profileId = (session as any).profileId;
-    const pendingSessions = this.listPending();
+    const pendingSessions = this.workspaceService.listPending();
 
     for(let i = 0; i < pendingSessions.length; i++) {
       if ((pendingSessions[i] as any).profileId === profileId && (pendingSessions[i] as any).sessionId !== sessionId) {
@@ -105,10 +88,10 @@ export abstract class AwsSessionService extends SessionService {
 
   private stopAllWithSameNameProfile(sessionId: string) {
     // Get profile to check
-    const session = this.get(sessionId);
+    const session = this.workspaceService.get(sessionId);
     const profileId = (session as any).profileId;
     // Get all active sessions
-    const activeSessions = this.listActive();
+    const activeSessions = this.workspaceService.listActive();
     // Stop all that shares the same profile
     activeSessions.forEach(sess => {
       if( (sess as any).profileId === profileId ) {

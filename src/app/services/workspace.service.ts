@@ -2,6 +2,9 @@ import {Injectable} from '@angular/core';
 import {Session} from '../../../core/models/session';
 import {BehaviorSubject, Observable} from 'rxjs';
 import Repository from '../../../core/services/repository';
+import {SessionStatus} from '../../../core/models/session-status';
+import {SessionType} from "../../../core/models/session-type";
+import {AwsIamRoleChainedSession} from "../../../core/models/aws-iam-role-chained-session";
 
 @Injectable({
   providedIn: 'root'
@@ -47,6 +50,49 @@ export class WorkspaceService {
 
   removeSession(sessionId: string) {
     this.sessions = this.sessions.filter(session => session.sessionId !== sessionId);
+  }
+
+  get(sessionId: string): Session {
+
+    const sessionFiltered = this.sessions.find(session => session.sessionId === sessionId);
+    return sessionFiltered ? sessionFiltered : null;
+  }
+
+  update(sessionId: string, session: Session) {
+    const sessions = this.sessions;
+    const index = sessions.findIndex(sess => sess.sessionId === sessionId);
+    if(index > -1) {
+      this.sessions[index] = session;
+      this.sessions = [...this.sessions];
+    }
+  }
+
+  listPending(): Session[] {
+    return (this.sessions.length > 0) ? this.sessions.filter( (session) => session.status === SessionStatus.pending ) : [];
+  }
+
+  listActive(): Session[] {
+    return (this.sessions.length > 0) ? this.sessions.filter( (session) => session.status === SessionStatus.active ) : [];
+  }
+
+  listInActive(): Session[] {
+    return (this.sessions.length > 0) ? this.sessions.filter( (session) => session.status === SessionStatus.inactive ) : [];
+  }
+
+  listAssumable(): Session[] {
+    return (this.sessions.length > 0) ? this.sessions.filter( (session) => session.type !== SessionType.azure ) : [];
+  }
+
+  listIamRoleChained(parentSession?: Session): Session[] {
+    let childSession = (this.sessions.length > 0) ? this.sessions.filter( (session) => session.type === SessionType.awsIamRoleChained ) : [];
+    if (parentSession) {
+      childSession = childSession.filter(session => (session as AwsIamRoleChainedSession).parentSessionId === parentSession.sessionId );
+    }
+    return childSession;
+  }
+
+  listAwsSsoRoles() {
+    return (this.sessions.length > 0) ? this.sessions.filter((session) => session.type === SessionType.awsSsoRole) : [];
   }
 
   private getPersistedSessions(): Session[] {

@@ -111,7 +111,7 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
 
   async catchClosingBrowserWindow(): Promise<void> {
     // Get all current sessions if any
-    const sessions = this.listAwsSsoRoles();
+    const sessions = this.workspaceService.listAwsSsoRoles();
 
     for (let i = 0; i < sessions.length; i++) {
       // Stop session
@@ -126,7 +126,7 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
   }
 
   async applyCredentials(sessionId: string, credentialsInfo: CredentialsInfo): Promise<void> {
-    const session = this.get(sessionId);
+    const session = this.workspaceService.get(sessionId);
     const profileName = Repository.getInstance().getProfileName((session as AwsSsoRoleSession).profileId);
     const credentialObject = {};
     credentialObject[profileName] = {
@@ -142,7 +142,7 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
   }
 
   async deApplyCredentials(sessionId: string): Promise<void> {
-    const session = this.get(sessionId);
+    const session = this.workspaceService.get(sessionId);
     const profileName = Repository.getInstance().getProfileName((session as AwsSsoRoleSession).profileId);
     const credentialsFile = await FileService.getInstance().iniParseSync(this.appService.awsCredentialPath());
     delete credentialsFile[profileName];
@@ -152,7 +152,7 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
   async generateCredentials(sessionId: string): Promise<CredentialsInfo> {
     const region = Repository.getInstance().getAwsSsoConfiguration().region;
     const portalUrl = Repository.getInstance().getAwsSsoConfiguration().portalUrl;
-    const roleArn = (this.get(sessionId) as AwsSsoRoleSession).roleArn;
+    const roleArn = (this.workspaceService.get(sessionId) as AwsSsoRoleSession).roleArn;
 
     const accessToken = await this.getAccessToken(region, portalUrl);
     const credentials = await this.getRoleCredentials(accessToken, region, roleArn);
@@ -347,12 +347,12 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
   }
 
   private async removeSsoSessionsFromWorkspace(): Promise<void> {
-    const sessions = this.listAwsSsoRoles();
+    const sessions = this.workspaceService.listAwsSsoRoles();
 
     for (let i = 0; i < sessions.length; i++) {
       const sess = sessions[i];
 
-      const iamRoleChainedSessions = this.listIamRoleChained(sess);
+      const iamRoleChainedSessions = this.workspaceService.listIamRoleChained(sess);
 
       for (let j = 0; j < iamRoleChainedSessions.length; j++) {
         await this.delete(iamRoleChainedSessions[j].sessionId);

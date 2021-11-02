@@ -244,7 +244,7 @@ export class SessionCardComponent implements OnInit {
       }
 
       this.session.region = this.selectedDefaultRegion;
-      this.sessionService.update(this.session.sessionId, this.session);
+      this.workspaceService.update(this.session.sessionId, this.session);
 
       if (wasActive) {
         this.startSession();
@@ -323,7 +323,7 @@ export class SessionCardComponent implements OnInit {
       }
 
       (this.session as any).profileId = this.selectedProfile.id;
-      this.sessionService.update(this.session.sessionId, this.session);
+      this.workspaceService.update(this.session.sessionId, this.session);
 
       if (wasActive) {
         this.startSession();
@@ -364,7 +364,7 @@ export class SessionCardComponent implements OnInit {
   private generateDeleteDialogMessage(session: Session): string {
     let iamRoleChainedSessions = [];
     if (session.type !== SessionType.azure) {
-      iamRoleChainedSessions = (this.sessionService as AwsSessionService).listIamRoleChained(session);
+      iamRoleChainedSessions = this.workspaceService.listIamRoleChained(session);
     }
 
     let iamRoleChainedSessionString = '';

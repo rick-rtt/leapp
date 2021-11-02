@@ -61,7 +61,7 @@ export class AwsIamRoleChainedService extends AwsSessionService {
   }
 
   async applyCredentials(sessionId: string, credentialsInfo: CredentialsInfo): Promise<void> {
-    const session = this.get(sessionId);
+    const session = this.workspaceService.get(sessionId);
     const profileName = Repository.getInstance().getProfileName((session as AwsIamRoleChainedSession).profileId);
     const credentialObject = {};
     credentialObject[profileName] = {
@@ -77,7 +77,7 @@ export class AwsIamRoleChainedService extends AwsSessionService {
   }
 
   async deApplyCredentials(sessionId: string): Promise<void> {
-    const session = this.get(sessionId);
+    const session = this.workspaceService.get(sessionId);
     const profileName = Repository.getInstance().getProfileName((session as AwsIamRoleChainedSession).profileId);
     const credentialsFile = await FileService.getInstance().iniParseSync(this.appService.awsCredentialPath());
     delete credentialsFile[profileName];
@@ -86,12 +86,12 @@ export class AwsIamRoleChainedService extends AwsSessionService {
 
   async generateCredentials(sessionId: string): Promise<CredentialsInfo> {
     // Retrieve Session
-    const session = this.get(sessionId);
+    const session = this.workspaceService.get(sessionId);
 
     // Retrieve Parent Session
     let parentSession: Session;
     try {
-      parentSession = this.get((session as AwsIamRoleChainedSession).parentSessionId);
+      parentSession = this.workspaceService.get((session as AwsIamRoleChainedSession).parentSessionId);
     } catch (err) {
       throw new LeappNotFoundError(this, `Parent Account Session  not found for Chained Account ${session.sessionName}`);
     }

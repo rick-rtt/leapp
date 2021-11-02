@@ -112,7 +112,7 @@ export class CreateAccountComponent implements OnInit {
       this.firstTime = params['firstTime'] || !this.hasOneGoodSession;
 
       // Show the assumable accounts
-      this.assumerAwsSessions = this.awsSessionService.listAssumable().map(session => ({
+      this.assumerAwsSessions = this.workspaceService.listAssumable().map(session => ({
           sessionName: session.sessionName,
           session
       }));

@@ -51,7 +51,7 @@ export class AzureService extends SessionService {
   async start(sessionId: string): Promise<void> {
     this.sessionLoading(sessionId);
 
-    const session = this.get(sessionId);
+    const session = this.workspaceService.get(sessionId);
 
     // Try parse accessToken.json
     let accessTokensFile = this.parseAccessTokens();

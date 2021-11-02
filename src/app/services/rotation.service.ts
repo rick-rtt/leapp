@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import {AwsSessionService} from './session/aws/aws-session.service';
 import {SessionFactoryService} from './session-factory.service';
+import {WorkspaceService} from './workspace.service';
 
 @Injectable({
   providedIn: 'root'
@@ -8,11 +8,11 @@ import {SessionFactoryService} from './session-factory.service';
 export class RotationService {
 
   constructor(
-    private sessionService: AwsSessionService,
+    private workspaceService: WorkspaceService,
     private sessionProviderService: SessionFactoryService) { }
 
   rotate(): void {
-    const activeSessions = this.sessionService.listActive();
+    const activeSessions = this.workspaceService.listActive();
     activeSessions.forEach(session => {
       if (session.expired()) {
         const concreteSessionService = this.sessionProviderService.getService(session.type);

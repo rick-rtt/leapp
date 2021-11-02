@@ -12,33 +12,6 @@ export abstract class SessionService {
     protected workspaceService: WorkspaceService
   ) {}
 
-  get(sessionId: string): Session {
-
-    const sessionFiltered = this.list().find(session => session.sessionId === sessionId);
-    return sessionFiltered ? sessionFiltered : null;
-  }
-
-  list(): Session[] {
-    return this.workspaceService.sessions;
-  }
-
-  listPending(): Session[] {
-    return (this.list().length > 0) ? this.list().filter( (session) => session.status === SessionStatus.pending ) : [];
-  }
-
-  listActive(): Session[] {
-    return (this.list().length > 0) ? this.list().filter( (session) => session.status === SessionStatus.active ) : [];
-  }
-
-  update(sessionId: string, session: Session) {
-    const sessions = this.list();
-    const index = sessions.findIndex(sess => sess.sessionId === sessionId);
-    if(index > -1) {
-      this.workspaceService.sessions[index] = session;
-      this.workspaceService.sessions = [...this.workspaceService.sessions];
-    }
-  }
-
   protected sessionActivate(sessionId: string) {
     const index = this.workspaceService.sessions.findIndex(s => s.sessionId === sessionId);
     if (index > -1) {

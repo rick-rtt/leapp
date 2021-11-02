@@ -67,7 +67,7 @@ export class AwsIamUserService extends AwsSessionService {
   }
 
   async applyCredentials(sessionId: string, credentialsInfo: CredentialsInfo): Promise<void> {
-    const session = this.get(sessionId);
+    const session = this.workspaceService.get(sessionId);
     const profileName = Repository.getInstance().getProfileName((session as AwsIamUserSession).profileId);
     const credentialObject = {};
     credentialObject[profileName] = {
@@ -83,7 +83,7 @@ export class AwsIamUserService extends AwsSessionService {
   }
 
   async deApplyCredentials(sessionId: string): Promise<void> {
-    const session = this.get(sessionId);
+    const session = this.workspaceService.get(sessionId);
     const profileName = Repository.getInstance().getProfileName((session as AwsIamUserSession).profileId);
     const credentialsFile = await FileService.getInstance().iniParseSync(this.appService.awsCredentialPath());
     delete credentialsFile[profileName];
@@ -92,7 +92,7 @@ export class AwsIamUserService extends AwsSessionService {
 
   async generateCredentials(sessionId: string): Promise<CredentialsInfo> {
       // Get the session in question
-      const session = this.get(sessionId);
+      const session = this.workspaceService.get(sessionId);
       // Retrieve session token expiration
       const tokenExpiration = (session as AwsIamUserSession).sessionTokenExpiration;
       // Check if token is expired
