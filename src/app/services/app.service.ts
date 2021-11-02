@@ -6,8 +6,18 @@ import {InputDialogComponent} from '../components/shared/input-dialog/input-dial
 import {Constants} from '../../../core/models/constants';
 import {BsModalService} from 'ngx-bootstrap/modal';
 import {ElectronService} from './electron.service';
-import {LoggerLevel, LoggingService, ToastLevel} from '../../../core/services/logging.service';
+import {LoggerLevel, LoggingService} from '../../../core/services/logging-service';
 import {ToastrService} from 'ngx-toastr';
+
+/*
+* External enum to the toast level so we can use this to define the type of log
+*/
+export enum ToastLevel {
+  info,
+  warn,
+  error,
+  success
+}
 
 @Injectable({
   providedIn: 'root'

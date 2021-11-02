@@ -4,13 +4,13 @@ import {AppService} from './services/app.service';
 import {Router} from '@angular/router';
 import {WorkspaceService} from './services/workspace.service';
 import {setTheme} from 'ngx-bootstrap/utils';
-import {TimerService} from '../../core/services/timer.service';
+import {TimerService} from '../../core/services/timer-service';
 import {RotationService} from './services/rotation.service';
 import {SessionFactoryService} from './services/session-factory.service';
 import {UpdaterService} from './services/updater.service';
 import compareVersions from 'compare-versions';
 import {RetrocompatibilityService} from './services/retrocompatibility.service';
-import {LoggerLevel, LoggingService} from '../../core/services/logging.service';
+import {LoggerLevel, LoggingService} from '../../core/services/logging-service';
 import {LeappParseError} from './errors/leapp-parse-error';
 import {Constants} from '../../core/models/constants';
 import Repository from '../../core/services/repository';
@@ -31,15 +31,14 @@ export class AppComponent implements OnInit {
     private rotationService: RotationService,
     private sessionProviderService: SessionFactoryService,
     private router: Router,
-    private updaterService: UpdaterService,
-    private loggingService: LoggingService
+    private updaterService: UpdaterService
   ) {}
 
   async ngOnInit() {
     // We get the right moment to set an hook to app close
     const ipc = this.app.getIpcRenderer();
     ipc.on('app-close', () => {
-      this.loggingService.logger('Preparing for closing instruction...', LoggerLevel.info, this);
+      LoggingService.getInstance().logger('Preparing for closing instruction...', LoggerLevel.info, this);
       this.beforeCloseInstructions();
     });
 
@@ -101,14 +100,14 @@ export class AppComponent implements OnInit {
    */
   private beforeCloseInstructions() {
     // Check if we are here
-    this.loggingService.logger('Closing app with cleaning process...', LoggerLevel.info, this);
+    LoggingService.getInstance().logger('Closing app with cleaning process...', LoggerLevel.info, this);
 
     // We need the Try/Catch as we have a the possibility to call the method without sessions
     try {
       // Clean the config file
       this.app.cleanCredentialFile();
     } catch (err) {
-      this.loggingService.logger('No sessions to stop, skipping...', LoggerLevel.error, this, err.stack);
+      LoggingService.getInstance().logger('No sessions to stop, skipping...', LoggerLevel.error, this, err.stack);
     }
 
     // Finally quit
@@ -125,7 +124,7 @@ export class AppComponent implements OnInit {
                   this.app.getFs().existsSync(oldAwsCredentialsPath) &&
                   !this.app.getFs().existsSync(newAwsCredentialsPath);
 
-    this.loggingService.logger(`Check existing credential file: ${check}`, LoggerLevel.info, this);
+    LoggingService.getInstance().logger(`Check existing credential file: ${check}`, LoggerLevel.info, this);
 
     if (check) {
       this.app.getFs().renameSync(oldAwsCredentialsPath, newAwsCredentialsPath);

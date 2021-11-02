@@ -10,16 +10,6 @@ export enum LoggerLevel {
   error
 }
 
-/*
-* External enum to the toast level so we can use this to define the type of log
-*/
-export enum ToastLevel {
-  info,
-  warn,
-  error,
-  success
-}
-
 export class LoggingService {
   static instance: LoggingService;
 

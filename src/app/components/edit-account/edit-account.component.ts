@@ -1,6 +1,6 @@
 import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
-import {AppService} from '../../services/app.service';
+import {AppService, ToastLevel} from '../../services/app.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {Workspace} from '../../../../core/models/workspace';
 import {SessionType} from '../../../../core/models/session-type';
@@ -9,7 +9,6 @@ import {WorkspaceService} from '../../services/workspace.service';
 import {KeychainService} from '../../services/keychain.service';
 import {environment} from '../../../environments/environment';
 import {SessionService} from '../../services/session.service';
-import {ToastLevel} from '../../../../core/services/logging.service';
 
 @Component({
   selector: 'app-edit-account',

@@ -1,6 +1,6 @@
 import {TestBed} from '@angular/core/testing';
 
-import {TimerService} from '../services/timer.service';
+import {TimerService} from '../services/timer-service';
 import {mustInjected} from '../../src/base-injectables';
 
 describe('TimerService', () => {

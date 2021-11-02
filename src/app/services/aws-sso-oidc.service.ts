@@ -10,11 +10,11 @@ import SSOOIDC, {
 } from 'aws-sdk/clients/ssooidc';
 import {Injectable} from '@angular/core';
 import {Constants} from '../../../core/models/constants';
-import {WorkspaceService} from './workspace.service';
-import {AppService, LoggerLevel} from './app.service';
+import {AppService} from './app.service';
 import {ElectronService} from './electron.service';
 import {LeappBaseError} from '../errors/leapp-base-error';
 import Repository from '../../../core/services/repository';
+import {LoggerLevel} from '../../../core/services/logging-service';
 
 export interface BrowserWindowClosing {
   catchClosingBrowserWindow(): void;

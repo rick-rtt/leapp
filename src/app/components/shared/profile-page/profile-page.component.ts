@@ -1,6 +1,6 @@
 import {Component, OnInit, ViewEncapsulation} from '@angular/core';
 import {FormControl, FormGroup} from '@angular/forms';
-import {AppService} from '../../../services/app.service';
+import {AppService, ToastLevel} from '../../../services/app.service';
 import {Router} from '@angular/router';
 import {Constants} from '../../../../../core/models/constants';
 import {environment} from '../../../../environments/environment';
@@ -11,8 +11,8 @@ import {SessionStatus} from '../../../../../core/models/session-status';
 import {SessionFactoryService} from '../../../services/session-factory.service';
 import {SessionType} from '../../../../../core/models/session-type';
 import {AwsSessionService} from '../../../services/session/aws/aws-session.service';
-import {LoggerLevel, LoggingService, ToastLevel} from '../../../../../core/services/logging.service';
 import Repository from '../../../../../core/services/repository';
+import {LoggerLevel, LoggingService} from '../../../../../core/services/logging-service';
 
 @Component({
   selector: 'app-profile-page',

@@ -7,7 +7,7 @@ import {SessionStatus} from '../../../../../core/models/session-status';
 import {AwsIamRoleChainedSession} from '../../../../../core/models/aws-iam-role-chained-session';
 import {SessionService} from '../../session.service';
 import {LeappBaseError} from '../../../errors/leapp-base-error';
-import {LoggerLevel} from '../../app.service';
+import {LoggerLevel} from '../../../../../core/services/logging-service';
 
 @Injectable({
   providedIn: 'root'

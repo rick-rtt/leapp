@@ -12,7 +12,7 @@ import {AwsIamRoleChainedSessionRequest, AwsIamRoleChainedService} from '../../s
 import {LeappParseError} from '../../errors/leapp-parse-error';
 import {AwsIamRoleFederatedSessionRequest, AwsIamRoleFederatedService} from '../../services/session/aws/methods/aws-iam-role-federated.service';
 import {AzureService, AzureSessionRequest} from '../../services/session/azure/azure.service';
-import {LoggerLevel, LoggingService} from '../../../../core/services/logging.service';
+import {LoggerLevel, LoggingService} from '../../../../core/services/logging-service';
 import Repository from '../../../../core/services/repository';
 
 @Component({

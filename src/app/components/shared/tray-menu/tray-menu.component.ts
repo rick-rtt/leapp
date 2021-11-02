@@ -11,7 +11,7 @@ import {UpdaterService} from '../../../services/updater.service';
 import {SessionService} from '../../../services/session.service';
 import {SessionFactoryService} from '../../../services/session-factory.service';
 import {Constants} from '../../../../../core/models/constants';
-import {LoggerLevel, LoggingService} from '../../../../../core/services/logging.service';
+import {LoggerLevel, LoggingService} from '../../../../../core/services/logging-service';
 import Repository from '../../../../../core/services/repository';
 
 @Component({

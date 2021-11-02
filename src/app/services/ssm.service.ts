@@ -1,9 +1,9 @@
 import {Injectable} from '@angular/core';
 import {ExecuteService} from './execute.service';
-import {AppService, LoggerLevel} from './app.service';
+import {AppService} from './app.service';
 import {LeappBaseError} from '../errors/leapp-base-error';
 import {CredentialsInfo} from '../../../core/models/credentials-info';
-import {LoggingService} from '../../../core/services/logging.service';
+import {LoggerLevel, LoggingService} from '../../../core/services/logging-service';
 
 const AWS = require('aws-sdk');
 
@@ -16,7 +16,6 @@ export class SsmService {
 
   constructor(
     private app: AppService,
-    private loggingService: LoggingService,
     private exec: ExecuteService) {}
 
   /**
@@ -103,7 +102,7 @@ export class SsmService {
           });
 
           // We have found and managed a list of instances
-          this.loggingService.logger('Obtained smm info from aws for SSM', LoggerLevel.info, this);
+          LoggingService.getInstance().logger('Obtained smm info from aws for SSM', LoggerLevel.info, this);
           return instances;
         } else {
           // No instances usable
