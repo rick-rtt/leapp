@@ -82,7 +82,6 @@ export class CreateAccountComponent implements OnInit {
     private workspaceService: WorkspaceService,
     private awsIamRoleFederatedService: AwsIamRoleFederatedService,
     private awsIamRoleChainedService: AwsIamRoleChainedService,
-    private awsSessionService: AwsSessionService,
     private azureService: AzureService
   ) {}
 
