@@ -2,13 +2,13 @@ import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {AppService, ToastLevel} from '../../services/app.service';
 import {ActivatedRoute, Router} from '@angular/router';
-import {Workspace} from '../../../../core/models/workspace';
-import {SessionType} from '../../../../core/models/session-type';
-import {AwsIamUserSession} from '../../../../core/models/aws-iam-user-session';
 import {WorkspaceService} from '../../services/workspace.service';
-import {KeychainService} from '../../../../core/services/keychain-service';
 import {environment} from '../../../environments/environment';
 import {SessionService} from '../../services/session.service';
+import {SessionType} from '../../../../../core/models/session-type';
+import {AwsIamUserSession} from '../../../../../core/models/aws-iam-user-session';
+import {Workspace} from '../../../../../core/models/workspace';
+import {KeychainService} from '../../../../../core/services/keychain-service';
 
 @Component({
   selector: 'app-edit-account',

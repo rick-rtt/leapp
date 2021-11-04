@@ -1,7 +1,6 @@
 import {Injectable} from '@angular/core';
 import {BsModalRef, BsModalService} from 'ngx-bootstrap/modal';
 import {AppService} from './app.service';
-import {Constants} from '../../../core/models/constants';
 import {environment} from '../../environments/environment';
 import {UpdateDialogComponent} from '../components/shared/update-dialog/update-dialog.component';
 import compareVersions from 'compare-versions';
@@ -9,7 +8,8 @@ import {WorkspaceService} from './workspace.service';
 import {HttpClient} from '@angular/common/http';
 import md from 'markdown-it';
 import {ElectronService} from './electron.service';
-import Repository from "../../../core/services/repository";
+import {constants} from '../../../../core/models/constants';
+import Repository from '../../../../core/services/repository';
 
 @Injectable({
   providedIn: 'root'
@@ -68,11 +68,11 @@ export class UpdaterService {
       }
 
       const callback = (event) => {
-        if (event === Constants.confirmClosedAndIgnoreUpdate) {
+        if (event === constants.confirmClosedAndIgnoreUpdate) {
           this.updateVersionJson(this.version);
           this.workspaceService.sessions = [...this.workspaceService.sessions];
           Repository.getInstance().updateSessions(this.workspaceService.sessions);
-        } else if (event === Constants.confirmCloseAndDownloadUpdate) {
+        } else if (event === constants.confirmCloseAndDownloadUpdate) {
           this.appService.openExternalUrl(`${environment.latestUrl}`);
         }
         this.bsModalRef = undefined;

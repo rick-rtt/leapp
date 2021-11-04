@@ -4,19 +4,19 @@ import {AppService} from './services/app.service';
 import {Router} from '@angular/router';
 import {WorkspaceService} from './services/workspace.service';
 import {setTheme} from 'ngx-bootstrap/utils';
-import {TimerService} from '../../core/services/timer-service';
 import {RotationService} from './services/rotation.service';
 import {SessionFactoryService} from './services/session-factory.service';
 import {UpdaterService} from './services/updater.service';
 import compareVersions from 'compare-versions';
 import {RetrocompatibilityService} from './services/retrocompatibility.service';
-import {LoggerLevel, LoggingService} from '../../core/services/logging-service';
-import {LeappParseError} from '../../core/errors/leapp-parse-error';
-import {Constants} from '../../core/models/constants';
-import Repository from '../../core/services/repository';
-import {FileService} from '../../core/services/file-service';
-import AwsIamUserService from '../../core/services/session/aws/method/aws-iam-user-service';
 import {MfaCodePromptService} from './services/mfa-code-prompt.service';
+import AwsIamUserService from '../../../core/services/session/aws/method/aws-iam-user-service';
+import {LoggerLevel, LoggingService} from '../../../core/services/logging-service';
+import Repository from '../../../core/services/repository';
+import {LeappParseError} from '../../../core/errors/leapp-parse-error';
+import {TimerService} from '../../../core/services/timer-service';
+import {constants} from '../../../core/models/constants';
+import {FileService} from '../../../core/services/file-service';
 
 @Component({
   selector: 'app-root',
@@ -68,7 +68,7 @@ export class AppComponent implements OnInit {
 
     try {
       if (!Repository.getInstance().getAwsSsoConfiguration().browserOpening) {
-        Repository.getInstance().setBrowserOpening(Constants.inApp.toString());
+        Repository.getInstance().setBrowserOpening(constants.inApp.toString());
       }
     } catch {
       throw new LeappParseError(this, 'We had trouble parsing your Leapp-lock.json file. It is either corrupt, obsolete, or with an error.');

@@ -1,23 +1,22 @@
 import {Component, Input, OnInit, TemplateRef, ViewChild} from '@angular/core';
-import {Session} from '../../../../../core/models/session';
-import AwsSessionService from '../../../../../core/services/session/aws/aws-session-service';
 import {AppService, ToastLevel} from '../../../services/app.service';
 import {Router} from '@angular/router';
-import {AwsIamRoleFederatedSession} from '../../../../../core/models/aws-iam-role-federated-session';
 import {SsmService} from '../../../services/ssm.service';
-import {SessionType} from '../../../../../core/models/session-type';
 import {WorkspaceService} from '../../../services/workspace.service';
 import {environment} from '../../../../environments/environment';
 import * as uuid from 'uuid';
 import {BsModalRef, BsModalService} from 'ngx-bootstrap/modal';
-
 import {SessionFactoryService} from '../../../services/session-factory.service';
-import {SessionStatus} from '../../../../../core/models/session-status';
 import {SessionService} from '../../../services/session.service';
-import {Constants} from '../../../../../core/models/constants';
-import AwsIamUserService from '../../../../../core/services/session/aws/method/aws-iam-user-service';
-import {LoggerLevel, LoggingService} from '../../../../../core/services/logging-service';
-import Repository from '../../../../../core/services/repository';
+import {Session} from '../../../../../../core/models/session';
+import { SessionType } from '../../../../../../core/models/session-type';
+import {SessionStatus} from '../../../../../../core/models/session-status';
+import Repository from '../../../../../../core/services/repository';
+import {constants} from '../../../../../../core/models/constants';
+import {AwsIamRoleFederatedSession} from '../../../../../../core/models/aws-iam-role-federated-session';
+import AwsIamUserService from '../../../../../../core/services/session/aws/method/aws-iam-user-service';
+import {LoggerLevel, LoggingService} from '../../../../../../core/services/logging-service';
+import AwsSessionService from '../../../../../../core/services/session/aws/aws-session-service';
 
 @Component({
   selector: 'app-session-card',
@@ -128,7 +127,7 @@ export class SessionCardComponent implements OnInit {
     const dialogMessage = this.generateDeleteDialogMessage(session);
 
     this.appService.confirmDialog(dialogMessage, (status) => {
-      if (status === Constants.confirmed) {
+      if (status === constants.confirmed) {
         this.sessionService.delete(session.sessionId).then(_ => {});
         this.logSessionData(session, 'Session Deleted');
       }

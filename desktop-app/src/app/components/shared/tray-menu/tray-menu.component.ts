@@ -1,18 +1,18 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {WorkspaceService} from '../../../services/workspace.service';
 import {AppService} from '../../../services/app.service';
-import {Session} from '../../../../../core/models/session';
-import {SessionType} from '../../../../../core/models/session-type';
 import {environment} from '../../../../environments/environment';
-import {SessionStatus} from '../../../../../core/models/session-status';
-import {AwsIamRoleChainedSession} from '../../../../../core/models/aws-iam-role-chained-session';
-import {AwsIamRoleFederatedSession} from '../../../../../core/models/aws-iam-role-federated-session';
 import {UpdaterService} from '../../../services/updater.service';
 import {SessionService} from '../../../services/session.service';
 import {SessionFactoryService} from '../../../services/session-factory.service';
-import {Constants} from '../../../../../core/models/constants';
-import {LoggerLevel, LoggingService} from '../../../../../core/services/logging-service';
-import Repository from '../../../../../core/services/repository';
+import {Session} from '../../../../../../core/models/session';
+import {SessionType} from '../../../../../../core/models/session-type';
+import {SessionStatus} from '../../../../../../core/models/session-status';
+import Repository from '../../../../../../core/services/repository';
+import {AwsIamRoleFederatedSession} from '../../../../../../core/models/aws-iam-role-federated-session';
+import {AwsIamRoleChainedSession} from '../../../../../../core/models/aws-iam-role-chained-session';
+import {constants} from '../../../../../../core/models/constants';
+import {LoggerLevel, LoggingService} from '../../../../../../core/services/logging-service';
 
 @Component({
   selector: 'app-tray-menu',
@@ -143,8 +143,8 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
     let normalIcon = 'LeappMini';
     let updateIcon = 'LeappMini2';
     if (
-      (this.appService.isDarkMode() && this.appService.detectOs() !== Constants.windows) ||
-      this.appService.detectOs() === Constants.linux
+      (this.appService.isDarkMode() && this.appService.detectOs() !== constants.windows) ||
+      this.appService.detectOs() === constants.linux
     ) {
       normalIcon = 'LeappMini3';
       updateIcon = 'Leappmini4';

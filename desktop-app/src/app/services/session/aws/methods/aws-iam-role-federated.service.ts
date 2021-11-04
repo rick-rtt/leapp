@@ -1,16 +1,16 @@
 import { Injectable } from '@angular/core';
-import {CredentialsInfo} from '../../../../../../core/models/credentials-info';
 import {WorkspaceService} from '../../../workspace.service';
 import {AppService} from '../../../app.service';
-import {AwsIamRoleFederatedSession} from '../../../../../../core/models/aws-iam-role-federated-session';
-import {LeappSamlError} from '../../../../../../core/errors/leapp-saml-error';
-import {LeappParseError} from '../../../../../../core/errors/leapp-parse-error';
 import {environment} from '../../../../../environments/environment';
 import * as AWS from 'aws-sdk';
-import {LeappAwsStsError} from '../../../../../../core/errors/leapp-aws-sts-error';
-import Repository from '../../../../../../core/services/repository';
-import {FileService} from '../../../../../../core/services/file-service';
-import AwsSessionService from '../../../../../../core/services/session/aws/aws-session-service';
+import {AwsIamRoleFederatedSession} from '../../../../../../../core/models/aws-iam-role-federated-session';
+import {CredentialsInfo} from '../../../../../../../core/models/credentials-info';
+import Repository from '../../../../../../../core/services/repository';
+import {FileService} from '../../../../../../../core/services/file-service';
+import {LeappSamlError} from '../../../../../../../core/errors/leapp-saml-error';
+import {LeappParseError} from '../../../../../../../core/errors/leapp-parse-error';
+import {LeappAwsStsError} from '../../../../../../../core/errors/leapp-aws-sts-error';
+import AwsSessionService from "../../../../../../../core/services/session/aws/aws-session-service";
 
 export interface AwsIamRoleFederatedSessionRequest {
   accountName: string;

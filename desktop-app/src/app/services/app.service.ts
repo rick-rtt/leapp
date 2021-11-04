@@ -3,11 +3,11 @@ import {ConfirmationDialogComponent} from '../components/shared/confirmation-dia
 import {FormControl, FormGroup} from '@angular/forms';
 import {environment} from '../../environments/environment';
 import {InputDialogComponent} from '../components/shared/input-dialog/input-dialog.component';
-import {Constants} from '../../../core/models/constants';
 import {BsModalService} from 'ngx-bootstrap/modal';
 import {ElectronService} from './electron.service';
-import {LoggerLevel, LoggingService} from '../../../core/services/logging-service';
 import {ToastrService} from 'ngx-toastr';
+import {constants} from '../../../../core/models/constants';
+import {LoggerLevel, LoggingService} from '../../../../core/services/logging-service';
 
 /*
 * External enum to the toast level so we can use this to define the type of log
@@ -236,9 +236,9 @@ export class AppService {
    */
   detectOs() {
     const hrNames = {
-      linux: Constants.linux,
-      darwin: Constants.mac,
-      win32: Constants.windows
+      linux: constants.linux,
+      darwin: constants.mac,
+      win32: constants.windows
     };
     const os = this.electronService.os.platform();
     return hrNames[os];

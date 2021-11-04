@@ -1,18 +1,17 @@
 import {Injectable} from '@angular/core';
 import {AppService} from './app.service';
 import {environment} from '../../environments/environment';
-import {Workspace} from '../../../core/models/workspace';
 import {serialize} from 'class-transformer';
-import {KeychainService} from '../../../core/services/keychain-service';
-import {AwsIamRoleFederatedSession} from '../../../core/models/aws-iam-role-federated-session';
-import {AwsIamRoleChainedSession} from '../../../core/models/aws-iam-role-chained-session';
-import {AwsIamUserSession} from '../../../core/models/aws-iam-user-session';
-import {AwsSsoRoleSession} from '../../../core/models/aws-sso-role-session';
-import {AzureSession} from '../../../core/models/azure-session';
 import {WorkspaceService} from './workspace.service';
-import {Constants} from '../../../core/models/constants';
-import {FileService} from '../../../core/services/file-service';
-import Repository from "../../../core/services/repository";
+import {Workspace} from "../../../../core/models/workspace";
+import {AwsIamRoleFederatedSession} from "../../../../core/models/aws-iam-role-federated-session";
+import {AwsIamRoleChainedSession} from "../../../../core/models/aws-iam-role-chained-session";
+import {AwsSsoRoleSession} from "../../../../core/models/aws-sso-role-session";
+import {AzureSession} from "../../../../core/models/azure-session";
+import {FileService} from "../../../../core/services/file-service";
+import {KeychainService} from "../../../../core/services/keychain-service";
+import {constants} from "../../../../core/models/constants";
+import {AwsIamUserSession} from "../../../../core/models/aws-iam-user-session";
 
 @Injectable({
   providedIn: 'root'
@@ -177,7 +176,7 @@ export class RetrocompatibilityService {
           region = await KeychainService.getInstance().getSecret(environment.appName, 'AWS_SSO_REGION');
           portalUrl = await KeychainService.getInstance().getSecret(environment.appName, 'AWS_SSO_PORTAL_URL');
           expirationTime = await KeychainService.getInstance().getSecret(environment.appName, 'AWS_SSO_EXPIRATION_TIME');
-          browserOpening = Constants.inApp.toString();
+          browserOpening = constants.inApp.toString();
         } catch(err) {
           // we need all or nothing, otherwise it means that configuration is incomplete so its better
           // to force the user to redo the process on the new fresh workspace
@@ -193,12 +192,6 @@ export class RetrocompatibilityService {
       }
     }
   }
-
-
-
-
-
-
 
   private async createNewAwsIamUserSession(session: any, workspace: Workspace) {
     const iamUserSession = new AwsIamUserSession(
@@ -220,8 +213,4 @@ export class RetrocompatibilityService {
 
     workspace.sessions.push(iamUserSession);
   }
-
-
-
-
 }

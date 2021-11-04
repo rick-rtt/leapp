@@ -1,8 +1,6 @@
 import {Injectable} from '@angular/core';
 import {WorkspaceService} from './workspace.service';
 import {AppService} from './app.service';
-import {SessionType} from '../../../core/models/session-type';
-import AwsIamUserService from '../../../core/services/session/aws/method/aws-iam-user-service';
 import {AwsIamRoleChainedService} from './session/aws/methods/aws-iam-role-chained.service';
 import {AwsIamRoleFederatedService} from './session/aws/methods/aws-iam-role-federated.service';
 import {AwsSsoRoleService} from './session/aws/methods/aws-sso-role.service';
@@ -11,6 +9,8 @@ import {ExecuteService} from './execute.service';
 import {SessionService} from './session.service';
 import {ElectronService} from './electron.service';
 import {AwsSsoOidcService} from './aws-sso-oidc.service';
+import {SessionType} from '../../../../core/models/session-type';
+import AwsIamUserService from '../../../../core/services/session/aws/method/aws-iam-user-service';
 
 @Injectable({
   providedIn: 'root'

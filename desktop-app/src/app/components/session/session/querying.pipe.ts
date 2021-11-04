@@ -1,9 +1,8 @@
 import {Pipe, PipeTransform} from '@angular/core';
-import {Session} from '../../../../../core/models/session';
-import {AwsIamRoleFederatedSession} from '../../../../../core/models/aws-iam-role-federated-session';
-import {AzureSession} from '../../../../../core/models/azure-session';
-import {Workspace} from '../../../../../core/models/workspace';
-
+import {Session} from '../../../../../../core/models/session';
+import {Workspace} from '../../../../../../core/models/workspace';
+import {AwsIamRoleFederatedSession} from '../../../../../../core/models/aws-iam-role-federated-session';
+import {AzureSession} from '../../../../../../core/models/azure-session';
 
 @Pipe({
   name: 'querying'

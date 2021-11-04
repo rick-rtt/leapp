@@ -9,12 +9,12 @@ import SSOOIDC, {
   StartDeviceAuthorizationRequest
 } from 'aws-sdk/clients/ssooidc';
 import {Injectable} from '@angular/core';
-import {Constants} from '../../../core/models/constants';
 import {AppService} from './app.service';
 import {ElectronService} from './electron.service';
-import {LeappBaseError} from '../../../core/errors/leapp-base-error';
-import Repository from '../../../core/services/repository';
-import {LoggerLevel} from '../../../core/services/logging-service';
+import {LeappBaseError} from '../../../../core/errors/leapp-base-error';
+import {LoggerLevel} from '../../../../core/services/logging-service';
+import {constants} from '../../../../core/models/constants';
+import Repository from '../../../../core/services/repository';
 
 export interface BrowserWindowClosing {
   catchClosingBrowserWindow(): void;
@@ -154,7 +154,7 @@ export class AwsSsoOidcService {
   }
 
   private async openVerificationBrowserWindow(registerClientResponse: RegisterClientResponse, startDeviceAuthorizationResponse: StartDeviceAuthorizationResponse): Promise<VerificationResponse> {
-    if(Repository.getInstance().getAwsSsoConfiguration().browserOpening === Constants.inApp.toString()) {
+    if(Repository.getInstance().getAwsSsoConfiguration().browserOpening === constants.inApp.toString()) {
       const pos = this.electronService.currentWindow.getPosition();
 
       this.ssoWindow = null;
@@ -241,7 +241,7 @@ export class AwsSsoOidcService {
 
     let createTokenResponse;
 
-    if(Repository.getInstance().getAwsSsoConfiguration().browserOpening === Constants.inApp) {
+    if(Repository.getInstance().getAwsSsoConfiguration().browserOpening === constants.inApp) {
       createTokenResponse = await this.getAwsSsoOidcClient().createToken(createTokenRequest).promise();
     } else {
       createTokenResponse = await this.waitForToken(createTokenRequest);

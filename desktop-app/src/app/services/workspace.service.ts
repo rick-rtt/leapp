@@ -1,12 +1,12 @@
 import {Injectable} from '@angular/core';
-import {Session} from '../../../core/models/session';
 import {BehaviorSubject, Observable} from 'rxjs';
-import Repository from '../../../core/services/repository';
-import {SessionStatus} from '../../../core/models/session-status';
-import {SessionType} from '../../../core/models/session-type';
-import {AwsIamRoleChainedSession} from '../../../core/models/aws-iam-role-chained-session';
-import {AwsIamUserSession} from '../../../core/models/aws-iam-user-session';
 import * as AWS from 'aws-sdk';
+import Repository from '../../../../core/services/repository';
+import {Session} from '../../../../core/models/session';
+import {SessionStatus} from '../../../../core/models/session-status';
+import {SessionType} from '../../../../core/models/session-type';
+import {AwsIamRoleChainedSession} from '../../../../core/models/aws-iam-role-chained-session';
+import {AwsIamUserSession} from '../../../../core/models/aws-iam-user-session';
 
 @Injectable({
   providedIn: 'root'

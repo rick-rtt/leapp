@@ -3,16 +3,16 @@ import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {AppService} from '../../services/app.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {WorkspaceService} from '../../services/workspace.service';
-import {SessionType} from '../../../../core/models/session-type';
 import {environment} from '../../../environments/environment';
 import * as uuid from 'uuid';
-import AwsIamUserService, {AwsIamUserSessionRequest} from '../../../../core/services/session/aws/method/aws-iam-user-service';
 import {AwsIamRoleChainedSessionRequest, AwsIamRoleChainedService} from '../../services/session/aws/methods/aws-iam-role-chained.service';
-import {LeappParseError} from '../../../../core/errors/leapp-parse-error';
 import {AwsIamRoleFederatedSessionRequest, AwsIamRoleFederatedService} from '../../services/session/aws/methods/aws-iam-role-federated.service';
 import {AzureService, AzureSessionRequest} from '../../services/session/azure/azure.service';
-import {LoggerLevel, LoggingService} from '../../../../core/services/logging-service';
-import Repository from '../../../../core/services/repository';
+import {SessionType} from "../../../../../core/models/session-type";
+import Repository from "../../../../../core/services/repository";
+import {LoggerLevel, LoggingService} from "../../../../../core/services/logging-service";
+import AwsIamUserService, {AwsIamUserSessionRequest} from "../../../../../core/services/session/aws/method/aws-iam-user-service";
+import {LeappParseError} from "../../../../../core/errors/leapp-parse-error";
 
 @Component({
   selector: 'app-create-account',

@@ -1,10 +1,10 @@
 import {Pipe, PipeTransform} from '@angular/core';
-import {Session} from '../../../../../core/models/session';
-import {SessionType} from '../../../../../core/models/session-type';
-import {AwsIamRoleFederatedSession} from '../../../../../core/models/aws-iam-role-federated-session';
-import {AzureSession} from '../../../../../core/models/azure-session';
-import {AwsSsoRoleSession} from '../../../../../core/models/aws-sso-role-session';
-import {AwsIamRoleChainedSession} from '../../../../../core/models/aws-iam-role-chained-session';
+import {Session} from '../../../../../../core/models/session';
+import {SessionType} from '../../../../../../core/models/session-type';
+import {AwsIamRoleFederatedSession} from '../../../../../../core/models/aws-iam-role-federated-session';
+import {AzureSession} from '../../../../../../core/models/azure-session';
+import {AwsSsoRoleSession} from '../../../../../../core/models/aws-sso-role-session';
+import {AwsIamRoleChainedSession} from '../../../../../../core/models/aws-iam-role-chained-session';
 
 @Pipe({
   name: 'detail'

@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
-import {IMfaCodePrompter} from '../../../core/services/session/aws/method/aws-iam-user-service';
 import {AppService} from './app.service';
+import {IMfaCodePrompter} from '../../../../core/services/session/aws/method/aws-iam-user-service';
 
 @Injectable({
   providedIn: 'root'
 })
-export class MfaCodePromptService implements IMfaCodePrompter{
+export class MfaCodePromptService implements IMfaCodePrompter {
 
   constructor(
     private appService: AppService

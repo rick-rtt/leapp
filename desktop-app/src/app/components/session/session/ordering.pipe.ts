@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import {Session} from '../../../../../core/models/session';
+import {Session} from '../../../../../../core/models/session';
 
 @Pipe({
   name: 'ordering'

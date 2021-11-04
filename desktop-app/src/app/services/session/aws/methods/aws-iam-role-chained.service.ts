@@ -1,22 +1,22 @@
 import {Injectable} from '@angular/core';
-import {CredentialsInfo} from '../../../../../../core/models/credentials-info';
 import {WorkspaceService} from '../../../workspace.service';
 import {AppService} from '../../../app.service';
-import {LeappNotFoundError} from '../../../../../../core/errors/leapp-not-found-error';
-import {Session} from '../../../../../../core/models/session';
-import {AwsIamRoleChainedSession} from '../../../../../../core/models/aws-iam-role-chained-session';
-import {LeappAwsStsError} from '../../../../../../core/errors/leapp-aws-sts-error';
 import * as AWS from 'aws-sdk';
-import {SessionType} from '../../../../../../core/models/session-type';
 import {AwsIamRoleFederatedService} from './aws-iam-role-federated.service';
 import {AwsSsoRoleService} from './aws-sso-role.service';
 import {ElectronService} from '../../../electron.service';
 import {AwsSsoOidcService} from '../../../aws-sso-oidc.service';
 import { AssumeRoleResponse } from 'aws-sdk/clients/sts';
-import Repository from '../../../../../../core/services/repository';
-import {FileService} from '../../../../../../core/services/file-service';
-import AwsSessionService from '../../../../../../core/services/session/aws/aws-session-service';
-import AwsIamUserService from '../../../../../../core/services/session/aws/method/aws-iam-user-service';
+import AwsSessionService from '../../../../../../../core/services/session/aws/aws-session-service';
+import {AwsIamRoleChainedSession} from '../../../../../../../core/models/aws-iam-role-chained-session';
+import {CredentialsInfo} from '../../../../../../../core/models/credentials-info';
+import Repository from '../../../../../../../core/services/repository';
+import {FileService} from '../../../../../../../core/services/file-service';
+import {Session} from '../../../../../../../core/models/session';
+import {LeappNotFoundError} from '../../../../../../../core/errors/leapp-not-found-error';
+import {SessionType} from '../../../../../../../core/models/session-type';
+import AwsIamUserService from '../../../../../../../core/services/session/aws/method/aws-iam-user-service';
+import {LeappAwsStsError} from '../../../../../../../core/errors/leapp-aws-sts-error';
 
 export interface AwsIamRoleChainedSessionRequest {
   accountName: string;

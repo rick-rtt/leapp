@@ -1,6 +1,6 @@
 import {Component, Input, OnInit, ViewEncapsulation} from '@angular/core';
-import {Constants} from '../../../../../core/models/constants';
 import {BsModalRef} from 'ngx-bootstrap/modal';
+import {constants} from "../../../../../../core/models/constants";
 
 @Component({
   selector: 'app-update-dialog',
@@ -30,14 +30,14 @@ export class UpdateDialogComponent implements OnInit {
 
   remindMeLater() {
     if (this.callback) {
-      this.callback(Constants.confirmClosedAndIgnoreUpdate);
+      this.callback(constants.confirmClosedAndIgnoreUpdate);
     }
     this.bsModalRef.hide();
   }
 
   goToDownloadPage() {
     if (this.callback) {
-      this.callback(Constants.confirmCloseAndDownloadUpdate);
+      this.callback(constants.confirmCloseAndDownloadUpdate);
     }
     this.bsModalRef.hide();
   }

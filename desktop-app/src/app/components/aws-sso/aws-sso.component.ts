@@ -4,9 +4,10 @@ import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {AppService} from '../../services/app.service';
 import {WorkspaceService} from '../../services/workspace.service';
 import {AwsSsoRoleService, SsoRoleSession} from '../../services/session/aws/methods/aws-sso-role.service';
-import {Constants} from '../../../../core/models/constants';
 import {AwsSsoOidcService, BrowserWindowClosing} from '../../services/aws-sso-oidc.service';
-import Repository from '../../../../core/services/repository';
+import * as Constants from 'constants';
+import Repository from '../../../../../core/services/repository';
+import {constants} from '../../../../../core/models/constants';
 
 @Component({
   selector: 'app-aws-sso',
@@ -15,7 +16,7 @@ import Repository from '../../../../core/services/repository';
 })
 export class AwsSsoComponent implements OnInit, BrowserWindowClosing {
 
-  eConstants = Constants;
+  eConstants = constants;
   isAwsSsoActive: boolean;
   regions = [];
   selectedRegion;
@@ -51,8 +52,8 @@ export class AwsSsoComponent implements OnInit, BrowserWindowClosing {
 
   async login() {
     if (this.form.valid && !this.loadingInApp) {
-      this.loadingInBrowser = (this.selectedBrowserOpening === Constants.inBrowser.toString());
-      this.loadingInApp = (this.selectedBrowserOpening === Constants.inApp.toString());
+      this.loadingInBrowser = (this.selectedBrowserOpening === constants.inBrowser.toString());
+      this.loadingInApp = (this.selectedBrowserOpening === constants.inApp.toString());
 
       Repository.getInstance().setAwsSsoConfiguration(
         this.selectedRegion,
@@ -113,7 +114,7 @@ export class AwsSsoComponent implements OnInit, BrowserWindowClosing {
     this.regions = this.appService.getRegions();
     const region = Repository.getInstance().getAwsSsoConfiguration().region;
     const portalUrl = Repository.getInstance().getAwsSsoConfiguration().portalUrl;
-    this.selectedBrowserOpening = Repository.getInstance().getAwsSsoConfiguration().browserOpening || Constants.inApp;
+    this.selectedBrowserOpening = Repository.getInstance().getAwsSsoConfiguration().browserOpening || constants.inApp;
 
     this.selectedRegion = region || this.regions[0].region;
     this.portalUrl = portalUrl;

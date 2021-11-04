@@ -2,16 +2,16 @@ import {Component, OnInit, ViewEncapsulation} from '@angular/core';
 import {FormControl, FormGroup} from '@angular/forms';
 import {AppService, ToastLevel} from '../../../services/app.service';
 import {Router} from '@angular/router';
-import {Constants} from '../../../../../core/models/constants';
 import {environment} from '../../../../environments/environment';
 import * as uuid from 'uuid';
-import {AwsIamRoleFederatedSession} from '../../../../../core/models/aws-iam-role-federated-session';
 import {WorkspaceService} from '../../../services/workspace.service';
-import {SessionStatus} from '../../../../../core/models/session-status';
 import {SessionFactoryService} from '../../../services/session-factory.service';
-import {SessionType} from '../../../../../core/models/session-type';
-import Repository from '../../../../../core/services/repository';
-import {LoggerLevel, LoggingService} from '../../../../../core/services/logging-service';
+import {constants} from '../../../../../../core/models/constants';
+import Repository from "../../../../../../core/services/repository";
+import {LoggerLevel, LoggingService} from "../../../../../../core/services/logging-service";
+import {SessionType} from "../../../../../../core/models/session-type";
+import {AwsIamRoleFederatedSession} from "../../../../../../core/models/aws-iam-role-federated-session";
+import {SessionStatus} from "../../../../../../core/models/session-status";
 
 @Component({
   selector: 'app-profile-page',
@@ -21,7 +21,7 @@ import {LoggerLevel, LoggingService} from '../../../../../core/services/logging-
 })
 export class ProfilePageComponent implements OnInit {
 
-  eConstants = Constants;
+  eConstants = constants;
   awsProfileValue: { id: string; name: string };
   idpUrlValue;
   editingIdpUrl: boolean;
@@ -38,7 +38,7 @@ export class ProfilePageComponent implements OnInit {
   regions: { region: string }[];
   selectedLocation: string;
   selectedRegion: string;
-  selectedBrowserOpening = Constants.inApp.toString();
+  selectedBrowserOpening = constants.inApp.toString();
 
   public form = new FormGroup({
     idpUrl: new FormControl(''),
@@ -95,7 +95,7 @@ export class ProfilePageComponent implements OnInit {
     this.locations = this.appService.getLocations();
     this.selectedRegion   = Repository.getInstance().getDefaultRegion() || environment.defaultRegion;
     this.selectedLocation = Repository.getInstance().getDefaultLocation() || environment.defaultLocation;
-    this.selectedBrowserOpening = Repository.getInstance().getAwsSsoConfiguration().browserOpening || Constants.inApp.toString();
+    this.selectedBrowserOpening = Repository.getInstance().getAwsSsoConfiguration().browserOpening || constants.inApp.toString();
 
     this.appService.validateAllFormFields(this.form);
   }
@@ -120,7 +120,7 @@ export class ProfilePageComponent implements OnInit {
       if (this.checkIfNeedDialogBox()) {
 
         this.appService.confirmDialog('You\'ve set a proxy url: the app must be restarted to update the configuration.', (res) => {
-          if (res !== Constants.confirmClosed) {
+          if (res !== constants.confirmClosed) {
             LoggingService.getInstance().logger('User have set a proxy url: the app must be restarted to update the configuration.', LoggerLevel.info, this);
             this.appService.restart();
           }
@@ -193,7 +193,7 @@ export class ProfilePageComponent implements OnInit {
 
     // Ask for deletion
     this.appService.confirmDialog(`Deleting this Idp url will also remove these sessions: <br><ul>${sessionsNames.join('')}</ul>Do you want to proceed?`, (res) => {
-      if (res !== Constants.confirmClosed) {
+      if (res !== constants.confirmClosed) {
         LoggingService.getInstance().logger(`Removing idp url with id: ${id}`, LoggerLevel.info, this);
 
         Repository.getInstance().removeIdpUrl(id);
@@ -251,7 +251,7 @@ export class ProfilePageComponent implements OnInit {
 
     // Ask for deletion
     this.appService.confirmDialog(`Deleting this profile will set default to these sessions: <br><ul>${sessionsNames.join('')}</ul>Do you want to proceed?`, async (res) => {
-      if (res !== Constants.confirmClosed) {
+      if (res !== constants.confirmClosed) {
         LoggingService.getInstance().logger(`Reverting to default profile with id: ${id}`, LoggerLevel.info, this);
         Repository.getInstance().removeProfile(id);
         // Reverting all sessions to default profile

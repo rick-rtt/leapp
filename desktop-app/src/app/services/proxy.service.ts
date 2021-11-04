@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {environment} from '../../environments/environment';
 import {AppService} from './app.service';
-import Repository from '../../../core/services/repository';
+import Repository from '../../../../core/services/repository';
 
 @Injectable({
   providedIn: 'root'
