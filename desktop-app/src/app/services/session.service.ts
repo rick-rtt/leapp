@@ -1,69 +1,76 @@
 import {Injectable} from '@angular/core';
-import {IAwsIamUserSessionUINotifier} from '../../../../core/services/session/aws/method/aws-iam-user-service';
 import {Session} from '../../../../core/models/session';
 import {SessionStatus} from '../../../../core/models/session-status';
 import Repository from '../../../../core/services/repository';
+import ISessionNotifier from '../../../../core/models/i-session-notifier';
 
 @Injectable({
   providedIn: 'root'
 })
 export abstract class SessionService {
 
-  protected awsIamUserSessionUINotifier: IAwsIamUserSessionUINotifier;
+  protected iSessionNotifier: ISessionNotifier;
 
   protected constructor(
-    awsIamUserSessionUINotifier: IAwsIamUserSessionUINotifier
+    iSessionNotifier: ISessionNotifier
   ) {
-    this.awsIamUserSessionUINotifier = awsIamUserSessionUINotifier;
+    this.iSessionNotifier = iSessionNotifier;
   }
 
   protected sessionActivate(sessionId: string) {
-    const index = this.awsIamUserSessionUINotifier.sessions.findIndex(s => s.sessionId === sessionId);
+    const index = this.iSessionNotifier.getSessions().findIndex(s => s.sessionId === sessionId);
+
     if (index > -1) {
-      const currentSession: Session = this.awsIamUserSessionUINotifier.sessions[index];
+      const currentSession: Session = this.iSessionNotifier.getSessions()[index];
       currentSession.status = SessionStatus.active;
       currentSession.startDateTime = new Date().toISOString();
-      this.awsIamUserSessionUINotifier.sessions[index] = currentSession;
-      this.awsIamUserSessionUINotifier.sessions = [...this.awsIamUserSessionUINotifier.sessions];
-      Repository.getInstance().updateSessions(this.awsIamUserSessionUINotifier.sessions);
+
+      this.iSessionNotifier.getSessions()[index] = currentSession;
+      this.iSessionNotifier.setSessions([...this.iSessionNotifier.getSessions()]);
+
+      Repository.getInstance().updateSessions(this.iSessionNotifier.getSessions());
     }
   }
 
   protected sessionLoading(sessionId: string) {
-    const session = this.awsIamUserSessionUINotifier.sessions.find(s => s.sessionId === sessionId);
-    if (session) {
-      const index = this.awsIamUserSessionUINotifier.sessions.indexOf(session);
-      const currentSession: Session = this.awsIamUserSessionUINotifier.sessions[index];
+    const index = this.iSessionNotifier.getSessions().findIndex(s => s.sessionId === sessionId);
+
+    if (index > -1) {
+      const currentSession: Session = this.iSessionNotifier.getSessions()[index];
       currentSession.status = SessionStatus.pending;
-      this.awsIamUserSessionUINotifier.sessions[index] = currentSession;
-      this.awsIamUserSessionUINotifier.sessions = [...this.awsIamUserSessionUINotifier.sessions];
-      Repository.getInstance().updateSessions(this.awsIamUserSessionUINotifier.sessions);
+
+      this.iSessionNotifier.getSessions()[index] = currentSession;
+      this.iSessionNotifier.setSessions([...this.iSessionNotifier.getSessions()]);
+
+      Repository.getInstance().updateSessions(this.iSessionNotifier.getSessions());
     }
   }
 
   protected sessionRotated(sessionId: string) {
-    const session = this.awsIamUserSessionUINotifier.sessions.find(s => s.sessionId === sessionId);
-    if (session) {
-      const index = this.awsIamUserSessionUINotifier.sessions.indexOf(session);
-      const currentSession: Session = this.awsIamUserSessionUINotifier.sessions[index];
+    const index = this.iSessionNotifier.getSessions().findIndex(s => s.sessionId === sessionId);
+    if (index > -1) {
+      const currentSession: Session = this.iSessionNotifier.getSessions()[index];
       currentSession.startDateTime = new Date().toISOString();
       currentSession.status = SessionStatus.active;
-      this.awsIamUserSessionUINotifier.sessions[index] = currentSession;
-      this.awsIamUserSessionUINotifier.sessions = [...this.awsIamUserSessionUINotifier.sessions];
-      Repository.getInstance().updateSessions(this.awsIamUserSessionUINotifier.sessions);
+
+      this.iSessionNotifier.getSessions()[index] = currentSession;
+      this.iSessionNotifier.setSessions([...this.iSessionNotifier.getSessions()]);
+
+      Repository.getInstance().updateSessions(this.iSessionNotifier.getSessions());
     }
   }
 
   protected sessionDeactivated(sessionId: string) {
-    const session = this.awsIamUserSessionUINotifier.sessions.find(s => s.sessionId === sessionId);
-    if (session) {
-      const index = this.awsIamUserSessionUINotifier.sessions.indexOf(session);
-      const currentSession: Session = this.awsIamUserSessionUINotifier.sessions[index];
+    const index = this.iSessionNotifier.getSessions().findIndex(s => s.sessionId === sessionId);
+    if (index > -1) {
+      const currentSession: Session = this.iSessionNotifier.getSessions()[index];
       currentSession.status = SessionStatus.inactive;
       currentSession.startDateTime = undefined;
-      this.awsIamUserSessionUINotifier.sessions[index] = currentSession;
-      this.awsIamUserSessionUINotifier.sessions = [...this.awsIamUserSessionUINotifier.sessions];
-      Repository.getInstance().updateSessions(this.awsIamUserSessionUINotifier.sessions);
+
+      this.iSessionNotifier.getSessions()[index] = currentSession;
+      this.iSessionNotifier.setSessions([...this.iSessionNotifier.getSessions()]);
+
+      Repository.getInstance().updateSessions(this.iSessionNotifier.getSessions());
     }
   }
 

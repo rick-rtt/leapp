@@ -17,6 +17,7 @@ import {LeappNotFoundError} from '../../../../../../../core/errors/leapp-not-fou
 import {SessionType} from '../../../../../../../core/models/session-type';
 import AwsIamUserService from '../../../../../../../core/services/session/aws/method/aws-iam-user-service';
 import {LeappAwsStsError} from '../../../../../../../core/errors/leapp-aws-sts-error';
+import ISessionNotifier from '../../../../../../../core/models/i-session-notifier';
 
 export interface AwsIamRoleChainedSessionRequest {
   accountName: string;
@@ -32,12 +33,12 @@ export interface AwsIamRoleChainedSessionRequest {
 export class AwsIamRoleChainedService extends AwsSessionService {
 
   constructor(
-    protected awsIamUserSessionUINotifier: WorkspaceService,
+    protected iSessionNotifier: ISessionNotifier,
     private appService: AppService,
     private electronService: ElectronService,
     private awsSsoOidcService: AwsSsoOidcService,
   ) {
-    super(awsIamUserSessionUINotifier);
+    super(iSessionNotifier);
   }
 
   static sessionTokenFromAssumeRoleResponse(assumeRoleResponse: AssumeRoleResponse): { sessionToken: any } {
@@ -55,11 +56,11 @@ export class AwsIamRoleChainedService extends AwsSessionService {
 
   create(sessionRequest: AwsIamRoleChainedSessionRequest, profileId: string): void {
     const session = new AwsIamRoleChainedSession(sessionRequest.accountName, sessionRequest.region, sessionRequest.roleArn, profileId, sessionRequest.parentSessionId, sessionRequest.roleSessionName);
-    this.awsIamUserSessionUINotifier.addSession(session);
+    this.iSessionNotifier.addSession(session);
   }
 
   async applyCredentials(sessionId: string, credentialsInfo: CredentialsInfo): Promise<void> {
-    const session = this.awsIamUserSessionUINotifier.get(sessionId);
+    const session = this.iSessionNotifier.getSession(sessionId);
     const profileName = Repository.getInstance().getProfileName((session as AwsIamRoleChainedSession).profileId);
     const credentialObject = {};
     credentialObject[profileName] = {
@@ -75,7 +76,7 @@ export class AwsIamRoleChainedService extends AwsSessionService {
   }
 
   async deApplyCredentials(sessionId: string): Promise<void> {
-    const session = this.awsIamUserSessionUINotifier.get(sessionId);
+    const session = this.iSessionNotifier.getSession(sessionId);
     const profileName = Repository.getInstance().getProfileName((session as AwsIamRoleChainedSession).profileId);
     const credentialsFile = await FileService.getInstance().iniParseSync(this.appService.awsCredentialPath());
     delete credentialsFile[profileName];
@@ -84,12 +85,12 @@ export class AwsIamRoleChainedService extends AwsSessionService {
 
   async generateCredentials(sessionId: string): Promise<CredentialsInfo> {
     // Retrieve Session
-    const session = this.awsIamUserSessionUINotifier.get(sessionId);
+    const session = this.iSessionNotifier.getSession(sessionId);
 
     // Retrieve Parent Session
     let parentSession: Session;
     try {
-      parentSession = this.awsIamUserSessionUINotifier.get((session as AwsIamRoleChainedSession).parentSessionId);
+      parentSession = this.iSessionNotifier.getSession((session as AwsIamRoleChainedSession).parentSessionId);
     } catch (err) {
       throw new LeappNotFoundError(this, `Parent Account Session  not found for Chained Account ${session.sessionName}`);
     }
@@ -97,11 +98,11 @@ export class AwsIamRoleChainedService extends AwsSessionService {
     // Generate a credential set from Parent Session
     let parentSessionService;
     if(parentSession.type === SessionType.awsIamRoleFederated) {
-      parentSessionService = new AwsIamRoleFederatedService(this.awsIamUserSessionUINotifier, this.appService) as AwsSessionService;
+      parentSessionService = new AwsIamRoleFederatedService(this.iSessionNotifier, this.appService) as AwsSessionService;
     } else if(parentSession.type === SessionType.awsIamUser) {
       parentSessionService = AwsIamUserService.getInstance() as AwsSessionService;
     } else if(parentSession.type === SessionType.awsSsoRole) {
-      parentSessionService = new AwsSsoRoleService(this.awsIamUserSessionUINotifier, this.appService, this.awsSsoOidcService) as AwsSessionService;
+      parentSessionService = new AwsSsoRoleService(this.iSessionNotifier, this.appService, this.awsSsoOidcService) as AwsSessionService;
     }
 
     const parentCredentialsInfo = await parentSessionService.generateCredentials(parentSession.sessionId);

@@ -6,12 +6,12 @@ import {Session} from '../../../../core/models/session';
 import {SessionStatus} from '../../../../core/models/session-status';
 import {SessionType} from '../../../../core/models/session-type';
 import {AwsIamRoleChainedSession} from '../../../../core/models/aws-iam-role-chained-session';
-import {AwsIamUserSession} from '../../../../core/models/aws-iam-user-session';
+import ISessionNotifier from '../../../../core/models/i-session-notifier';
 
 @Injectable({
   providedIn: 'root'
 })
-export class WorkspaceService {
+export class WorkspaceService implements ISessionNotifier{
 
   // Expose the observable$ part of the _sessions subject (read only stream)
   readonly sessions$: Observable<Session[]>;
@@ -31,6 +31,22 @@ export class WorkspaceService {
     this.sessions$ = this._sessions.asObservable();
     this.sessions = this.repository.getSessions();
     this.repository = Repository.getInstance();
+  }
+
+  setSessions(sessions: Session[]): void {
+        throw new Error('Method not implemented.');
+  }
+
+  getSession(sessionId: string): Session {
+        throw new Error('Method not implemented.');
+  }
+
+  getSessions(): Session[] {
+        throw new Error('Method not implemented.');
+  }
+
+  deleteSession(sessionId: string): void {
+        throw new Error('Method not implemented.');
   }
 
   // the getter will return the last value emitted in _sessions subject
@@ -97,14 +113,6 @@ export class WorkspaceService {
 
   listAwsSsoRoles() {
     return (this.sessions.length > 0) ? this.sessions.filter((session) => session.type === SessionType.awsSsoRole) : [];
-  }
-
-  updateSessionTokenExpiration(session: Session, getSessionTokenResponse: AWS.STS.GetSessionTokenResponse) {
-    const index = this.sessions.indexOf(session);
-    const currentSession: Session = this.sessions[index];
-    (currentSession as AwsIamUserSession).sessionTokenExpiration = getSessionTokenResponse.Credentials.Expiration.toISOString();
-    this.sessions[index] = currentSession;
-    this.sessions = [...this.sessions];
   }
 
   /*private getPersistedSessions(): Session[] {

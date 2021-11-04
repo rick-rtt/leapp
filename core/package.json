@@ -6,32 +6,6 @@
     "email": "info@besharp.it"
   },
   "description": "Leapp Core contains core functionalities for clients app",
-  "contributors": [
-    {
-      "name": "Alessandro Gaggia",
-      "email": "alex@besharp.it"
-    },
-    {
-      "name": "Paolo Diciaula",
-      "email": "paolo.diciaula@besharp.it"
-    },
-    {
-      "name": "Eric Villa",
-      "email": "eric@noovolari.com"
-    },
-    {
-      "name": "Andrea Cavagna",
-      "email": "andrea.cavagna@noovolari.com"
-    },
-    {
-      "name": "Nicolò Marchesi",
-      "email": "nicolo@noovolari.com"
-    }
-  ],
-  "repository": "https://github.com/Noovolari/leapp",
-  "private": true,
-  "category": "public.app-category.developer-tools",
-  "homepage": "https://leapp.cloud",
   "dependencies": {},
   "devDependencies": {}
 }

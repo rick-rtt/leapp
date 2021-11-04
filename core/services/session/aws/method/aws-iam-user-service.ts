@@ -14,6 +14,7 @@ import AwsSessionService from '../aws-session-service';
 import {LeappBaseError} from '../../../../errors/leapp-base-error';
 import {LoggerLevel} from '../../../logging-service';
 import AppService2 from '../../../app-service2';
+import ISessionNotifier from '../../../../models/i-session-notifier';
 
 export interface AwsIamUserSessionRequest {
   accountName: string;
@@ -27,12 +28,6 @@ export interface IMfaCodePrompter {
   promptForMFACode(sessionName: string, callback: any): void;
 }
 
-export interface IAwsIamUserSessionUINotifier  {
-  addSession(session: AwsIamUserSession): void;
-  getSessions(): AwsIamUserSession[];
-  updateSessionTokenExpiration(session: Session, getSessionTokenResponse: AWS.STS.GetSessionTokenResponse): void;
-}
-
 export default class AwsIamUserService extends AwsSessionService {
 
   private static instance: AwsIamUserService;
@@ -40,10 +35,10 @@ export default class AwsIamUserService extends AwsSessionService {
   private repository: Repository;
 
   private constructor(
-    awsIamUserSessionUINotifier: IAwsIamUserSessionUINotifier,
+    iSessionNotifier: ISessionNotifier,
     mfaCodePrompter: IMfaCodePrompter
   ) {
-    super(awsIamUserSessionUINotifier);
+    super(iSessionNotifier);
     this.mfaCodePrompter = mfaCodePrompter;
     this.repository = Repository.getInstance();
   }
@@ -57,13 +52,13 @@ export default class AwsIamUserService extends AwsSessionService {
     return this.instance;
   }
 
-  static init(awsIamUserSessionUINotifier: IAwsIamUserSessionUINotifier, mfaCodePrompter: IMfaCodePrompter) {
+  static init(iSessionNotifier: ISessionNotifier, mfaCodePrompter: IMfaCodePrompter) {
     if(this.instance) {
       // TODO: understand if we need to move Leapp Errors in a core folder
       throw new LeappBaseError('Already initialized service error', this, LoggerLevel.error,
         'Service already initialized');
     }
-    this.instance = new AwsIamUserService(awsIamUserSessionUINotifier, mfaCodePrompter);
+    this.instance = new AwsIamUserService(iSessionNotifier, mfaCodePrompter);
   }
 
   static isTokenExpired(tokenExpiration: string): boolean {
@@ -92,7 +87,8 @@ export default class AwsIamUserService extends AwsSessionService {
           .catch(err => console.error(err));
       })
       .catch(err => console.error(err));
-    this.awsIamUserSessionUINotifier.addSession(session);
+
+    this.iSessionNotifier.addSession(session);
   }
 
   async applyCredentials(sessionId: string, credentialsInfo: CredentialsInfo): Promise<void> {
@@ -248,7 +244,14 @@ export default class AwsIamUserService extends AwsSessionService {
   }
 
   private saveSessionTokenResponseInTheSession(session: Session, getSessionTokenResponse: AWS.STS.GetSessionTokenResponse): void {
-    this.awsIamUserSessionUINotifier.updateSessionTokenExpiration(session, getSessionTokenResponse);
-    Repository.getInstance().updateSessions(this.awsIamUserSessionUINotifier.getSessions());
+    const index = this.iSessionNotifier.getSessions().indexOf(session);
+    const currentSession: Session = this.iSessionNotifier.getSessions()[index];
+
+    (currentSession as AwsIamUserSession).sessionTokenExpiration = getSessionTokenResponse.Credentials.Expiration.toISOString();
+
+    this.iSessionNotifier.getSessions()[index] = currentSession;
+    this.iSessionNotifier.setSessions([...this.iSessionNotifier.getSessions()]);
+
+    Repository.getInstance().updateSessions(this.iSessionNotifier.getSessions());
   }
 }

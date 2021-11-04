@@ -2,14 +2,15 @@ import {CredentialsInfo} from '../../../models/credentials-info';
 import {SessionStatus} from '../../../models/session-status';
 import {LeappBaseError} from '../../../errors/leapp-base-error';
 import {LoggerLevel} from '../../logging-service';
-import {IAwsIamUserSessionUINotifier} from './method/aws-iam-user-service';
 import {SessionService} from '../../../../desktop-app/src/app/services/session.service';
+import ISessionNotifier from '../../../models/i-session-notifier';
+import Repository from '../../repository';
 
 export default abstract class AwsSessionService extends SessionService {
 
   /* This service manage the session manipulation as we need top generate credentials and maintain them for a specific duration */
-  protected constructor(protected awsIamUserSessionUINotifier: IAwsIamUserSessionUINotifier) {
-    super(awsIamUserSessionUINotifier);
+  protected constructor(protected iSessionNotifier: ISessionNotifier) {
+    super(iSessionNotifier);
   }
 
   async start(sessionId: string): Promise<void> {
@@ -49,16 +50,20 @@ export default abstract class AwsSessionService extends SessionService {
 
   async delete(sessionId: string): Promise<void> {
     try {
-      if (this.awsIamUserSessionUINotifier.get(sessionId).status === SessionStatus.active) {
+      if (this.iSessionNotifier.getSession(sessionId).status === SessionStatus.active) {
         await this.stop(sessionId);
       }
-      this.awsIamUserSessionUINotifier.listIamRoleChained(this.awsIamUserSessionUINotifier.get(sessionId)).forEach(sess => {
+      this.iSessionNotifier.listIamRoleChained(this.iSessionNotifier.getSession(sessionId)).forEach(sess => {
         if (sess.status === SessionStatus.active) {
           this.stop(sess.sessionId);
         }
-        this.awsIamUserSessionUINotifier.removeSession(sess.sessionId);
+
+        this.iSessionNotifier.deleteSession(sess.sessionId);
+        Repository.getInstance().deleteSession(sess.sessionId);
       });
-      this.awsIamUserSessionUINotifier.removeSession(sessionId);
+
+      this.iSessionNotifier.deleteSession(sessionId);
+      Repository.getInstance().deleteSession(sessionId);
       await this.removeSecrets(sessionId);
     } catch(error) {
       this.sessionError(sessionId, error);
@@ -66,9 +71,9 @@ export default abstract class AwsSessionService extends SessionService {
   }
 
   private isThereAnotherPendingSessionWithSameNamedProfile(sessionId: string) {
-    const session = this.awsIamUserSessionUINotifier.get(sessionId);
+    const session = this.iSessionNotifier.getSession(sessionId);
     const profileId = (session as any).profileId;
-    const pendingSessions = this.awsIamUserSessionUINotifier.listPending();
+    const pendingSessions = this.iSessionNotifier.listPending();
 
     for(let i = 0; i < pendingSessions.length; i++) {
       if ((pendingSessions[i] as any).profileId === profileId && (pendingSessions[i] as any).sessionId !== sessionId) {
@@ -81,10 +86,10 @@ export default abstract class AwsSessionService extends SessionService {
 
   private stopAllWithSameNameProfile(sessionId: string) {
     // Get profile to check
-    const session = this.awsIamUserSessionUINotifier.get(sessionId);
+    const session = this.iSessionNotifier.getSession(sessionId);
     const profileId = (session as any).profileId;
     // Get all active sessions
-    const activeSessions = this.awsIamUserSessionUINotifier.listActive();
+    const activeSessions = this.iSessionNotifier.listActive();
     // Stop all that shares the same profile
     activeSessions.forEach(sess => {
       if( (sess as any).profileId === profileId ) {

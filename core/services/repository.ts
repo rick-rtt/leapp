@@ -208,4 +208,13 @@ export default class Repository {
     workspace.sessions = sessions;
     Repository.getInstance().persist(workspace);
   }
+
+  deleteSession(sessionId: string) {
+    const workspace = this.get();
+    const index = workspace.sessions.findIndex(sess => sess.sessionId === sessionId);
+    if(index > -1) {
+      workspace.sessions.splice(index, 1);
+      Repository.getInstance().persist(workspace);
+    }
+  }
 }

@@ -8,6 +8,7 @@ import {AzureSession} from '../../../../../../core/models/azure-session';
 import {LeappExecuteError} from '../../../../../../core/errors/leapp-execute-error';
 import {LeappParseError} from '../../../../../../core/errors/leapp-parse-error';
 import {FileService} from '../../../../../../core/services/file-service';
+import ISessionNotifier from '../../../../../../core/models/i-session-notifier';
 
 export interface AzureSessionRequest {
   sessionName: string;
@@ -36,22 +37,22 @@ export interface AzureSessionToken {
 export class AzureService extends SessionService {
 
   constructor(
-    protected awsIamUserSessionUINotifier: WorkspaceService,
+    protected iSessionNotifier: ISessionNotifier,
     private appService: AppService,
     private executeService: ExecuteService
   ) {
-    super(awsIamUserSessionUINotifier);
+    super(iSessionNotifier);
   }
 
   create(sessionRequest: AzureSessionRequest): void {
     const session = new AzureSession(sessionRequest.sessionName, sessionRequest.region, sessionRequest.subscriptionId, sessionRequest.tenantId);
-    this.awsIamUserSessionUINotifier.addSession(session);
+    this.iSessionNotifier.addSession(session);
   }
 
   async start(sessionId: string): Promise<void> {
     this.sessionLoading(sessionId);
 
-    const session = this.awsIamUserSessionUINotifier.get(sessionId);
+    const session = this.iSessionNotifier.getSession(sessionId);
 
     // Try parse accessToken.json
     let accessTokensFile = this.parseAccessTokens();
@@ -118,7 +119,7 @@ export class AzureService extends SessionService {
   async delete(sessionId: string): Promise<void> {
     try {
       await this.stop(sessionId);
-      this.awsIamUserSessionUINotifier.removeSession(sessionId);
+      this.iSessionNotifier.deleteSession(sessionId);
     } catch(error) {
       throw new LeappParseError(this, error.message);
     }
