@@ -29,7 +29,7 @@ export default class Repository {
     return this.instance;
   }
 
-
+  // WORKSPACE
 
   get workspace(): Workspace {
     return this._workspace;
@@ -38,8 +38,6 @@ export default class Repository {
   set workspace(value: Workspace) {
     this._workspace = value;
   }
-
-  // WORKSPACE
 
   getWorkspace(): Workspace {
     if(!this._workspace) {
