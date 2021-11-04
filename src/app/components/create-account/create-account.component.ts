@@ -2,7 +2,6 @@ import {Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {AppService} from '../../services/app.service';
 import {ActivatedRoute, Router} from '@angular/router';
-import AwsSessionService from '../../../../core/services/session/aws/aws-session-service';
 import {WorkspaceService} from '../../services/workspace.service';
 import {SessionType} from '../../../../core/models/session-type';
 import {environment} from '../../../environments/environment';
@@ -82,7 +81,6 @@ export class CreateAccountComponent implements OnInit {
     private workspaceService: WorkspaceService,
     private awsIamRoleFederatedService: AwsIamRoleFederatedService,
     private awsIamRoleChainedService: AwsIamRoleChainedService,
-    private awsSessionService: AwsSessionService,
     private azureService: AzureService
   ) {}
 

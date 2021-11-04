@@ -10,7 +10,6 @@ import {WorkspaceService} from '../../../services/workspace.service';
 import {SessionStatus} from '../../../../../core/models/session-status';
 import {SessionFactoryService} from '../../../services/session-factory.service';
 import {SessionType} from '../../../../../core/models/session-type';
-import AwsSessionService from '../../../../../core/services/session/aws/aws-session-service';
 import Repository from '../../../../../core/services/repository';
 import {LoggerLevel, LoggingService} from '../../../../../core/services/logging-service';
 
@@ -64,7 +63,6 @@ export class ProfilePageComponent implements OnInit {
     public workspaceService: WorkspaceService,
     private appService: AppService,
     private sessionProviderService: SessionFactoryService,
-    private awsSessionService: AwsSessionService,
     private router: Router
   ) {
     this.repository = Repository.getInstance();
