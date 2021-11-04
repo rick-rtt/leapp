@@ -1,0 +1,157 @@
+{
+  "name": "Leapp",
+  "version": "0.7.3",
+  "author": {
+    "name": "besharp",
+    "email": "info@besharp.it"
+  },
+  "description": "Leapp is a Cross-Platform Cloud access App, built on top of Electron.",
+  "contributors": [
+    {
+      "name": "Alessandro Gaggia",
+      "email": "alex@besharp.it"
+    },
+    {
+      "name": "Paolo Diciaula",
+      "email": "paolo.diciaula@besharp.it"
+    },
+    {
+      "name": "Eric Villa",
+      "email": "eric@noovolari.com"
+    },
+    {
+      "name": "Andrea Cavagna",
+      "email": "andrea.cavagna@noovolari.com"
+    },
+    {
+      "name": "Nicolò Marchesi",
+      "email": "nicolo@noovolari.com"
+    }
+  ],
+  "repository": "https://github.com/Noovolari/leapp",
+  "private": true,
+  "category": "public.app-category.developer-tools",
+  "homepage": "https://leapp.cloud",
+  "main": "electron/dist/electron/main.js",
+  "scripts": {
+    "postinstall": "electron-builder install-app-deps",
+    "ng": "ng",
+    "release": "standard-version",
+    "rebuild-keytar": "electron-rebuild -f -w keytar",
+    "build": "rm -rf electron/dist && cp src/assets/icons/* dist/leapp-client/ && ng build --base-href ./",
+    "test": "ng test",
+    "prepare": "husky install",
+    "electron-dev": "rm -rf electron/dist && rm -rf dist && mkdir -p dist/leapp-client && cp -a src/assets/icons/* dist/leapp-client/ && ng build --aot --base-href ./ && tsc --p electron && mkdir -p electron/dist/electron/assets/images && cp -a electron/assets/images/* electron/dist/electron/assets/images/ && electron --enable-accelerated-mjpeg-decode --enable-accelerated-video --ignore-gpu-blacklist --enable-native-gpu-memory-buffers --enable-gpu-rasterization --ignore-gpu-blacklist .",
+    "electron-stag": "rm -rf electron/dist && rm -rf dist && mkdir -p dist/leapp-client && cp -a src/assets/icons/* dist/leapp-client/ && ng build --configuration staging --base-href ./ && tsc --p electron && mkdir -p electron/dist/electron/assets/images && cp -a electron/assets/images/* electron/dist/electron/assets/images/ && electron .",
+    "electron-prod": "rm -rf electron/dist && rm -rf dist && mkdir -p dist/leapp-client && cp -a src/assets/icons/* dist/leapp-client/ && ng build --configuration production --base-href ./ && tsc --p electron && mkdir -p electron/dist/electron/assets/images && cp -a electron/assets/images/* electron/dist/electron/assets/images/ && electron .",
+    "dist-mac-dev": "rm -rf electron/dist && rm -rf release && rm -rf dist && tsc --p electron && ng build --aot --base-href ./ && mkdir -p electron/dist/electron/assets/images && cp -a electron/assets/images/* electron/dist/electron/assets/images/ && electron-builder build",
+    "dist-mac-stag": "rm -rf electron/dist && rm -rf release && rm -rf dist && tsc --p electron && ng build --aot --configuration staging --base-href ./ && mkdir -p electron/dist/electron/assets/images && cp -a electron/assets/images/* electron/dist/electron/assets/images/ && electron-builder build",
+    "dist-mac-prod": "rm -rf electron/dist && rm -rf release && rm -rf dist && tsc --p electron && ng build --aot --configuration production --base-href ./ && mkdir -p electron/dist/electron/assets/images && cp -a electron/assets/images/* electron/dist/electron/assets/images/ && electron-builder build",
+    "dist-deb-dev": "rm -rf electron/dist && rm -rf release && rm -rf dist && tsc --p electron && ng build --aot --base-href ./ && mkdir -p electron/dist/electron/assets/images && cp -a electron/assets/images/* electron/dist/electron/assets/images/ && electron-builder build --linux",
+    "dist-deb-stag": "rm -rf electron/dist && rm -rf release && rm -rf dist && tsc --p electron && ng build --aot --configuration staging --base-href ./ && mkdir -p electron/dist/electron/assets/images && cp -a electron/assets/images/* electron/dist/electron/assets/images/ && electron-builder build --linux",
+    "dist-deb-prod": "rm -rf electron/dist && rm -rf release && rm -rf dist && tsc --p electron && ng build --aot --configuration production --base-href ./ && mkdir -p electron/dist/electron/assets/images && cp -a electron/assets/images/* electron/dist/electron/assets/images/ && electron-builder build --linux",
+    "dist-win-dev": "rm -rf electron/dist && rm -rf release && rm -rf dist && tsc --p electron && ng build --aot --base-href ./ && mkdir -p electron/dist/electron/assets/images && cp -a electron/assets/images/* electron/dist/electron/assets/images/ && electron-builder build --win --x64",
+    "dist-win-stag": "rm -rf electron/dist && rm -rf release && rm -rf dist && tsc --p electron && ng build --aot --configuration staging --base-href ./ && mkdir -p electron/dist/electron/assets/images && cp -a electron/assets/images/* electron/dist/electron/assets/images/ && electron-builder build --win --x64",
+    "dist-win-prod": "rm -rf electron/dist && rm -rf release && rm -rf dist && tsc --p electron && ng build --aot --configuration production --base-href ./ && mkdir -p electron/dist/electron/assets/images && cp -a electron/assets/images/* electron/dist/electron/assets/images/ && electron-builder build --win --x64",
+    "dist-all-dev": "rm -rf electron/dist && rm -rf release && rm -rf dist && tsc --p electron && ng build --aot --base-href ./ && mkdir -p electron/dist/electron/assets/images && cp -a electron/assets/images/* electron/dist/electron/assets/images/ && electron-builder build --mac --win --linux",
+    "dist-all-stag": "rm -rf electron/dist && rm -rf release && rm -rf dist && tsc --p electron && ng build --aot --configuration staging --base-href ./ && mkdir -p electron/dist/electron/assets/images && cp -a electron/assets/images/* electron/dist/electron/assets/images/ && electron-builder build --mac --win --linux",
+    "dist-all-prod": "rm -rf electron/dist && rm -rf release && rm -rf dist && tsc --p electron && ng build --aot --configuration production --base-href ./ && mkdir -p electron/dist/electron/assets/images && cp -a electron/assets/images/* electron/dist/electron/assets/images/ && electron-builder build --mac --win --linux"
+  },
+  "build": {
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "Noovolari",
+        "repo": "leapp",
+        "releaseType": "release"
+      }
+    ],
+    "afterSign": "scripts/notarize.js",
+    "productName": "Leapp",
+    "icon": "src/assets/icons/icon.icns",
+    "files": [
+      "dist/assets/images/Leapp.icns",
+      "dist/assets/images/Leapp.ico",
+      "dist/assets/images/Leapp.png",
+      "dist/icon.icns",
+      "dist/icon.ico",
+      "dist/icon.png",
+      "dist/leapp-client/*",
+      "dist/leapp-client/**/*",
+      "electron/dist/*",
+      "electron/dist/**/*",
+      "node_modules/**/*",
+      "package.json"
+    ],
+    "directories": {
+      "output": "release",
+      "buildResources": "dist"
+    },
+    "appId": "com.leapp.app",
+    "dmg": {
+      "icon": "src/assets/icons/icon.icns",
+      "background": "src/assets/icons/background.png",
+      "contents": [
+        {
+          "x": 110,
+          "y": 150
+        },
+        {
+          "x": 240,
+          "y": 150,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ]
+    },
+    "linux": {
+      "category": "Utility",
+      "synopsis": "Leapp Client is a tool that allows the user to obtain secure, temporary and refreshable credentials to access AWS Services with AWS CLI and tools based on it",
+      "description": "Leapp Client is a tool that allows the user to obtain secure, temporary and refreshable credentials to access AWS Services with AWS CLI and tools based on it, with versioning tools that work with AWS CodeCommit service and to easily use AWS SDK from your local environment during your everyday development.",
+      "icon": "src/assets/icons/1024x1024.png",
+      "desktop": {
+        "Icon": "/usr/share/icons/hicolor/0x0/apps/leapp.png"
+      },
+      "target": [
+        "deb",
+        "AppImage"
+      ]
+    },
+    "mac": {
+      "icon": "src/assets/images/Leapp.icns",
+      "forceCodeSigning": true,
+      "hardenedRuntime": true,
+      "entitlements": "./build/entitlements.mac.plist",
+      "entitlementsInherit": "./build/entitlements.mac.plist",
+      "gatekeeperAssess": false,
+      "target": [
+        {
+          "target": "zip",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "dmg",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "win": {
+      "target": [
+        "nsis",
+        "zip"
+      ],
+      "icon": "src/assets/images/Leapp.ico",
+      "legalTrademarks": "beSharp",
+      "publisherName": "beSharp",
+      "requestedExecutionLevel": "highestAvailable",
+      "verifyUpdateCodeSignature": false,
+      "certificateFile": "windows_sign_certificate.pfx"
+    }
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}
