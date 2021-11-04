@@ -1,5 +1,5 @@
-import {environment} from '../../src/environments/environment';
 import NativeService from './native-service';
+import {constants} from '../models/constants';
 
 /*
 * External enum to the logger level so we can use this to define the type of log
@@ -46,22 +46,16 @@ export class LoggingService {
 
     switch (type) {
       case LoggerLevel.info:
-        if (!environment.production) {
-          NativeService.getInstance().log.info(message);
-        }
+        NativeService.getInstance().log.info(message);
         break;
       case LoggerLevel.warn:
-        if (!environment.production) {
-          NativeService.getInstance().log.warn(message);
-        }
+        NativeService.getInstance().log.warn(message);
         break;
       case LoggerLevel.error:
         NativeService.getInstance().log.error(message);
         break;
       default:
-        if (!environment.production) {
-          NativeService.getInstance().log.error(message);
-        }
+        NativeService.getInstance().log.error(message);
         break;
     }
   }

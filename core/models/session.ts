@@ -1,7 +1,7 @@
 import * as uuid from 'uuid';
-import {environment} from '../../src/environments/environment';
 import {SessionStatus} from './session-status';
 import {SessionType} from './session-type';
+import {constants} from './constants';
 
 export class Session {
 
@@ -23,6 +23,6 @@ export class Session {
   expired(): boolean {
     const currentTime = new Date().getTime();
     const startTime = new Date(this.startDateTime).getTime();
-    return (currentTime - startTime) / 1000 > environment.sessionDuration;
+    return (currentTime - startTime) / 1000 > constants.sessionDuration;
   };
 }

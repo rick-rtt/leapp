@@ -4,7 +4,7 @@ import {KeychainService} from '../../../keychain-service';
 import {Session} from '../../../../models/session';
 import * as AWS from 'aws-sdk';
 import {GetSessionTokenResponse} from 'aws-sdk/clients/sts';
-import {Constants} from '../../../../models/constants';
+import {constants} from '../../../../models/constants';
 import {LeappAwsStsError} from '../../../../errors/leapp-aws-sts-error';
 import {LeappParseError} from '../../../../errors/leapp-parse-error';
 import {LeappMissingMfaTokenError} from '../../../../errors/leapp-missing-mfa-token-error';
@@ -14,7 +14,6 @@ import AwsSessionService from '../aws-session-service';
 import {LeappBaseError} from '../../../../errors/leapp-base-error';
 import {LoggerLevel} from '../../../logging-service';
 import AppService2 from '../../../app-service2';
-import {environment} from '../../../../environment';
 
 export interface AwsIamUserSessionRequest {
   accountName: string;
@@ -87,9 +86,9 @@ export default class AwsIamUserService extends AwsSessionService {
 
   create(accountRequest: AwsIamUserSessionRequest, profileId: string): void {
     const session = new AwsIamUserSession(accountRequest.accountName, accountRequest.region, profileId, accountRequest.mfaDevice);
-    KeychainService.getInstance().saveSecret(environment.appName, `${session.sessionId}-iam-user-aws-session-access-key-id`, accountRequest.accessKey)
+    KeychainService.getInstance().saveSecret(constants.appName, `${session.sessionId}-iam-user-aws-session-access-key-id`, accountRequest.accessKey)
       .then(_ => {
-        KeychainService.getInstance().saveSecret(environment.appName, `${session.sessionId}-iam-user-aws-session-secret-access-key`, accountRequest.secretKey)
+        KeychainService.getInstance().saveSecret(constants.appName, `${session.sessionId}-iam-user-aws-session-secret-access-key`, accountRequest.secretKey)
           .catch(err => console.error(err));
       })
       .catch(err => console.error(err));
@@ -141,7 +140,7 @@ export default class AwsIamUserService extends AwsSessionService {
       const sts = new AWS.STS(AppService2.getInstance().stsOptions(session));
       // Configure sts get-session-token api call params
       // eslint-disable-next-line @typescript-eslint/naming-convention
-      const params = { DurationSeconds: environment.sessionTokenDuration };
+      const params = { DurationSeconds: constants.sessionTokenDuration };
       // Check if MFA is needed or not
       if ((session as AwsIamUserSession).mfaDevice) {
         // Return session token after calling MFA modal
@@ -154,7 +153,7 @@ export default class AwsIamUserService extends AwsSessionService {
       // Session Token is NOT expired
       try {
         // Retrieve session token from keychain
-        return JSON.parse(await KeychainService.getInstance().getSecret(environment.appName, `${session.sessionId}-iam-user-aws-session-token`));
+        return JSON.parse(await KeychainService.getInstance().getSecret(constants.appName, `${session.sessionId}-iam-user-aws-session-token`));
       } catch (err) {
         throw new LeappParseError(this, err.message);
       }
@@ -195,7 +194,7 @@ export default class AwsIamUserService extends AwsSessionService {
       // TODO: think about timeout management
       // TODO: handle condition in which mfaCodePrompter is null
       this.mfaCodePrompter.promptForMFACode(session.sessionName, (value) => {
-        if (value !== Constants.confirmClosed) {
+        if (value !== constants.confirmClosed) {
           params['SerialNumber'] = (session as AwsIamUserSession).mfaDevice;
           params['TokenCode'] = value;
           // Return session token in the form of CredentialsInfo
@@ -208,23 +207,23 @@ export default class AwsIamUserService extends AwsSessionService {
   }
 
   private async getAccessKeyFromKeychain(sessionId: string): Promise<string> {
-    return await KeychainService.getInstance().getSecret(environment.appName, `${sessionId}-iam-user-aws-session-access-key-id`);
+    return await KeychainService.getInstance().getSecret(constants.appName, `${sessionId}-iam-user-aws-session-access-key-id`);
   }
 
   private async getSecretKeyFromKeychain(sessionId: string): Promise<string> {
-    return await KeychainService.getInstance().getSecret(environment.appName, `${sessionId}-iam-user-aws-session-secret-access-key`);
+    return await KeychainService.getInstance().getSecret(constants.appName, `${sessionId}-iam-user-aws-session-secret-access-key`);
   }
 
   private async removeAccessKeyFromKeychain(sessionId: string): Promise<void> {
-    await KeychainService.getInstance().deletePassword(environment.appName, `${sessionId}-iam-user-aws-session-access-key-id`);
+    await KeychainService.getInstance().deletePassword(constants.appName, `${sessionId}-iam-user-aws-session-access-key-id`);
   }
 
   private async removeSecretKeyFromKeychain(sessionId: string): Promise<void> {
-    await KeychainService.getInstance().deletePassword(environment.appName, `${sessionId}-iam-user-aws-session-secret-access-key`);
+    await KeychainService.getInstance().deletePassword(constants.appName, `${sessionId}-iam-user-aws-session-secret-access-key`);
   }
 
   private async removeSessionTokenFromKeychain(sessionId: string): Promise<void> {
-    await KeychainService.getInstance().deletePassword(environment.appName, `${sessionId}-iam-user-aws-session-token`);
+    await KeychainService.getInstance().deletePassword(constants.appName, `${sessionId}-iam-user-aws-session-token`);
   }
 
   private async generateSessionToken(session: Session, sts: AWS.STS, params: any): Promise<CredentialsInfo> {
@@ -239,7 +238,7 @@ export default class AwsIamUserService extends AwsSessionService {
       const sessionToken = AwsIamUserService.sessionTokenFromGetSessionTokenResponse(getSessionTokenResponse);
 
       // Save in keychain the session token
-      await KeychainService.getInstance().saveSecret(environment.appName, `${session.sessionId}-iam-user-aws-session-token`, JSON.stringify(sessionToken));
+      await KeychainService.getInstance().saveSecret(constants.appName, `${session.sessionId}-iam-user-aws-session-token`, JSON.stringify(sessionToken));
 
       // Return Session Token
       return sessionToken;

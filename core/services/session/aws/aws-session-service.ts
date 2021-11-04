@@ -1,10 +1,9 @@
-import {WorkspaceService} from '../../../../src/app/services/workspace.service';
 import {CredentialsInfo} from '../../../models/credentials-info';
 import {SessionStatus} from '../../../models/session-status';
-import {SessionService} from '../../../../src/app/services/session.service';
 import {LeappBaseError} from '../../../errors/leapp-base-error';
 import {LoggerLevel} from '../../logging-service';
 import {IAwsIamUserSessionUINotifier} from './method/aws-iam-user-service';
+import {SessionService} from '../../../../desktop-app/src/app/services/session.service';
 
 export default abstract class AwsSessionService extends SessionService {
 

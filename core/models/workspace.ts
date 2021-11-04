@@ -1,8 +1,7 @@
 import {Session} from './session';
 import * as uuid from 'uuid';
-import {environment} from '../../src/environments/environment';
 import {Type} from 'class-transformer';
-import {Constants} from './constants';
+import {constants} from './constants';
 
 export class Workspace {
   @Type(() => Session)
@@ -29,18 +28,18 @@ export class Workspace {
 
   constructor() {
     this._sessions = [];
-    this._defaultRegion = environment.defaultRegion;
-    this._defaultLocation = environment.defaultLocation;
+    this._defaultRegion = constants.defaultRegion;
+    this._defaultLocation = constants.defaultLocation;
     this._idpUrls = [];
     this._profiles = [
-      { id: uuid.v4(), name: environment.defaultAwsProfileName }
+      { id: uuid.v4(), name: constants.defaultAwsProfileName }
     ];
 
     this._awsSsoConfiguration = {
       region: undefined,
       portalUrl: undefined,
       expirationTime: undefined,
-      browserOpening: Constants.inApp.toString()
+      browserOpening: constants.inApp.toString()
     };
 
     this._proxyConfiguration = {

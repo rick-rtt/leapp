@@ -1,5 +1,5 @@
-import {environment} from '../../src/environments/environment';
 import NativeService from './native-service';
+import {constants} from '../models/constants';
 
 export default class AppService2 {
 
@@ -55,7 +55,7 @@ export default class AppService2 {
   stsOptions(session) {
     let options: any = {
       maxRetries: 0,
-      httpOptions: { timeout: environment.timeout }
+      httpOptions: { timeout: constants.timeout }
     };
 
     if (session.region) {

@@ -1,9 +1,9 @@
 import {Workspace} from '../models/workspace';
 import {Session} from '../models/session';
 import {deserialize, serialize} from 'class-transformer';
-import {environment} from '../../src/environments/environment';
 import {FileService} from './file-service';
 import NativeService from './native-service';
+import {constants} from '../models/constants';
 
 export default class Repository {
 
@@ -38,7 +38,7 @@ export default class Repository {
   }
 
   create(): void {
-    if (!this.fileService.exists(this.nativeService.os.homedir() + '/' + environment.lockFileDestination)) {
+    if (!this.fileService.exists(this.nativeService.os.homedir() + '/' + constants.lockFileDestination)) {
       this.fileService.newDir(this.nativeService.os.homedir() + '/.Leapp', { recursive: true});
       this._workspace = new Workspace();
       this.persist(this._workspace);
@@ -47,7 +47,7 @@ export default class Repository {
 
   get(): Workspace {
     if(!this._workspace) {
-      const workspaceJSON = this.fileService.decryptText(this.fileService.readFileSync(this.nativeService.os.homedir() + '/' + environment.lockFileDestination));
+      const workspaceJSON = this.fileService.decryptText(this.fileService.readFileSync(this.nativeService.os.homedir() + '/' + constants.lockFileDestination));
       this._workspace = deserialize(Workspace, workspaceJSON);
       return this._workspace;
     }
@@ -194,7 +194,7 @@ export default class Repository {
   }
 
   persist(workspace: Workspace) {
-    const path = this.nativeService.os.homedir() + '/' + environment.lockFileDestination;
+    const path = this.nativeService.os.homedir() + '/' + constants.lockFileDestination;
     this.fileService.writeFileSync(path, this.fileService.encryptText(serialize(workspace)));
   }
 
