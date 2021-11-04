@@ -79,11 +79,11 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
   private ssoPortal: SSO;
 
   constructor(
-    protected workspaceService: WorkspaceService,
+    protected awsIamUserSessionUINotifier: WorkspaceService,
     private appService: AppService,
     private awsSsoOidcService: AwsSsoOidcService
   ) {
-    super(workspaceService);
+    super(awsIamUserSessionUINotifier);
     this.awsSsoOidcService.listeners.push(this);
   }
 
@@ -110,7 +110,7 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
 
   async catchClosingBrowserWindow(): Promise<void> {
     // Get all current sessions if any
-    const sessions = this.workspaceService.listAwsSsoRoles();
+    const sessions = this.awsIamUserSessionUINotifier.listAwsSsoRoles();
 
     for (let i = 0; i < sessions.length; i++) {
       // Stop session
@@ -121,11 +121,11 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
 
   create(accountRequest: AwsSsoRoleSessionRequest, profileId: string): void {
     const session = new AwsSsoRoleSession(accountRequest.sessionName, accountRequest.region, accountRequest.roleArn, profileId, accountRequest.email);
-    this.workspaceService.addSession(session);
+    this.awsIamUserSessionUINotifier.addSession(session);
   }
 
   async applyCredentials(sessionId: string, credentialsInfo: CredentialsInfo): Promise<void> {
-    const session = this.workspaceService.get(sessionId);
+    const session = this.awsIamUserSessionUINotifier.get(sessionId);
     const profileName = Repository.getInstance().getProfileName((session as AwsSsoRoleSession).profileId);
     const credentialObject = {};
     credentialObject[profileName] = {
@@ -141,7 +141,7 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
   }
 
   async deApplyCredentials(sessionId: string): Promise<void> {
-    const session = this.workspaceService.get(sessionId);
+    const session = this.awsIamUserSessionUINotifier.get(sessionId);
     const profileName = Repository.getInstance().getProfileName((session as AwsSsoRoleSession).profileId);
     const credentialsFile = await FileService.getInstance().iniParseSync(this.appService.awsCredentialPath());
     delete credentialsFile[profileName];
@@ -151,7 +151,7 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
   async generateCredentials(sessionId: string): Promise<CredentialsInfo> {
     const region = Repository.getInstance().getAwsSsoConfiguration().region;
     const portalUrl = Repository.getInstance().getAwsSsoConfiguration().portalUrl;
-    const roleArn = (this.workspaceService.get(sessionId) as AwsSsoRoleSession).roleArn;
+    const roleArn = (this.awsIamUserSessionUINotifier.get(sessionId) as AwsSsoRoleSession).roleArn;
 
     const accessToken = await this.getAccessToken(region, portalUrl);
     const credentials = await this.getRoleCredentials(accessToken, region, roleArn);
@@ -346,12 +346,12 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
   }
 
   private async removeSsoSessionsFromWorkspace(): Promise<void> {
-    const sessions = this.workspaceService.listAwsSsoRoles();
+    const sessions = this.awsIamUserSessionUINotifier.listAwsSsoRoles();
 
     for (let i = 0; i < sessions.length; i++) {
       const sess = sessions[i];
 
-      const iamRoleChainedSessions = this.workspaceService.listIamRoleChained(sess);
+      const iamRoleChainedSessions = this.awsIamUserSessionUINotifier.listIamRoleChained(sess);
 
       for (let j = 0; j < iamRoleChainedSessions.length; j++) {
         await this.delete(iamRoleChainedSessions[j].sessionId);
@@ -359,7 +359,7 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
 
       await this.stop(sess.sessionId);
 
-      this.workspaceService.removeSession(sess.sessionId);
+      this.awsIamUserSessionUINotifier.removeSession(sess.sessionId);
     }
   }
 
@@ -379,8 +379,8 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
   }
 
   private findOldSession(accountInfo: SSO.AccountInfo, accountRole: SSO.RoleInfo): { region: string; profileId: string } {
-    for (let i = 0; i < this.workspaceService.sessions.length; i++) {
-      const sess = this.workspaceService.sessions[i];
+    for (let i = 0; i < this.awsIamUserSessionUINotifier.sessions.length; i++) {
+      const sess = this.awsIamUserSessionUINotifier.sessions[i];
 
       if(sess.type === SessionType.awsSsoRole) {
         if (

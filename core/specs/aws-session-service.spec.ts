@@ -9,7 +9,7 @@ import {AppService} from '../../src/app/services/app.service';
 import {Session} from '../models/session';
 import {WorkspaceService} from '../../src/app/services/workspace.service';
 import {SessionType} from '../models/session-type';
-import {LeappNotFoundError} from '../../src/app/errors/leapp-not-found-error';
+import {LeappNotFoundError} from '../errors/leapp-not-found-error';
 import {SessionStatus} from '../models/session-status';
 import {AwsIamUserSession} from '../models/aws-iam-user-session';
 import {FileService} from '../services/file-service';

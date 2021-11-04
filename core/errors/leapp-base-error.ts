@@ -1,4 +1,4 @@
-import {LoggerLevel} from '../../../core/services/logging-service';
+import {LoggerLevel} from '../services/logging-service';
 
 export class LeappBaseError extends Error {
 

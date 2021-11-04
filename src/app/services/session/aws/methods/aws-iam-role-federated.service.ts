@@ -4,11 +4,11 @@ import {WorkspaceService} from '../../../workspace.service';
 import {KeychainService} from '../../../../../../core/services/keychain-service';
 import {AppService} from '../../../app.service';
 import {AwsIamRoleFederatedSession} from '../../../../../../core/models/aws-iam-role-federated-session';
-import {LeappSamlError} from '../../../../errors/leapp-saml-error';
-import {LeappParseError} from '../../../../errors/leapp-parse-error';
+import {LeappSamlError} from '../../../../../../core/errors/leapp-saml-error';
+import {LeappParseError} from '../../../../../../core/errors/leapp-parse-error';
 import {environment} from '../../../../../environments/environment';
 import * as AWS from 'aws-sdk';
-import {LeappAwsStsError} from '../../../../errors/leapp-aws-sts-error';
+import {LeappAwsStsError} from '../../../../../../core/errors/leapp-aws-sts-error';
 import Repository from '../../../../../../core/services/repository';
 import {FileService} from '../../../../../../core/services/file-service';
 import AwsSessionService from '../../../../../../core/services/session/aws/aws-session-service';
@@ -31,10 +31,10 @@ export interface ResponseHookDetails {
 export class AwsIamRoleFederatedService extends AwsSessionService {
 
   constructor(
-    protected workspaceService: WorkspaceService,
+    protected awsIamUserSessionUINotifier: WorkspaceService,
     private appService: AppService
   ) {
-    super(workspaceService);
+    super(awsIamUserSessionUINotifier);
   }
 
   static async extractSamlResponse(responseHookDetails: ResponseHookDetails) {
@@ -66,11 +66,11 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
       sessionRequest.idpArn,
       sessionRequest.roleArn,
       profileId);
-    this.workspaceService.addSession(session);
+    this.awsIamUserSessionUINotifier.addSession(session);
   }
 
   async applyCredentials(sessionId: string, credentialsInfo: CredentialsInfo): Promise<void> {
-    const session = this.workspaceService.get(sessionId);
+    const session = this.awsIamUserSessionUINotifier.get(sessionId);
     const profileName = Repository.getInstance().getProfileName((session as AwsIamRoleFederatedSession).profileId);
     const credentialObject = {};
     credentialObject[profileName] = {
@@ -86,7 +86,7 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
   }
 
   async deApplyCredentials(sessionId: string): Promise<void> {
-    const session = this.workspaceService.get(sessionId);
+    const session = this.awsIamUserSessionUINotifier.get(sessionId);
     const profileName = Repository.getInstance().getProfileName((session as AwsIamRoleFederatedSession).profileId);
     const credentialsFile = await FileService.getInstance().iniParseSync(this.appService.awsCredentialPath());
     delete credentialsFile[profileName];
@@ -95,7 +95,7 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
 
   async generateCredentials(sessionId: string): Promise<CredentialsInfo> {
     // Get the session in question
-    const session = this.workspaceService.get(sessionId);
+    const session = this.awsIamUserSessionUINotifier.get(sessionId);
 
     // Get idpUrl
     const idpUrl = Repository.getInstance().getIdpUrl((session as AwsIamRoleFederatedSession).idpUrlId);

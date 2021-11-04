@@ -12,7 +12,7 @@ import {Injectable} from '@angular/core';
 import {Constants} from '../../../core/models/constants';
 import {AppService} from './app.service';
 import {ElectronService} from './electron.service';
-import {LeappBaseError} from '../errors/leapp-base-error';
+import {LeappBaseError} from '../../../core/errors/leapp-base-error';
 import Repository from '../../../core/services/repository';
 import {LoggerLevel} from '../../../core/services/logging-service';
 

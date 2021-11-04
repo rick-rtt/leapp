@@ -4,7 +4,7 @@ import { ErrorService } from './error.service';
 import {mustInjected} from '../../../base-injectables';
 import {AppService} from '../app.service';
 import {ToastrModule} from 'ngx-toastr';
-import {LeappBaseError} from '../../errors/leapp-base-error';
+import {LeappBaseError} from '../../../../core/errors/leapp-base-error';
 import {ErrorHandler} from '@angular/core';
 import {AppModule} from '../../app.module';
 import {LoggerLevel} from '../../../../core/services/logging-service';

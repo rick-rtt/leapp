@@ -177,11 +177,11 @@ export class ProfilePageComponent implements OnInit {
   deleteIdpUrl(id) {
     // Assumable sessions with this id
     this.sessionService = this.sessionProviderService.getService(SessionType.awsIamRoleFederated);
-    let sessions = this.sessionService.list().filter(s => (s as AwsIamRoleFederatedSession).idpUrlId === id);
+    let sessions = this.workspaceService.sessions.filter(s => (s as AwsIamRoleFederatedSession).idpUrlId === id);
 
     // Add iam Role Chained from iam role iam_federated_role
     sessions.forEach(parent => {
-      const childs = this.sessionService.listIamRoleChained(parent);
+      const childs = this.workspaceService.listIamRoleChained(parent);
       sessions = sessions.concat(childs);
     });
 

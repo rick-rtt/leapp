@@ -197,4 +197,15 @@ export default class Repository {
     const path = this.nativeService.os.homedir() + '/' + environment.lockFileDestination;
     this.fileService.writeFileSync(path, this.fileService.encryptText(serialize(workspace)));
   }
+
+  getSessions(): Session[] {
+    const workspace = this.get();
+    return workspace.sessions;
+  }
+
+  updateSessions(sessions: Session[]): void {
+    const workspace = this.get();
+    workspace.sessions = sessions;
+    Repository.getInstance().persist(workspace);
+  }
 }

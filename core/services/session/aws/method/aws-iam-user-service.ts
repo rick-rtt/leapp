@@ -1,21 +1,20 @@
 import {CredentialsInfo} from '../../../../models/credentials-info';
-import {WorkspaceService} from '../../../../../src/app/services/workspace.service';
 import {AwsIamUserSession} from '../../../../models/aws-iam-user-session';
 import {KeychainService} from '../../../keychain-service';
-import {environment} from '../../../../../src/environments/environment';
 import {Session} from '../../../../models/session';
 import * as AWS from 'aws-sdk';
 import {GetSessionTokenResponse} from 'aws-sdk/clients/sts';
 import {Constants} from '../../../../models/constants';
-import {LeappAwsStsError} from '../../../../../src/app/errors/leapp-aws-sts-error';
-import {LeappParseError} from '../../../../../src/app/errors/leapp-parse-error';
-import {LeappMissingMfaTokenError} from '../../../../../src/app/errors/leapp-missing-mfa-token-error';
+import {LeappAwsStsError} from '../../../../errors/leapp-aws-sts-error';
+import {LeappParseError} from '../../../../errors/leapp-parse-error';
+import {LeappMissingMfaTokenError} from '../../../../errors/leapp-missing-mfa-token-error';
 import Repository from '../../../repository';
 import {FileService} from '../../../file-service';
 import AwsSessionService from '../aws-session-service';
-import {LeappBaseError} from '../../../../../src/app/errors/leapp-base-error';
+import {LeappBaseError} from '../../../../errors/leapp-base-error';
 import {LoggerLevel} from '../../../logging-service';
 import AppService2 from '../../../app-service2';
+import {environment} from '../../../../environment';
 
 export interface AwsIamUserSessionRequest {
   accountName: string;
@@ -29,18 +28,25 @@ export interface IMfaCodePrompter {
   promptForMFACode(sessionName: string, callback: any): void;
 }
 
+export interface IAwsIamUserSessionUINotifier  {
+  addSession(session: AwsIamUserSession): void;
+  getSessions(): AwsIamUserSession[];
+  updateSessionTokenExpiration(session: Session, getSessionTokenResponse: AWS.STS.GetSessionTokenResponse): void;
+}
+
 export default class AwsIamUserService extends AwsSessionService {
 
   private static instance: AwsIamUserService;
-  protected workspaceService: WorkspaceService;
   private mfaCodePrompter: IMfaCodePrompter;
+  private repository: Repository;
 
   private constructor(
-    workspaceService: WorkspaceService,
+    awsIamUserSessionUINotifier: IAwsIamUserSessionUINotifier,
     mfaCodePrompter: IMfaCodePrompter
   ) {
-    super(workspaceService);
+    super(awsIamUserSessionUINotifier);
     this.mfaCodePrompter = mfaCodePrompter;
+    this.repository = Repository.getInstance();
   }
 
   static getInstance() {
@@ -52,13 +58,13 @@ export default class AwsIamUserService extends AwsSessionService {
     return this.instance;
   }
 
-  static init(workspaceService: WorkspaceService, mfaCodePrompter: IMfaCodePrompter) {
+  static init(awsIamUserSessionUINotifier: IAwsIamUserSessionUINotifier, mfaCodePrompter: IMfaCodePrompter) {
     if(this.instance) {
       // TODO: understand if we need to move Leapp Errors in a core folder
       throw new LeappBaseError('Already initialized service error', this, LoggerLevel.error,
         'Service already initialized');
     }
-    this.instance = new AwsIamUserService(workspaceService, mfaCodePrompter);
+    this.instance = new AwsIamUserService(awsIamUserSessionUINotifier, mfaCodePrompter);
   }
 
   static isTokenExpired(tokenExpiration: string): boolean {
@@ -87,11 +93,12 @@ export default class AwsIamUserService extends AwsSessionService {
           .catch(err => console.error(err));
       })
       .catch(err => console.error(err));
-    this.workspaceService.addSession(session);
+    this.awsIamUserSessionUINotifier.addSession(session);
   }
 
   async applyCredentials(sessionId: string, credentialsInfo: CredentialsInfo): Promise<void> {
-    const session = this.workspaceService.get(sessionId);
+    //const session = this.workspaceService.get(sessionId);
+    const session = this.repository.getSessions().find(sess => sess.sessionId === sessionId);
     const profileName = Repository.getInstance().getProfileName((session as AwsIamUserSession).profileId);
     const credentialObject = {};
     credentialObject[profileName] = {
@@ -107,7 +114,8 @@ export default class AwsIamUserService extends AwsSessionService {
   }
 
   async deApplyCredentials(sessionId: string): Promise<void> {
-    const session = this.workspaceService.get(sessionId);
+    //const session = this.workspaceService.get(sessionId);
+    const session = this.repository.getSessions().find(sess => sess.sessionId === sessionId);
     const profileName = Repository.getInstance().getProfileName((session as AwsIamUserSession).profileId);
     const credentialsFile = await FileService.getInstance().iniParseSync(AppService2.getInstance().awsCredentialPath());
     delete credentialsFile[profileName];
@@ -115,41 +123,42 @@ export default class AwsIamUserService extends AwsSessionService {
   }
 
   async generateCredentials(sessionId: string): Promise<CredentialsInfo> {
-      // Get the session in question
-      const session = this.workspaceService.get(sessionId);
-      // Retrieve session token expiration
-      const tokenExpiration = (session as AwsIamUserSession).sessionTokenExpiration;
-      // Check if token is expired
-      if (!tokenExpiration || AwsIamUserService.isTokenExpired(tokenExpiration)) {
-        // Token is Expired!
-        // Retrieve access keys from keychain
-        const accessKeyId = await this.getAccessKeyFromKeychain(sessionId);
-        const secretAccessKey = await this.getSecretKeyFromKeychain(sessionId);
-        // Get session token
-        // https://docs.aws.amazon.com/STS/latest/APIReference/API_GetSessionToken.html
-        AWS.config.update({ accessKeyId, secretAccessKey });
-        // Configure sts client options
-        const sts = new AWS.STS(AppService2.getInstance().stsOptions(session));
-        // Configure sts get-session-token api call params
-        // eslint-disable-next-line @typescript-eslint/naming-convention
-        const params = { DurationSeconds: environment.sessionTokenDuration };
-        // Check if MFA is needed or not
-        if ((session as AwsIamUserSession).mfaDevice) {
-          // Return session token after calling MFA modal
-          return this.generateSessionTokenCallingMfaModal(session, sts, params);
-        } else {
-          // Return session token in the form of CredentialsInfo
-          return this.generateSessionToken(session, sts, params);
-        }
+    // Get the session in question
+    //const session = this.workspaceService.get(sessionId);
+    const session = this.repository.getSessions().find(sess => sess.sessionId === sessionId);
+    // Retrieve session token expiration
+    const tokenExpiration = (session as AwsIamUserSession).sessionTokenExpiration;
+    // Check if token is expired
+    if (!tokenExpiration || AwsIamUserService.isTokenExpired(tokenExpiration)) {
+      // Token is Expired!
+      // Retrieve access keys from keychain
+      const accessKeyId = await this.getAccessKeyFromKeychain(sessionId);
+      const secretAccessKey = await this.getSecretKeyFromKeychain(sessionId);
+      // Get session token
+      // https://docs.aws.amazon.com/STS/latest/APIReference/API_GetSessionToken.html
+      AWS.config.update({ accessKeyId, secretAccessKey });
+      // Configure sts client options
+      const sts = new AWS.STS(AppService2.getInstance().stsOptions(session));
+      // Configure sts get-session-token api call params
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      const params = { DurationSeconds: environment.sessionTokenDuration };
+      // Check if MFA is needed or not
+      if ((session as AwsIamUserSession).mfaDevice) {
+        // Return session token after calling MFA modal
+        return this.generateSessionTokenCallingMfaModal(session, sts, params);
       } else {
-        // Session Token is NOT expired
-        try {
-          // Retrieve session token from keychain
-          return JSON.parse(await KeychainService.getInstance().getSecret(environment.appName, `${session.sessionId}-iam-user-aws-session-token`));
-        } catch (err) {
-          throw new LeappParseError(this, err.message);
-        }
+        // Return session token in the form of CredentialsInfo
+        return this.generateSessionToken(session, sts, params);
       }
+    } else {
+      // Session Token is NOT expired
+      try {
+        // Retrieve session token from keychain
+        return JSON.parse(await KeychainService.getInstance().getSecret(environment.appName, `${session.sessionId}-iam-user-aws-session-token`));
+      } catch (err) {
+        throw new LeappParseError(this, err.message);
+      }
+    }
   }
 
   async getAccountNumberFromCallerIdentity(session: Session): Promise<string> {
@@ -195,18 +204,6 @@ export default class AwsIamUserService extends AwsSessionService {
           reject(new LeappMissingMfaTokenError(this, 'Missing Multi Factor Authentication code'));
         }
       });
-      /*
-      this.appService.inputDialog('MFA Code insert', 'Insert MFA Code', `please insert MFA code from your app or device for ${session.sessionName}`, (value) => {
-        if (value !== Constants.confirmClosed) {
-          params['SerialNumber'] = (session as AwsIamUserSession).mfaDevice;
-          params['TokenCode'] = value;
-          // Return session token in the form of CredentialsInfo
-          resolve(this.generateSessionToken(session, sts, params));
-        } else {
-          reject(new LeappMissingMfaTokenError(this, 'Missing Multi Factor Authentication code'));
-        }
-      });
-      */
     });
   }
 
@@ -252,10 +249,7 @@ export default class AwsIamUserService extends AwsSessionService {
   }
 
   private saveSessionTokenResponseInTheSession(session: Session, getSessionTokenResponse: AWS.STS.GetSessionTokenResponse): void {
-    const index = this.workspaceService.sessions.indexOf(session);
-    const currentSession: Session = this.workspaceService.sessions[index];
-    (currentSession as AwsIamUserSession).sessionTokenExpiration = getSessionTokenResponse.Credentials.Expiration.toISOString();
-    this.workspaceService.sessions[index] = currentSession;
-    this.workspaceService.sessions = [...this.workspaceService.sessions];
+    this.awsIamUserSessionUINotifier.updateSessionTokenExpiration(session, getSessionTokenResponse);
+    Repository.getInstance().updateSessions(this.awsIamUserSessionUINotifier.getSessions());
   }
 }

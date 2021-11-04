@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {ExecuteService} from './execute.service';
 import {AppService} from './app.service';
-import {LeappBaseError} from '../errors/leapp-base-error';
+import {LeappBaseError} from '../../../core/errors/leapp-base-error';
 import {CredentialsInfo} from '../../../core/models/credentials-info';
 import {LoggerLevel, LoggingService} from '../../../core/services/logging-service';
 

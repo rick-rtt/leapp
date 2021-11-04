@@ -5,6 +5,8 @@ import Repository from '../../../core/services/repository';
 import {SessionStatus} from '../../../core/models/session-status';
 import {SessionType} from '../../../core/models/session-type';
 import {AwsIamRoleChainedSession} from '../../../core/models/aws-iam-role-chained-session';
+import {AwsIamUserSession} from '../../../core/models/aws-iam-user-session';
+import * as AWS from 'aws-sdk';
 
 @Injectable({
   providedIn: 'root'
@@ -22,10 +24,13 @@ export class WorkspaceService {
   //   create a new BehaviorSubject for it, as well as the observable$, and getters/setters
   private readonly _sessions;
 
+  private repository: Repository;
+
   constructor() {
     this._sessions = new BehaviorSubject<Session[]>([]);
     this.sessions$ = this._sessions.asObservable();
-    this.sessions = this.getPersistedSessions();
+    this.sessions = this.repository.getSessions();
+    this.repository = Repository.getInstance();
   }
 
   // the getter will return the last value emitted in _sessions subject
@@ -36,7 +41,7 @@ export class WorkspaceService {
   // assigning a value to this.sessions will push it onto the observable
   // and down to all of its subscribers (ex: this.sessions = [])
   set sessions(sessions: Session[]) {
-    this.updatePersistedSessions(sessions);
+    //this.updatePersistedSessions(sessions);
     this._sessions.next(sessions);
   }
 
@@ -53,7 +58,6 @@ export class WorkspaceService {
   }
 
   get(sessionId: string): Session {
-
     const sessionFiltered = this.sessions.find(session => session.sessionId === sessionId);
     return sessionFiltered ? sessionFiltered : null;
   }
@@ -95,7 +99,15 @@ export class WorkspaceService {
     return (this.sessions.length > 0) ? this.sessions.filter((session) => session.type === SessionType.awsSsoRole) : [];
   }
 
-  private getPersistedSessions(): Session[] {
+  updateSessionTokenExpiration(session: Session, getSessionTokenResponse: AWS.STS.GetSessionTokenResponse) {
+    const index = this.sessions.indexOf(session);
+    const currentSession: Session = this.sessions[index];
+    (currentSession as AwsIamUserSession).sessionTokenExpiration = getSessionTokenResponse.Credentials.Expiration.toISOString();
+    this.sessions[index] = currentSession;
+    this.sessions = [...this.sessions];
+  }
+
+  /*private getPersistedSessions(): Session[] {
     const workspace = Repository.getInstance().get();
     return workspace.sessions;
   }
@@ -104,5 +116,5 @@ export class WorkspaceService {
     const workspace = Repository.getInstance().get();
     workspace.sessions = sessions;
     Repository.getInstance().persist(workspace);
-  }
+  }*/
 }

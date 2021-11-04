@@ -12,6 +12,7 @@ import {AzureSession} from '../../../core/models/azure-session';
 import {WorkspaceService} from './workspace.service';
 import {Constants} from '../../../core/models/constants';
 import {FileService} from '../../../core/services/file-service';
+import Repository from "../../../core/services/repository";
 
 @Injectable({
   providedIn: 'root'
@@ -119,6 +120,7 @@ export class RetrocompatibilityService {
 
       // Persist adapted workspace data
       this.persists(workspace);
+
       // Apply sessions to behaviour subject
       this.workspaceService.sessions = workspace.sessions;
 

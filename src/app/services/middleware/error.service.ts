@@ -1,5 +1,5 @@
 import {ErrorHandler, Injectable, Injector} from '@angular/core';
-import {LeappBaseError} from '../../errors/leapp-base-error';
+import {LeappBaseError} from '../../../../core/errors/leapp-base-error';
 import {LoggingService} from '../../../../core/services/logging-service';
 import {AppService} from '../app.service';
 

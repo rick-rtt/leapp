@@ -11,6 +11,7 @@ export enum LoggerLevel {
 }
 
 export class LoggingService {
+
   static instance: LoggingService;
 
   private constructor() {}

@@ -5,8 +5,8 @@ import {environment} from '../../../../environments/environment';
 import {AppService} from '../../app.service';
 import {ExecuteService} from '../../execute.service';
 import {SessionService} from '../../session.service';
-import {LeappExecuteError} from '../../../errors/leapp-execute-error';
-import {LeappParseError} from '../../../errors/leapp-parse-error';
+import {LeappExecuteError} from '../../../../../core/errors/leapp-execute-error';
+import {LeappParseError} from '../../../../../core/errors/leapp-parse-error';
 import {FileService} from '../../../../../core/services/file-service';
 
 export interface AzureSessionRequest {
@@ -36,22 +36,22 @@ export interface AzureSessionToken {
 export class AzureService extends SessionService {
 
   constructor(
-    protected workspaceService: WorkspaceService,
+    protected awsIamUserSessionUINotifier: WorkspaceService,
     private appService: AppService,
     private executeService: ExecuteService
   ) {
-    super(workspaceService);
+    super(awsIamUserSessionUINotifier);
   }
 
   create(sessionRequest: AzureSessionRequest): void {
     const session = new AzureSession(sessionRequest.sessionName, sessionRequest.region, sessionRequest.subscriptionId, sessionRequest.tenantId);
-    this.workspaceService.addSession(session);
+    this.awsIamUserSessionUINotifier.addSession(session);
   }
 
   async start(sessionId: string): Promise<void> {
     this.sessionLoading(sessionId);
 
-    const session = this.workspaceService.get(sessionId);
+    const session = this.awsIamUserSessionUINotifier.get(sessionId);
 
     // Try parse accessToken.json
     let accessTokensFile = this.parseAccessTokens();
@@ -118,7 +118,7 @@ export class AzureService extends SessionService {
   async delete(sessionId: string): Promise<void> {
     try {
       await this.stop(sessionId);
-      this.workspaceService.removeSession(sessionId);
+      this.awsIamUserSessionUINotifier.removeSession(sessionId);
     } catch(error) {
       throw new LeappParseError(this, error.message);
     }

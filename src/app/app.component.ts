@@ -11,7 +11,7 @@ import {UpdaterService} from './services/updater.service';
 import compareVersions from 'compare-versions';
 import {RetrocompatibilityService} from './services/retrocompatibility.service';
 import {LoggerLevel, LoggingService} from '../../core/services/logging-service';
-import {LeappParseError} from './errors/leapp-parse-error';
+import {LeappParseError} from '../../core/errors/leapp-parse-error';
 import {Constants} from '../../core/models/constants';
 import Repository from '../../core/services/repository';
 import {FileService} from '../../core/services/file-service';
@@ -175,6 +175,7 @@ export class AppComponent implements OnInit {
       if (this.updaterService.isUpdateNeeded()) {
         this.updaterService.updateDialog();
         this.workspaceService.sessions = [...this.workspaceService.sessions];
+        Repository.getInstance().updateSessions(this.workspaceService.sessions);
       }
     });
   }

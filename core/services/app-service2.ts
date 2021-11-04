@@ -1,6 +1,5 @@
 import {environment} from '../../src/environments/environment';
 import NativeService from './native-service';
-import {InputDialogComponent} from '../../src/app/components/shared/input-dialog/input-dialog.component';
 
 export default class AppService2 {
 

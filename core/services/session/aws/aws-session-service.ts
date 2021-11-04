@@ -2,14 +2,15 @@ import {WorkspaceService} from '../../../../src/app/services/workspace.service';
 import {CredentialsInfo} from '../../../models/credentials-info';
 import {SessionStatus} from '../../../models/session-status';
 import {SessionService} from '../../../../src/app/services/session.service';
-import {LeappBaseError} from '../../../../src/app/errors/leapp-base-error';
+import {LeappBaseError} from '../../../errors/leapp-base-error';
 import {LoggerLevel} from '../../logging-service';
+import {IAwsIamUserSessionUINotifier} from './method/aws-iam-user-service';
 
 export default abstract class AwsSessionService extends SessionService {
 
   /* This service manage the session manipulation as we need top generate credentials and maintain them for a specific duration */
-  protected constructor(protected workspaceService: WorkspaceService) {
-    super(workspaceService);
+  protected constructor(protected awsIamUserSessionUINotifier: IAwsIamUserSessionUINotifier) {
+    super(awsIamUserSessionUINotifier);
   }
 
   async start(sessionId: string): Promise<void> {
@@ -49,16 +50,16 @@ export default abstract class AwsSessionService extends SessionService {
 
   async delete(sessionId: string): Promise<void> {
     try {
-      if (this.workspaceService.get(sessionId).status === SessionStatus.active) {
+      if (this.awsIamUserSessionUINotifier.get(sessionId).status === SessionStatus.active) {
         await this.stop(sessionId);
       }
-      this.workspaceService.listIamRoleChained(this.workspaceService.get(sessionId)).forEach(sess => {
+      this.awsIamUserSessionUINotifier.listIamRoleChained(this.awsIamUserSessionUINotifier.get(sessionId)).forEach(sess => {
         if (sess.status === SessionStatus.active) {
           this.stop(sess.sessionId);
         }
-        this.workspaceService.removeSession(sess.sessionId);
+        this.awsIamUserSessionUINotifier.removeSession(sess.sessionId);
       });
-      this.workspaceService.removeSession(sessionId);
+      this.awsIamUserSessionUINotifier.removeSession(sessionId);
       await this.removeSecrets(sessionId);
     } catch(error) {
       this.sessionError(sessionId, error);
@@ -66,9 +67,9 @@ export default abstract class AwsSessionService extends SessionService {
   }
 
   private isThereAnotherPendingSessionWithSameNamedProfile(sessionId: string) {
-    const session = this.workspaceService.get(sessionId);
+    const session = this.awsIamUserSessionUINotifier.get(sessionId);
     const profileId = (session as any).profileId;
-    const pendingSessions = this.workspaceService.listPending();
+    const pendingSessions = this.awsIamUserSessionUINotifier.listPending();
 
     for(let i = 0; i < pendingSessions.length; i++) {
       if ((pendingSessions[i] as any).profileId === profileId && (pendingSessions[i] as any).sessionId !== sessionId) {
@@ -81,10 +82,10 @@ export default abstract class AwsSessionService extends SessionService {
 
   private stopAllWithSameNameProfile(sessionId: string) {
     // Get profile to check
-    const session = this.workspaceService.get(sessionId);
+    const session = this.awsIamUserSessionUINotifier.get(sessionId);
     const profileId = (session as any).profileId;
     // Get all active sessions
-    const activeSessions = this.workspaceService.listActive();
+    const activeSessions = this.awsIamUserSessionUINotifier.listActive();
     // Stop all that shares the same profile
     activeSessions.forEach(sess => {
       if( (sess as any).profileId === profileId ) {

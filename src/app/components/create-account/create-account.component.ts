@@ -9,7 +9,7 @@ import {environment} from '../../../environments/environment';
 import * as uuid from 'uuid';
 import AwsIamUserService, {AwsIamUserSessionRequest} from '../../../../core/services/session/aws/method/aws-iam-user-service';
 import {AwsIamRoleChainedSessionRequest, AwsIamRoleChainedService} from '../../services/session/aws/methods/aws-iam-role-chained.service';
-import {LeappParseError} from '../../errors/leapp-parse-error';
+import {LeappParseError} from '../../../../core/errors/leapp-parse-error';
 import {AwsIamRoleFederatedSessionRequest, AwsIamRoleFederatedService} from '../../services/session/aws/methods/aws-iam-role-federated.service';
 import {AzureService, AzureSessionRequest} from '../../services/session/azure/azure.service';
 import {LoggerLevel, LoggingService} from '../../../../core/services/logging-service';

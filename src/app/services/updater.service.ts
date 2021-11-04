@@ -9,6 +9,7 @@ import {WorkspaceService} from './workspace.service';
 import {HttpClient} from '@angular/common/http';
 import md from 'markdown-it';
 import {ElectronService} from './electron.service';
+import Repository from "../../../core/services/repository";
 
 @Injectable({
   providedIn: 'root'
@@ -57,6 +58,7 @@ export class UpdaterService {
     this.releaseNotes = releaseNotes;
 
     this.workspaceService.sessions = [...this.workspaceService.sessions];
+    Repository.getInstance().updateSessions(this.workspaceService.sessions);
   }
 
   updateDialog(): void {
@@ -69,6 +71,7 @@ export class UpdaterService {
         if (event === Constants.confirmClosedAndIgnoreUpdate) {
           this.updateVersionJson(this.version);
           this.workspaceService.sessions = [...this.workspaceService.sessions];
+          Repository.getInstance().updateSessions(this.workspaceService.sessions);
         } else if (event === Constants.confirmCloseAndDownloadUpdate) {
           this.appService.openExternalUrl(`${environment.latestUrl}`);
         }
