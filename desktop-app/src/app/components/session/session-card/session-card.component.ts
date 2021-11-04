@@ -151,7 +151,7 @@ export class SessionCardComponent implements OnInit {
   async copyCredentials(session: Session, type: number, event) {
     event.stopPropagation();
     try {
-      if (Repository.getInstance().get()) {
+      if (Repository.getInstance().getWorkspace()) {
         const texts = {
           1: (session as AwsIamRoleFederatedSession).roleArn ? `${(session as AwsIamRoleFederatedSession).roleArn.split('/')[0].substring(13, 25)}` : '',
           2: (session as AwsIamRoleFederatedSession).roleArn ? `${(session as AwsIamRoleFederatedSession).roleArn}` : ''

@@ -81,12 +81,15 @@ export default class AwsIamUserService extends AwsSessionService {
 
   create(accountRequest: AwsIamUserSessionRequest, profileId: string): void {
     const session = new AwsIamUserSession(accountRequest.accountName, accountRequest.region, profileId, accountRequest.mfaDevice);
+
     KeychainService.getInstance().saveSecret(constants.appName, `${session.sessionId}-iam-user-aws-session-access-key-id`, accountRequest.accessKey)
       .then(_ => {
         KeychainService.getInstance().saveSecret(constants.appName, `${session.sessionId}-iam-user-aws-session-secret-access-key`, accountRequest.secretKey)
           .catch(err => console.error(err));
       })
       .catch(err => console.error(err));
+
+    Repository.
 
     this.iSessionNotifier.addSession(session);
   }
