@@ -4,7 +4,7 @@ import {AppService} from './app.service';
 import {AwsIamRoleChainedService} from '../../../../core/services/session/aws/method/aws-iam-role-chained-service';
 import {AwsIamRoleFederatedService} from '../../../../core/services/session/aws/method/aws-iam-role-federated-service';
 import {AwsSsoRoleService} from '../../../../core/services/session/aws/method/aws-sso-role-service';
-import {AzureService} from './session/azure/azure.service';
+import {AzureService} from '../../../../core/services/session/azure/azure.service';
 import {ExecuteService} from './execute.service';
 import {SessionService} from './session.service';
 import {ElectronService} from './electron.service';

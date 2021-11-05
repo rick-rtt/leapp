@@ -11,9 +11,7 @@ export abstract class SessionService {
 
   protected iSessionNotifier: ISessionNotifier;
 
-  protected constructor(
-    iSessionNotifier: ISessionNotifier
-  ) {
+  protected constructor(iSessionNotifier: ISessionNotifier) {
     this.iSessionNotifier = iSessionNotifier;
   }
 

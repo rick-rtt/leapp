@@ -5,9 +5,15 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {WorkspaceService} from '../../services/workspace.service';
 import {environment} from '../../../environments/environment';
 import * as uuid from 'uuid';
+<<<<<<< HEAD
 import {AwsIamRoleChainedSessionRequest, AwsIamRoleChainedService} from '../../../../../core/services/session/aws/method/aws-iam-role-chained-service';
 import {AwsIamRoleFederatedSessionRequest, AwsIamRoleFederatedService} from '../../../../../core/services/session/aws/method/aws-iam-role-federated-service';
 import {AzureService, AzureSessionRequest} from '../../services/session/azure/azure.service';
+=======
+import {AwsIamRoleChainedSessionRequest, AwsIamRoleChainedService} from '../../services/session/aws/methods/aws-iam-role-chained.service';
+import {AwsIamRoleFederatedSessionRequest, AwsIamRoleFederatedService} from '../../services/session/aws/methods/aws-iam-role-federated.service';
+import {AzureService, AzureSessionRequest} from '../../../../../core/services/session/azure/azure.service';
+>>>>>>> 02ab792460b763d822654687aaf324fa0466a5b1
 import {SessionType} from "../../../../../core/models/session-type";
 import Repository from "../../../../../core/services/repository";
 import {LoggerLevel, LoggingService} from "../../../../../core/services/logging-service";

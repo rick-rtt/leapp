@@ -1,14 +1,13 @@
-import {Injectable} from '@angular/core';
-import {WorkspaceService} from '../../workspace.service';
-import {environment} from '../../../../environments/environment';
-import {AppService} from '../../app.service';
-import {ExecuteService} from '../../execute.service';
-import {SessionService} from '../../session.service';
-import {AzureSession} from '../../../../../../core/models/azure-session';
-import {LeappExecuteError} from '../../../../../../core/errors/leapp-execute-error';
-import {LeappParseError} from '../../../../../../core/errors/leapp-parse-error';
-import {FileService} from '../../../../../../core/services/file-service';
-import ISessionNotifier from '../../../../../../core/interfaces/i-session-notifier';
+import {environment} from '../../../../desktop-app/src/environments/environment';
+import {AppService} from '../../../../desktop-app/src/app/services/app.service';
+import {ExecuteService} from '../../../../desktop-app/src/app/services/execute.service';
+import {SessionService} from '../../../../desktop-app/src/app/services/session.service';
+import {AzureSession} from '../../../models/azure-session';
+import {LeappExecuteError} from '../../../errors/leapp-execute-error';
+import {LeappParseError} from '../../../errors/leapp-parse-error';
+import {FileService} from '../../file-service';
+import ISessionNotifier from '../../../interfaces/i-session-notifier';
+import Repository from '../../repository';
 
 export interface AzureSessionRequest {
   sessionName: string;
@@ -31,28 +30,36 @@ export interface AzureSessionToken {
   _authority: string;
 }
 
-@Injectable({
-  providedIn: 'root'
-})
 export class AzureService extends SessionService {
+
+  private appService: AppService;
+  private executeService: ExecuteService;
 
   constructor(
     iSessionNotifier: ISessionNotifier,
+<<<<<<< HEAD:desktop-app/src/app/services/session/azure/azure.service.ts
     private appService: AppService,
     private executeService: ExecuteService
+=======
+    appService: AppService,
+    executeService: ExecuteService
+>>>>>>> 02ab792460b763d822654687aaf324fa0466a5b1:core/services/session/azure/azure.service.ts
   ) {
     super(iSessionNotifier);
+    this.appService = appService;
+    this.executeService = executeService;
   }
 
   create(sessionRequest: AzureSessionRequest): void {
     const session = new AzureSession(sessionRequest.sessionName, sessionRequest.region, sessionRequest.subscriptionId, sessionRequest.tenantId);
+    Repository.getInstance().addSession(session);
     this.iSessionNotifier.addSession(session);
   }
 
   async start(sessionId: string): Promise<void> {
     this.sessionLoading(sessionId);
 
-    const session = this.iSessionNotifier.getSessionById(sessionId);
+    const session = Repository.getInstance().getSessionById(sessionId);
 
     // Try parse accessToken.json
     let accessTokensFile = this.parseAccessTokens();
@@ -119,6 +126,7 @@ export class AzureService extends SessionService {
   async delete(sessionId: string): Promise<void> {
     try {
       await this.stop(sessionId);
+      Repository.getInstance().deleteSession(sessionId);
       this.iSessionNotifier.deleteSession(sessionId);
     } catch(error) {
       throw new LeappParseError(this, error.message);

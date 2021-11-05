@@ -74,6 +74,7 @@ export interface SsoRoleSession {
 
 export class AwsSsoRoleService extends AwsSessionService implements BrowserWindowClosing {
 
+<<<<<<< HEAD:core/services/session/aws/method/aws-sso-role-service.ts
   private static instance: AwsSsoRoleService;
   private appService: AppService;
   private awsSsoOidcService;
@@ -88,6 +89,16 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
 
     this.appService = appService;
     this.awsSsoOidcService = awsSsoOidcService;
+=======
+  protected iSessionNotifier: ISessionNotifier;
+  private ssoPortal: SSO;
+
+  constructor(
+    private appService: AppService,
+    private awsSsoOidcService: AwsSsoOidcService
+  ) {
+    super();
+>>>>>>> 02ab792460b763d822654687aaf324fa0466a5b1:desktop-app/src/app/services/session/aws/methods/aws-sso-role.service.ts
     this.awsSsoOidcService.listeners.push(this);
   }
 
