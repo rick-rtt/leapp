@@ -1,4 +1,4 @@
-import {Session} from './session';
+import {Session} from '../models/session';
 import {environment} from '../../src/environments/environment';
 
 describe('expire()', () => {
