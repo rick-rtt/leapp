@@ -76,14 +76,14 @@ export interface SsoRoleSession {
 })
 export class AwsSsoRoleService extends AwsSessionService implements BrowserWindowClosing {
 
+  protected iSessionNotifier: ISessionNotifier;
   private ssoPortal: SSO;
 
   constructor(
-    protected iSessionNotifier: ISessionNotifier,
     private appService: AppService,
     private awsSsoOidcService: AwsSsoOidcService
   ) {
-    super(iSessionNotifier);
+    super();
     this.awsSsoOidcService.listeners.push(this);
   }
 

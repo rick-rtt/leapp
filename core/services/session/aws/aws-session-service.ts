@@ -9,7 +9,7 @@ import Repository from '../../repository';
 export default abstract class AwsSessionService extends SessionService {
 
   /* This service manage the session manipulation as we need top generate credentials and maintain them for a specific duration */
-  protected constructor(protected iSessionNotifier: ISessionNotifier) {
+  protected constructor(iSessionNotifier: ISessionNotifier) {
     super(iSessionNotifier);
   }
 

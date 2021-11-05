@@ -67,7 +67,7 @@ export class WorkspaceService implements ISessionNotifier {
   }
 
   deleteSession(sessionId: string): void {
-    throw new Error('Method not implemented.');
+    this.sessions = this.sessions.filter(session => session.sessionId !== sessionId);
   }
 
   listPending(): Session[] {
