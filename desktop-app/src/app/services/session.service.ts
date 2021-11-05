@@ -29,49 +29,63 @@ export abstract class SessionService {
       sessions[index] = currentSession;
 
       Repository.getInstance().updateSessions(sessions);
-      this.iSessionNotifier.setSessions([...sessions]);
+
+      if(this.iSessionNotifier) {
+        this.iSessionNotifier.setSessions([...sessions]);
+      }
     }
   }
 
   protected sessionLoading(sessionId: string) {
-    const index = this.iSessionNotifier.getSessions().findIndex(s => s.sessionId === sessionId);
+    const sessions = Repository.getInstance().getSessions();
+    const index = sessions.findIndex(s => s.sessionId === sessionId);
 
     if (index > -1) {
-      const currentSession: Session = this.iSessionNotifier.getSessions()[index];
+      const currentSession: Session = sessions[index];
       currentSession.status = SessionStatus.pending;
 
-      this.iSessionNotifier.getSessions()[index] = currentSession;
-      this.iSessionNotifier.setSessions([...this.iSessionNotifier.getSessions()]);
+      sessions[index] = currentSession;
 
-      Repository.getInstance().updateSessions(this.iSessionNotifier.getSessions());
+      Repository.getInstance().updateSessions(sessions);
+
+      if(this.iSessionNotifier) {
+        this.iSessionNotifier.setSessions([...sessions]);
+      }
     }
   }
 
   protected sessionRotated(sessionId: string) {
-    const index = this.iSessionNotifier.getSessions().findIndex(s => s.sessionId === sessionId);
+    const sessions = Repository.getInstance().getSessions();
+    const index = sessions.findIndex(s => s.sessionId === sessionId);
+
     if (index > -1) {
-      const currentSession: Session = this.iSessionNotifier.getSessions()[index];
+      const currentSession: Session = sessions[index];
       currentSession.startDateTime = new Date().toISOString();
       currentSession.status = SessionStatus.active;
 
-      this.iSessionNotifier.getSessions()[index] = currentSession;
-      this.iSessionNotifier.setSessions([...this.iSessionNotifier.getSessions()]);
+      sessions[index] = currentSession;
 
-      Repository.getInstance().updateSessions(this.iSessionNotifier.getSessions());
+      Repository.getInstance().updateSessions(sessions);
+
+      if(this.iSessionNotifier) {
+        this.iSessionNotifier.setSessions([...sessions]);
+      }
     }
   }
 
   protected sessionDeactivated(sessionId: string) {
-    const index = this.iSessionNotifier.getSessions().findIndex(s => s.sessionId === sessionId);
+    const sessions = Repository.getInstance().getSessions();
+    const index = sessions.findIndex(s => s.sessionId === sessionId);
+
     if (index > -1) {
-      const currentSession: Session = this.iSessionNotifier.getSessions()[index];
+      const currentSession: Session = sessions[index];
       currentSession.status = SessionStatus.inactive;
       currentSession.startDateTime = undefined;
 
-      this.iSessionNotifier.getSessions()[index] = currentSession;
-      this.iSessionNotifier.setSessions([...this.iSessionNotifier.getSessions()]);
+      sessions[index] = currentSession;
 
-      Repository.getInstance().updateSessions(this.iSessionNotifier.getSessions());
+      Repository.getInstance().updateSessions(sessions);
+      this.iSessionNotifier.setSessions([...sessions]);
     }
   }
 
