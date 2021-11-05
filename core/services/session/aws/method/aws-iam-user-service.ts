@@ -90,7 +90,10 @@ export default class AwsIamUserService extends AwsSessionService {
       .catch(err => console.error(err));
 
     Repository.getInstance().addSession(session);
-    this.iSessionNotifier.addSession(session);
+
+    if(this.iSessionNotifier) {
+      this.iSessionNotifier.addSession(session);
+    }
   }
 
   async applyCredentials(sessionId: string, credentialsInfo: CredentialsInfo): Promise<void> {
@@ -99,7 +102,7 @@ export default class AwsIamUserService extends AwsSessionService {
     const credentialObject = {};
 
     credentialObject[profileName] = {
-      // eslint-disable-next-line @typescript-eslint/naming-convention
+      // eslint-disable-next-line @typescript-eslint/naming-convention,@typescript-eslint/naming-convention
       aws_access_key_id: credentialsInfo.sessionToken.aws_access_key_id,
       // eslint-disable-next-line @typescript-eslint/naming-convention
       aws_secret_access_key: credentialsInfo.sessionToken.aws_secret_access_key,
@@ -247,14 +250,15 @@ export default class AwsIamUserService extends AwsSessionService {
   }
 
   private saveSessionTokenResponseInTheSession(session: Session, getSessionTokenResponse: AWS.STS.GetSessionTokenResponse): void {
-    const index = this.iSessionNotifier.getSessions().indexOf(session);
-    const currentSession: Session = this.iSessionNotifier.getSessions()[index];
+    const sessions = Repository.getInstance().getSessions();
+    const index = sessions.indexOf(session);
+    const currentSession: Session = sessions[index];
 
     (currentSession as AwsIamUserSession).sessionTokenExpiration = getSessionTokenResponse.Credentials.Expiration.toISOString();
 
-    this.iSessionNotifier.getSessions()[index] = currentSession;
-    this.iSessionNotifier.setSessions([...this.iSessionNotifier.getSessions()]);
+    sessions[index] = currentSession;
 
-    Repository.getInstance().updateSessions(this.iSessionNotifier.getSessions());
+    Repository.getInstance().updateSessions(sessions);
+    this.iSessionNotifier.setSessions([...sessions]);
   }
 }
