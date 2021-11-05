@@ -72,7 +72,7 @@ export class SessionFactoryService {
   }
 
   private getAzureSessionService(accountType: SessionType) {
-    const service = new AzureService(this.workspaceService, this.appService, this.executeService);
+    const service = AzureService.getInstance();
     this.sessionServiceCache[accountType.toString()] = service;
     return service;
   }
