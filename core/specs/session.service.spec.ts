@@ -1,12 +1,12 @@
 import { TestBed } from '@angular/core/testing';
 
-import { SessionService } from './session.service';
-import {mustInjected} from '../../base-injectables';
+import { SessionService } from '../services/session/session.service';
+import {mustInjected} from '../../desktop-app/src/base-injectables';
 import {serialize} from 'class-transformer';
 import {Workspace} from '../../../core/models/workspace';
-import {AppService} from './app.service';
+import {AppService} from '../../desktop-app/src/app/services/app.service';
 import SpyObj = jasmine.SpyObj;
-import {WorkspaceService} from './workspace.service';
+import {WorkspaceService} from '../../desktop-app/src/app/services/workspace.service';
 import {FileService} from '../../../core/services/file-service';
 
 describe('SessionService', () => {

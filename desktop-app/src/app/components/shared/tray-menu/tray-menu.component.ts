@@ -3,7 +3,7 @@ import {WorkspaceService} from '../../../services/workspace.service';
 import {AppService} from '../../../services/app.service';
 import {environment} from '../../../../environments/environment';
 import {UpdaterService} from '../../../services/updater.service';
-import {SessionService} from '../../../services/session.service';
+import {SessionService} from '../../../../../../core/services/session/session.service';
 import {SessionFactoryService} from '../../../services/session-factory.service';
 import {Session} from '../../../../../../core/models/session';
 import {SessionType} from '../../../../../../core/models/session-type';
@@ -27,7 +27,6 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
 
   constructor(
     private workspaceService: WorkspaceService,
-    private sessionService: SessionService,
     private updaterService: UpdaterService,
     private sessionProviderService: SessionFactoryService,
     private appService: AppService

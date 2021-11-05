@@ -7,7 +7,7 @@ import {environment} from '../../../../environments/environment';
 import * as uuid from 'uuid';
 import {BsModalRef, BsModalService} from 'ngx-bootstrap/modal';
 import {SessionFactoryService} from '../../../services/session-factory.service';
-import {SessionService} from '../../../services/session.service';
+import {SessionService} from '../../../../../../core/services/session/session.service';
 import {Session} from '../../../../../../core/models/session';
 import { SessionType } from '../../../../../../core/models/session-type';
 import {SessionStatus} from '../../../../../../core/models/session-status';

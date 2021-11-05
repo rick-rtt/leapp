@@ -1,6 +1,5 @@
 import {Injectable} from '@angular/core';
 import {BehaviorSubject, Observable} from 'rxjs';
-import * as AWS from 'aws-sdk';
 import Repository from '../../../../core/services/repository';
 import {Session} from '../../../../core/models/session';
 import {SessionStatus} from '../../../../core/models/session-status';
@@ -29,8 +28,8 @@ export class WorkspaceService implements ISessionNotifier {
   constructor() {
     this._sessions = new BehaviorSubject<Session[]>([]);
     this.sessions$ = this._sessions.asObservable();
-    this.sessions = this.repository.getSessions();
     this.repository = Repository.getInstance();
+    this.sessions = this.repository.getSessions();
   }
 
   // the getter will return the last value emitted in _sessions subject
@@ -41,7 +40,6 @@ export class WorkspaceService implements ISessionNotifier {
   // assigning a value to this.sessions will push it onto the observable
   // and down to all of its subscribers (ex: this.sessions = [])
   set sessions(sessions: Session[]) {
-    //this.updatePersistedSessions(sessions);
     this._sessions.next(sessions);
   }
 
@@ -55,7 +53,7 @@ export class WorkspaceService implements ISessionNotifier {
   }
 
   setSessions(sessions: Session[]): void {
-    throw new Error('Method not implemented.');
+    this._sessions.next(sessions);
   }
 
   addSession(session: Session) {

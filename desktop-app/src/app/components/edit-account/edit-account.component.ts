@@ -4,7 +4,7 @@ import {AppService, ToastLevel} from '../../services/app.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {WorkspaceService} from '../../services/workspace.service';
 import {environment} from '../../../environments/environment';
-import {SessionService} from '../../services/session.service';
+import {SessionService} from '../../../../../core/services/session/session.service';
 import {SessionType} from '../../../../../core/models/session-type';
 import {AwsIamUserSession} from '../../../../../core/models/aws-iam-user-session';
 import {Workspace} from '../../../../../core/models/workspace';
@@ -42,8 +42,7 @@ export class EditAccountComponent implements OnInit {
     private appService: AppService,
     private router: Router,
     private activatedRoute: ActivatedRoute,
-    private workspaceService: WorkspaceService,
-    private sessionService: SessionService
+    private workspaceService: WorkspaceService
   ) {}
 
   ngOnInit() {

@@ -6,7 +6,7 @@ import {AwsIamRoleFederatedService} from '../../../../core/services/session/aws/
 import {AwsSsoRoleService} from '../../../../core/services/session/aws/method/aws-sso-role-service';
 import {AzureService} from '../../../../core/services/session/azure/azure.service';
 import {ExecuteService} from './execute.service';
-import {SessionService} from './session.service';
+import {SessionService} from '../../../../core/services/session/session.service';
 import {ElectronService} from './electron.service';
 import {AwsSsoOidcService} from './aws-sso-oidc.service';
 import {SessionType} from '../../../../core/models/session-type';

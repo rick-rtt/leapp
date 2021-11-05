@@ -2,7 +2,7 @@ import {CredentialsInfo} from '../../../models/credentials-info';
 import {SessionStatus} from '../../../models/session-status';
 import {LeappBaseError} from '../../../errors/leapp-base-error';
 import {LoggerLevel} from '../../logging-service';
-import {SessionService} from '../../../../desktop-app/src/app/services/session.service';
+import {SessionService} from '../session.service';
 import ISessionNotifier from '../../../interfaces/i-session-notifier';
 import Repository from '../../repository';
 

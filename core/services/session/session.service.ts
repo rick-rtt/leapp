@@ -1,12 +1,8 @@
-import {Injectable} from '@angular/core';
-import {Session} from '../../../../core/models/session';
-import {SessionStatus} from '../../../../core/models/session-status';
-import Repository from '../../../../core/services/repository';
-import ISessionNotifier from '../../../../core/interfaces/i-session-notifier';
+import {Session} from '../../models/session';
+import {SessionStatus} from '../../models/session-status';
+import Repository from '../repository';
+import ISessionNotifier from '../../interfaces/i-session-notifier';
 
-@Injectable({
-  providedIn: 'root'
-})
 export abstract class SessionService {
 
   protected iSessionNotifier: ISessionNotifier;
