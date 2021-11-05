@@ -50,20 +50,18 @@ export default abstract class AwsSessionService extends SessionService {
 
   async delete(sessionId: string): Promise<void> {
     try {
-      if (this.iSessionNotifier.getSessionById(sessionId).status === SessionStatus.active) {
+      if (Repository.getInstance().getSessionById(sessionId).status === SessionStatus.active) {
         await this.stop(sessionId);
       }
-      this.iSessionNotifier.listIamRoleChained(this.iSessionNotifier.getSessionById(sessionId)).forEach(sess => {
+      Repository.getInstance().listIamRoleChained(this.iSessionNotifier.getSessionById(sessionId)).forEach(sess => {
         if (sess.status === SessionStatus.active) {
           this.stop(sess.sessionId);
         }
-
-        this.iSessionNotifier.deleteSession(sess.sessionId);
         Repository.getInstance().deleteSession(sess.sessionId);
       });
-
-      this.iSessionNotifier.deleteSession(sessionId);
       Repository.getInstance().deleteSession(sessionId);
+
+      this.iSessionNotifier.setSessions(Repository.getInstance().getSessions());
       await this.removeSecrets(sessionId);
     } catch(error) {
       this.sessionError(sessionId, error);
@@ -71,9 +69,9 @@ export default abstract class AwsSessionService extends SessionService {
   }
 
   private isThereAnotherPendingSessionWithSameNamedProfile(sessionId: string) {
-    const session = this.iSessionNotifier.getSessionById(sessionId);
+    const session = Repository.getInstance().getSessionById(sessionId);
     const profileId = (session as any).profileId;
-    const pendingSessions = this.iSessionNotifier.listPending();
+    const pendingSessions = Repository.getInstance().listPending();
 
     for(let i = 0; i < pendingSessions.length; i++) {
       if ((pendingSessions[i] as any).profileId === profileId && (pendingSessions[i] as any).sessionId !== sessionId) {
@@ -86,10 +84,10 @@ export default abstract class AwsSessionService extends SessionService {
 
   private stopAllWithSameNameProfile(sessionId: string) {
     // Get profile to check
-    const session = this.iSessionNotifier.getSessionById(sessionId);
+    const session = Repository.getInstance().getSessionById(sessionId);
     const profileId = (session as any).profileId;
     // Get all active sessions
-    const activeSessions = this.iSessionNotifier.listActive();
+    const activeSessions = Repository.getInstance().listActive();
     // Stop all that shares the same profile
     activeSessions.forEach(sess => {
       if( (sess as any).profileId === profileId ) {

@@ -4,6 +4,9 @@ import {deserialize, serialize} from 'class-transformer';
 import {FileService} from './file-service';
 import NativeService from './native-service';
 import {constants} from '../models/constants';
+import {SessionStatus} from '../models/session-status';
+import {SessionType} from '../models/session-type';
+import {AwsIamRoleChainedSession} from '../models/aws-iam-role-chained-session';
 
 export default class Repository {
 
@@ -237,7 +240,6 @@ export default class Repository {
   }
 
   // PROXY CONFIGURATION
-
   getProxyConfiguration() {
     return this.getWorkspace().proxyConfiguration;
   }
@@ -246,5 +248,29 @@ export default class Repository {
     const workspace = this.getWorkspace();
     workspace.proxyConfiguration = proxyConfiguration;
     this.persistWorkspace(workspace);
+  }
+
+  listPending(): Session[] {
+    const workspace = this.getWorkspace();
+    return (workspace.sessions && workspace.sessions.length > 0) ? workspace.sessions.filter( (session) => session.status === SessionStatus.pending ) : [];
+  }
+
+  listActive(): Session[] {
+    const workspace = this.getWorkspace();
+    return (workspace.sessions && workspace.sessions.length > 0) ? workspace.sessions.filter( (session) => session.status === SessionStatus.active ) : [];
+  }
+
+  listAwsSsoRoles() {
+    const workspace = this.getWorkspace();
+    return (workspace.sessions && workspace.sessions.length > 0) ? workspace.sessions.filter((session) => session.type === SessionType.awsSsoRole) : [];
+  }
+
+  listIamRoleChained(parentSession?: Session): Session[] {
+    const workspace = this.getWorkspace();
+    let childSession = (workspace.sessions && workspace.sessions.length > 0) ? workspace.sessions.filter( (session) => session.type === SessionType.awsIamRoleChained ) : [];
+    if (parentSession) {
+      childSession = childSession.filter(session => (session as AwsIamRoleChainedSession).parentSessionId === parentSession.sessionId );
+    }
+    return childSession;
   }
 }
