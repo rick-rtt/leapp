@@ -6,12 +6,12 @@ import {Session} from '../../../../core/models/session';
 import {SessionStatus} from '../../../../core/models/session-status';
 import {SessionType} from '../../../../core/models/session-type';
 import {AwsIamRoleChainedSession} from '../../../../core/models/aws-iam-role-chained-session';
-import ISessionNotifier from '../../../../core/models/i-session-notifier';
+import ISessionNotifier from '../../../../core/interfaces/i-session-notifier';
 
 @Injectable({
   providedIn: 'root'
 })
-export class WorkspaceService implements ISessionNotifier{
+export class WorkspaceService implements ISessionNotifier {
 
   // Expose the observable$ part of the _sessions subject (read only stream)
   readonly sessions$: Observable<Session[]>;
@@ -33,22 +33,6 @@ export class WorkspaceService implements ISessionNotifier{
     this.repository = Repository.getInstance();
   }
 
-  setSessions(sessions: Session[]): void {
-        throw new Error('Method not implemented.');
-  }
-
-  getSession(sessionId: string): Session {
-        throw new Error('Method not implemented.');
-  }
-
-  getSessions(): Session[] {
-        throw new Error('Method not implemented.');
-  }
-
-  deleteSession(sessionId: string): void {
-        throw new Error('Method not implemented.');
-  }
-
   // the getter will return the last value emitted in _sessions subject
   get sessions(): Session[] {
     return this._sessions.getValue();
@@ -61,6 +45,19 @@ export class WorkspaceService implements ISessionNotifier{
     this._sessions.next(sessions);
   }
 
+  getSessions(): Session[] {
+    return this._sessions.getValue();
+  }
+
+  getSessionById(sessionId: string): Session {
+    const sessionFiltered = this.sessions.find(session => session.sessionId === sessionId);
+    return sessionFiltered ? sessionFiltered : null;
+  }
+
+  setSessions(sessions: Session[]): void {
+    throw new Error('Method not implemented.');
+  }
+
   addSession(session: Session) {
     // we assign a new copy of session by adding a new session to it
     this.sessions = [
@@ -69,22 +66,8 @@ export class WorkspaceService implements ISessionNotifier{
     ];
   }
 
-  removeSession(sessionId: string) {
-    this.sessions = this.sessions.filter(session => session.sessionId !== sessionId);
-  }
-
-  get(sessionId: string): Session {
-    const sessionFiltered = this.sessions.find(session => session.sessionId === sessionId);
-    return sessionFiltered ? sessionFiltered : null;
-  }
-
-  update(sessionId: string, session: Session) {
-    const sessions = this.sessions;
-    const index = sessions.findIndex(sess => sess.sessionId === sessionId);
-    if(index > -1) {
-      this.sessions[index] = session;
-      this.sessions = [...this.sessions];
-    }
+  deleteSession(sessionId: string): void {
+    throw new Error('Method not implemented.');
   }
 
   listPending(): Session[] {
@@ -95,12 +78,8 @@ export class WorkspaceService implements ISessionNotifier{
     return (this.sessions.length > 0) ? this.sessions.filter( (session) => session.status === SessionStatus.active ) : [];
   }
 
-  listInActive(): Session[] {
-    return (this.sessions.length > 0) ? this.sessions.filter( (session) => session.status === SessionStatus.inactive ) : [];
-  }
-
-  listAssumable(): Session[] {
-    return (this.sessions.length > 0) ? this.sessions.filter( (session) => session.type !== SessionType.azure ) : [];
+  listAwsSsoRoles() {
+    return (this.sessions.length > 0) ? this.sessions.filter((session) => session.type === SessionType.awsSsoRole) : [];
   }
 
   listIamRoleChained(parentSession?: Session): Session[] {
@@ -111,18 +90,24 @@ export class WorkspaceService implements ISessionNotifier{
     return childSession;
   }
 
-  listAwsSsoRoles() {
-    return (this.sessions.length > 0) ? this.sessions.filter((session) => session.type === SessionType.awsSsoRole) : [];
+  removeSessionById(sessionId: string) {
+    this.sessions = this.sessions.filter(session => session.sessionId !== sessionId);
   }
 
-  /*private getPersistedSessions(): Session[] {
-    const workspace = Repository.getInstance().get();
-    return workspace.sessions;
+  updateSession(sessionId: string, session: Session) {
+    const sessions = this.sessions;
+    const index = sessions.findIndex(sess => sess.sessionId === sessionId);
+    if(index > -1) {
+      this.sessions[index] = session;
+      this.sessions = [...this.sessions];
+    }
   }
 
-  private updatePersistedSessions(sessions: Session[]): void {
-    const workspace = Repository.getInstance().get();
-    workspace.sessions = sessions;
-    Repository.getInstance().persist(workspace);
-  }*/
+  listInActive(): Session[] {
+    return (this.sessions.length > 0) ? this.sessions.filter( (session) => session.status === SessionStatus.inactive ) : [];
+  }
+
+  listAssumable(): Session[] {
+    return (this.sessions.length > 0) ? this.sessions.filter( (session) => session.type !== SessionType.azure ) : [];
+  }
 }

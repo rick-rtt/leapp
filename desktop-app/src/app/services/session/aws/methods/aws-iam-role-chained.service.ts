@@ -17,7 +17,7 @@ import {LeappNotFoundError} from '../../../../../../../core/errors/leapp-not-fou
 import {SessionType} from '../../../../../../../core/models/session-type';
 import AwsIamUserService from '../../../../../../../core/services/session/aws/method/aws-iam-user-service';
 import {LeappAwsStsError} from '../../../../../../../core/errors/leapp-aws-sts-error';
-import ISessionNotifier from '../../../../../../../core/models/i-session-notifier';
+import ISessionNotifier from '../../../../../../../core/interfaces/i-session-notifier';
 
 export interface AwsIamRoleChainedSessionRequest {
   accountName: string;
@@ -60,7 +60,7 @@ export class AwsIamRoleChainedService extends AwsSessionService {
   }
 
   async applyCredentials(sessionId: string, credentialsInfo: CredentialsInfo): Promise<void> {
-    const session = this.iSessionNotifier.getSession(sessionId);
+    const session = this.iSessionNotifier.getSessionById(sessionId);
     const profileName = Repository.getInstance().getProfileName((session as AwsIamRoleChainedSession).profileId);
     const credentialObject = {};
     credentialObject[profileName] = {
@@ -76,7 +76,7 @@ export class AwsIamRoleChainedService extends AwsSessionService {
   }
 
   async deApplyCredentials(sessionId: string): Promise<void> {
-    const session = this.iSessionNotifier.getSession(sessionId);
+    const session = this.iSessionNotifier.getSessionById(sessionId);
     const profileName = Repository.getInstance().getProfileName((session as AwsIamRoleChainedSession).profileId);
     const credentialsFile = await FileService.getInstance().iniParseSync(this.appService.awsCredentialPath());
     delete credentialsFile[profileName];
@@ -85,12 +85,12 @@ export class AwsIamRoleChainedService extends AwsSessionService {
 
   async generateCredentials(sessionId: string): Promise<CredentialsInfo> {
     // Retrieve Session
-    const session = this.iSessionNotifier.getSession(sessionId);
+    const session = this.iSessionNotifier.getSessionById(sessionId);
 
     // Retrieve Parent Session
     let parentSession: Session;
     try {
-      parentSession = this.iSessionNotifier.getSession((session as AwsIamRoleChainedSession).parentSessionId);
+      parentSession = this.iSessionNotifier.getSessionById((session as AwsIamRoleChainedSession).parentSessionId);
     } catch (err) {
       throw new LeappNotFoundError(this, `Parent Account Session  not found for Chained Account ${session.sessionName}`);
     }

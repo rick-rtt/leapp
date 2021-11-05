@@ -3,7 +3,7 @@ import {SessionStatus} from '../../../models/session-status';
 import {LeappBaseError} from '../../../errors/leapp-base-error';
 import {LoggerLevel} from '../../logging-service';
 import {SessionService} from '../../../../desktop-app/src/app/services/session.service';
-import ISessionNotifier from '../../../models/i-session-notifier';
+import ISessionNotifier from '../../../interfaces/i-session-notifier';
 import Repository from '../../repository';
 
 export default abstract class AwsSessionService extends SessionService {
@@ -50,10 +50,10 @@ export default abstract class AwsSessionService extends SessionService {
 
   async delete(sessionId: string): Promise<void> {
     try {
-      if (this.iSessionNotifier.getSession(sessionId).status === SessionStatus.active) {
+      if (this.iSessionNotifier.getSessionById(sessionId).status === SessionStatus.active) {
         await this.stop(sessionId);
       }
-      this.iSessionNotifier.listIamRoleChained(this.iSessionNotifier.getSession(sessionId)).forEach(sess => {
+      this.iSessionNotifier.listIamRoleChained(this.iSessionNotifier.getSessionById(sessionId)).forEach(sess => {
         if (sess.status === SessionStatus.active) {
           this.stop(sess.sessionId);
         }
@@ -71,7 +71,7 @@ export default abstract class AwsSessionService extends SessionService {
   }
 
   private isThereAnotherPendingSessionWithSameNamedProfile(sessionId: string) {
-    const session = this.iSessionNotifier.getSession(sessionId);
+    const session = this.iSessionNotifier.getSessionById(sessionId);
     const profileId = (session as any).profileId;
     const pendingSessions = this.iSessionNotifier.listPending();
 
@@ -86,7 +86,7 @@ export default abstract class AwsSessionService extends SessionService {
 
   private stopAllWithSameNameProfile(sessionId: string) {
     // Get profile to check
-    const session = this.iSessionNotifier.getSession(sessionId);
+    const session = this.iSessionNotifier.getSessionById(sessionId);
     const profileId = (session as any).profileId;
     // Get all active sessions
     const activeSessions = this.iSessionNotifier.listActive();

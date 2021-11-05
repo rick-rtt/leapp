@@ -8,7 +8,7 @@ import {AzureSession} from '../../../../../../core/models/azure-session';
 import {LeappExecuteError} from '../../../../../../core/errors/leapp-execute-error';
 import {LeappParseError} from '../../../../../../core/errors/leapp-parse-error';
 import {FileService} from '../../../../../../core/services/file-service';
-import ISessionNotifier from '../../../../../../core/models/i-session-notifier';
+import ISessionNotifier from '../../../../../../core/interfaces/i-session-notifier';
 
 export interface AzureSessionRequest {
   sessionName: string;
@@ -52,7 +52,7 @@ export class AzureService extends SessionService {
   async start(sessionId: string): Promise<void> {
     this.sessionLoading(sessionId);
 
-    const session = this.iSessionNotifier.getSession(sessionId);
+    const session = this.iSessionNotifier.getSessionById(sessionId);
 
     // Try parse accessToken.json
     let accessTokensFile = this.parseAccessTokens();

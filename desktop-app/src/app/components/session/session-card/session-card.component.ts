@@ -241,7 +241,7 @@ export class SessionCardComponent implements OnInit {
       }
 
       this.session.region = this.selectedDefaultRegion;
-      this.workspaceService.update(this.session.sessionId, this.session);
+      this.workspaceService.updateSession(this.session.sessionId, this.session);
 
       if (wasActive) {
         this.startSession();
@@ -320,7 +320,7 @@ export class SessionCardComponent implements OnInit {
       }
 
       (this.session as any).profileId = this.selectedProfile.id;
-      this.workspaceService.update(this.session.sessionId, this.session);
+      this.workspaceService.updateSession(this.session.sessionId, this.session);
 
       if (wasActive) {
         this.startSession();

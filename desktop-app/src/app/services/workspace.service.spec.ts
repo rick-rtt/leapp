@@ -172,7 +172,7 @@ describe('WorkspaceService', () => {
 
       const sessionId = mockedSession.sessionId;
       const oldLength = workspaceService.sessions.length;
-      workspaceService.removeSession(sessionId);
+      workspaceService.removeSessionById(sessionId);
 
       expect(workspaceService.sessions.length).toEqual(oldLength - 1);
       expect(workspaceService.sessions.find(s => s.sessionId === sessionId)).toBeUndefined();

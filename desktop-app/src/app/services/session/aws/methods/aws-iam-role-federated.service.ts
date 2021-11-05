@@ -11,7 +11,7 @@ import {LeappSamlError} from '../../../../../../../core/errors/leapp-saml-error'
 import {LeappParseError} from '../../../../../../../core/errors/leapp-parse-error';
 import {LeappAwsStsError} from '../../../../../../../core/errors/leapp-aws-sts-error';
 import AwsSessionService from '../../../../../../../core/services/session/aws/aws-session-service';
-import ISessionNotifier from '../../../../../../../core/models/i-session-notifier';
+import ISessionNotifier from '../../../../../../../core/interfaces/i-session-notifier';
 
 export interface AwsIamRoleFederatedSessionRequest {
   accountName: string;
@@ -70,7 +70,7 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
   }
 
   async applyCredentials(sessionId: string, credentialsInfo: CredentialsInfo): Promise<void> {
-    const session = this.iSessionNotifier.getSession(sessionId);
+    const session = this.iSessionNotifier.getSessionById(sessionId);
     const profileName = Repository.getInstance().getProfileName((session as AwsIamRoleFederatedSession).profileId);
     const credentialObject = {};
     credentialObject[profileName] = {
@@ -86,7 +86,7 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
   }
 
   async deApplyCredentials(sessionId: string): Promise<void> {
-    const session = this.iSessionNotifier.getSession(sessionId);
+    const session = this.iSessionNotifier.getSessionById(sessionId);
     const profileName = Repository.getInstance().getProfileName((session as AwsIamRoleFederatedSession).profileId);
     const credentialsFile = await FileService.getInstance().iniParseSync(this.appService.awsCredentialPath());
     delete credentialsFile[profileName];
@@ -95,7 +95,7 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
 
   async generateCredentials(sessionId: string): Promise<CredentialsInfo> {
     // Get the session in question
-    const session = this.iSessionNotifier.getSession(sessionId);
+    const session = this.iSessionNotifier.getSessionById(sessionId);
 
     // Get idpUrl
     const idpUrl = Repository.getInstance().getIdpUrl((session as AwsIamRoleFederatedSession).idpUrlId);

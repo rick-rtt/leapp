@@ -68,6 +68,22 @@ export default class Repository {
     return workspace.sessions;
   }
 
+  getSessionById(sessionId: string): Session {
+    const workspace = this.getWorkspace();
+    return workspace.sessions.find(session => session.sessionId === sessionId);
+  }
+
+  addSession(session: Session): void {
+    const workspace = this.getWorkspace();
+
+    workspace.sessions = [
+      ...workspace.sessions,
+      session
+    ];
+
+    Repository.getInstance().persistWorkspace(workspace);
+  }
+
   updateSessions(sessions: Session[]): void {
     const workspace = this.getWorkspace();
     workspace.sessions = sessions;

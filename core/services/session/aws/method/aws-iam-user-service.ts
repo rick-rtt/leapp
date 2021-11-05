@@ -14,7 +14,7 @@ import AwsSessionService from '../aws-session-service';
 import {LeappBaseError} from '../../../../errors/leapp-base-error';
 import {LoggerLevel} from '../../../logging-service';
 import AppService2 from '../../../app-service2';
-import ISessionNotifier from '../../../../models/i-session-notifier';
+import ISessionNotifier from '../../../../interfaces/i-session-notifier';
 
 export interface AwsIamUserSessionRequest {
   accountName: string;
@@ -89,16 +89,15 @@ export default class AwsIamUserService extends AwsSessionService {
       })
       .catch(err => console.error(err));
 
-    Repository.
-
+    Repository.getInstance().addSession(session);
     this.iSessionNotifier.addSession(session);
   }
 
   async applyCredentials(sessionId: string, credentialsInfo: CredentialsInfo): Promise<void> {
-    //const session = this.workspaceService.get(sessionId);
-    const session = this.repository.getSessions().find(sess => sess.sessionId === sessionId);
+    const session = this.repository.getSessionById(sessionId);
     const profileName = Repository.getInstance().getProfileName((session as AwsIamUserSession).profileId);
     const credentialObject = {};
+
     credentialObject[profileName] = {
       // eslint-disable-next-line @typescript-eslint/naming-convention
       aws_access_key_id: credentialsInfo.sessionToken.aws_access_key_id,
@@ -108,6 +107,7 @@ export default class AwsIamUserService extends AwsSessionService {
       aws_session_token: credentialsInfo.sessionToken.aws_session_token,
       region: session.region
     };
+
     return await FileService.getInstance().iniWriteSync(AppService2.getInstance().awsCredentialPath(), credentialObject);
   }
 

@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {Session} from '../../../../core/models/session';
 import {SessionStatus} from '../../../../core/models/session-status';
 import Repository from '../../../../core/services/repository';
-import ISessionNotifier from '../../../../core/models/i-session-notifier';
+import ISessionNotifier from '../../../../core/interfaces/i-session-notifier';
 
 @Injectable({
   providedIn: 'root'

@@ -72,7 +72,7 @@ export class EditAccountComponent implements OnInit {
       KeychainService.getInstance().saveSecret(environment.appName, `${this.selectedSession.sessionId}-iam-user-aws-session-access-key-id`, this.form.controls['accessKey'].value).then(_ => {});
       KeychainService.getInstance().saveSecret(environment.appName, `${this.selectedSession.sessionId}-iam-user-aws-session-secret-access-key`, this.form.controls['secretKey'].value).then(_ => {});
 
-      this.workspaceService.update(this.selectedSession.sessionId, this.selectedSession);
+      this.workspaceService.updateSession(this.selectedSession.sessionId, this.selectedSession);
       this.appService.toast('Session updated correctly.', ToastLevel.success, 'Session Update');
 
       this.router.navigate(['/sessions', 'session-selected']).then(_ => {});
