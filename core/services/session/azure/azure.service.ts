@@ -8,6 +8,9 @@ import {LeappParseError} from '../../../errors/leapp-parse-error';
 import {FileService} from '../../file-service';
 import ISessionNotifier from '../../../interfaces/i-session-notifier';
 import Repository from '../../repository';
+import {LeappBaseError} from "../../../errors/leapp-base-error";
+import {LoggerLevel} from "../../logging-service";
+import {AwsSsoOidcService} from "../../../../desktop-app/src/app/services/aws-sso-oidc.service";
 
 export interface AzureSessionRequest {
   sessionName: string;
@@ -30,24 +33,39 @@ export interface AzureSessionToken {
   _authority: string;
 }
 
+
 export class AzureService extends SessionService {
 
+  private static instance: AzureService;
   private appService: AppService;
   private executeService: ExecuteService;
 
-  constructor(
+  private constructor(
     iSessionNotifier: ISessionNotifier,
-<<<<<<< HEAD:desktop-app/src/app/services/session/azure/azure.service.ts
-    private appService: AppService,
-    private executeService: ExecuteService
-=======
     appService: AppService,
     executeService: ExecuteService
->>>>>>> 02ab792460b763d822654687aaf324fa0466a5b1:core/services/session/azure/azure.service.ts
   ) {
     super(iSessionNotifier);
     this.appService = appService;
     this.executeService = executeService;
+  }
+
+  static getInstance() {
+    if(!this.instance) {
+      // TODO: understand if we need to move Leapp Errors in a core folder
+      throw new LeappBaseError('Not initialized service error', this, LoggerLevel.error,
+        'Service needs to be initialized');
+    }
+    return this.instance;
+  }
+
+  static init(iSessionNotifier: ISessionNotifier, appService: AppService, executeService: ExecuteService) {
+    if(this.instance) {
+      // TODO: understand if we need to move Leapp Errors in a core folder
+      throw new LeappBaseError('Already initialized service error', this, LoggerLevel.error,
+        'Service already initialized');
+    }
+    this.instance = new AzureService(iSessionNotifier, appService, executeService);
   }
 
   create(sessionRequest: AzureSessionRequest): void {

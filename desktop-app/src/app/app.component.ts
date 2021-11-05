@@ -21,6 +21,8 @@ import {AwsIamRoleChainedService} from '../../../core/services/session/aws/metho
 import {AwsSsoOidcService} from './services/aws-sso-oidc.service';
 import {AwsIamRoleFederatedService} from '../../../core/services/session/aws/method/aws-iam-role-federated-service';
 import {AwsSsoRoleService} from '../../../core/services/session/aws/method/aws-sso-role-service';
+import {AzureService} from '../../../core/services/session/azure/azure.service';
+import {ExecuteService} from './services/execute.service';
 
 @Component({
   selector: 'app-root',
@@ -39,7 +41,8 @@ export class AppComponent implements OnInit {
     private router: Router,
     private updaterService: UpdaterService,
     private mfaCodePromptService: MfaCodePromptService,
-    private awsSsoOidcService: AwsSsoOidcService
+    private awsSsoOidcService: AwsSsoOidcService,
+    private executeService: ExecuteService
   ) {}
 
   async ngOnInit() {
@@ -47,6 +50,7 @@ export class AppComponent implements OnInit {
     AwsIamRoleChainedService.init(this.workspaceService, this.app, this.awsSsoOidcService);
     AwsIamRoleFederatedService.init(this.workspaceService, this.app);
     AwsSsoRoleService.init(this.workspaceService, this.app, this.awsSsoOidcService);
+    AzureService.init(this.workspaceService, this.app, this.executeService);
 
     // We get the right moment to set an hook to app close
     const ipc = this.app.getIpcRenderer();

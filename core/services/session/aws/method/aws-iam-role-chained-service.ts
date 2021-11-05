@@ -2,7 +2,6 @@ import {AppService} from '../../../../../desktop-app/src/app/services/app.servic
 import * as AWS from 'aws-sdk';
 import {AwsIamRoleFederatedService} from './aws-iam-role-federated-service';
 import {AwsSsoRoleService} from './aws-sso-role-service';
-import {ElectronService} from '../../../../../desktop-app/src/app/services/electron.service';
 import {AwsSsoOidcService} from '../../../../../desktop-app/src/app/services/aws-sso-oidc.service';
 import { AssumeRoleResponse } from 'aws-sdk/clients/sts';
 import AwsSessionService from '../aws-session-service';
@@ -13,7 +12,7 @@ import {FileService} from '../../../file-service';
 import {Session} from '../../../../models/session';
 import {LeappNotFoundError} from '../../../../errors/leapp-not-found-error';
 import {SessionType} from '../../../../models/session-type';
-import AwsIamUserService, {IMfaCodePrompter} from './aws-iam-user-service';
+import AwsIamUserService from './aws-iam-user-service';
 import {LeappAwsStsError} from '../../../../errors/leapp-aws-sts-error';
 import ISessionNotifier from '../../../../interfaces/i-session-notifier';
 import {LeappBaseError} from '../../../../errors/leapp-base-error';
@@ -120,11 +119,11 @@ export class AwsIamRoleChainedService extends AwsSessionService {
     // Generate a credential set from Parent Session
     let parentSessionService;
     if(parentSession.type === SessionType.awsIamRoleFederated) {
-      parentSessionService = new AwsIamRoleFederatedService(this.iSessionNotifier, this.appService) as AwsSessionService;
+      parentSessionService = AwsIamRoleFederatedService.getInstance() as AwsSessionService;
     } else if(parentSession.type === SessionType.awsIamUser) {
       parentSessionService = AwsIamUserService.getInstance() as AwsSessionService;
     } else if(parentSession.type === SessionType.awsSsoRole) {
-      parentSessionService = new AwsSsoRoleService(this.iSessionNotifier, this.appService, this.awsSsoOidcService) as AwsSessionService;
+      parentSessionService = AwsSsoRoleService.getInstance() as AwsSessionService;
     }
 
     const parentCredentialsInfo = await parentSessionService.generateCredentials(parentSession.sessionId);

@@ -30,12 +30,11 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
   private static instance: AwsIamRoleFederatedService;
   private appService: AppService;
 
-  constructor(
+  private constructor(
     iSessionNotifier: ISessionNotifier,
     appService: AppService
   ) {
     super(iSessionNotifier);
-
     this.appService = appService;
   }
 
