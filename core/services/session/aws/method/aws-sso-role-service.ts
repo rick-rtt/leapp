@@ -1,5 +1,4 @@
-import {Injectable} from '@angular/core';
-import {AppService} from '../../../app.service';
+import {AppService} from '../../../../../desktop-app/src/app/services/app.service';
 
 import SSO, {
   AccountInfo,
@@ -11,16 +10,18 @@ import SSO, {
   RoleInfo
 } from 'aws-sdk/clients/sso';
 
-import {environment} from '../../../../../environments/environment';
-import {AwsSsoOidcService, BrowserWindowClosing} from '../../../aws-sso-oidc.service';
-import AwsSessionService from '../../../../../../../core/services/session/aws/aws-session-service';
-import {AwsSsoRoleSession} from '../../../../../../../core/models/aws-sso-role-session';
-import {CredentialsInfo} from '../../../../../../../core/models/credentials-info';
-import Repository from '../../../../../../../core/services/repository';
-import {FileService} from '../../../../../../../core/services/file-service';
-import {KeychainService} from '../../../../../../../core/services/keychain-service';
-import {SessionType} from '../../../../../../../core/models/session-type';
-import ISessionNotifier from '../../../../../../../core/interfaces/i-session-notifier';
+import {environment} from '../../../../../desktop-app/src/environments/environment';
+import {AwsSsoOidcService, BrowserWindowClosing} from '../../../../../desktop-app/src/app/services/aws-sso-oidc.service';
+import AwsSessionService from '../aws-session-service';
+import {AwsSsoRoleSession} from '../../../../models/aws-sso-role-session';
+import {CredentialsInfo} from '../../../../models/credentials-info';
+import Repository from '../../../repository';
+import {FileService} from '../../../file-service';
+import {KeychainService} from '../../../keychain-service';
+import {SessionType} from '../../../../models/session-type';
+import ISessionNotifier from '../../../../interfaces/i-session-notifier';
+import {LeappBaseError} from '../../../../errors/leapp-base-error';
+import {LoggerLevel} from '../../../logging-service';
 
 export interface AwsSsoRoleSessionRequest {
   sessionName: string;
@@ -71,20 +72,41 @@ export interface SsoRoleSession {
   profileId: string;
 }
 
-@Injectable({
-  providedIn: 'root'
-})
 export class AwsSsoRoleService extends AwsSessionService implements BrowserWindowClosing {
 
+  private static instance: AwsSsoRoleService;
+  private appService: AppService;
+  private awsSsoOidcService;
   private ssoPortal: SSO;
 
   constructor(
-    protected iSessionNotifier: ISessionNotifier,
-    private appService: AppService,
-    private awsSsoOidcService: AwsSsoOidcService
+    iSessionNotifier: ISessionNotifier,
+    appService: AppService,
+    awsSsoOidcService: AwsSsoOidcService
   ) {
     super(iSessionNotifier);
+
+    this.appService = appService;
+    this.awsSsoOidcService = awsSsoOidcService;
     this.awsSsoOidcService.listeners.push(this);
+  }
+
+  static getInstance() {
+    if(!this.instance) {
+      // TODO: understand if we need to move Leapp Errors in a core folder
+      throw new LeappBaseError('Not initialized service error', this, LoggerLevel.error,
+        'Service needs to be initialized');
+    }
+    return this.instance;
+  }
+
+  static init(iSessionNotifier: ISessionNotifier, appService: AppService, awsSsoOidcService: AwsSsoOidcService) {
+    if(this.instance) {
+      // TODO: understand if we need to move Leapp Errors in a core folder
+      throw new LeappBaseError('Already initialized service error', this, LoggerLevel.error,
+        'Service already initialized');
+    }
+    this.instance = new AwsSsoRoleService(iSessionNotifier, appService, awsSsoOidcService);
   }
 
   static getProtocol(aliasedUrl: string): string {

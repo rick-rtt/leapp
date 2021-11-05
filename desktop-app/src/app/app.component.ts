@@ -17,6 +17,10 @@ import {LeappParseError} from '../../../core/errors/leapp-parse-error';
 import {TimerService} from '../../../core/services/timer-service';
 import {constants} from '../../../core/models/constants';
 import {FileService} from '../../../core/services/file-service';
+import {AwsIamRoleChainedService} from '../../../core/services/session/aws/method/aws-iam-role-chained-service';
+import {AwsSsoOidcService} from './services/aws-sso-oidc.service';
+import {AwsIamRoleFederatedService} from '../../../core/services/session/aws/method/aws-iam-role-federated-service';
+import {AwsSsoRoleService} from '../../../core/services/session/aws/method/aws-sso-role-service';
 
 @Component({
   selector: 'app-root',
@@ -34,11 +38,15 @@ export class AppComponent implements OnInit {
     private sessionProviderService: SessionFactoryService,
     private router: Router,
     private updaterService: UpdaterService,
-    private mfaCodePromptService: MfaCodePromptService
+    private mfaCodePromptService: MfaCodePromptService,
+    private awsSsoOidcService: AwsSsoOidcService
   ) {}
 
   async ngOnInit() {
     AwsIamUserService.init(this.workspaceService, this.mfaCodePromptService);
+    AwsIamRoleChainedService.init(this.workspaceService, this.app, this.awsSsoOidcService);
+    AwsIamRoleFederatedService.init(this.workspaceService, this.app);
+    AwsSsoRoleService.init(this.workspaceService, this.app, this.awsSsoOidcService);
 
     // We get the right moment to set an hook to app close
     const ipc = this.app.getIpcRenderer();

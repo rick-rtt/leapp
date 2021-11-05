@@ -1,17 +1,17 @@
-import { Injectable } from '@angular/core';
-import {WorkspaceService} from '../../../workspace.service';
-import {AppService} from '../../../app.service';
-import {environment} from '../../../../../environments/environment';
+import {AppService} from '../../../../../desktop-app/src/app/services/app.service';
+import {environment} from '../../../../../desktop-app/src/environments/environment';
 import * as AWS from 'aws-sdk';
-import {AwsIamRoleFederatedSession} from '../../../../../../../core/models/aws-iam-role-federated-session';
-import {CredentialsInfo} from '../../../../../../../core/models/credentials-info';
-import Repository from '../../../../../../../core/services/repository';
-import {FileService} from '../../../../../../../core/services/file-service';
-import {LeappSamlError} from '../../../../../../../core/errors/leapp-saml-error';
-import {LeappParseError} from '../../../../../../../core/errors/leapp-parse-error';
-import {LeappAwsStsError} from '../../../../../../../core/errors/leapp-aws-sts-error';
-import AwsSessionService from '../../../../../../../core/services/session/aws/aws-session-service';
-import ISessionNotifier from '../../../../../../../core/interfaces/i-session-notifier';
+import {AwsIamRoleFederatedSession} from '../../../../models/aws-iam-role-federated-session';
+import {CredentialsInfo} from '../../../../models/credentials-info';
+import Repository from '../../../repository';
+import {FileService} from '../../../file-service';
+import {LeappSamlError} from '../../../../errors/leapp-saml-error';
+import {LeappParseError} from '../../../../errors/leapp-parse-error';
+import {LeappAwsStsError} from '../../../../errors/leapp-aws-sts-error';
+import AwsSessionService from '../aws-session-service';
+import ISessionNotifier from '../../../../interfaces/i-session-notifier';
+import {LeappBaseError} from '../../../../errors/leapp-base-error';
+import {LoggerLevel} from '../../../logging-service';
 
 export interface AwsIamRoleFederatedSessionRequest {
   accountName: string;
@@ -25,16 +25,36 @@ export interface ResponseHookDetails {
   uploadData: { bytes: any[] }[];
 }
 
-@Injectable({
-  providedIn: 'root'
-})
 export class AwsIamRoleFederatedService extends AwsSessionService {
 
+  private static instance: AwsIamRoleFederatedService;
+  private appService: AppService;
+
   constructor(
-    protected iSessionNotifier: ISessionNotifier,
-    private appService: AppService
+    iSessionNotifier: ISessionNotifier,
+    appService: AppService
   ) {
     super(iSessionNotifier);
+
+    this.appService = appService;
+  }
+
+  static getInstance() {
+    if(!this.instance) {
+      // TODO: understand if we need to move Leapp Errors in a core folder
+      throw new LeappBaseError('Not initialized service error', this, LoggerLevel.error,
+        'Service needs to be initialized');
+    }
+    return this.instance;
+  }
+
+  static init(iSessionNotifier: ISessionNotifier, appService: AppService) {
+    if(this.instance) {
+      // TODO: understand if we need to move Leapp Errors in a core folder
+      throw new LeappBaseError('Already initialized service error', this, LoggerLevel.error,
+        'Service already initialized');
+    }
+    this.instance = new AwsIamRoleFederatedService(iSessionNotifier, appService);
   }
 
   static async extractSamlResponse(responseHookDetails: ResponseHookDetails) {

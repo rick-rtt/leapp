@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 
-import { AwsIamRoleFederatedService } from './aws-iam-role-federated.service';
-import {mustInjected} from '../../../../../base-injectables';
+import { AwsIamRoleFederatedService } from '../services/session/aws/method/aws-iam-role-federated-service';
+import {mustInjected} from '../../desktop-app/src/base-injectables';
 
 describe('AwsIamRoleFederatedService', () => {
   let service: AwsIamRoleFederatedService;

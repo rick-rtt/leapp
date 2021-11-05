@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 
-import { AwsIamRoleChainedService } from './aws-iam-role-chained.service';
-import {mustInjected} from '../../../../../base-injectables';
+import { AwsIamRoleChainedService } from '../services/session/aws/method/aws-iam-role-chained-service';
+import {mustInjected} from '../../desktop-app/src/base-injectables';
 
 describe('AwsIamRoleChainedService', () => {
   let service: AwsIamRoleChainedService;

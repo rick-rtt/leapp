@@ -2,7 +2,7 @@ import {
   GenerateSSOTokenResponse,
   RegisterClientResponse,
   StartDeviceAuthorizationResponse, VerificationResponse
-} from './session/aws/methods/aws-sso-role.service';
+} from '../../../../core/services/session/aws/method/aws-sso-role-service';
 import SSOOIDC, {
   CreateTokenRequest,
   RegisterClientRequest,

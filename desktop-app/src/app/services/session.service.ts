@@ -85,7 +85,10 @@ export abstract class SessionService {
       sessions[index] = currentSession;
 
       Repository.getInstance().updateSessions(sessions);
-      this.iSessionNotifier.setSessions([...sessions]);
+
+      if(this.iSessionNotifier) {
+        this.iSessionNotifier.setSessions([...sessions]);
+      }
     }
   }
 

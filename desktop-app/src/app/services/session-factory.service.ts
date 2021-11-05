@@ -1,9 +1,9 @@
 import {Injectable} from '@angular/core';
 import {WorkspaceService} from './workspace.service';
 import {AppService} from './app.service';
-import {AwsIamRoleChainedService} from './session/aws/methods/aws-iam-role-chained.service';
-import {AwsIamRoleFederatedService} from './session/aws/methods/aws-iam-role-federated.service';
-import {AwsSsoRoleService} from './session/aws/methods/aws-sso-role.service';
+import {AwsIamRoleChainedService} from '../../../../core/services/session/aws/method/aws-iam-role-chained-service';
+import {AwsIamRoleFederatedService} from '../../../../core/services/session/aws/method/aws-iam-role-federated-service';
+import {AwsSsoRoleService} from '../../../../core/services/session/aws/method/aws-sso-role-service';
 import {AzureService} from './session/azure/azure.service';
 import {ExecuteService} from './execute.service';
 import {SessionService} from './session.service';
@@ -48,7 +48,7 @@ export class SessionFactoryService {
   }
 
   private getAwsIamRoleFederatedSessionService(accountType: SessionType) {
-    const service = new AwsIamRoleFederatedService(this.workspaceService, this.appService);
+    const service = AwsIamRoleFederatedService.getInstance();
     this.sessionServiceCache[accountType.toString()] = service;
     return service;
   }
@@ -60,13 +60,13 @@ export class SessionFactoryService {
   }
 
   private getAwsIamRoleChainedSessionService(accountType: SessionType) {
-    const service = new AwsIamRoleChainedService(this.workspaceService, this.appService, this.electronService, this.awsSsoOidcService);
+    const service = AwsIamRoleChainedService.getInstance();
     this.sessionServiceCache[accountType.toString()] = service;
     return service;
   }
 
   private getAwsSsoRoleSessionService(accountType: SessionType) {
-    const service = new AwsSsoRoleService(this.workspaceService, this.appService, this.awsSsoOidcService);
+    const service = AwsSsoRoleService.getInstance();
     this.sessionServiceCache[accountType.toString()] = service;
     return service;
   }

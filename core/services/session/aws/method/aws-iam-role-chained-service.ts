@@ -1,23 +1,23 @@
-import {Injectable} from '@angular/core';
-import {WorkspaceService} from '../../../workspace.service';
-import {AppService} from '../../../app.service';
+import {AppService} from '../../../../../desktop-app/src/app/services/app.service';
 import * as AWS from 'aws-sdk';
-import {AwsIamRoleFederatedService} from './aws-iam-role-federated.service';
-import {AwsSsoRoleService} from './aws-sso-role.service';
-import {ElectronService} from '../../../electron.service';
-import {AwsSsoOidcService} from '../../../aws-sso-oidc.service';
+import {AwsIamRoleFederatedService} from './aws-iam-role-federated-service';
+import {AwsSsoRoleService} from './aws-sso-role-service';
+import {ElectronService} from '../../../../../desktop-app/src/app/services/electron.service';
+import {AwsSsoOidcService} from '../../../../../desktop-app/src/app/services/aws-sso-oidc.service';
 import { AssumeRoleResponse } from 'aws-sdk/clients/sts';
-import AwsSessionService from '../../../../../../../core/services/session/aws/aws-session-service';
-import {AwsIamRoleChainedSession} from '../../../../../../../core/models/aws-iam-role-chained-session';
-import {CredentialsInfo} from '../../../../../../../core/models/credentials-info';
-import Repository from '../../../../../../../core/services/repository';
-import {FileService} from '../../../../../../../core/services/file-service';
-import {Session} from '../../../../../../../core/models/session';
-import {LeappNotFoundError} from '../../../../../../../core/errors/leapp-not-found-error';
-import {SessionType} from '../../../../../../../core/models/session-type';
-import AwsIamUserService from '../../../../../../../core/services/session/aws/method/aws-iam-user-service';
-import {LeappAwsStsError} from '../../../../../../../core/errors/leapp-aws-sts-error';
-import ISessionNotifier from '../../../../../../../core/interfaces/i-session-notifier';
+import AwsSessionService from '../aws-session-service';
+import {AwsIamRoleChainedSession} from '../../../../models/aws-iam-role-chained-session';
+import {CredentialsInfo} from '../../../../models/credentials-info';
+import Repository from '../../../repository';
+import {FileService} from '../../../file-service';
+import {Session} from '../../../../models/session';
+import {LeappNotFoundError} from '../../../../errors/leapp-not-found-error';
+import {SessionType} from '../../../../models/session-type';
+import AwsIamUserService, {IMfaCodePrompter} from './aws-iam-user-service';
+import {LeappAwsStsError} from '../../../../errors/leapp-aws-sts-error';
+import ISessionNotifier from '../../../../interfaces/i-session-notifier';
+import {LeappBaseError} from '../../../../errors/leapp-base-error';
+import {LoggerLevel} from '../../../logging-service';
 
 export interface AwsIamRoleChainedSessionRequest {
   accountName: string;
@@ -27,18 +27,39 @@ export interface AwsIamRoleChainedSessionRequest {
   parentSessionId: string;
 }
 
-@Injectable({
-  providedIn: 'root'
-})
 export class AwsIamRoleChainedService extends AwsSessionService {
 
-  constructor(
-    protected iSessionNotifier: ISessionNotifier,
-    private appService: AppService,
-    private electronService: ElectronService,
-    private awsSsoOidcService: AwsSsoOidcService,
+  private static instance: AwsSessionService;
+  private appService: AppService;
+  private awsSsoOidcService: AwsSsoOidcService;
+
+  private constructor(
+    iSessionNotifier: ISessionNotifier,
+    appService: AppService,
+    awsSsoOidcService: AwsSsoOidcService,
   ) {
     super(iSessionNotifier);
+
+    this.appService = appService;
+    this.awsSsoOidcService = awsSsoOidcService;
+  }
+
+  static getInstance() {
+    if(!this.instance) {
+      // TODO: understand if we need to move Leapp Errors in a core folder
+      throw new LeappBaseError('Not initialized service error', this, LoggerLevel.error,
+        'Service needs to be initialized');
+    }
+    return this.instance;
+  }
+
+  static init(iSessionNotifier: ISessionNotifier, appService: AppService, awsSsoOidcService: AwsSsoOidcService) {
+    if(this.instance) {
+      // TODO: understand if we need to move Leapp Errors in a core folder
+      throw new LeappBaseError('Already initialized service error', this, LoggerLevel.error,
+        'Service already initialized');
+    }
+    this.instance = new AwsIamRoleChainedService(iSessionNotifier, appService, awsSsoOidcService);
   }
 
   static sessionTokenFromAssumeRoleResponse(assumeRoleResponse: AssumeRoleResponse): { sessionToken: any } {
@@ -56,6 +77,7 @@ export class AwsIamRoleChainedService extends AwsSessionService {
 
   create(sessionRequest: AwsIamRoleChainedSessionRequest, profileId: string): void {
     const session = new AwsIamRoleChainedSession(sessionRequest.accountName, sessionRequest.region, sessionRequest.roleArn, profileId, sessionRequest.parentSessionId, sessionRequest.roleSessionName);
+
     this.iSessionNotifier.addSession(session);
   }
 
