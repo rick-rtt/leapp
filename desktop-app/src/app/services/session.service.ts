@@ -18,17 +18,18 @@ export abstract class SessionService {
   }
 
   protected sessionActivate(sessionId: string) {
-    const index = this.iSessionNotifier.getSessions().findIndex(s => s.sessionId === sessionId);
+    const sessions = Repository.getInstance().getSessions();
+    const index = sessions.findIndex(s => s.sessionId === sessionId);
 
     if (index > -1) {
-      const currentSession: Session = this.iSessionNotifier.getSessions()[index];
+      const currentSession: Session = sessions[index];
       currentSession.status = SessionStatus.active;
       currentSession.startDateTime = new Date().toISOString();
 
-      this.iSessionNotifier.getSessions()[index] = currentSession;
-      this.iSessionNotifier.setSessions([...this.iSessionNotifier.getSessions()]);
+      sessions[index] = currentSession;
 
-      Repository.getInstance().updateSessions(this.iSessionNotifier.getSessions());
+      Repository.getInstance().updateSessions(sessions);
+      this.iSessionNotifier.setSessions([...sessions]);
     }
   }
 
