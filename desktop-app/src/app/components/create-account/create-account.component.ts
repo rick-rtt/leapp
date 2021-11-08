@@ -6,19 +6,19 @@ import {WorkspaceService} from '../../services/workspace.service';
 import {environment} from '../../../environments/environment';
 import * as uuid from 'uuid';
 import {AzureService, AzureSessionRequest} from '../../../../../core/services/session/azure/azure.service';
-import {SessionType} from "../../../../../core/models/session-type";
+import {SessionType} from '../../../../../core/models/session-type';
 import {
   AwsIamRoleFederatedService,
   AwsIamRoleFederatedSessionRequest
-} from "../../../../../core/services/session/aws/method/aws-iam-role-federated-service";
+} from '../../../../../core/services/session/aws/method/aws-iam-role-federated-service';
 import {
   AwsIamRoleChainedService,
   AwsIamRoleChainedSessionRequest
-} from "../../../../../core/services/session/aws/method/aws-iam-role-chained-service";
-import Repository from "../../../../../core/services/repository";
-import {LoggerLevel, LoggingService} from "../../../../../core/services/logging-service";
-import AwsIamUserService, {AwsIamUserSessionRequest} from "../../../../../core/services/session/aws/method/aws-iam-user-service";
-import {LeappParseError} from "../../../../../core/errors/leapp-parse-error";
+} from '../../../../../core/services/session/aws/method/aws-iam-role-chained-service';
+import Repository from '../../../../../core/services/repository';
+import {LoggerLevel, LoggingService} from '../../../../../core/services/logging-service';
+import AwsIamUserService, {AwsIamUserSessionRequest} from '../../../../../core/services/session/aws/method/aws-iam-user-service';
+import {LeappParseError} from '../../../../../core/errors/leapp-parse-error';
 
 @Component({
   selector: 'app-create-account',
