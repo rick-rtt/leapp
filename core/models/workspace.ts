@@ -3,6 +3,9 @@ import * as uuid from 'uuid';
 import {Type} from 'class-transformer';
 import {constants} from './constants';
 
+
+//TODO: Check required and optional keys for every object
+
 export class Workspace {
   @Type(() => Session)
   private _sessions: Session[];
@@ -12,18 +15,18 @@ export class Workspace {
   private _profiles: { id: string; name: string }[];
 
   private _awsSsoConfiguration: {
-    region: string;
-    portalUrl: string;
-    expirationTime: string;
+    region?: string;
+    portalUrl?: string;
+    expirationTime?: string;
     browserOpening: string;
   };
 
   private _proxyConfiguration: {
     proxyProtocol: string;
-    proxyUrl: string;
+    proxyUrl?: string;
     proxyPort: string;
-    username: string;
-    password: string;
+    username?: string;
+    password?: string;
   };
 
   constructor() {
@@ -75,11 +78,11 @@ export class Workspace {
     this._sessions = value;
   }
 
-  get proxyConfiguration(): { proxyProtocol: string; proxyUrl: string; proxyPort: string; username: string; password: string } {
+  get proxyConfiguration(): { proxyProtocol: string; proxyUrl?: string; proxyPort: string; username?: string; password?: string } {
     return this._proxyConfiguration;
   }
 
-  set proxyConfiguration(value: { proxyProtocol: string; proxyUrl: string; proxyPort: string; username: string; password: string }) {
+  set proxyConfiguration(value: { proxyProtocol: string; proxyUrl?: string; proxyPort: string; username?: string; password?: string }) {
     this._proxyConfiguration = value;
   }
 
@@ -99,11 +102,11 @@ export class Workspace {
     this._defaultLocation = value;
   }
 
-  get awsSsoConfiguration(): { region: string; portalUrl: string; browserOpening: string; expirationTime: string } {
+  get awsSsoConfiguration(): { region?: string; portalUrl?: string; browserOpening: string; expirationTime?: string } {
     return this._awsSsoConfiguration;
   }
 
-  set awsSsoConfiguration(value: { region: string; portalUrl: string; browserOpening: string; expirationTime: string }) {
+  set awsSsoConfiguration(value: { region?: string; portalUrl?: string; browserOpening: string; expirationTime?: string }) {
     this._awsSsoConfiguration = value;
   }
 }

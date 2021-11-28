@@ -16,6 +16,7 @@ import {LoggerLevel} from '../../../logging-service';
 import AppService2 from '../../../app-service2';
 import ISessionNotifier from '../../../../interfaces/i-session-notifier';
 import {LeappNotFoundError} from '../../../../errors/leapp-not-found-error';
+import {Credentials} from "../../../../models/credentials";
 
 export interface AwsIamUserSessionRequest {
   accountName: string;
@@ -30,8 +31,6 @@ export interface GenerateSessionTokenCallingMfaParams {
   durationSeconds: number;
   serialNumber?: string;
   tokenCode?: string;
-
-
 }
 
 export interface IMfaCodePrompter {
@@ -77,6 +76,9 @@ export default class AwsIamUserService extends AwsSessionService {
   }
 
   static sessionTokenFromGetSessionTokenResponse(getSessionTokenResponse: GetSessionTokenResponse): { sessionToken: any } {
+    if (getSessionTokenResponse.Credentials === undefined) {
+      throw new LeappAwsStsError(this, 'an error occurred during session token generation.');
+    }
     return {
       sessionToken: {
         // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -93,11 +95,11 @@ export default class AwsIamUserService extends AwsSessionService {
     const session = new AwsIamUserSession(accountRequest.accountName, accountRequest.region, profileId, accountRequest.mfaDevice);
 
     KeychainService.getInstance().saveSecret(constants.appName, `${session.sessionId}-iam-user-aws-session-access-key-id`, accountRequest.accessKey)
-      .then(_ => {
+      .then((_: any) => {
         KeychainService.getInstance().saveSecret(constants.appName, `${session.sessionId}-iam-user-aws-session-secret-access-key`, accountRequest.secretKey)
-          .catch(err => console.error(err));
+          .catch((err: any) => console.error(err));
       })
-      .catch(err => console.error(err));
+      .catch((err: any) => console.error(err));
 
     Repository.getInstance().addSession(session);
 
@@ -109,7 +111,7 @@ export default class AwsIamUserService extends AwsSessionService {
   async applyCredentials(sessionId: string, credentialsInfo: CredentialsInfo): Promise<void> {
     const session = this.repository.getSessionById(sessionId);
     const profileName = Repository.getInstance().getProfileName((session as AwsIamUserSession).profileId);
-    const credentialObject = {};
+    const credentialObject: {[key: string]: Credentials} = {};
 
     credentialObject[profileName] = {
       // eslint-disable-next-line @typescript-eslint/naming-convention,@typescript-eslint/naming-convention

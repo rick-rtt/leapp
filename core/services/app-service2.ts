@@ -1,5 +1,6 @@
 import NativeService from './native-service';
 import {constants} from '../models/constants';
+import {Session} from '../models/session';
 
 export default class AppService2 {
 
@@ -52,7 +53,7 @@ export default class AppService2 {
   }
 
   // TODO: move environment in core
-  stsOptions(session) {
+  stsOptions(session: Session) {
     let options: any = {
       maxRetries: 0,
       httpOptions: { timeout: constants.timeout }

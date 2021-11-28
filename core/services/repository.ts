@@ -7,6 +7,7 @@ import {constants} from '../models/constants';
 import {SessionStatus} from '../models/session-status';
 import {SessionType} from '../models/session-type';
 import {AwsIamRoleChainedSession} from '../models/aws-iam-role-chained-session';
+import {LeappNotFoundError} from "../errors/leapp-not-found-error";
 
 export default class Repository {
 
@@ -73,7 +74,11 @@ export default class Repository {
 
   getSessionById(sessionId: string): Session {
     const workspace = this.getWorkspace();
-    return workspace.sessions.find(session => session.sessionId === sessionId);
+    const session = workspace.sessions.find(sess => sess.sessionId === sessionId);
+    if (session === undefined) {
+      throw new LeappNotFoundError(this, `session with id ${sessionId} not found.`);
+    }
+    return session;
   }
 
   addSession(session: Session): void {
@@ -126,7 +131,7 @@ export default class Repository {
 
   // IDP URLS
 
-  getIdpUrl(idpUrlId: string): string {
+  getIdpUrl(idpUrlId: string): string | null {
     const workspace = this.getWorkspace();
     const idpUrlFiltered = workspace.idpUrls.find(url => url.id === idpUrlId);
     return idpUrlFiltered ? idpUrlFiltered.url : null;
@@ -166,15 +171,21 @@ export default class Repository {
     return this.getWorkspace().profiles;
   }
 
-  getProfileName(profileId): string {
+  getProfileName(profileId: string): string{
     const workspace = this.getWorkspace();
     const profileFiltered = workspace.profiles.find(profile => profile.id === profileId);
-    return profileFiltered ? profileFiltered.name : null;
+    if (profileFiltered === undefined) {
+      throw new LeappNotFoundError(this, `named profile with id ${profileId} not found.`)
+    }
+    return profileFiltered.name;
   }
 
   getDefaultProfileId(): string {
     const workspace = this.getWorkspace();
     const profileFiltered = workspace.profiles.find(profile => profile.name === 'default');
+    if (profileFiltered === undefined) {
+      throw new LeappNotFoundError(this, 'no default named profile found.');
+    }
     return profileFiltered.id;
   }
 
@@ -203,7 +214,7 @@ export default class Repository {
 
   // AWS SSO CONFIGURATION
 
-  getAwsSsoConfiguration(): {region: string; portalUrl: string; browserOpening: string; expirationTime: string} {
+  getAwsSsoConfiguration(): {region?: string; portalUrl?: string; browserOpening: string; expirationTime?: string} {
     return this.getWorkspace().awsSsoConfiguration;
   }
 
@@ -215,7 +226,7 @@ export default class Repository {
     this.persistWorkspace(workspace);
   }
 
-  setAwsSsoConfiguration(region: string, portalUrl: string, browserOpening: string, expirationTime: string) {
+  setAwsSsoConfiguration(region: string, portalUrl: string, browserOpening: string, expirationTime?: string) {
     const workspace = this.getWorkspace();
     workspace.awsSsoConfiguration = { region, portalUrl, browserOpening, expirationTime };
     this.persistWorkspace(workspace);

@@ -8,7 +8,7 @@ export class Session {
   sessionId: string;
   sessionName: string;
   status: SessionStatus;
-  startDateTime: string | undefined;
+  startDateTime?: string;
   region: string;
   type: SessionType;
 
@@ -21,6 +21,9 @@ export class Session {
   }
 
   expired(): boolean {
+    if (this.startDateTime === undefined) {
+      return false;
+    }
     const currentTime = new Date().getTime();
     const startTime = new Date(this.startDateTime).getTime();
     return (currentTime - startTime) / 1000 > constants.sessionDuration;

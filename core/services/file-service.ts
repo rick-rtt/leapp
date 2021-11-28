@@ -60,7 +60,7 @@ export class FileService {
    */
   readFile(filePath: string): Observable<string> {
     return new Observable(subscriber => {
-      this.nativeService.fs.readFile(filePath, {encoding: 'utf-8'}, (err, data) => {
+      this.nativeService.fs.readFile(filePath, {encoding: 'utf-8'}, (err: any, data: any) => {
         if (err) {
           subscriber.error(err);
         } else {
@@ -99,8 +99,8 @@ export class FileService {
    */
   getSubDirs(source: string) {
     return this.nativeService.fs.readdirSync(source, {withFileTypes: true})
-      .filter(dirent => dirent.isDirectory())
-      .map(dirent => dirent.name);
+      .filter((dirent: any) => dirent.isDirectory())
+      .map((dirent: any) => dirent.name);
   }
 
   /**
@@ -131,7 +131,7 @@ export class FileService {
    */
   writeFile(filePath: string, content: string): Observable<any> {
     return new Observable(subscriber => {
-      this.nativeService.fs.writeFile(filePath, content, (err, data) => {
+      this.nativeService.fs.writeFile(filePath, content, (err: any, data: any) => {
         if (err) {
           subscriber.error(err);
         } else {

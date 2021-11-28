@@ -1,5 +1,4 @@
 import NativeService from './native-service';
-import {constants} from '../models/constants';
 
 /*
 * External enum to the logger level so we can use this to define the type of log
