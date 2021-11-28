@@ -15,6 +15,7 @@ import {LeappBaseError} from '../../../../errors/leapp-base-error';
 import {LoggerLevel} from '../../../logging-service';
 import AppService2 from '../../../app-service2';
 import ISessionNotifier from '../../../../interfaces/i-session-notifier';
+import {LeappNotFoundError} from '../../../../errors/leapp-not-found-error';
 
 export interface AwsIamUserSessionRequest {
   accountName: string;
@@ -22,6 +23,15 @@ export interface AwsIamUserSessionRequest {
   secretKey: string;
   region: string;
   mfaDevice?: string;
+}
+
+
+export interface GenerateSessionTokenCallingMfaParams {
+  durationSeconds: number;
+  serialNumber?: string;
+  tokenCode?: string;
+
+
 }
 
 export interface IMfaCodePrompter {
@@ -127,6 +137,10 @@ export default class AwsIamUserService extends AwsSessionService {
     // Get the session in question
     //const session = this.workspaceService.get(sessionId);
     const session = this.repository.getSessions().find(sess => sess.sessionId === sessionId);
+
+    if (session === undefined) {
+      throw new LeappNotFoundError(this, `session with id ${sessionId} not found.`);
+    }
     // Retrieve session token expiration
     const tokenExpiration = (session as AwsIamUserSession).sessionTokenExpiration;
     // Check if token is expired
@@ -142,7 +156,7 @@ export default class AwsIamUserService extends AwsSessionService {
       const sts = new AWS.STS(AppService2.getInstance().stsOptions(session));
       // Configure sts get-session-token api call params
       // eslint-disable-next-line @typescript-eslint/naming-convention
-      const params = { DurationSeconds: constants.sessionTokenDuration };
+      const params = { durationSeconds: constants.sessionTokenDuration };
       // Check if MFA is needed or not
       if ((session as AwsIamUserSession).mfaDevice) {
         // Return session token after calling MFA modal
@@ -170,7 +184,7 @@ export default class AwsIamUserService extends AwsSessionService {
     try {
       const sts = new AWS.STS(AppService2.getInstance().stsOptions(session));
       const response = await sts.getCallerIdentity({}).promise();
-      return response.Account;
+      return response.Account ?? '';
     } catch (err) {
       throw new LeappAwsStsError(this, err.message);
     }
@@ -191,14 +205,14 @@ export default class AwsIamUserService extends AwsSessionService {
   }
 
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  private generateSessionTokenCallingMfaModal(session: Session, sts: AWS.STS, params: { DurationSeconds: number }): Promise<CredentialsInfo> {
+  private generateSessionTokenCallingMfaModal(session: Session, sts: AWS.STS, params: GenerateSessionTokenCallingMfaParams): Promise<CredentialsInfo> {
     return new Promise((resolve, reject) => {
       // TODO: think about timeout management
       // TODO: handle condition in which mfaCodePrompter is null
-      this.mfaCodePrompter.promptForMFACode(session.sessionName, (value) => {
+      this.mfaCodePrompter.promptForMFACode(session.sessionName, (value: string) => {
         if (value !== constants.confirmClosed) {
-          params['SerialNumber'] = (session as AwsIamUserSession).mfaDevice;
-          params['TokenCode'] = value;
+          params.serialNumber = (session as AwsIamUserSession).mfaDevice;
+          params.tokenCode = value;
           // Return session token in the form of CredentialsInfo
           resolve(this.generateSessionToken(session, sts, params));
         } else {
@@ -254,7 +268,9 @@ export default class AwsIamUserService extends AwsSessionService {
     const index = sessions.indexOf(session);
     const currentSession: Session = sessions[index];
 
-    (currentSession as AwsIamUserSession).sessionTokenExpiration = getSessionTokenResponse.Credentials.Expiration.toISOString();
+    if (getSessionTokenResponse.Credentials !== undefined) {
+      (currentSession as AwsIamUserSession).sessionTokenExpiration = getSessionTokenResponse.Credentials.Expiration.toISOString();
+    }
 
     sessions[index] = currentSession;
 

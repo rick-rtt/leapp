@@ -8,7 +8,7 @@ export class Session {
   sessionId: string;
   sessionName: string;
   status: SessionStatus;
-  startDateTime: string;
+  startDateTime: string | undefined;
   region: string;
   type: SessionType;
 
