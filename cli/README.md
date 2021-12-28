@@ -1,12 +1,13 @@
 leapp
-=====
+=================
 
-Command Line Interface for Leapp
+Leapp's Command Line Interface.
 
 [![oclif](https://img.shields.io/badge/cli-oclif-brightgreen.svg)](https://oclif.io)
-[![Version](https://img.shields.io/npm/v/leapp.svg)](https://npmjs.org/package/leapp)
-[![Downloads/week](https://img.shields.io/npm/dw/leapp.svg)](https://npmjs.org/package/leapp)
-[![License](https://img.shields.io/npm/l/leapp.svg)](https://github.com/agatim/leapp/blob/master/package.json)
+[![Version](https://img.shields.io/npm/v/@noovolari/leapp-core.svg)](https://npmjs.org/package/@noovolari/leapp-cli)
+[![Downloads/week](https://img.shields.io/npm/dw/@noovolari/leapp-core.svg)](https://npmjs.org/package/@noovolari/leapp-cli)
+[![License](https://img.shields.io/npm/l/@noovolari/leapp-core.svg)](https://github.com/Noovolari/leapp/package.json)
+<!--[![CircleCI](https://circleci.com/gh/oclif/hello-world/tree/main.svg?style=shield)](https://circleci.com/gh/oclif/hello-world/tree/main)-->
 
 <!-- toc -->
 * [Usage](#usage)
@@ -18,8 +19,8 @@ Command Line Interface for Leapp
 $ npm install -g leapp
 $ leapp COMMAND
 running command...
-$ leapp (-v|--version|version)
-leapp/0.0.0 darwin-x64 node-v14.17.0
+$ leapp (--version)
+leapp/0.1.0 darwin-x64 node-v12.9.1
 $ leapp --help [COMMAND]
 USAGE
   $ leapp COMMAND
@@ -28,43 +29,198 @@ USAGE
 <!-- usagestop -->
 # Commands
 <!-- commands -->
-* [`leapp hello [FILE]`](#leapp-hello-file)
 * [`leapp help [COMMAND]`](#leapp-help-command)
-
-## `leapp hello [FILE]`
-
-describe the command here
-
-```
-USAGE
-  $ leapp hello [FILE]
-
-OPTIONS
-  -f, --force
-  -h, --help       show CLI help
-  -n, --name=name  name to print
-
-EXAMPLE
-  $ leapp hello
-  hello world from ./src/version.ts!
-```
-
-_See code: [src/commands/version.ts](https://github.com/agatim/leapp/blob/v0.0.0/src/commands/hello.ts)_
+* [`leapp plugins`](#leapp-plugins)
+* [`leapp plugins:inspect PLUGIN...`](#leapp-pluginsinspect-plugin)
+* [`leapp plugins:install PLUGIN...`](#leapp-pluginsinstall-plugin)
+* [`leapp plugins:link PLUGIN`](#leapp-pluginslink-plugin)
+* [`leapp plugins:uninstall PLUGIN...`](#leapp-pluginsuninstall-plugin)
+* [`leapp plugins update`](#leapp-plugins-update)
+* [`leapp start`](#leapp-start)
 
 ## `leapp help [COMMAND]`
 
-display help for leapp
+Display help for leapp.
 
 ```
 USAGE
-  $ leapp help [COMMAND]
+  $ leapp help [COMMAND] [-n]
 
 ARGUMENTS
-  COMMAND  command to show help for
+  COMMAND  Command to show help for.
 
-OPTIONS
-  --all  see all commands in CLI
+FLAGS
+  -n, --nested-commands  Include all nested commands in the output.
+
+DESCRIPTION
+  Display help for leapp.
 ```
 
-_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v3.2.7/src/commands/help.ts)_
+_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v5.1.9/src/commands/help.ts)_
+
+## `leapp plugins`
+
+List installed plugins.
+
+```
+USAGE
+  $ leapp plugins [--core]
+
+FLAGS
+  --core  Show core plugins.
+
+DESCRIPTION
+  List installed plugins.
+
+EXAMPLES
+  $ leapp plugins
+```
+
+_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v2.0.11/src/commands/plugins/index.ts)_
+
+## `leapp plugins:inspect PLUGIN...`
+
+Displays installation properties of a plugin.
+
+```
+USAGE
+  $ leapp plugins:inspect PLUGIN...
+
+ARGUMENTS
+  PLUGIN  [default: .] Plugin to inspect.
+
+FLAGS
+  -h, --help     Show CLI help.
+  -v, --verbose
+
+DESCRIPTION
+  Displays installation properties of a plugin.
+
+EXAMPLES
+  $ leapp plugins:inspect myplugin
+```
+
+## `leapp plugins:install PLUGIN...`
+
+Installs a plugin into the CLI.
+
+```
+USAGE
+  $ leapp plugins:install PLUGIN...
+
+ARGUMENTS
+  PLUGIN  Plugin to install.
+
+FLAGS
+  -f, --force    Run yarn install with force flag.
+  -h, --help     Show CLI help.
+  -v, --verbose
+
+DESCRIPTION
+  Installs a plugin into the CLI.
+
+  Can be installed from npm or a git url.
+
+  Installation of a user-installed plugin will override a core plugin.
+
+  e.g. If you have a core plugin that has a 'hello' command, installing a user-installed plugin with a 'hello' command
+  will override the core plugin implementation. This is useful if a user needs to update core plugin functionality in
+  the CLI without the need to patch and update the whole CLI.
+
+ALIASES
+  $ leapp plugins add
+
+EXAMPLES
+  $ leapp plugins:install myplugin 
+
+  $ leapp plugins:install https://github.com/someuser/someplugin
+
+  $ leapp plugins:install someuser/someplugin
+```
+
+## `leapp plugins:link PLUGIN`
+
+Links a plugin into the CLI for development.
+
+```
+USAGE
+  $ leapp plugins:link PLUGIN
+
+ARGUMENTS
+  PATH  [default: .] path to plugin
+
+FLAGS
+  -h, --help     Show CLI help.
+  -v, --verbose
+
+DESCRIPTION
+  Links a plugin into the CLI for development.
+
+  Installation of a linked plugin will override a user-installed or core plugin.
+
+  e.g. If you have a user-installed or core plugin that has a 'hello' command, installing a linked plugin with a 'hello'
+  command will override the user-installed or core plugin implementation. This is useful for development work.
+
+EXAMPLES
+  $ leapp plugins:link myplugin
+```
+
+## `leapp plugins:uninstall PLUGIN...`
+
+Removes a plugin from the CLI.
+
+```
+USAGE
+  $ leapp plugins:uninstall PLUGIN...
+
+ARGUMENTS
+  PLUGIN  plugin to uninstall
+
+FLAGS
+  -h, --help     Show CLI help.
+  -v, --verbose
+
+DESCRIPTION
+  Removes a plugin from the CLI.
+
+ALIASES
+  $ leapp plugins unlink
+  $ leapp plugins remove
+```
+
+## `leapp plugins update`
+
+Update installed plugins.
+
+```
+USAGE
+  $ leapp plugins update [-h] [-v]
+
+FLAGS
+  -h, --help     Show CLI help.
+  -v, --verbose
+
+DESCRIPTION
+  Update installed plugins.
+```
+
+## `leapp start`
+
+Start Session
+
+```
+USAGE
+  $ leapp start -i <value>
+
+FLAGS
+  -i, --sessionId=<value>  (required) Session ID
+
+DESCRIPTION
+  Start Session
+
+EXAMPLES
+  $ oex start --sessionId 1234567890
+```
+
+_See code: [dist/commands/start/index.ts](https://github.com/noovolari/leapp/blob/v0.1.0/dist/commands/start/index.ts)_
 <!-- commandsstop -->

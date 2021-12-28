@@ -19,7 +19,7 @@ import Repository from '../../../repository';
 import {FileService} from '../../../file-service';
 import {KeychainService} from '../../../keychain-service';
 import {SessionType} from '../../../../models/session-type';
-import ISessionNotifier from '../../../../interfaces/i-session-notifier';
+import {ISessionNotifier} from '../../../../interfaces/i-session-notifier';
 import {LeappBaseError} from '../../../../errors/leapp-base-error';
 import {LoggerLevel} from '../../../logging-service';
 

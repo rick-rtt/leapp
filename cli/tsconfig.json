@@ -1,9 +1,10 @@
 {
   "compilerOptions": {
+    "rootDir": "src",
     "downlevelIteration": true,
-    "module": "commonjs",
-    "moduleResolution": "node",
-    "importHelpers": false,
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "importHelpers": true,
     "declaration": true,
     "strict": true,
     "noImplicitAny": true,
@@ -21,14 +22,14 @@
     "emitDecoratorMetadata": true,
     "resolveJsonModule": true,
     "esModuleInterop": true,
-    "target": "es2018",
+    "target": "ES2021",
     "types": [
       "node",
       "jest"
     ],
     "lib": [
-      "es2018",
-      "dom"
+      "ES2021",
+      "DOM"
     ],
     "outDir": "dist",
     "baseUrl": ".",
@@ -39,6 +40,9 @@
       ]
     }
   },
+  "include": [
+    "src/**/*"
+  ],
   "exclude": [
     "coverage",
     "node_modules",

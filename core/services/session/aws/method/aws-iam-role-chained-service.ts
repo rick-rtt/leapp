@@ -12,9 +12,9 @@ import {FileService} from '../../../file-service';
 import {Session} from '../../../../models/session';
 import {LeappNotFoundError} from '../../../../errors/leapp-not-found-error';
 import {SessionType} from '../../../../models/session-type';
-import AwsIamUserService from './aws-iam-user-service';
+import {AwsIamUserService} from './aws-iam-user-service';
 import {LeappAwsStsError} from '../../../../errors/leapp-aws-sts-error';
-import ISessionNotifier from '../../../../interfaces/i-session-notifier';
+import {ISessionNotifier} from '../../../../interfaces/i-session-notifier';
 import {LeappBaseError} from '../../../../errors/leapp-base-error';
 import {LoggerLevel} from '../../../logging-service';
 

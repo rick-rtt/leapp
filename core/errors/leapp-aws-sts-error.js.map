@@ -1,0 +1,1 @@
+{"version":3,"file":"leapp-aws-sts-error.js","sourceRoot":"","sources":["leapp-aws-sts-error.ts"],"names":[],"mappings":"AAAA,OAAO,EAAC,cAAc,EAAC,MAAM,oBAAoB,CAAC;AAClD,OAAO,EAAC,WAAW,EAAC,MAAM,6BAA6B,CAAC;AAExD,MAAM,OAAO,gBAAiB,SAAQ,cAAc;IAClD,YAAY,OAAY,EAAE,OAAgB;QACxC,KAAK,CAAC,qBAAqB,EAAE,OAAO,EAAE,WAAW,CAAC,IAAI,EAAE,OAAO,CAAC,CAAC;IACnE,CAAC;CACF"}

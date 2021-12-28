@@ -1,11 +1,20 @@
 {
-  "name": "Leapp-Core",
-  "version": "0.7.3",
-  "author": {
-    "name": "besharp",
-    "email": "info@besharp.it"
-  },
-  "description": "Leapp Core contains core functionalities for clients app",
+  "name": "@noovolari/leapp-core",
+  "version": "0.1.17",
+  "author": "besharp <info@besharp.it>",
+  "description": "Leapp's core module",
   "dependencies": {},
-  "devDependencies": {}
+  "devDependencies": {},
+  "main": "dist/core/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Noovolari/leapp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Noovolari/leapp/issues"
+  },
+  "homepage": "https://github.com/Noovolari/leapp#readme"
 }

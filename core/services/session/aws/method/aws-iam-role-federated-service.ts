@@ -9,7 +9,7 @@ import {LeappSamlError} from '../../../../errors/leapp-saml-error';
 import {LeappParseError} from '../../../../errors/leapp-parse-error';
 import {LeappAwsStsError} from '../../../../errors/leapp-aws-sts-error';
 import AwsSessionService from '../aws-session-service';
-import ISessionNotifier from '../../../../interfaces/i-session-notifier';
+import {ISessionNotifier} from '../../../../interfaces/i-session-notifier';
 import {LeappBaseError} from '../../../../errors/leapp-base-error';
 import {LoggerLevel} from '../../../logging-service';
 

@@ -10,7 +10,7 @@ import {UpdaterService} from './services/updater.service';
 import compareVersions from 'compare-versions';
 import {RetrocompatibilityService} from './services/retrocompatibility.service';
 import {MfaCodePromptService} from './services/mfa-code-prompt.service';
-import AwsIamUserService from '../../../core/services/session/aws/method/aws-iam-user-service';
+import {AwsIamUserService} from '../../../core/services/session/aws/method/aws-iam-user-service';
 import {LoggerLevel, LoggingService} from '../../../core/services/logging-service';
 import Repository from '../../../core/services/repository';
 import {LeappParseError} from '../../../core/errors/leapp-parse-error';

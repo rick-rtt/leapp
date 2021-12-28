@@ -1,13 +1,10 @@
-"use strict";
 // This file can be replaced during build by using the `fileReplacements` array.
 // `ng build --prod` replaces `environment.ts` with `environment.prod.ts`.
 // The list of file replacements can be found in `angular.json`.
-exports.__esModule = true;
-exports.environment = void 0;
-var environment = {
+const environment = {
     appName: 'Leapp',
     samlRoleSessionDuration: 3600,
-    sessionDuration: 1200,
+    sessionDuration: 60,
     sessionTokenDuration: 36000,
     timeout: 10000,
     lockFileDestination: '.Leapp/Leapp-lock.json',
@@ -21,4 +18,5 @@ var environment = {
     defaultAzureProfileName: 'default-azure',
     latestUrl: 'https://leapp.cloud/releases.html'
 };
-exports.environment = environment;
+export { environment };
+//# sourceMappingURL=environment.js.map

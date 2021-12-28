@@ -1,6 +1,6 @@
 import {Session} from '../models/session';
 
-export default interface ISessionNotifier  {
+export interface ISessionNotifier  {
   getSessions(): Session[];
   getSessionById(sessionId: string): Session;
   setSessions(sessions: Session[]): void;

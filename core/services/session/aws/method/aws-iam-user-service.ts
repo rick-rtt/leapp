@@ -13,8 +13,8 @@ import {FileService} from '../../../file-service';
 import AwsSessionService from '../aws-session-service';
 import {LeappBaseError} from '../../../../errors/leapp-base-error';
 import {LoggerLevel} from '../../../logging-service';
-import AppService2 from '../../../app-service2';
-import ISessionNotifier from '../../../../interfaces/i-session-notifier';
+import AppService from '../../../app-service';
+import {ISessionNotifier} from '../../../../interfaces/i-session-notifier';
 import {LeappNotFoundError} from '../../../../errors/leapp-not-found-error';
 import {Credentials} from "../../../../models/credentials";
 
@@ -26,18 +26,17 @@ export interface AwsIamUserSessionRequest {
   mfaDevice?: string;
 }
 
-
 export interface GenerateSessionTokenCallingMfaParams {
-  durationSeconds: number;
-  serialNumber?: string;
-  tokenCode?: string;
+  DurationSeconds: number;
+  SerialNumber?: string;
+  TokenCode?: string;
 }
 
 export interface IMfaCodePrompter {
   promptForMFACode(sessionName: string, callback: any): void;
 }
 
-export default class AwsIamUserService extends AwsSessionService {
+export class AwsIamUserService extends AwsSessionService {
 
   private static instance: AwsIamUserService;
   private mfaCodePrompter: IMfaCodePrompter;
@@ -123,16 +122,16 @@ export default class AwsIamUserService extends AwsSessionService {
       region: session.region
     };
 
-    return await FileService.getInstance().iniWriteSync(AppService2.getInstance().awsCredentialPath(), credentialObject);
+    return await FileService.getInstance().iniWriteSync(AppService.getInstance().awsCredentialPath(), credentialObject);
   }
 
   async deApplyCredentials(sessionId: string): Promise<void> {
     //const session = this.workspaceService.get(sessionId);
     const session = this.repository.getSessions().find(sess => sess.sessionId === sessionId);
     const profileName = Repository.getInstance().getProfileName((session as AwsIamUserSession).profileId);
-    const credentialsFile = await FileService.getInstance().iniParseSync(AppService2.getInstance().awsCredentialPath());
+    const credentialsFile = await FileService.getInstance().iniParseSync(AppService.getInstance().awsCredentialPath());
     delete credentialsFile[profileName];
-    return await FileService.getInstance().replaceWriteSync(AppService2.getInstance().awsCredentialPath(), credentialsFile);
+    return await FileService.getInstance().replaceWriteSync(AppService.getInstance().awsCredentialPath(), credentialsFile);
   }
 
   async generateCredentials(sessionId: string): Promise<CredentialsInfo> {
@@ -155,10 +154,10 @@ export default class AwsIamUserService extends AwsSessionService {
       // https://docs.aws.amazon.com/STS/latest/APIReference/API_GetSessionToken.html
       AWS.config.update({ accessKeyId, secretAccessKey });
       // Configure sts client options
-      const sts = new AWS.STS(AppService2.getInstance().stsOptions(session));
+      const sts = new AWS.STS(AppService.getInstance().stsOptions(session));
       // Configure sts get-session-token api call params
       // eslint-disable-next-line @typescript-eslint/naming-convention
-      const params = { durationSeconds: constants.sessionTokenDuration };
+      const params = { DurationSeconds: constants.sessionTokenDuration };
       // Check if MFA is needed or not
       if ((session as AwsIamUserSession).mfaDevice) {
         // Return session token after calling MFA modal
@@ -172,7 +171,7 @@ export default class AwsIamUserService extends AwsSessionService {
       try {
         // Retrieve session token from keychain
         return JSON.parse(await KeychainService.getInstance().getSecret(constants.appName, `${session.sessionId}-iam-user-aws-session-token`));
-      } catch (err) {
+      } catch (err: any) {
         throw new LeappParseError(this, err.message);
       }
     }
@@ -184,10 +183,10 @@ export default class AwsIamUserService extends AwsSessionService {
     AWS.config.update({ accessKeyId: credentials.sessionToken.aws_access_key_id, secretAccessKey: credentials.sessionToken.aws_secret_access_key, sessionToken: credentials.sessionToken.aws_session_token });
     // Configure sts client options
     try {
-      const sts = new AWS.STS(AppService2.getInstance().stsOptions(session));
+      const sts = new AWS.STS(AppService.getInstance().stsOptions(session));
       const response = await sts.getCallerIdentity({}).promise();
       return response.Account ?? '';
-    } catch (err) {
+    } catch (err: any) {
       throw new LeappAwsStsError(this, err.message);
     }
   }
@@ -213,8 +212,8 @@ export default class AwsIamUserService extends AwsSessionService {
       // TODO: handle condition in which mfaCodePrompter is null
       this.mfaCodePrompter.promptForMFACode(session.sessionName, (value: string) => {
         if (value !== constants.confirmClosed) {
-          params.serialNumber = (session as AwsIamUserSession).mfaDevice;
-          params.tokenCode = value;
+          params.SerialNumber = (session as AwsIamUserSession).mfaDevice;
+          params.TokenCode = value;
           // Return session token in the form of CredentialsInfo
           resolve(this.generateSessionToken(session, sts, params));
         } else {
@@ -260,7 +259,7 @@ export default class AwsIamUserService extends AwsSessionService {
 
       // Return Session Token
       return sessionToken;
-    } catch (err) {
+    } catch (err: any) {
       throw new LeappAwsStsError(this, err.message);
     }
   }

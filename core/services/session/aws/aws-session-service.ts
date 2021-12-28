@@ -3,7 +3,7 @@ import {SessionStatus} from '../../../models/session-status';
 import {LeappBaseError} from '../../../errors/leapp-base-error';
 import {LoggerLevel} from '../../logging-service';
 import {SessionService} from '../session.service';
-import ISessionNotifier from '../../../interfaces/i-session-notifier';
+import {ISessionNotifier} from '../../../interfaces/i-session-notifier';
 import Repository from '../../repository';
 
 export default abstract class AwsSessionService extends SessionService {
@@ -14,6 +14,8 @@ export default abstract class AwsSessionService extends SessionService {
   }
 
   async start(sessionId: string): Promise<void> {
+    console.log(`${JSON.stringify(Repository.getInstance().getSessions())}`);
+
     try {
       if (this.isThereAnotherPendingSessionWithSameNamedProfile(sessionId)) {
         throw new LeappBaseError('Pending session with same named profile', this, LoggerLevel.info, 'Pending session with same named profile');

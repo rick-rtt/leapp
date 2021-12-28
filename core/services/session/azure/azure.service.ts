@@ -6,7 +6,7 @@ import {AzureSession} from '../../../models/azure-session';
 import {LeappExecuteError} from '../../../errors/leapp-execute-error';
 import {LeappParseError} from '../../../errors/leapp-parse-error';
 import {FileService} from '../../file-service';
-import ISessionNotifier from '../../../interfaces/i-session-notifier';
+import {ISessionNotifier} from '../../../interfaces/i-session-notifier';
 import Repository from '../../repository';
 import {LeappBaseError} from "../../../errors/leapp-base-error";
 import {LoggerLevel} from "../../logging-service";

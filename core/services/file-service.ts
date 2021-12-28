@@ -1,5 +1,6 @@
 import {Observable, Subscription} from 'rxjs';
-import * as CryptoJS from 'crypto-js';
+//import * as CryptoJS from 'crypto-js';
+const CryptoJS = require('crypto-js');
 import NativeService from './native-service';
 
 export class FileService {

@@ -3,6 +3,7 @@ import * as uuid from 'uuid';
 import {Type} from 'class-transformer';
 import {constants} from './constants';
 
+import 'reflect-metadata';
 
 //TODO: Check required and optional keys for every object
 
