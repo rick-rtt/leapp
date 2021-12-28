@@ -20,7 +20,7 @@ $ npm install -g leapp
 $ leapp COMMAND
 running command...
 $ leapp (--version)
-leapp/0.1.0 darwin-x64 node-v12.9.1
+leapp/0.1.0 darwin-x64 node-v14.17.0
 $ leapp --help [COMMAND]
 USAGE
   $ leapp COMMAND
@@ -37,6 +37,7 @@ USAGE
 * [`leapp plugins:uninstall PLUGIN...`](#leapp-pluginsuninstall-plugin)
 * [`leapp plugins update`](#leapp-plugins-update)
 * [`leapp start`](#leapp-start)
+* [`leapp stop`](#leapp-stop)
 
 ## `leapp help [COMMAND]`
 
@@ -223,4 +224,24 @@ EXAMPLES
 ```
 
 _See code: [dist/commands/start/index.ts](https://github.com/noovolari/leapp/blob/v0.1.0/dist/commands/start/index.ts)_
+
+## `leapp stop`
+
+Stop Session
+
+```
+USAGE
+  $ leapp stop -i <value>
+
+FLAGS
+  -i, --sessionId=<value>  (required) Session ID
+
+DESCRIPTION
+  Stop Session
+
+EXAMPLES
+  $ oex stop --sessionId 1234567890
+```
+
+_See code: [dist/commands/stop/index.ts](https://github.com/noovolari/leapp/blob/v0.1.0/dist/commands/stop/index.ts)_
 <!-- commandsstop -->
