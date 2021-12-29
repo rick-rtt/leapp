@@ -1,1 +1,0 @@
-{"version":3,"file":"leapp-not-aws-account-error.js","sourceRoot":"","sources":["leapp-not-aws-account-error.ts"],"names":[],"mappings":"AAAA,OAAO,EAAC,cAAc,EAAC,MAAM,oBAAoB,CAAC;AAClD,OAAO,EAAC,WAAW,EAAC,MAAM,6BAA6B,CAAC;AAExD,MAAM,OAAO,uBAAwB,SAAQ,cAAc;IACzD,YAAY,OAAY,EAAE,OAAgB;QACxC,KAAK,CAAC,6BAA6B,EAAE,OAAO,EAAE,WAAW,CAAC,IAAI,EAAE,OAAO,CAAC,CAAC;IAC3E,CAAC;CACF"}

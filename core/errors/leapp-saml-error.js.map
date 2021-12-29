@@ -1,1 +1,0 @@
-{"version":3,"file":"leapp-saml-error.js","sourceRoot":"","sources":["leapp-saml-error.ts"],"names":[],"mappings":"AAAA,OAAO,EAAC,cAAc,EAAC,MAAM,oBAAoB,CAAC;AAClD,OAAO,EAAC,WAAW,EAAC,MAAM,6BAA6B,CAAC;AAExD,MAAM,OAAO,cAAe,SAAQ,cAAc;IAChD,YAAY,OAAY,EAAE,OAAgB;QACxC,KAAK,CAAC,kBAAkB,EAAE,OAAO,EAAE,WAAW,CAAC,IAAI,EAAE,OAAO,CAAC,CAAC;IAChE,CAAC;CACF"}
