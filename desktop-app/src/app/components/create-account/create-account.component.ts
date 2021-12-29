@@ -17,7 +17,7 @@ import {
 } from '../../../../../core/services/session/aws/method/aws-iam-role-chained-service';
 import Repository from '../../../../../core/services/repository';
 import {LoggerLevel, LoggingService} from '../../../../../core/services/logging-service';
-import AwsIamUserService, {AwsIamUserSessionRequest} from '../../../../../core/services/session/aws/method/aws-iam-user-service';
+import {AwsIamUserService, AwsIamUserSessionRequest} from '../../../../../core/services/session/aws/method/aws-iam-user-service';
 import {LeappParseError} from '../../../../../core/errors/leapp-parse-error';
 
 @Component({

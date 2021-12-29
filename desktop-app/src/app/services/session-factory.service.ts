@@ -10,7 +10,7 @@ import {SessionService} from '../../../../core/services/session/session.service'
 import {ElectronService} from './electron.service';
 import {AwsSsoOidcService} from './aws-sso-oidc.service';
 import {SessionType} from '../../../../core/models/session-type';
-import AwsIamUserService from '../../../../core/services/session/aws/method/aws-iam-user-service';
+import {AwsIamUserService} from '../../../../core/services/session/aws/method/aws-iam-user-service';
 
 @Injectable({
   providedIn: 'root'

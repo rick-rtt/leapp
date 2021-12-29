@@ -14,7 +14,7 @@ import {SessionStatus} from '../../../../../../core/models/session-status';
 import Repository from '../../../../../../core/services/repository';
 import {constants} from '../../../../../../core/models/constants';
 import {AwsIamRoleFederatedSession} from '../../../../../../core/models/aws-iam-role-federated-session';
-import AwsIamUserService from '../../../../../../core/services/session/aws/method/aws-iam-user-service';
+import {AwsIamUserService} from '../../../../../../core/services/session/aws/method/aws-iam-user-service';
 import {LoggerLevel, LoggingService} from '../../../../../../core/services/logging-service';
 import AwsSessionService from '../../../../../../core/services/session/aws/aws-session-service';
 

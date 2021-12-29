@@ -5,7 +5,7 @@ import {Session} from '../../../../core/models/session';
 import {SessionStatus} from '../../../../core/models/session-status';
 import {SessionType} from '../../../../core/models/session-type';
 import {AwsIamRoleChainedSession} from '../../../../core/models/aws-iam-role-chained-session';
-import ISessionNotifier from '../../../../core/interfaces/i-session-notifier';
+import {ISessionNotifier} from '../../../../core/interfaces/i-session-notifier';
 
 @Injectable({
   providedIn: 'root'
