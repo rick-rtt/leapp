@@ -6,8 +6,8 @@ import {InputDialogComponent} from '../components/shared/input-dialog/input-dial
 import {BsModalService} from 'ngx-bootstrap/modal';
 import {ElectronService} from './electron.service';
 import {ToastrService} from 'ngx-toastr';
-import {constants} from '../../../../core/models/constants';
-import {LoggerLevel, LoggingService} from '../../../../core/services/logging-service';
+import {constants} from '@noovolari/leapp-core/models/constants';
+import {LoggerLevel, LoggingService} from '@noovolari/leapp-core/services/logging-service';
 
 /*
 * External enum to the toast level so we can use this to define the type of log
