@@ -15,7 +15,7 @@ import * as AWSMock from 'aws-sdk-mock';
 import * as AWS from 'aws-sdk';
 import {AwsIamUserSession} from '../models/aws-iam-user-session';
 import {FileService} from '../services/file-service';
-import AwsIamUserService from '../services/session/aws/method/aws-iam-user-service';
+import {AwsIamUserService} from '../services/session/aws/method/aws-iam-user-service';
 
 let spyAppService;
 let spyFileService;

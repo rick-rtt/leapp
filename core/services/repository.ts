@@ -255,7 +255,7 @@ export default class Repository {
     return this.getWorkspace().proxyConfiguration;
   }
 
-  updateProxyConfiguration(proxyConfiguration: { proxyProtocol: string; proxyUrl: string; proxyPort: string; username: string; password: string }) {
+  updateProxyConfiguration(proxyConfiguration: { proxyProtocol: string; proxyUrl?: string; proxyPort: string; username?: string; password?: string }) {
     const workspace = this.getWorkspace();
     workspace.proxyConfiguration = proxyConfiguration;
     this.persistWorkspace(workspace);

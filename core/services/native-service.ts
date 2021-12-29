@@ -70,7 +70,7 @@ export default class NativeService {
     } catch (e: any) {
       if (e.constructor.name === 'ReferenceError') { // TODO: add message check
         //this.log = require('electron-log');
-        this.fs = require('fs-extra');
+        /*this.fs = require('fs-extra');
         this.rimraf = require('rimraf');
         this.os = require('os');
         this.ini = require('ini');
@@ -87,7 +87,7 @@ export default class NativeService {
         this.keytar = require('keytar');
         this.followRedirects = require('follow-redirects');
         this.httpProxyAgent = require('http-proxy-agent');
-        this.httpsProxyAgent = require('https-proxy-agent');
+        this.httpsProxyAgent = require('https-proxy-agent');*/
         /*this.app = require('@electron/remote').app;
         this.session = require('@electron/remote').session;
         this.dialog = require('@electron/remote').dialog;
