@@ -1,8 +1,8 @@
-import NativeService from './native-service';
-
 /*
 * External enum to the logger level so we can use this to define the type of log
 */
+import {INativeService} from "../interfaces/i-native-service";
+
 export enum LoggerLevel {
   info,
   warn,
@@ -13,14 +13,7 @@ export class LoggingService {
 
   static instance: LoggingService;
 
-  private constructor() {}
-
-  static getInstance() {
-    if(!this.instance) {
-      this.instance = new LoggingService();
-    }
-    return this.instance;
-  }
+  constructor(private nativeService: INativeService) {}
 
   /**
    * Log the message to a file and also to console for development mode
@@ -45,16 +38,16 @@ export class LoggingService {
 
     switch (type) {
       case LoggerLevel.info:
-        NativeService.getInstance().log.info(message);
+        this.nativeService.log.info(message);
         break;
       case LoggerLevel.warn:
-        NativeService.getInstance().log.warn(message);
+        this.nativeService.log.warn(message);
         break;
       case LoggerLevel.error:
-        NativeService.getInstance().log.error(message);
+        this.nativeService.log.error(message);
         break;
       default:
-        NativeService.getInstance().log.error(message);
+        this.nativeService.log.error(message);
         break;
     }
   }

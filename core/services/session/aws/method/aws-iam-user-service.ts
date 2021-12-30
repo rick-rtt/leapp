@@ -8,15 +8,13 @@ import {constants} from '../../../../models/constants';
 import {LeappAwsStsError} from '../../../../errors/leapp-aws-sts-error';
 import {LeappParseError} from '../../../../errors/leapp-parse-error';
 import {LeappMissingMfaTokenError} from '../../../../errors/leapp-missing-mfa-token-error';
-import Repository from '../../../repository';
 import {FileService} from '../../../file-service';
 import {AwsSessionService} from '../aws-session-service';
-import {LeappBaseError} from '../../../../errors/leapp-base-error';
-import {LoggerLevel} from '../../../logging-service';
 import AppService from '../../../app-service';
 import {ISessionNotifier} from '../../../../interfaces/i-session-notifier';
 import {LeappNotFoundError} from '../../../../errors/leapp-not-found-error';
 import {Credentials} from "../../../../models/credentials";
+import Repository from "../../../repository";
 
 export interface AwsIamUserSessionRequest {
   accountName: string;
@@ -38,35 +36,15 @@ export interface IMfaCodePrompter {
 
 export class AwsIamUserService extends AwsSessionService {
 
-  private static instance: AwsIamUserService;
-  private mfaCodePrompter: IMfaCodePrompter;
-  private repository: Repository;
-
-  private constructor(
+  constructor(
     iSessionNotifier: ISessionNotifier,
-    mfaCodePrompter: IMfaCodePrompter
+    repository: Repository,
+    private mfaCodePrompter: IMfaCodePrompter,
+    private keychainService: KeychainService,
+    private fileService: FileService,
+    private appService: AppService
   ) {
-    super(iSessionNotifier);
-    this.mfaCodePrompter = mfaCodePrompter;
-    this.repository = Repository.getInstance();
-  }
-
-  static getInstance() {
-    if(!this.instance) {
-      // TODO: understand if we need to move Leapp Errors in a core folder
-      throw new LeappBaseError('Not initialized service error', this, LoggerLevel.error,
-        'Service needs to be initialized');
-    }
-    return this.instance;
-  }
-
-  static init(iSessionNotifier: ISessionNotifier, mfaCodePrompter: IMfaCodePrompter) {
-    if(this.instance) {
-      // TODO: understand if we need to move Leapp Errors in a core folder
-      throw new LeappBaseError('Already initialized service error', this, LoggerLevel.error,
-        'Service already initialized');
-    }
-    this.instance = new AwsIamUserService(iSessionNotifier, mfaCodePrompter);
+    super(iSessionNotifier, repository);
   }
 
   static isTokenExpired(tokenExpiration: string): boolean {
@@ -93,14 +71,14 @@ export class AwsIamUserService extends AwsSessionService {
   create(accountRequest: AwsIamUserSessionRequest, profileId: string): void {
     const session = new AwsIamUserSession(accountRequest.accountName, accountRequest.region, profileId, accountRequest.mfaDevice);
 
-    KeychainService.getInstance().saveSecret(constants.appName, `${session.sessionId}-iam-user-aws-session-access-key-id`, accountRequest.accessKey)
+    this.keychainService.saveSecret(constants.appName, `${session.sessionId}-iam-user-aws-session-access-key-id`, accountRequest.accessKey)
       .then((_: any) => {
-        KeychainService.getInstance().saveSecret(constants.appName, `${session.sessionId}-iam-user-aws-session-secret-access-key`, accountRequest.secretKey)
+        this.keychainService.saveSecret(constants.appName, `${session.sessionId}-iam-user-aws-session-secret-access-key`, accountRequest.secretKey)
           .catch((err: any) => console.error(err));
       })
       .catch((err: any) => console.error(err));
 
-    Repository.getInstance().addSession(session);
+    this.repository.addSession(session);
 
     if(this.iSessionNotifier) {
       this.iSessionNotifier.addSession(session);
@@ -109,7 +87,7 @@ export class AwsIamUserService extends AwsSessionService {
 
   async applyCredentials(sessionId: string, credentialsInfo: CredentialsInfo): Promise<void> {
     const session = this.repository.getSessionById(sessionId);
-    const profileName = Repository.getInstance().getProfileName((session as AwsIamUserSession).profileId);
+    const profileName = this.repository.getProfileName((session as AwsIamUserSession).profileId);
     const credentialObject: {[key: string]: Credentials} = {};
 
     credentialObject[profileName] = {
@@ -122,16 +100,16 @@ export class AwsIamUserService extends AwsSessionService {
       region: session.region
     };
 
-    return await FileService.getInstance().iniWriteSync(AppService.getInstance().awsCredentialPath(), credentialObject);
+    return await this.fileService.iniWriteSync(this.appService.awsCredentialPath(), credentialObject);
   }
 
   async deApplyCredentials(sessionId: string): Promise<void> {
     //const session = this.workspaceService.get(sessionId);
     const session = this.repository.getSessions().find(sess => sess.sessionId === sessionId);
-    const profileName = Repository.getInstance().getProfileName((session as AwsIamUserSession).profileId);
-    const credentialsFile = await FileService.getInstance().iniParseSync(AppService.getInstance().awsCredentialPath());
+    const profileName = this.repository.getProfileName((session as AwsIamUserSession).profileId);
+    const credentialsFile = await this.fileService.iniParseSync(this.appService.awsCredentialPath());
     delete credentialsFile[profileName];
-    return await FileService.getInstance().replaceWriteSync(AppService.getInstance().awsCredentialPath(), credentialsFile);
+    return await this.fileService.replaceWriteSync(this.appService.awsCredentialPath(), credentialsFile);
   }
 
   async generateCredentials(sessionId: string): Promise<CredentialsInfo> {
@@ -154,7 +132,7 @@ export class AwsIamUserService extends AwsSessionService {
       // https://docs.aws.amazon.com/STS/latest/APIReference/API_GetSessionToken.html
       AWS.config.update({ accessKeyId, secretAccessKey });
       // Configure sts client options
-      const sts = new AWS.STS(AppService.getInstance().stsOptions(session));
+      const sts = new AWS.STS(this.appService.stsOptions(session));
       // Configure sts get-session-token api call params
       // eslint-disable-next-line @typescript-eslint/naming-convention
       const params = { DurationSeconds: constants.sessionTokenDuration };
@@ -170,7 +148,7 @@ export class AwsIamUserService extends AwsSessionService {
       // Session Token is NOT expired
       try {
         // Retrieve session token from keychain
-        return JSON.parse(await KeychainService.getInstance().getSecret(constants.appName, `${session.sessionId}-iam-user-aws-session-token`));
+        return JSON.parse(await this.keychainService.getSecret(constants.appName, `${session.sessionId}-iam-user-aws-session-token`));
       } catch (err: any) {
         throw new LeappParseError(this, err.message);
       }
@@ -183,7 +161,7 @@ export class AwsIamUserService extends AwsSessionService {
     AWS.config.update({ accessKeyId: credentials.sessionToken.aws_access_key_id, secretAccessKey: credentials.sessionToken.aws_secret_access_key, sessionToken: credentials.sessionToken.aws_session_token });
     // Configure sts client options
     try {
-      const sts = new AWS.STS(AppService.getInstance().stsOptions(session));
+      const sts = new AWS.STS(this.appService.stsOptions(session));
       const response = await sts.getCallerIdentity({}).promise();
       return response.Account ?? '';
     } catch (err: any) {
@@ -224,23 +202,23 @@ export class AwsIamUserService extends AwsSessionService {
   }
 
   private async getAccessKeyFromKeychain(sessionId: string): Promise<string> {
-    return await KeychainService.getInstance().getSecret(constants.appName, `${sessionId}-iam-user-aws-session-access-key-id`);
+    return await this.keychainService.getSecret(constants.appName, `${sessionId}-iam-user-aws-session-access-key-id`);
   }
 
   private async getSecretKeyFromKeychain(sessionId: string): Promise<string> {
-    return await KeychainService.getInstance().getSecret(constants.appName, `${sessionId}-iam-user-aws-session-secret-access-key`);
+    return await this.keychainService.getSecret(constants.appName, `${sessionId}-iam-user-aws-session-secret-access-key`);
   }
 
   private async removeAccessKeyFromKeychain(sessionId: string): Promise<void> {
-    await KeychainService.getInstance().deletePassword(constants.appName, `${sessionId}-iam-user-aws-session-access-key-id`);
+    await this.keychainService.deletePassword(constants.appName, `${sessionId}-iam-user-aws-session-access-key-id`);
   }
 
   private async removeSecretKeyFromKeychain(sessionId: string): Promise<void> {
-    await KeychainService.getInstance().deletePassword(constants.appName, `${sessionId}-iam-user-aws-session-secret-access-key`);
+    await this.keychainService.deletePassword(constants.appName, `${sessionId}-iam-user-aws-session-secret-access-key`);
   }
 
   private async removeSessionTokenFromKeychain(sessionId: string): Promise<void> {
-    await KeychainService.getInstance().deletePassword(constants.appName, `${sessionId}-iam-user-aws-session-token`);
+    await this.keychainService.deletePassword(constants.appName, `${sessionId}-iam-user-aws-session-token`);
   }
 
   private async generateSessionToken(session: Session, sts: AWS.STS, params: any): Promise<CredentialsInfo> {
@@ -255,7 +233,7 @@ export class AwsIamUserService extends AwsSessionService {
       const sessionToken = AwsIamUserService.sessionTokenFromGetSessionTokenResponse(getSessionTokenResponse);
 
       // Save in keychain the session token
-      await KeychainService.getInstance().saveSecret(constants.appName, `${session.sessionId}-iam-user-aws-session-token`, JSON.stringify(sessionToken));
+      await this.keychainService.saveSecret(constants.appName, `${session.sessionId}-iam-user-aws-session-token`, JSON.stringify(sessionToken));
 
       // Return Session Token
       return sessionToken;
@@ -265,7 +243,7 @@ export class AwsIamUserService extends AwsSessionService {
   }
 
   private saveSessionTokenResponseInTheSession(session: Session, getSessionTokenResponse: AWS.STS.GetSessionTokenResponse): void {
-    const sessions = Repository.getInstance().getSessions();
+    const sessions = this.repository.getSessions();
     const index = sessions.indexOf(session);
     const currentSession: Session = sessions[index];
 
@@ -275,7 +253,7 @@ export class AwsIamUserService extends AwsSessionService {
 
     sessions[index] = currentSession;
 
-    Repository.getInstance().updateSessions(sessions);
+    this.repository.updateSessions(sessions);
     this.iSessionNotifier.setSessions([...sessions]);
   }
 }

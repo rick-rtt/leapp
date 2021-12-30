@@ -1,5 +1,5 @@
 import {Command, Flags} from '@oclif/core';
-import {AwsIamUserService, IMfaCodePrompter, ISessionNotifier, Session} from "@noovolari/leapp-core";
+import {awsIamUserService} from "../../bootstrap";
 
 export default class Start extends Command {
   static description = 'Start Session'
@@ -18,59 +18,9 @@ export default class Start extends Command {
     const parserOuput = await this.parse(Start)
 
     try {
-      AwsIamUserService.init(new SessionNotifier(), new MfaCodePrompter())
-      await AwsIamUserService.getInstance().start(parserOuput.flags.sessionId);
+      await awsIamUserService.start(parserOuput.flags.sessionId);
     } catch (e: any) {
       this.log(e);
-    }
-  }
-}
-
-export class SessionNotifier implements ISessionNotifier {
-  addSession(session: Session): void {
-    console.log(session);
-  }
-
-  deleteSession(sessionId: string): void {
-    console.log(sessionId);
-  }
-
-  getSessionById(sessionId: string): Session {
-    console.log(sessionId);
-    return new Session('fake session name', 'fake region')
-  }
-
-  getSessions(): Session[] {
-    return [];
-  }
-
-  listActive(): Session[] {
-    return [];
-  }
-
-  listAwsSsoRoles(): Session[] {
-    return [];
-  }
-
-  listIamRoleChained(session: Session): Session[] {
-    console.log(session);
-    return [];
-  }
-
-  listPending(): Session[] {
-    return [];
-  }
-
-  setSessions(sessions: Session[]): void {
-    console.log(sessions);
-  }
-}
-
-export class MfaCodePrompter implements IMfaCodePrompter {
-  promptForMFACode(sessionName: string, callback: any): void {
-    console.log(`prompting mfa for session ${sessionName}`);
-    if(callback !== undefined) {
-      callback();
     }
   }
 }

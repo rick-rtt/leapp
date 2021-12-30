@@ -9,12 +9,15 @@ import Repository from '../../repository';
 export abstract class AwsSessionService extends SessionService {
 
   /* This service manage the session manipulation as we need top generate credentials and maintain them for a specific duration */
-  protected constructor(iSessionNotifier: ISessionNotifier) {
-    super(iSessionNotifier);
+  protected constructor(
+    iSessionNotifier: ISessionNotifier,
+    repository: Repository
+  ) {
+    super(iSessionNotifier, repository);
   }
 
   async start(sessionId: string): Promise<void> {
-    console.log(`${JSON.stringify(Repository.getInstance().getSessions())}`);
+    console.log(`${JSON.stringify(this.repository.getSessions())}`);
 
     try {
       if (this.isThereAnotherPendingSessionWithSameNamedProfile(sessionId)) {
@@ -52,18 +55,18 @@ export abstract class AwsSessionService extends SessionService {
 
   async delete(sessionId: string): Promise<void> {
     try {
-      if (Repository.getInstance().getSessionById(sessionId).status === SessionStatus.active) {
+      if (this.repository.getSessionById(sessionId).status === SessionStatus.active) {
         await this.stop(sessionId);
       }
-      Repository.getInstance().listIamRoleChained(this.iSessionNotifier.getSessionById(sessionId)).forEach(sess => {
+      this.repository.listIamRoleChained(this.iSessionNotifier.getSessionById(sessionId)).forEach(sess => {
         if (sess.status === SessionStatus.active) {
           this.stop(sess.sessionId);
         }
-        Repository.getInstance().deleteSession(sess.sessionId);
+        this.repository.deleteSession(sess.sessionId);
       });
-      Repository.getInstance().deleteSession(sessionId);
+      this.repository.deleteSession(sessionId);
 
-      this.iSessionNotifier.setSessions(Repository.getInstance().getSessions());
+      this.iSessionNotifier.setSessions(this.repository.getSessions());
       await this.removeSecrets(sessionId);
     } catch(error) {
       this.sessionError(sessionId, error);
@@ -71,9 +74,9 @@ export abstract class AwsSessionService extends SessionService {
   }
 
   private isThereAnotherPendingSessionWithSameNamedProfile(sessionId: string) {
-    const session = Repository.getInstance().getSessionById(sessionId);
+    const session = this.repository.getSessionById(sessionId);
     const profileId = (session as any).profileId;
-    const pendingSessions = Repository.getInstance().listPending();
+    const pendingSessions = this.repository.listPending();
 
     for(let i = 0; i < pendingSessions.length; i++) {
       if ((pendingSessions[i] as any).profileId === profileId && (pendingSessions[i] as any).sessionId !== sessionId) {
@@ -86,10 +89,10 @@ export abstract class AwsSessionService extends SessionService {
 
   private stopAllWithSameNameProfile(sessionId: string) {
     // Get profile to check
-    const session = Repository.getInstance().getSessionById(sessionId);
+    const session = this.repository.getSessionById(sessionId);
     const profileId = (session as any).profileId;
     // Get all active sessions
-    const activeSessions = Repository.getInstance().listActive();
+    const activeSessions = this.repository.listActive();
     // Stop all that shares the same profile
     activeSessions.forEach(sess => {
       if( (sess as any).profileId === profileId ) {

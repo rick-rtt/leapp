@@ -1,24 +1,13 @@
 import {Observable, Subscription} from 'rxjs';
+import {INativeService} from "../interfaces/i-native-service";
 //import * as CryptoJS from 'crypto-js';
 const CryptoJS = require('crypto-js');
-import NativeService from './native-service';
 
 export class FileService {
 
-  private static instance: FileService;
   private readSubscription: Subscription;
-  private nativeService: NativeService;
 
-  private constructor() {
-    this.nativeService = NativeService.getInstance();
-  }
-
-  static getInstance() {
-    if (!this.instance) {
-      this.instance = new FileService();
-    }
-    return this.instance;
-  }
+  constructor(private nativeService: INativeService) {}
 
   /* ====================================================
    * === Wrapper functions over the fs native library ===
@@ -120,7 +109,9 @@ export class FileService {
    * @returns - {string} - the path of the file to open
    */
   chooseFile(): string {
-    return this.nativeService.dialog.showOpenDialog({properties: ['openFile']});
+    // TODO: implement it!
+    //return this.nativeService.dialog.showOpenDialog({properties: ['openFile']});
+    return 'to be implemented';
   }
 
   /**

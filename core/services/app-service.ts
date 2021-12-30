@@ -1,8 +1,10 @@
-import NativeService from './native-service';
 import {constants} from '../models/constants';
 import {Session} from '../models/session';
+import {INativeService} from "../interfaces/i-native-service";
 
 export default class AppService {
+
+  constructor(private nativeService: INativeService) {}
 
   static stsEndpointsPerRegion: Map<string, string> = new Map([
     ['af-south-1', 'https://sts.af-south-1.amazonaws.com'],
@@ -32,24 +34,13 @@ export default class AppService {
     ['us-west-2', 'https://sts.us-west-2.amazonaws.com']
   ]);
 
-  private static instance: AppService;
-
-  private constructor() {}
-
-  static getInstance() {
-    if(!this.instance) {
-      AppService.instance = new AppService();
-    }
-    return this.instance;
-  }
-
   /**
    * Return the aws credential path so we have only one point in the application where we need to adjust it!
    *
    * @returns the credential path string
    */
   awsCredentialPath() {
-    return NativeService.getInstance().path.join(NativeService.getInstance().os.homedir(), '.aws', 'credentials');
+    return this.nativeService.path.join(this.nativeService.os.homedir(), '.aws', 'credentials');
   }
 
   // TODO: move environment in core

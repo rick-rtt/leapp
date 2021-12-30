@@ -5,14 +5,13 @@ import {ISessionNotifier} from '../../interfaces/i-session-notifier';
 
 export abstract class SessionService {
 
-  protected iSessionNotifier: ISessionNotifier;
-
-  protected constructor(iSessionNotifier: ISessionNotifier) {
-    this.iSessionNotifier = iSessionNotifier;
-  }
+  protected constructor(
+    protected iSessionNotifier: ISessionNotifier,
+    protected repository: Repository
+  ) {}
 
   protected sessionActivate(sessionId: string) {
-    const sessions = Repository.getInstance().getSessions();
+    const sessions = this.repository.getSessions();
     const index = sessions.findIndex(s => s.sessionId === sessionId);
 
     if (index > -1) {
@@ -22,7 +21,7 @@ export abstract class SessionService {
 
       sessions[index] = currentSession;
 
-      Repository.getInstance().updateSessions(sessions);
+      this.repository.updateSessions(sessions);
 
       if(this.iSessionNotifier) {
         this.iSessionNotifier.setSessions([...sessions]);
@@ -31,7 +30,7 @@ export abstract class SessionService {
   }
 
   protected sessionLoading(sessionId: string) {
-    const sessions = Repository.getInstance().getSessions();
+    const sessions = this.repository.getSessions();
     const index = sessions.findIndex(s => s.sessionId === sessionId);
 
     if (index > -1) {
@@ -40,7 +39,7 @@ export abstract class SessionService {
 
       sessions[index] = currentSession;
 
-      Repository.getInstance().updateSessions(sessions);
+      this.repository.updateSessions(sessions);
 
       if(this.iSessionNotifier) {
         this.iSessionNotifier.setSessions([...sessions]);
@@ -49,7 +48,7 @@ export abstract class SessionService {
   }
 
   protected sessionRotated(sessionId: string) {
-    const sessions = Repository.getInstance().getSessions();
+    const sessions = this.repository.getSessions();
     const index = sessions.findIndex(s => s.sessionId === sessionId);
 
     if (index > -1) {
@@ -59,7 +58,7 @@ export abstract class SessionService {
 
       sessions[index] = currentSession;
 
-      Repository.getInstance().updateSessions(sessions);
+      this.repository.updateSessions(sessions);
 
       if(this.iSessionNotifier) {
         this.iSessionNotifier.setSessions([...sessions]);
@@ -68,7 +67,7 @@ export abstract class SessionService {
   }
 
   protected sessionDeactivated(sessionId: string) {
-    const sessions = Repository.getInstance().getSessions();
+    const sessions = this.repository.getSessions();
     const index = sessions.findIndex(s => s.sessionId === sessionId);
 
     if (index > -1) {
@@ -78,7 +77,7 @@ export abstract class SessionService {
 
       sessions[index] = currentSession;
 
-      Repository.getInstance().updateSessions(sessions);
+      this.repository.updateSessions(sessions);
 
       if(this.iSessionNotifier) {
         this.iSessionNotifier.setSessions([...sessions]);

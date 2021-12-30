@@ -1,16 +1,10 @@
-import NativeService from './native-service';
+import {INativeService} from "../interfaces/i-native-service";
+
 
 export class KeychainService {
   private static instance: KeychainService;
 
-  private constructor() {}
-
-  static getInstance() {
-    if(!this.instance) {
-      this.instance = new KeychainService();
-    }
-    return this.instance;
-  }
+  constructor(private nativeService: INativeService) {}
 
   /**
    * Save your secret in the keychain
@@ -20,7 +14,7 @@ export class KeychainService {
    * @param password - secret
    */
   saveSecret(service: string, account: string, password: string) {
-    return NativeService.getInstance().keytar.setPassword(service, account, password);
+    return this.nativeService.keytar.setPassword(service, account, password);
   }
 
   /**
@@ -31,7 +25,7 @@ export class KeychainService {
    * @returns the secret
    */
   getSecret(service: string, account: string): any {
-    return NativeService.getInstance().keytar.getPassword(service, account);
+    return this.nativeService.keytar.getPassword(service, account);
   }
 
   /**
@@ -41,6 +35,6 @@ export class KeychainService {
    * @param account - unique identifier
    */
   deletePassword(service: string, account: string) {
-    return NativeService.getInstance().keytar.deletePassword(service, account);
+    return this.nativeService.keytar.deletePassword(service, account);
   }
 }

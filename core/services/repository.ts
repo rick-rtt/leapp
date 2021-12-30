@@ -2,12 +2,12 @@ import {Workspace} from '../models/workspace';
 import {Session} from '../models/session';
 import {deserialize, serialize} from 'class-transformer';
 import {FileService} from './file-service';
-import NativeService from './native-service';
 import {constants} from '../models/constants';
 import {SessionStatus} from '../models/session-status';
 import {SessionType} from '../models/session-type';
 import {AwsIamRoleChainedSession} from '../models/aws-iam-role-chained-session';
 import {LeappNotFoundError} from "../errors/leapp-not-found-error";
+import {INativeService} from "../interfaces/i-native-service";
 
 export default class Repository {
 
@@ -16,21 +16,12 @@ export default class Repository {
   // Private singleton workspace
   private _workspace: Workspace;
 
-  private fileService: FileService;
-  private nativeService: NativeService;
-
-  private constructor() {
-    this.fileService = FileService.getInstance();
-    this.nativeService = NativeService.getInstance();
+  constructor(
+    private nativeService: INativeService,
+    private fileService: FileService
+  ) {
     // TODO: check if it can be moved to a bootstrap phase
     this.createWorkspace();
-  }
-
-  static getInstance(): Repository {
-    if (!this.instance) {
-      this.instance = new Repository();
-    }
-    return this.instance;
   }
 
   // WORKSPACE
@@ -89,13 +80,13 @@ export default class Repository {
       session
     ];
 
-    Repository.getInstance().persistWorkspace(workspace);
+    this.persistWorkspace(workspace);
   }
 
   updateSessions(sessions: Session[]): void {
     const workspace = this.getWorkspace();
     workspace.sessions = sessions;
-    Repository.getInstance().persistWorkspace(workspace);
+    this.persistWorkspace(workspace);
   }
 
   deleteSession(sessionId: string) {
@@ -103,7 +94,7 @@ export default class Repository {
     const index = workspace.sessions.findIndex(sess => sess.sessionId === sessionId);
     if(index > -1) {
       workspace.sessions.splice(index, 1);
-      Repository.getInstance().persistWorkspace(workspace);
+      this.persistWorkspace(workspace);
     }
   }
 
