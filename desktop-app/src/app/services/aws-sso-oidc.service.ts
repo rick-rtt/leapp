@@ -1,8 +1,3 @@
-import {
-  GenerateSSOTokenResponse,
-  RegisterClientResponse,
-  StartDeviceAuthorizationResponse, VerificationResponse
-} from '../../../../core/services/session/aws/method/aws-sso-role-service';
 import SSOOIDC, {
   CreateTokenRequest,
   RegisterClientRequest,
@@ -11,10 +6,15 @@ import SSOOIDC, {
 import {Injectable} from '@angular/core';
 import {AppService} from './app.service';
 import {ElectronService} from './electron.service';
-import {LeappBaseError} from '../../../../core/errors/leapp-base-error';
-import {LoggerLevel} from '../../../../core/services/logging-service';
-import {constants} from '../../../../core/models/constants';
-import Repository from '../../../../core/services/repository';
+import {LeappBaseError} from '@noovolari/leapp-core/errors/leapp-base-error';
+import {LoggerLevel} from '@noovolari/leapp-core/services/logging-service';
+import {constants} from '@noovolari/leapp-core/models/constants';
+import Repository from '@noovolari/leapp-core/services/repository';
+import {
+  GenerateSSOTokenResponse,
+  RegisterClientResponse,
+  StartDeviceAuthorizationResponse, VerificationResponse
+} from "./session/aws/method/aws-sso-role-service";
 
 export interface BrowserWindowClosing {
   catchClosingBrowserWindow(): void;

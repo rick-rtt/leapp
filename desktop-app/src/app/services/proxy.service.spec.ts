@@ -4,11 +4,11 @@ import {ProxyService} from './proxy.service';
 import {mustInjected} from '../../base-injectables';
 import {WorkspaceService} from './workspace.service';
 import {serialize} from 'class-transformer';
-import {Workspace} from '../../../core/models/workspace';
+import {Workspace} from '@noovolari/leapp-core/models/workspace';
 import {AppService} from './app.service';
 
 import SpyObj = jasmine.SpyObj;
-import {FileService} from '../../../core/services/file-service';
+import {FileService} from '@noovolari/leapp-core/services/file-service';
 
 describe('ProxyService', () => {
   let service: ProxyService;

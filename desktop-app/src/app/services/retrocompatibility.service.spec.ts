@@ -3,12 +3,12 @@ import { TestBed } from '@angular/core/testing';
 import { RetrocompatibilityService } from './retrocompatibility.service';
 import {mustInjected} from '../../base-injectables';
 import {serialize} from 'class-transformer';
-import {Workspace} from '../../../core/models/workspace';
+import {Workspace} from '@noovolari/leapp-core/models/workspace';
 import {AppService} from './app.service';
 import SpyObj = jasmine.SpyObj;
-import {KeychainService} from '../../../core/services/keychain-service';
-import {FileService} from '../../../core/services/file-service';
-import Repository from '../../../core/services/repository';
+import {KeychainService} from '@noovolari/leapp-core/services/keychain-service';
+import {FileService} from '@noovolari/leapp-core/services/file-service';
+import Repository from '@noovolari/leapp-core/services/repository';
 
 describe('RetrocompatibilityService', () => {
   let service: RetrocompatibilityService;
@@ -221,7 +221,7 @@ describe('RetrocompatibilityService', () => {
       const workspace = new Workspace();
       workspace.profiles = workspaceService.getProfiles();
 
-      expect(JSON.stringify(workspace)).toEqual(JSON.stringify(workspaceService.get()));
+      expect(JSON.stringify(workspace)).toEqual(JSON.stringify(workspaceService.getWorkspace()));
     });
   });
 

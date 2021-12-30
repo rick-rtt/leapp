@@ -1,7 +1,7 @@
 import {ErrorHandler, Injectable, Injector} from '@angular/core';
 import {AppService} from '../app.service';
-import {LoggingService} from '../../../../../core/services/logging-service';
-import {LeappBaseError} from '../../../../../core/errors/leapp-base-error';
+import {LoggingService} from '@noovolari/leapp-core/services/logging-service';
+import {LeappBaseError} from '@noovolari/leapp-core/errors/leapp-base-error';
 
 @Injectable({
   providedIn: 'root'

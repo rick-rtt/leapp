@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import {AppService} from './app.service';
-import {IMfaCodePrompter} from '../../../../core/services/session/aws/method/aws-iam-user-service';
+import {IMfaCodePrompter} from '@noovolari/leapp-core/services/session/aws/method/aws-iam-user-service';
 
 @Injectable({
   providedIn: 'root'

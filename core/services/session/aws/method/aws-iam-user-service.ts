@@ -10,7 +10,7 @@ import {LeappParseError} from '../../../../errors/leapp-parse-error';
 import {LeappMissingMfaTokenError} from '../../../../errors/leapp-missing-mfa-token-error';
 import Repository from '../../../repository';
 import {FileService} from '../../../file-service';
-import AwsSessionService from '../aws-session-service';
+import {AwsSessionService} from '../aws-session-service';
 import {LeappBaseError} from '../../../../errors/leapp-base-error';
 import {LoggerLevel} from '../../../logging-service';
 import AppService from '../../../app-service';

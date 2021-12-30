@@ -3,16 +3,16 @@ import {WorkspaceService} from '../../../services/workspace.service';
 import {AppService} from '../../../services/app.service';
 import {environment} from '../../../../environments/environment';
 import {UpdaterService} from '../../../services/updater.service';
-import {SessionService} from '../../../../../../core/services/session/session.service';
+import {SessionService} from '@noovolari/leapp-core/services/session/session.service';
 import {SessionFactoryService} from '../../../services/session-factory.service';
-import {Session} from '../../../../../../core/models/session';
-import {SessionType} from '../../../../../../core/models/session-type';
-import {SessionStatus} from '../../../../../../core/models/session-status';
-import Repository from '../../../../../../core/services/repository';
-import {AwsIamRoleFederatedSession} from '../../../../../../core/models/aws-iam-role-federated-session';
-import {AwsIamRoleChainedSession} from '../../../../../../core/models/aws-iam-role-chained-session';
-import {constants} from '../../../../../../core/models/constants';
-import {LoggerLevel, LoggingService} from '../../../../../../core/services/logging-service';
+import {Session} from '@noovolari/leapp-core/models/session';
+import {SessionType} from '@noovolari/leapp-core/models/session-type';
+import {SessionStatus} from '@noovolari/leapp-core/models/session-status';
+import Repository from '@noovolari/leapp-core/services/repository';
+import {AwsIamRoleFederatedSession} from '@noovolari/leapp-core/models/aws-iam-role-federated-session';
+import {AwsIamRoleChainedSession} from '@noovolari/leapp-core/models/aws-iam-role-chained-session';
+import {constants} from '@noovolari/leapp-core/models/constants';
+import {LoggerLevel, LoggingService} from '@noovolari/leapp-core/services/logging-service';
 
 @Component({
   selector: 'app-tray-menu',

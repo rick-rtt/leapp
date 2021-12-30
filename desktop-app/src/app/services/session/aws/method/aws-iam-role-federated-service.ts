@@ -1,17 +1,17 @@
-import {AppService} from '../../../../../desktop-app/src/app/services/app.service';
-import {environment} from '../../../../../desktop-app/src/environments/environment';
-import * as AWS from 'aws-sdk';
-import {AwsIamRoleFederatedSession} from '../../../../models/aws-iam-role-federated-session';
-import {CredentialsInfo} from '../../../../models/credentials-info';
-import Repository from '../../../repository';
-import {FileService} from '../../../file-service';
-import {LeappSamlError} from '../../../../errors/leapp-saml-error';
-import {LeappParseError} from '../../../../errors/leapp-parse-error';
-import {LeappAwsStsError} from '../../../../errors/leapp-aws-sts-error';
-import AwsSessionService from '../aws-session-service';
-import {ISessionNotifier} from '../../../../interfaces/i-session-notifier';
-import {LeappBaseError} from '../../../../errors/leapp-base-error';
-import {LoggerLevel} from '../../../logging-service';
+import {AppService} from "../../../app.service";
+import {ISessionNotifier} from "@noovolari/leapp-core/interfaces/i-session-notifier";
+import {LeappBaseError} from "@noovolari/leapp-core/errors/leapp-base-error";
+import {LoggerLevel} from "@noovolari/leapp-core/services/logging-service";
+import {CredentialsInfo} from "@noovolari/leapp-core/models/credentials-info";
+import Repository from "@noovolari/leapp-core/services/repository";
+import {AwsIamRoleFederatedSession} from "@noovolari/leapp-core/models/aws-iam-role-federated-session";
+import {FileService} from "@noovolari/leapp-core/services/file-service";
+import {LeappSamlError} from "@noovolari/leapp-core/errors/leapp-saml-error";
+import {LeappParseError} from "@noovolari/leapp-core/errors/leapp-parse-error";
+import AWS from "aws-sdk";
+import {environment} from "../../../../../environments/environment";
+import {LeappAwsStsError} from "@noovolari/leapp-core/errors/leapp-aws-sts-error";
+import {AwsSessionService} from "@noovolari/leapp-core/services/session/aws/aws-session-service";
 
 export interface AwsIamRoleFederatedSessionRequest {
   accountName: string;

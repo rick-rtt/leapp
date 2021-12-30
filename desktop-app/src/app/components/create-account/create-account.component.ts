@@ -5,20 +5,20 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {WorkspaceService} from '../../services/workspace.service';
 import {environment} from '../../../environments/environment';
 import * as uuid from 'uuid';
-import {AzureService, AzureSessionRequest} from '../../../../../core/services/session/azure/azure.service';
-import {SessionType} from '../../../../../core/models/session-type';
+import {SessionType} from '@noovolari/leapp-core/models/session-type';
+import Repository from '@noovolari/leapp-core/services/repository';
+import {LoggerLevel, LoggingService} from '@noovolari/leapp-core/services/logging-service';
+import {AwsIamUserService, AwsIamUserSessionRequest} from '@noovolari/leapp-core/services/session/aws/method/aws-iam-user-service';
+import {LeappParseError} from '@noovolari/leapp-core/errors/leapp-parse-error';
 import {
   AwsIamRoleFederatedService,
   AwsIamRoleFederatedSessionRequest
-} from '../../../../../core/services/session/aws/method/aws-iam-role-federated-service';
+} from "../../services/session/aws/method/aws-iam-role-federated-service";
 import {
   AwsIamRoleChainedService,
   AwsIamRoleChainedSessionRequest
-} from '../../../../../core/services/session/aws/method/aws-iam-role-chained-service';
-import Repository from '../../../../../core/services/repository';
-import {LoggerLevel, LoggingService} from '../../../../../core/services/logging-service';
-import {AwsIamUserService, AwsIamUserSessionRequest} from '../../../../../core/services/session/aws/method/aws-iam-user-service';
-import {LeappParseError} from '../../../../../core/errors/leapp-parse-error';
+} from "../../services/session/aws/method/aws-iam-role-chained-service";
+import {AzureService, AzureSessionRequest} from "../../services/session/azure/azure.service";
 
 @Component({
   selector: 'app-create-account',

@@ -1,11 +1,11 @@
 import {Injectable} from '@angular/core';
 import {BehaviorSubject, Observable} from 'rxjs';
-import Repository from '../../../../core/services/repository';
-import {Session} from '../../../../core/models/session';
-import {SessionStatus} from '../../../../core/models/session-status';
-import {SessionType} from '../../../../core/models/session-type';
-import {AwsIamRoleChainedSession} from '../../../../core/models/aws-iam-role-chained-session';
-import {ISessionNotifier} from '../../../../core/interfaces/i-session-notifier';
+import Repository from '@noovolari/leapp-core/services/repository';
+import {Session} from '@noovolari/leapp-core/models/session';
+import {SessionStatus} from '@noovolari/leapp-core/models/session-status';
+import {SessionType} from '@noovolari/leapp-core/models/session-type';
+import {AwsIamRoleChainedSession} from '@noovolari/leapp-core/models/aws-iam-role-chained-session';
+import {ISessionNotifier} from '@noovolari/leapp-core/interfaces/i-session-notifier';
 
 @Injectable({
   providedIn: 'root'

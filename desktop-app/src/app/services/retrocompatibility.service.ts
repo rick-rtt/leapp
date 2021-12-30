@@ -3,15 +3,15 @@ import {AppService} from './app.service';
 import {environment} from '../../environments/environment';
 import {serialize} from 'class-transformer';
 import {WorkspaceService} from './workspace.service';
-import {Workspace} from "../../../../core/models/workspace";
-import {AwsIamRoleFederatedSession} from "../../../../core/models/aws-iam-role-federated-session";
-import {AwsIamRoleChainedSession} from "../../../../core/models/aws-iam-role-chained-session";
-import {AwsSsoRoleSession} from "../../../../core/models/aws-sso-role-session";
-import {AzureSession} from "../../../../core/models/azure-session";
-import {FileService} from "../../../../core/services/file-service";
-import {KeychainService} from "../../../../core/services/keychain-service";
-import {constants} from "../../../../core/models/constants";
-import {AwsIamUserSession} from "../../../../core/models/aws-iam-user-session";
+import {Workspace} from "@noovolari/leapp-core/models/workspace";
+import {AwsIamRoleFederatedSession} from "@noovolari/leapp-core/models/aws-iam-role-federated-session";
+import {AwsIamRoleChainedSession} from "@noovolari/leapp-core/models/aws-iam-role-chained-session";
+import {AwsSsoRoleSession} from "@noovolari/leapp-core/models/aws-sso-role-session";
+import {AzureSession} from "@noovolari/leapp-core/models/azure-session";
+import {FileService} from "@noovolari/leapp-core/services/file-service";
+import {KeychainService} from "@noovolari/leapp-core/services/keychain-service";
+import {constants} from "@noovolari/leapp-core/models/constants";
+import {AwsIamUserSession} from "@noovolari/leapp-core/models/aws-iam-user-session";
 
 @Injectable({
   providedIn: 'root'

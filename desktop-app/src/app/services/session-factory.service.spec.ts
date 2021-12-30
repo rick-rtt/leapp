@@ -2,14 +2,14 @@ import {TestBed} from '@angular/core/testing';
 
 import {SessionFactoryService} from './session-factory.service';
 import {mustInjected} from '../../base-injectables';
-import AwsSessionService from '../../../core/services/session/aws/aws-session-service';
-import {SessionType} from '../../../core/models/session-type';
-import {AwsIamUserService} from '../../../core/services/session/aws/method/aws-iam-user-service';
+import {AwsSessionService} from '@noovolari/leapp-core/services/session/aws/aws-session-service';
+import {SessionType} from '@noovolari/leapp-core/models/session-type';
+import {AwsIamUserService} from '@noovolari/leapp-core/services/session/aws/method/aws-iam-user-service';
 import {WorkspaceService} from './workspace.service';
-import {KeychainService} from '../../../core/services/keychain-service';
+import {KeychainService} from '@noovolari/leapp-core/services/keychain-service';
 import {AppService} from './app.service';
-import {Workspace} from '../../../core/models/workspace';
-import {FileService} from '../../../core/services/file-service';
+import {Workspace} from '@noovolari/leapp-core/models/workspace';
+import {FileService} from '@noovolari/leapp-core/services/file-service';
 
 describe('SessionProviderService', () => {
   let sessionFactoryService: SessionFactoryService;

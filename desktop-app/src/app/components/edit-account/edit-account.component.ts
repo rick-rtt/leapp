@@ -4,11 +4,11 @@ import {AppService, ToastLevel} from '../../services/app.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {WorkspaceService} from '../../services/workspace.service';
 import {environment} from '../../../environments/environment';
-import {SessionService} from '../../../../../core/services/session/session.service';
-import {SessionType} from '../../../../../core/models/session-type';
-import {AwsIamUserSession} from '../../../../../core/models/aws-iam-user-session';
-import {Workspace} from '../../../../../core/models/workspace';
-import {KeychainService} from '../../../../../core/services/keychain-service';
+import {SessionService} from '@noovolari/leapp-core/services/session/session.service';
+import {SessionType} from '@noovolari/leapp-core/models/session-type';
+import {AwsIamUserSession} from '@noovolari/leapp-core/models/aws-iam-user-session';
+import {Workspace} from '@noovolari/leapp-core/models/workspace';
+import {KeychainService} from '@noovolari/leapp-core/services/keychain-service';
 
 @Component({
   selector: 'app-edit-account',

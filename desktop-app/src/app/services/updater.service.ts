@@ -8,8 +8,8 @@ import {WorkspaceService} from './workspace.service';
 import {HttpClient} from '@angular/common/http';
 import md from 'markdown-it';
 import {ElectronService} from './electron.service';
-import {constants} from '../../../../core/models/constants';
-import Repository from '../../../../core/services/repository';
+import {constants} from '@noovolari/leapp-core/models/constants';
+import Repository from '@noovolari/leapp-core/services/repository';
 
 @Injectable({
   providedIn: 'root'

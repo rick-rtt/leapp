@@ -1,9 +1,8 @@
 import {Session} from './session';
 import * as uuid from 'uuid';
+import 'reflect-metadata';
 import {Type} from 'class-transformer';
 import {constants} from './constants';
-
-import 'reflect-metadata';
 
 //TODO: Check required and optional keys for every object
 

@@ -1,14 +1,14 @@
 import {WorkspaceService} from './workspace.service';
 import {TestBed} from '@angular/core/testing';
-import {Workspace} from '../../../core/models/workspace';
+import {Workspace} from '@noovolari/leapp-core/models/workspace';
 import {mustInjected} from '../../base-injectables';
-import {Session} from '../../../core/models/session';
-import {AwsIamUserSession} from '../../../core/models/aws-iam-user-session';
+import {Session} from '@noovolari/leapp-core/models/session';
+import {AwsIamUserSession} from '@noovolari/leapp-core/models/aws-iam-user-session';
 import {serialize} from 'class-transformer';
 import {AppService} from './app.service';
 import SpyObj = jasmine.SpyObj;
-import {FileService} from '../../../core/services/file-service';
-import Repository from '../../../core/services/repository';
+import {FileService} from '@noovolari/leapp-core/services/file-service';
+import Repository from '@noovolari/leapp-core/services/repository';
 
 describe('WorkspaceService', () => {
   let repository: Repository;

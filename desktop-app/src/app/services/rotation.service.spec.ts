@@ -2,9 +2,9 @@ import { TestBed } from '@angular/core/testing';
 
 import { RotationService } from './rotation.service';
 import {mustInjected} from '../../base-injectables';
-import AwsSessionService from '../../../core/services/session/aws/aws-session-service';
+import {AwsSessionService} from '@noovolari/leapp-core/services/session/aws/aws-session-service';
 import {SessionFactoryService} from './session-factory.service';
-import {Session} from '../../../core/models/session';
+import {Session} from '@noovolari/leapp-core/models/session';
 
 describe('RotationService', () => {
   let rotationService: RotationService;

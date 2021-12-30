@@ -126,7 +126,7 @@
     }
   },
   "dependencies": {
-    "@noovolari/leapp-core": "0.1.18",
+    "@noovolari/leapp-core": "0.1.25",
     "@angular/animations": "~12.2.7",
     "@angular/cdk": "^12.2.9",
     "@angular/common": "~12.2.7",
@@ -140,7 +140,7 @@
     "@commitlint/cli": "^12.1.4",
     "@commitlint/config-conventional": "^12.1.4",
     "@electron/remote": "^2.0.1",
-    "@ng-select/ng-select": "~6.1.0",
+    "@ng-select/ng-select": "~7.2.0",
     "@ngx-translate/core": "~13.0.0",
     "@ngx-translate/http-loader": "~6.0.0",
     "@sebgroup/magic-iframe": "1.1.2",
@@ -205,10 +205,10 @@
   "devDependencies": {
     "@angular-devkit/build-angular": "^12.2.7",
     "@angular-eslint/builder": "12.5.0",
-    "@angular-eslint/eslint-plugin": "4.2.0",
-    "@angular-eslint/eslint-plugin-template": "4.2.0",
+    "@angular-eslint/eslint-plugin": "12.5.0",
+    "@angular-eslint/eslint-plugin-template": "12.5.0",
     "@angular-eslint/schematics": "12.5.0",
-    "@angular-eslint/template-parser": "4.2.0",
+    "@angular-eslint/template-parser": "12.5.0",
     "@angular/cli": "^12.2.7",
     "@angular/compiler-cli": "^12.2.7",
     "@angular/language-service": "~12.2.7",

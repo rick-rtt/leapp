@@ -1,16 +1,16 @@
 import {Injectable} from '@angular/core';
 import {WorkspaceService} from './workspace.service';
 import {AppService} from './app.service';
-import {AwsIamRoleChainedService} from '../../../../core/services/session/aws/method/aws-iam-role-chained-service';
-import {AwsIamRoleFederatedService} from '../../../../core/services/session/aws/method/aws-iam-role-federated-service';
-import {AwsSsoRoleService} from '../../../../core/services/session/aws/method/aws-sso-role-service';
-import {AzureService} from '../../../../core/services/session/azure/azure.service';
 import {ExecuteService} from './execute.service';
-import {SessionService} from '../../../../core/services/session/session.service';
+import {SessionService} from '@noovolari/leapp-core/services/session/session.service';
 import {ElectronService} from './electron.service';
 import {AwsSsoOidcService} from './aws-sso-oidc.service';
-import {SessionType} from '../../../../core/models/session-type';
-import {AwsIamUserService} from '../../../../core/services/session/aws/method/aws-iam-user-service';
+import {SessionType} from '@noovolari/leapp-core/models/session-type';
+import {AwsIamUserService} from '@noovolari/leapp-core/services/session/aws/method/aws-iam-user-service';
+import {AwsIamRoleFederatedService} from "./session/aws/method/aws-iam-role-federated-service";
+import {AwsIamRoleChainedService} from "./session/aws/method/aws-iam-role-chained-service";
+import {AzureService} from "./session/azure/azure.service";
+import {AwsSsoRoleService} from "./session/aws/method/aws-sso-role-service";
 
 @Injectable({
   providedIn: 'root'

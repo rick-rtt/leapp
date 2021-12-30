@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {AppService} from '../../../services/app.service';
-import {LoggerLevel, LoggingService} from "../../../../../../core/services/logging-service";
+import {LoggerLevel, LoggingService} from "@noovolari/leapp-core/services/logging-service";
 
 @Component({
   selector: 'app-profile',

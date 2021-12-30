@@ -4,10 +4,10 @@ import { ErrorService } from './error.service';
 import {mustInjected} from '../../../base-injectables';
 import {AppService} from '../app.service';
 import {ToastrModule} from 'ngx-toastr';
-import {LeappBaseError} from '../../../../core/errors/leapp-base-error';
+import {LeappBaseError} from '@noovolari/leapp-core/errors/leapp-base-error';
 import {ErrorHandler} from '@angular/core';
 import {AppModule} from '../../app.module';
-import {LoggerLevel} from '../../../../core/services/logging-service';
+import {LoggerLevel} from '@noovolari/leapp-core/services/logging-service';
 
 describe('ErrorService', () => {
   let spyAppService;

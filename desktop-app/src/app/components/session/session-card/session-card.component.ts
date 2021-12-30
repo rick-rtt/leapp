@@ -7,16 +7,16 @@ import {environment} from '../../../../environments/environment';
 import * as uuid from 'uuid';
 import {BsModalRef, BsModalService} from 'ngx-bootstrap/modal';
 import {SessionFactoryService} from '../../../services/session-factory.service';
-import {SessionService} from '../../../../../../core/services/session/session.service';
-import {Session} from '../../../../../../core/models/session';
-import { SessionType } from '../../../../../../core/models/session-type';
-import {SessionStatus} from '../../../../../../core/models/session-status';
-import Repository from '../../../../../../core/services/repository';
-import {constants} from '../../../../../../core/models/constants';
-import {AwsIamRoleFederatedSession} from '../../../../../../core/models/aws-iam-role-federated-session';
-import {AwsIamUserService} from '../../../../../../core/services/session/aws/method/aws-iam-user-service';
-import {LoggerLevel, LoggingService} from '../../../../../../core/services/logging-service';
-import AwsSessionService from '../../../../../../core/services/session/aws/aws-session-service';
+import {SessionService} from '@noovolari/leapp-core/services/session/session.service';
+import {Session} from '@noovolari/leapp-core/models/session';
+import { SessionType } from '@noovolari/leapp-core/models/session-type';
+import {SessionStatus} from '@noovolari/leapp-core/models/session-status';
+import Repository from '@noovolari/leapp-core/services/repository';
+import {constants} from '@noovolari/leapp-core/models/constants';
+import {AwsIamRoleFederatedSession} from '@noovolari/leapp-core/models/aws-iam-role-federated-session';
+import {AwsIamUserService} from '@noovolari/leapp-core/services/session/aws/method/aws-iam-user-service';
+import {LoggerLevel, LoggingService} from '@noovolari/leapp-core/services/logging-service';
+import {AwsSessionService} from '@noovolari/leapp-core/services/session/aws/aws-session-service';
 
 @Component({
   selector: 'app-session-card',

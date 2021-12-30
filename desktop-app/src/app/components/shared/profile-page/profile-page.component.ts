@@ -6,12 +6,12 @@ import {environment} from '../../../../environments/environment';
 import * as uuid from 'uuid';
 import {WorkspaceService} from '../../../services/workspace.service';
 import {SessionFactoryService} from '../../../services/session-factory.service';
-import {constants} from '../../../../../../core/models/constants';
-import Repository from "../../../../../../core/services/repository";
-import {LoggerLevel, LoggingService} from "../../../../../../core/services/logging-service";
-import {SessionType} from "../../../../../../core/models/session-type";
-import {AwsIamRoleFederatedSession} from "../../../../../../core/models/aws-iam-role-federated-session";
-import {SessionStatus} from "../../../../../../core/models/session-status";
+import {constants} from '@noovolari/leapp-core/models/constants';
+import Repository from "@noovolari/leapp-core/services/repository";
+import {LoggerLevel, LoggingService} from "@noovolari/leapp-core/services/logging-service";
+import {SessionType} from "@noovolari/leapp-core/models/session-type";
+import {AwsIamRoleFederatedSession} from "@noovolari/leapp-core/models/aws-iam-role-federated-session";
+import {SessionStatus} from "@noovolari/leapp-core/models/session-status";
 
 @Component({
   selector: 'app-profile-page',

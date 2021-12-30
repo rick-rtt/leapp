@@ -1,4 +1,4 @@
-import {AppService} from '../../../../../desktop-app/src/app/services/app.service';
+import {AppService} from '../../../../services/app.service';
 
 import SSO, {
   AccountInfo,
@@ -10,18 +10,18 @@ import SSO, {
   RoleInfo
 } from 'aws-sdk/clients/sso';
 
-import {environment} from '../../../../../desktop-app/src/environments/environment';
-import {AwsSsoOidcService, BrowserWindowClosing} from '../../../../../desktop-app/src/app/services/aws-sso-oidc.service';
-import AwsSessionService from '../aws-session-service';
-import {AwsSsoRoleSession} from '../../../../models/aws-sso-role-session';
-import {CredentialsInfo} from '../../../../models/credentials-info';
-import Repository from '../../../repository';
-import {FileService} from '../../../file-service';
-import {KeychainService} from '../../../keychain-service';
-import {SessionType} from '../../../../models/session-type';
-import {ISessionNotifier} from '../../../../interfaces/i-session-notifier';
-import {LeappBaseError} from '../../../../errors/leapp-base-error';
-import {LoggerLevel} from '../../../logging-service';
+import {AwsSessionService} from '@noovolari/leapp-core/services/session/aws/aws-session-service';
+import {AwsSsoOidcService, BrowserWindowClosing} from "../../../aws-sso-oidc.service";
+import {ISessionNotifier} from "@noovolari/leapp-core/interfaces/i-session-notifier";
+import {LeappBaseError} from "@noovolari/leapp-core/errors/leapp-base-error";
+import {LoggerLevel} from "@noovolari/leapp-core/services/logging-service";
+import {AwsSsoRoleSession} from "@noovolari/leapp-core/models/aws-sso-role-session";
+import {CredentialsInfo} from "@noovolari/leapp-core/models/credentials-info";
+import Repository from "@noovolari/leapp-core/services/repository";
+import {FileService} from "@noovolari/leapp-core/services/file-service";
+import {environment} from "../../../../../environments/environment";
+import {KeychainService} from "@noovolari/leapp-core/services/keychain-service";
+import {SessionType} from "@noovolari/leapp-core/models/session-type";
 
 export interface AwsSsoRoleSessionRequest {
   sessionName: string;

@@ -5,7 +5,7 @@ import {HttpClient} from '@angular/common/http';
 import {ExecuteService} from '../../../services/execute.service';
 import {ProxyService} from '../../../services/proxy.service';
 import {WorkspaceService} from '../../../services/workspace.service';
-import {LoggerLevel, LoggingService} from '../../../../../../core/services/logging-service';
+import {LoggerLevel, LoggingService} from '@noovolari/leapp-core/services/logging-service';
 
 @Component({
   selector: 'app-profile-sidebar',

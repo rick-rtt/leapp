@@ -1,16 +1,15 @@
-import {environment} from '../../../../desktop-app/src/environments/environment';
-import {AppService} from '../../../../desktop-app/src/app/services/app.service';
-import {ExecuteService} from '../../../../desktop-app/src/app/services/execute.service';
-import {SessionService} from '../session.service';
-import {AzureSession} from '../../../models/azure-session';
-import {LeappExecuteError} from '../../../errors/leapp-execute-error';
-import {LeappParseError} from '../../../errors/leapp-parse-error';
-import {FileService} from '../../file-service';
-import {ISessionNotifier} from '../../../interfaces/i-session-notifier';
-import Repository from '../../repository';
-import {LeappBaseError} from "../../../errors/leapp-base-error";
-import {LoggerLevel} from "../../logging-service";
-import {AwsSsoOidcService} from "../../../../desktop-app/src/app/services/aws-sso-oidc.service";
+import { SessionService } from "@noovolari/leapp-core/services/session/session.service";
+import {AppService} from "../../app.service";
+import {ExecuteService} from "../../execute.service";
+import {ISessionNotifier} from "@noovolari/leapp-core/interfaces/i-session-notifier";
+import {LeappBaseError} from "@noovolari/leapp-core/errors/leapp-base-error";
+import {LoggerLevel} from "@noovolari/leapp-core/services/logging-service";
+import {AzureSession} from "@noovolari/leapp-core/models/azure-session";
+import Repository from "@noovolari/leapp-core/services/repository";
+import {LeappExecuteError} from "@noovolari/leapp-core/errors/leapp-execute-error";
+import {LeappParseError} from "@noovolari/leapp-core/errors/leapp-parse-error";
+import {FileService} from "@noovolari/leapp-core/services/file-service";
+import {environment} from "../../../../environments/environment";
 
 export interface AzureSessionRequest {
   sessionName: string;

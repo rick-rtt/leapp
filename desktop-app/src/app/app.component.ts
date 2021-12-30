@@ -10,19 +10,19 @@ import {UpdaterService} from './services/updater.service';
 import compareVersions from 'compare-versions';
 import {RetrocompatibilityService} from './services/retrocompatibility.service';
 import {MfaCodePromptService} from './services/mfa-code-prompt.service';
-import {AwsIamUserService} from '../../../core/services/session/aws/method/aws-iam-user-service';
-import {LoggerLevel, LoggingService} from '../../../core/services/logging-service';
-import Repository from '../../../core/services/repository';
-import {LeappParseError} from '../../../core/errors/leapp-parse-error';
-import {TimerService} from '../../../core/services/timer-service';
-import {constants} from '../../../core/models/constants';
-import {FileService} from '../../../core/services/file-service';
-import {AwsIamRoleChainedService} from '../../../core/services/session/aws/method/aws-iam-role-chained-service';
+import {AwsIamUserService} from '@noovolari/leapp-core/services/session/aws/method/aws-iam-user-service';
+import {LoggerLevel, LoggingService} from '@noovolari/leapp-core/services/logging-service';
+import Repository from '@noovolari/leapp-core/services/repository';
+import {LeappParseError} from '@noovolari/leapp-core/errors/leapp-parse-error';
+import {TimerService} from '@noovolari/leapp-core/services/timer-service';
+import {constants} from '@noovolari/leapp-core/models/constants';
+import {FileService} from '@noovolari/leapp-core/services/file-service';
 import {AwsSsoOidcService} from './services/aws-sso-oidc.service';
-import {AwsIamRoleFederatedService} from '../../../core/services/session/aws/method/aws-iam-role-federated-service';
-import {AwsSsoRoleService} from '../../../core/services/session/aws/method/aws-sso-role-service';
-import {AzureService} from '../../../core/services/session/azure/azure.service';
 import {ExecuteService} from './services/execute.service';
+import {AwsIamRoleChainedService} from "./services/session/aws/method/aws-iam-role-chained-service";
+import {AwsIamRoleFederatedService} from "./services/session/aws/method/aws-iam-role-federated-service";
+import {AwsSsoRoleService} from "./services/session/aws/method/aws-sso-role-service";
+import {AzureService} from "./services/session/azure/azure.service";
 
 @Component({
   selector: 'app-root',

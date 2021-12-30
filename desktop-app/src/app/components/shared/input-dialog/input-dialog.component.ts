@@ -1,7 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {BsModalRef} from 'ngx-bootstrap/modal';
-import {constants} from "../../../../../../core/models/constants";
+import {constants} from "@noovolari/leapp-core/models/constants";
 
 @Component({
   selector: 'app-input-dialog',
