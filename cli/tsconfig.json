@@ -2,7 +2,7 @@
   "compilerOptions": {
     "rootDir": "src",
     "downlevelIteration": true,
-    "module": "CommonJS",
+    "module": "ES2020",
     "moduleResolution": "Node",
     "importHelpers": true,
     "declaration": true,
@@ -22,15 +22,9 @@
     "emitDecoratorMetadata": true,
     "resolveJsonModule": true,
     "esModuleInterop": true,
-    "target": "ES2021",
-    "types": [
-      "node",
-      "jest"
-    ],
-    "lib": [
-      "ES2021",
-      "DOM"
-    ],
+    "target": "ES2017",
+    "types": ["node", "jest"],
+    "lib": ["ES2017", "DOM"],
     "outDir": "dist",
     "baseUrl": ".",
     "skipLibCheck": true,

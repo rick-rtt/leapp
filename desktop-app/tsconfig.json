@@ -10,10 +10,10 @@
     "declaration": false,
     "experimentalDecorators": true,
     "lib": ["ES2019", "DOM"],
-    "module": "esnext",
+    "module": "ES2020",
     "moduleResolution": "node",
     "sourceMap": true,
-    "target": "ES6",
+    "target": "ES2019",
     "typeRoots": ["../node_modules/@types"],
     "paths": {
       "stream": ["../node_modules/stream-browserify"],

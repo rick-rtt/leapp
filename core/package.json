@@ -1,6 +1,6 @@
 {
   "name": "@noovolari/leapp-core",
-  "version": "0.1.32",
+  "version": "0.1.35",
   "author": "besharp <info@besharp.it>",
   "description": "Leapp's core module",
   "dependencies": {
@@ -56,8 +56,6 @@
   "main": "index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "rm -rf dist && npx tsc",
-    "publish": "cp package.json dist && cd dist && npm publish --access public",
     "test": "jest"
   },
   "repository": {
