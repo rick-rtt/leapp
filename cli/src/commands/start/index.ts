@@ -1,5 +1,5 @@
 import {Command, Flags} from '@oclif/core';
-import {AwsIamUserService, IMfaCodePrompter, ISessionNotifier, Session} from '@noovolari/leapp-core';
+import {AwsIamUserService, IMfaCodePrompter, ISessionNotifier, Session} from "@noovolari/leapp-core";
 
 export default class Start extends Command {
   static description = 'Start Session'

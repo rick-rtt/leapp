@@ -8,9 +8,10 @@
   },
   "bugs": "https://github.com/Noovolari/leapp/issues",
   "dependencies": {
-    "@noovolari/leapp-core": "0.1.17",
+    "@noovolari/leapp-core": "0.1.40",
     "@oclif/core": "^1",
     "@oclif/plugin-help": "^5",
+    "@oclif/plugin-legacy": "^1.2.7",
     "@oclif/plugin-plugins": "^2.0.1"
   },
   "devDependencies": {
@@ -41,7 +42,7 @@
     "/npm-shrinkwrap.json",
     "/oclif.manifest.json"
   ],
-  "homepage": "https://github.com/ericvilla/hello-world",
+  "homepage": "https://github.com/noovolari/leapp",
   "keywords": [
     "oclif"
   ],
