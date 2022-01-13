@@ -1,9 +1,9 @@
 {
   "name": "@noovolari/leapp-core",
-  "version": "0.1.44",
+  "version": "0.1.47",
   "author": "besharp <info@besharp.it>",
   "description": "Leapp's core module",
-  "dependencies": {
+  "peerDependencies": {
     "@babel/plugin-proposal-decorators": "^7.16.5",
     "@commitlint/cli": "^12.1.4",
     "@commitlint/config-conventional": "^12.1.4",
@@ -56,6 +56,10 @@
   "main": "index.js",
   "types": "dist/index.d.ts",
   "scripts": {
+    "win-bash-enable": "npm config set script-shell \"C:\\Users\\nukka\\AppData\\Local\\Atlassian\\SourceTree\\git_local\\bin\\bash.exe\"",
+    "win-bash-disable": "npm config delete script-shell",
+    "build": "rm -rf dist && npx tsc",
+    "publish": "cp package.json dist && cd dist && npm publish --access public",
     "test": "jest"
   },
   "repository": {

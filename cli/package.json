@@ -8,7 +8,7 @@
   },
   "bugs": "https://github.com/Noovolari/leapp/issues",
   "dependencies": {
-    "@noovolari/leapp-core": "0.1.43",
+    "@noovolari/leapp-core": "file:../core/dist",
     "@oclif/core": "^1",
     "@oclif/plugin-help": "^5",
     "@oclif/plugin-legacy": "^1.2.7",
