@@ -11,21 +11,17 @@ import {AwsIamRoleFederatedService} from "./session/aws/method/aws-iam-role-fede
 import {AwsIamRoleChainedService} from "./session/aws/method/aws-iam-role-chained-service";
 import {AzureService} from "./session/azure/azure.service";
 import {AwsSsoRoleService} from "./session/aws/method/aws-sso-role-service";
+import { LeappCoreService } from './leapp-core.service'
 
 @Injectable({
   providedIn: 'root'
 })
 export class SessionFactoryService {
 
+  //TODO remove this unuseful cache, singleton are already lazy-initialized (see AwsIamUserService)
   private sessionServiceCache: SessionService[];
 
-  constructor(
-    private workspaceService: WorkspaceService,
-    private appService: AppService,
-    private executeService: ExecuteService,
-    private electronService: ElectronService,
-    private awsSsoOidcService: AwsSsoOidcService
-  ) {
+  constructor(private readonly leappCoreService: LeappCoreService) {
     this.sessionServiceCache = [];
   }
 
@@ -40,7 +36,7 @@ export class SessionFactoryService {
     // Creater and save the SessionService needed; return it to the requester
     switch (accountType) {
       case SessionType.awsIamRoleFederated: return this.getAwsIamRoleFederatedSessionService(accountType);
-      case SessionType.awsIamUser: return this.getAwsIamUserSessionService(accountType);
+      case SessionType.awsIamUser: return this.leappCoreService.awsIamUserService;
       case SessionType.awsIamRoleChained: return this.getAwsIamRoleChainedSessionService(accountType);
       case SessionType.awsSsoRole: return this.getAwsSsoRoleSessionService(accountType);
       case SessionType.azure: return this.getAzureSessionService(accountType);
@@ -49,12 +45,6 @@ export class SessionFactoryService {
 
   private getAwsIamRoleFederatedSessionService(accountType: SessionType) {
     const service = AwsIamRoleFederatedService.getInstance();
-    this.sessionServiceCache[accountType.toString()] = service;
-    return service;
-  }
-
-  private getAwsIamUserSessionService(accountType: SessionType): AwsIamUserService {
-    const service = AwsIamUserService.getInstance();
     this.sessionServiceCache[accountType.toString()] = service;
     return service;
   }

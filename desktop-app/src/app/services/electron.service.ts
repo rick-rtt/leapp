@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import * as Keytar from 'keytar';
-import NativeService from '@noovolari/leapp-core/services/native-service';
 
 @Injectable({
   providedIn: 'root'

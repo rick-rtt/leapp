@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {BehaviorSubject, Observable} from 'rxjs';
-import Repository from '@noovolari/leapp-core/services/repository';
+import { Repository } from '@noovolari/leapp-core/services/repository';
 import {Session} from '@noovolari/leapp-core/models/session';
 import {SessionStatus} from '@noovolari/leapp-core/models/session-status';
 import {SessionType} from '@noovolari/leapp-core/models/session-type';

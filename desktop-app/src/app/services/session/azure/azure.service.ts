@@ -5,7 +5,7 @@ import {ISessionNotifier} from "@noovolari/leapp-core/interfaces/i-session-notif
 import {LeappBaseError} from "@noovolari/leapp-core/errors/leapp-base-error";
 import {LoggerLevel} from "@noovolari/leapp-core/services/logging-service";
 import {AzureSession} from "@noovolari/leapp-core/models/azure-session";
-import Repository from "@noovolari/leapp-core/services/repository";
+import { Repository } from "@noovolari/leapp-core/services/repository";
 import {LeappExecuteError} from "@noovolari/leapp-core/errors/leapp-execute-error";
 import {LeappParseError} from "@noovolari/leapp-core/errors/leapp-parse-error";
 import {FileService} from "@noovolari/leapp-core/services/file-service";

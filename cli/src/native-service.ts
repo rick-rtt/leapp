@@ -1,4 +1,4 @@
-import {INativeService} from "@noovolari/leapp-core";
+import {INativeService} from "@noovolari/leapp-core/interfaces/i-native-service";
 
 export default class NativeService implements INativeService {
 

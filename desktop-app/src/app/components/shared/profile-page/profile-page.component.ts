@@ -7,7 +7,7 @@ import * as uuid from 'uuid';
 import {WorkspaceService} from '../../../services/workspace.service';
 import {SessionFactoryService} from '../../../services/session-factory.service';
 import {constants} from '@noovolari/leapp-core/models/constants';
-import Repository from "@noovolari/leapp-core/services/repository";
+import { Repository } from "@noovolari/leapp-core/services/repository";
 import {LoggerLevel, LoggingService} from "@noovolari/leapp-core/services/logging-service";
 import {SessionType} from "@noovolari/leapp-core/models/session-type";
 import {AwsIamRoleFederatedSession} from "@noovolari/leapp-core/models/aws-iam-role-federated-session";

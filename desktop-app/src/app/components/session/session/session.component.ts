@@ -4,7 +4,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {AppService} from '../../../services/app.service';
 import {HttpClient} from '@angular/common/http';
 import {BsModalService} from 'ngx-bootstrap/modal';
-import Repository from "@noovolari/leapp-core/services/repository";
+import { Repository } from "@noovolari/leapp-core/services/repository";
 
 @Component({
   selector: 'app-session',

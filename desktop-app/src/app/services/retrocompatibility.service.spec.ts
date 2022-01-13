@@ -8,7 +8,7 @@ import {AppService} from './app.service';
 import SpyObj = jasmine.SpyObj;
 import {KeychainService} from '@noovolari/leapp-core/services/keychain-service';
 import {FileService} from '@noovolari/leapp-core/services/file-service';
-import Repository from '@noovolari/leapp-core/services/repository';
+import { Repository } from '@noovolari/leapp-core/services/repository';
 
 describe('RetrocompatibilityService', () => {
   let service: RetrocompatibilityService;

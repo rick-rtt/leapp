@@ -4,7 +4,7 @@ import {LeappBaseError} from '../../../errors/leapp-base-error';
 import {LoggerLevel} from '../../logging-service';
 import {SessionService} from '../session.service';
 import {ISessionNotifier} from '../../../interfaces/i-session-notifier';
-import Repository from '../../repository';
+import { Repository } from '../../repository';
 
 export abstract class AwsSessionService extends SessionService {
 

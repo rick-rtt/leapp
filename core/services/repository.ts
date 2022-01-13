@@ -9,7 +9,7 @@ import {AwsIamRoleChainedSession} from '../models/aws-iam-role-chained-session';
 import {LeappNotFoundError} from "../errors/leapp-not-found-error";
 import {INativeService} from "../interfaces/i-native-service";
 
-export default class Repository {
+export class Repository {
 
   private static instance: Repository;
 

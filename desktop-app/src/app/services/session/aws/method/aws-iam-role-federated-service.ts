@@ -3,7 +3,7 @@ import {ISessionNotifier} from "@noovolari/leapp-core/interfaces/i-session-notif
 import {LeappBaseError} from "@noovolari/leapp-core/errors/leapp-base-error";
 import {LoggerLevel} from "@noovolari/leapp-core/services/logging-service";
 import {CredentialsInfo} from "@noovolari/leapp-core/models/credentials-info";
-import Repository from "@noovolari/leapp-core/services/repository";
+import { Repository } from "@noovolari/leapp-core/services/repository";
 import {AwsIamRoleFederatedSession} from "@noovolari/leapp-core/models/aws-iam-role-federated-session";
 import {FileService} from "@noovolari/leapp-core/services/file-service";
 import {LeappSamlError} from "@noovolari/leapp-core/errors/leapp-saml-error";

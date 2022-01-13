@@ -17,7 +17,7 @@ import {LeappBaseError} from "@noovolari/leapp-core/errors/leapp-base-error";
 import {LoggerLevel} from "@noovolari/leapp-core/services/logging-service";
 import {AwsSsoRoleSession} from "@noovolari/leapp-core/models/aws-sso-role-session";
 import {CredentialsInfo} from "@noovolari/leapp-core/models/credentials-info";
-import Repository from "@noovolari/leapp-core/services/repository";
+import { Repository } from "@noovolari/leapp-core/services/repository";
 import {FileService} from "@noovolari/leapp-core/services/file-service";
 import {environment} from "../../../../../environments/environment";
 import {KeychainService} from "@noovolari/leapp-core/services/keychain-service";

@@ -4,7 +4,7 @@ import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {AppService} from '../../services/app.service';
 import {WorkspaceService} from '../../services/workspace.service';
 import {AwsSsoOidcService, BrowserWindowClosing} from '../../services/aws-sso-oidc.service';
-import Repository from '@noovolari/leapp-core/services/repository';
+import { Repository } from '@noovolari/leapp-core/services/repository';
 import {constants} from '@noovolari/leapp-core/models/constants';
 import {AwsSsoRoleService, SsoRoleSession} from "../../services/session/aws/method/aws-sso-role-service";
 

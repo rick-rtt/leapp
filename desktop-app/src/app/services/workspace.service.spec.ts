@@ -8,7 +8,7 @@ import {serialize} from 'class-transformer';
 import {AppService} from './app.service';
 import SpyObj = jasmine.SpyObj;
 import {FileService} from '@noovolari/leapp-core/services/file-service';
-import Repository from '@noovolari/leapp-core/services/repository';
+import { Repository } from '@noovolari/leapp-core/services/repository';
 
 describe('WorkspaceService', () => {
   let repository: Repository;

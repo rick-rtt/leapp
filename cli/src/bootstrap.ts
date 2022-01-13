@@ -1,65 +1,69 @@
-import {AwsIamUserService, IMfaCodePrompter, ISessionNotifier, Session} from "@noovolari/leapp-core";
-import Repository from "@noovolari/leapp-core/services/repository";
-import NativeService from "./native-service";
-import {FileService} from "@noovolari/leapp-core/services/file-service";
-import {KeychainService} from "@noovolari/leapp-core/services/keychain-service";
-import AppService from "@noovolari/leapp-core/services/app-service";
+import { Repository } from '@noovolari/leapp-core/services/repository'
+import { ISessionNotifier } from '@noovolari/leapp-core/interfaces/i-session-notifier'
+import { Session } from '@noovolari/leapp-core/models/session'
+import NativeService from './native-service'
+import { FileService } from '@noovolari/leapp-core/services/file-service'
+import { AwsIamUserService, IMfaCodePrompter }
+  from '@noovolari/leapp-core/services/session/aws/method/aws-iam-user-service'
+import { KeychainService } from '@noovolari/leapp-core/services/keychain-service'
+import AppService from '@noovolari/leapp-core/services/app-service'
+
 
 class SessionNotifier implements ISessionNotifier {
 
   addSession(session: Session): void {
-    console.log(session);
+    console.log(session)
   }
 
   deleteSession(sessionId: string): void {
-    console.log(sessionId);
+    console.log(sessionId)
   }
 
   getSessionById(sessionId: string): Session {
-    console.log(sessionId);
-    return new Session('fake-session-name', 'fake-region');
+    console.log(sessionId)
+    return new Session('fake-session-name', 'fake-region')
   }
 
   getSessions(): Session[] {
-    return [];
+    return []
   }
 
   listActive(): Session[] {
-    return [];
+    return []
   }
 
   listAwsSsoRoles(): Session[] {
-    return [];
+    return []
   }
 
   listIamRoleChained(session: Session): Session[] {
-    return [session];
+    return [session]
   }
 
   listPending(): Session[] {
-    return [];
+    return []
   }
 
   setSessions(sessions: Session[]): void {
-    console.log(sessions);
+    console.log(sessions)
   }
 }
 
-const nativeService: NativeService = new NativeService();
-const fileService: FileService = new FileService(nativeService);
-const repository: Repository = new Repository(nativeService, fileService);
+const nativeService: NativeService = new NativeService()
+const fileService: FileService = new FileService(nativeService)
+const repository: Repository = new Repository(nativeService, fileService)
 
 class MfaCodePrompter implements IMfaCodePrompter {
   promptForMFACode(sessionName: string, callback: any): void {
-    console.log(`prompting mfa for session ${sessionName}`);
-    if(callback !== undefined) {
-      callback();
+    console.log(`prompting mfa for session ${sessionName}`)
+    if (callback !== undefined) {
+      callback()
     }
   }
 }
 
-const keychainService: KeychainService = new KeychainService(nativeService);
-const appService: AppService = new AppService(nativeService);
+const keychainService: KeychainService = new KeychainService(nativeService)
+const appService: AppService = new AppService(nativeService)
 
 export const awsIamUserService = new AwsIamUserService(new SessionNotifier(), repository, new MfaCodePrompter(),
-  keychainService, fileService, appService);
+  keychainService, fileService, appService)

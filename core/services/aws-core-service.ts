@@ -2,7 +2,7 @@ import {constants} from '../models/constants';
 import {Session} from '../models/session';
 import {INativeService} from "../interfaces/i-native-service";
 
-export default class AppService {
+export class AwsCoreService {
 
   constructor(private nativeService: INativeService) {}
 
@@ -53,7 +53,7 @@ export default class AppService {
     if (session.region) {
       options = {
         ...options,
-        endpoint: AppService.stsEndpointsPerRegion.get(session.region),
+        endpoint: AwsCoreService.stsEndpointsPerRegion.get(session.region),
         region: session.region
       };
     }

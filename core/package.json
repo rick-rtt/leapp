@@ -53,8 +53,6 @@
     "jest": "^27.4.5",
     "typescript": "4.3.5"
   },
-  "main": "index.js",
-  "types": "dist/index.d.ts",
   "scripts": {
     "win-bash-enable": "npm config set script-shell \"C:\\Users\\nukka\\AppData\\Local\\Atlassian\\SourceTree\\git_local\\bin\\bash.exe\"",
     "win-bash-disable": "npm config delete script-shell",

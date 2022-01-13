@@ -1,6 +1,6 @@
 import {Session} from '../../models/session';
 import {SessionStatus} from '../../models/session-status';
-import Repository from '../repository';
+import { Repository } from '../repository';
 import {ISessionNotifier} from '../../interfaces/i-session-notifier';
 
 export abstract class SessionService {

@@ -8,7 +8,7 @@ import {SessionFactoryService} from '../../../services/session-factory.service';
 import {Session} from '@noovolari/leapp-core/models/session';
 import {SessionType} from '@noovolari/leapp-core/models/session-type';
 import {SessionStatus} from '@noovolari/leapp-core/models/session-status';
-import Repository from '@noovolari/leapp-core/services/repository';
+import { Repository } from '@noovolari/leapp-core/services/repository';
 import {AwsIamRoleFederatedSession} from '@noovolari/leapp-core/models/aws-iam-role-federated-session';
 import {AwsIamRoleChainedSession} from '@noovolari/leapp-core/models/aws-iam-role-chained-session';
 import {constants} from '@noovolari/leapp-core/models/constants';

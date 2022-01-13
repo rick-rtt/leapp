@@ -6,7 +6,7 @@ import {WorkspaceService} from '../../services/workspace.service';
 import {environment} from '../../../environments/environment';
 import * as uuid from 'uuid';
 import {SessionType} from '@noovolari/leapp-core/models/session-type';
-import Repository from '@noovolari/leapp-core/services/repository';
+import { Repository } from '@noovolari/leapp-core/services/repository';
 import {LoggerLevel, LoggingService} from '@noovolari/leapp-core/services/logging-service';
 import {AwsIamUserService, AwsIamUserSessionRequest} from '@noovolari/leapp-core/services/session/aws/method/aws-iam-user-service';
 import {LeappParseError} from '@noovolari/leapp-core/errors/leapp-parse-error';
