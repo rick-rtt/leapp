@@ -2,8 +2,6 @@ import {INativeService} from "@noovolari/leapp-core";
 
 export default class NativeService implements INativeService {
 
-  private static instance: NativeService;
-
   log: any;
   url: any;
   fs: any;
@@ -46,12 +44,5 @@ export default class NativeService implements INativeService {
       warn: (msg: string) => { console.warn(msg); },
       error: (msg: string) => { console.error(msg); }
     }
-  }
-
-  static getInstance() {
-    if (!this.instance) {
-      this.instance = new NativeService();
-    }
-    return this.instance;
   }
 }
