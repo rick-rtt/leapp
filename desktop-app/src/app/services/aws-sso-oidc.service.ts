@@ -158,7 +158,8 @@ export class AwsSsoOidcService {
       const pos = this.electronService.currentWindow.getPosition();
 
       this.ssoWindow = null;
-      this.ssoWindow = this.appService.newWindow(startDeviceAuthorizationResponse.verificationUriComplete, true, 'Portal url - Client verification', pos[0] + 200, pos[1] + 50);
+      this.ssoWindow = this.appService.newWindow(startDeviceAuthorizationResponse.verificationUriComplete,
+        true, 'Portal url - Client verification', pos[0] + 200, pos[1] + 50);
       this.ssoWindow.loadURL(startDeviceAuthorizationResponse.verificationUriComplete);
 
       this.ssoWindow.on('close', (e) => {
