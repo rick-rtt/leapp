@@ -1,3 +1,5 @@
+import {INativeService} from "@noovolari/leapp-core";
+
 export default class NativeService implements INativeService {
 
   private static instance: NativeService;
