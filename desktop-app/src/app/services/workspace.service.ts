@@ -6,6 +6,7 @@ import {SessionStatus} from '@noovolari/leapp-core/models/session-status';
 import {SessionType} from '@noovolari/leapp-core/models/session-type';
 import {AwsIamRoleChainedSession} from '@noovolari/leapp-core/models/aws-iam-role-chained-session';
 import {ISessionNotifier} from '@noovolari/leapp-core/interfaces/i-session-notifier';
+import { LeappCoreService } from './leapp-core.service'
 
 @Injectable({
   providedIn: 'root'
@@ -25,10 +26,10 @@ export class WorkspaceService implements ISessionNotifier {
 
   private repository: Repository;
 
-  constructor() {
+  constructor(leappCoreService: LeappCoreService) {
     this._sessions = new BehaviorSubject<Session[]>([]);
     this.sessions$ = this._sessions.asObservable();
-    this.repository = Repository.getInstance();
+    this.repository = leappCoreService.repository;
     this.sessions = this.repository.getSessions();
   }
 

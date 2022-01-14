@@ -5,10 +5,7 @@ import {ISessionNotifier} from '../../interfaces/i-session-notifier';
 
 export abstract class SessionService {
 
-  protected constructor(
-    protected iSessionNotifier: ISessionNotifier,
-    protected repository: Repository
-  ) {}
+  protected constructor(protected iSessionNotifier: ISessionNotifier, protected repository: Repository) {}
 
   protected sessionActivate(sessionId: string) {
     const sessions = this.repository.getSessions();

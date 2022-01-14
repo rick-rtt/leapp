@@ -2,13 +2,10 @@ import { AwsSessionService } from '@noovolari/leapp-core/services/session/aws/aw
 import * as AWS from 'aws-sdk'
 import { AwsIamRoleFederatedService } from './aws-iam-role-federated-service'
 import { AwsSsoRoleService } from './aws-sso-role-service'
-import { AppService } from '../../../app.service'
 import { AwsSsoOidcService } from '../../../aws-sso-oidc.service'
 import { ISessionNotifier } from '@noovolari/leapp-core/interfaces/i-session-notifier'
-import { LeappBaseError } from '@noovolari/leapp-core/errors/leapp-base-error'
 import { LeappAwsStsError } from '@noovolari/leapp-core/errors/leapp-aws-sts-error'
 import { LeappNotFoundError } from '@noovolari/leapp-core/errors/leapp-not-found-error'
-import { LoggerLevel } from '@noovolari/leapp-core/services/logging-service'
 import { AssumeRoleResponse } from 'aws-sdk/clients/sts'
 import { AwsIamRoleChainedSession } from '@noovolari/leapp-core/models/aws-iam-role-chained-session'
 import { CredentialsInfo } from '@noovolari/leapp-core/models/credentials-info'
@@ -17,7 +14,7 @@ import { FileService } from '@noovolari/leapp-core/services/file-service'
 import { Session } from '@noovolari/leapp-core/models/session'
 import { SessionType } from '@noovolari/leapp-core/models/session-type'
 import { AwsIamUserService } from '@noovolari/leapp-core/services/session/aws/method/aws-iam-user-service'
-import { LeappCoreService } from '../../../leapp-core.service'
+import { AwsCoreService } from '@noovolari/leapp-core/services/aws-core-service'
 
 export interface AwsIamRoleChainedSessionRequest {
   accountName: string;
@@ -28,35 +25,10 @@ export interface AwsIamRoleChainedSessionRequest {
 }
 
 export class AwsIamRoleChainedService extends AwsSessionService {
-
-  private static instance: AwsSessionService
-
-  private constructor(
-    iSessionNotifier: ISessionNotifier,
-    private appService: AppService,
-    private awsSsoOidcService: AwsSsoOidcService,
-    private leappCoreService: LeappCoreService,
-    private fileService: FileService
-  ) {
-    super(iSessionNotifier, leappCoreService.repository)
-  }
-
-  static getInstance() {
-    if (!this.instance) {
-      // TODO: understand if we need to move Leapp Errors in a core folder
-      throw new LeappBaseError('Not initialized service error', this, LoggerLevel.error,
-        'Service needs to be initialized')
-    }
-    return this.instance
-  }
-
-  static init(iSessionNotifier: ISessionNotifier, appService: AppService, awsSsoOidcService: AwsSsoOidcService) {
-    if (this.instance) {
-      // TODO: understand if we need to move Leapp Errors in a core folder
-      throw new LeappBaseError('Already initialized service error', this, LoggerLevel.error,
-        'Service already initialized')
-    }
-    this.instance = new AwsIamRoleChainedService(iSessionNotifier, appService, awsSsoOidcService)
+  private constructor(iSessionNotifier: ISessionNotifier, repository: Repository, private awsCoreService: AwsCoreService,
+                      private awsSsoOidcService: AwsSsoOidcService, private fileService: FileService,
+                      private awsIamUserService: AwsIamUserService) {
+    super(iSessionNotifier, repository)
   }
 
   static sessionTokenFromAssumeRoleResponse(assumeRoleResponse: AssumeRoleResponse): { sessionToken: any } {
@@ -73,7 +45,8 @@ export class AwsIamRoleChainedService extends AwsSessionService {
   }
 
   create(sessionRequest: AwsIamRoleChainedSessionRequest, profileId: string): void {
-    const session = new AwsIamRoleChainedSession(sessionRequest.accountName, sessionRequest.region, sessionRequest.roleArn, profileId, sessionRequest.parentSessionId, sessionRequest.roleSessionName)
+    const session = new AwsIamRoleChainedSession(sessionRequest.accountName, sessionRequest.region,
+      sessionRequest.roleArn, profileId, sessionRequest.parentSessionId, sessionRequest.roleSessionName)
 
     this.iSessionNotifier.addSession(session)
   }
@@ -91,15 +64,15 @@ export class AwsIamRoleChainedService extends AwsSessionService {
       aws_session_token: credentialsInfo.sessionToken.aws_session_token,
       region: session.region
     }
-    return await this.fileService.iniWriteSync(this.appService.awsCredentialPath(), credentialObject)
+    return await this.fileService.iniWriteSync(this.awsCoreService.awsCredentialPath(), credentialObject)
   }
 
   async deApplyCredentials(sessionId: string): Promise<void> {
     const session = this.iSessionNotifier.getSessionById(sessionId)
-    const profileName = Repository.getInstance().getProfileName((session as AwsIamRoleChainedSession).profileId)
-    const credentialsFile = await this.fileService.iniParseSync(this.appService.awsCredentialPath())
+    const profileName = this.repository.getProfileName((session as AwsIamRoleChainedSession).profileId)
+    const credentialsFile = await this.fileService.iniParseSync(this.awsCoreService.awsCredentialPath())
     delete credentialsFile[profileName]
-    return await this.fileService.replaceWriteSync(this.appService.awsCredentialPath(), credentialsFile)
+    return await this.fileService.replaceWriteSync(this.awsCoreService.awsCredentialPath(), credentialsFile)
   }
 
   async generateCredentials(sessionId: string): Promise<CredentialsInfo> {
@@ -116,10 +89,12 @@ export class AwsIamRoleChainedService extends AwsSessionService {
 
     // Generate a credential set from Parent Session
     let parentSessionService
-    if (parentSession.type === SessionType.awsIamRoleFederated) { // TODO: try to reuse SessionFactoryService
+
+    // TODO: try to reuse SessionFactoryService
+    if (parentSession.type === SessionType.awsIamRoleFederated) {
       parentSessionService = AwsIamRoleFederatedService.getInstance() as AwsSessionService
     } else if (parentSession.type === SessionType.awsIamUser) {
-      parentSessionService = AwsIamUserService.getInstance() as AwsSessionService
+      parentSessionService = this.awsIamUserService as AwsSessionService
     } else if (parentSession.type === SessionType.awsSsoRole) {
       parentSessionService = AwsSsoRoleService.getInstance() as AwsSessionService
     }
@@ -135,7 +110,7 @@ export class AwsIamRoleChainedService extends AwsSessionService {
 
     // Assume Role from parent
     // Prepare session credentials set parameters and client
-    const sts = new AWS.STS(this.appService.stsOptions(session))
+    const sts = new AWS.STS(this.awsCoreService.stsOptions(session))
 
     // Configure IamRoleChained Account session parameters
     const roleSessionName = (session as AwsIamRoleChainedSession).roleSessionName

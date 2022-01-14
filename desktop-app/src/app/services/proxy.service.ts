@@ -2,18 +2,20 @@ import {Injectable} from '@angular/core';
 import {environment} from '../../environments/environment';
 import {AppService} from './app.service';
 import { Repository } from '@noovolari/leapp-core/services/repository';
+import { LeappCoreService } from './leapp-core.service'
 
 @Injectable({
   providedIn: 'root'
 })
 export class ProxyService {
+  private repository: Repository
 
-  constructor(
-    private appService: AppService
-  ) {}
+  constructor(private appService: AppService, leappCoreService: LeappCoreService) {
+    this.repository = leappCoreService.repository
+  }
 
   configureBrowserWindow(browserWindow: any): void {
-    const proxyConfiguration = Repository.getInstance().getProxyConfiguration();
+    const proxyConfiguration = this.repository.getProxyConfiguration();
 
     let proxyUrl;
     let proxyPort;
@@ -35,7 +37,7 @@ export class ProxyService {
 
   getHttpClientOptions(url: string): any {
     const options = this.appService.getUrl().parse(url);
-    const proxyConfiguration = Repository.getInstance().getProxyConfiguration();
+    const proxyConfiguration = this.repository.getProxyConfiguration();
 
     let proxyUrl;
     let proxyPort;

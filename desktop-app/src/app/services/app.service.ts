@@ -1,13 +1,15 @@
-import {EventEmitter, Injectable} from '@angular/core';
-import {ConfirmationDialogComponent} from '../components/shared/confirmation-dialog/confirmation-dialog.component';
-import {FormControl, FormGroup} from '@angular/forms';
-import {environment} from '../../environments/environment';
-import {InputDialogComponent} from '../components/shared/input-dialog/input-dialog.component';
-import {BsModalService} from 'ngx-bootstrap/modal';
-import {ElectronService} from './electron.service';
-import {ToastrService} from 'ngx-toastr';
-import {constants} from '@noovolari/leapp-core/models/constants';
-import {LoggerLevel, LoggingService} from '@noovolari/leapp-core/services/logging-service';
+import { EventEmitter, Injectable } from '@angular/core'
+import { ConfirmationDialogComponent } from '../components/shared/confirmation-dialog/confirmation-dialog.component'
+import { FormControl, FormGroup } from '@angular/forms'
+import { environment } from '../../environments/environment'
+import { InputDialogComponent } from '../components/shared/input-dialog/input-dialog.component'
+import { BsModalService } from 'ngx-bootstrap/modal'
+import { ElectronService } from './electron.service'
+import { ToastrService } from 'ngx-toastr'
+import { constants } from '@noovolari/leapp-core/models/constants'
+import { LoggerLevel, LoggingService } from '@noovolari/leapp-core/services/logging-service'
+import { AwsCoreService } from '@noovolari/leapp-core/services/aws-core-service'
+import { LeappCoreService } from './leapp-core.service'
 
 /*
 * External enum to the toast level so we can use this to define the type of log
@@ -24,16 +26,17 @@ export enum ToastLevel {
 })
 export class AppService {
 
-  profileOpen: EventEmitter<boolean> = new EventEmitter<boolean>();
+  profileOpen: EventEmitter<boolean> = new EventEmitter<boolean>()
 
   /* This service is defined to provide different app wide methods as utilities */
-  private newWin: any;
+  private newWin: any
+  private loggingService: LoggingService
+  private awsCoreService: AwsCoreService
 
-  constructor(
-    private modalService: BsModalService,
-    private electronService: ElectronService,
-    private toastr: ToastrService
-  ) {
+  constructor(private modalService: BsModalService, private electronService: ElectronService,
+              private toastr: ToastrService, leappCoreService: LeappCoreService) {
+    this.awsCoreService = leappCoreService.awsCoreService
+    this.loggingService = leappCoreService.loggingService
 
     // Global Configure logger
     if (this.electronService.log) {
@@ -41,11 +44,11 @@ export class AppService {
         mac: `${this.electronService.process.env.HOME}/Library/Logs/Leapp/log.electronService.log`,
         linux: `${this.electronService.process.env.HOME}/.config/Leapp/logs/log.electronService.log`,
         windows: `${this.electronService.process.env.USERPROFILE}\\AppData\\Roaming\\Leapp\\log.electronService.log`
-      };
+      }
 
-      this.electronService.log.transports.console.format = '[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{processType}] {text}';
-      this.electronService.log.transports.file.format = '[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] [{processType}] {text}';
-      this.electronService.log.transports.file.resolvePath = () => logPaths[this.detectOs()];
+      this.electronService.log.transports.console.format = '[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{processType}] {text}'
+      this.electronService.log.transports.file.format = '[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] [{processType}] {text}'
+      this.electronService.log.transports.file.resolvePath = () => logPaths[this.detectOs()]
     }
   }
 
@@ -53,70 +56,70 @@ export class AppService {
    * Return the app object from node
    */
   getApp() {
-    return this.electronService.app;
+    return this.electronService.app
   }
 
   getMenu() {
-    return this.electronService.menu;
+    return this.electronService.menu
   }
 
   getTray() {
-    return this.electronService.tray;
+    return this.electronService.tray
   }
 
   getCurrentWindow() {
-    return this.electronService.currentWindow;
+    return this.electronService.currentWindow
   }
 
   getFollowRedirects() {
-    return this.electronService.followRedirects;
+    return this.electronService.followRedirects
   }
 
   getHttpsProxyAgent() {
-    return this.electronService.httpsProxyAgent;
+    return this.electronService.httpsProxyAgent
   }
 
   /**
    * Return the dialog native object
    */
   getDialog() {
-    return this.electronService.dialog;
+    return this.electronService.dialog
   }
 
   /**
    * Return the native os object
    */
   getOS() {
-    return this.electronService.os;
+    return this.electronService.os
   }
 
   /**
    * Return the fs native object
    */
   getFs() {
-    return this.electronService.fs;
+    return this.electronService.fs
   }
 
   /**
    * Return the app process
    */
   getProcess() {
-    return this.electronService.process;
+    return this.electronService.process
   }
 
   /**
    * Return Electron ipcRenderer
    */
   getIpcRenderer() {
-    return this.electronService.ipcRenderer;
+    return this.electronService.ipcRenderer
   }
 
   newNotification(title: string, message: string) {
-    new this.electronService.notification({ title, body: message, icon: __dirname + `/assets/images/Leapp.png` }).show();
+    new this.electronService.notification({title, body: message, icon: __dirname + `/assets/images/Leapp.png`}).show()
   }
 
   getLog() {
-    return this.electronService.log;
+    return this.electronService.log
   }
 
   /**
@@ -125,26 +128,26 @@ export class AppService {
    * @returns - {any} -
    */
   currentBrowserWindow() {
-    return this.electronService.currentWindow;
+    return this.electronService.currentWindow
   }
 
   isDarkMode() {
-    return this.electronService.nativeTheme.shouldUseDarkColors;
+    return this.electronService.nativeTheme.shouldUseDarkColors
   }
 
   /**
    * Quit the app
    */
   quit() {
-    this.electronService.app.exit(0);
+    this.electronService.app.exit(0)
   }
 
   /**
    * Restart the app
    */
   restart() {
-    this.electronService.app.relaunch();
-    this.electronService.app.exit(0);
+    this.electronService.app.relaunch()
+    this.electronService.app.exit(0)
   }
 
   /**
@@ -171,23 +174,24 @@ export class AppService {
         worldSafeExecuteJavaScript: true,
         partition: `persist:Leapp-${btoa(url)}`
       }
-    };
+    }
 
     if (x && y) {
       Object.assign(opts, {
         x: x + 50,
         y: y + 50
-      });
+      })
     }
 
     if (this.newWin) {
       try {
-        this.newWin.close();
-      } catch (e) { }
-      this.newWin = null;
+        this.newWin.close()
+      } catch (e) {
+      }
+      this.newWin = null
     }
-    this.newWin = new this.electronService.browserWindow(opts);
-    return this.newWin;
+    this.newWin = new this.electronService.browserWindow(opts)
+    return this.newWin
 
   }
 
@@ -198,9 +202,9 @@ export class AppService {
    * @returns return a new browser window
    */
   newInvisibleWindow(url: string) {
-    const win = new this.electronService.browserWindow({ width: 1, height: 1, show: false });
-    win.loadURL(url);
-    return win;
+    const win = new this.electronService.browserWindow({width: 1, height: 1, show: false})
+    win.loadURL(url)
+    return win
   }
 
   /**
@@ -211,32 +215,32 @@ export class AppService {
       linux: constants.linux,
       darwin: constants.mac,
       win32: constants.windows
-    };
-    const os = this.electronService.os.platform();
-    return hrNames[os];
+    }
+    const os = this.electronService.os.platform()
+    return hrNames[os]
   }
 
   public async logout() {
     try {
       // Clear all extra data
-      const getAppPath = this.electronService.path.join(this.electronService.app.getPath('appData'), environment.appName);
-      this.electronService.rimraf.sync(getAppPath + '/Partitions/leapp*');
+      const getAppPath = this.electronService.path.join(this.electronService.app.getPath('appData'), environment.appName)
+      this.electronService.rimraf.sync(getAppPath + '/Partitions/leapp*')
 
       // Cleaning Library Electron Cache
-      await this.electronService.session.defaultSession.clearStorageData();
+      await this.electronService.session.defaultSession.clearStorageData()
 
       // Clean localStorage
-      localStorage.clear();
+      localStorage.clear()
 
-      this.toast('Cache and configuration file cleaned.', ToastLevel.success, 'Cleaning configuration file');
+      this.toast('Cache and configuration file cleaned.', ToastLevel.success, 'Cleaning configuration file')
 
       // Restart
       setTimeout(() => {
-        this.restart();
-      }, 2000);
+        this.restart()
+      }, 2000)
     } catch (err) {
-      LoggingService.getInstance().logger(`Leapp has an error re-creating your configuration file and cache.`, LoggerLevel.error, this, err.stack);
-      this.toast(`Leapp has an error re-creating your configuration file and cache.`, ToastLevel.error, 'Cleaning configuration file');
+      this.loggingService.logger(`Leapp has an error re-creating your configuration file and cache.`, LoggerLevel.error, this, err.stack)
+      this.toast(`Leapp has an error re-creating your configuration file and cache.`, ToastLevel.error, 'Cleaning configuration file')
     }
   }
 
@@ -246,7 +250,7 @@ export class AppService {
    * @returns the semver object
    */
   semVer() {
-    return this.electronService.semver;
+    return this.electronService.semver
   }
 
   /**
@@ -255,17 +259,17 @@ export class AppService {
    * @param text - the element to copy to clipboard
    */
   copyToClipboard(text: string) {
-    const selBox = document.createElement('textarea');
-    selBox.style.position = 'fixed';
-    selBox.style.left = '0';
-    selBox.style.top = '0';
-    selBox.style.opacity = '0';
-    selBox.value = text;
-    document.body.appendChild(selBox);
-    selBox.focus();
-    selBox.select();
-    document.execCommand('copy');
-    document.body.removeChild(selBox);
+    const selBox = document.createElement('textarea')
+    selBox.style.position = 'fixed'
+    selBox.style.left = '0'
+    selBox.style.top = '0'
+    selBox.style.opacity = '0'
+    selBox.value = text
+    document.body.appendChild(selBox)
+    selBox.focus()
+    selBox.select()
+    document.execCommand('copy')
+    document.body.removeChild(selBox)
   }
 
   /**
@@ -275,10 +279,10 @@ export class AppService {
    * @returns the json object decoded
    */
   parseJwt(token) {
-    const base64Url = token.split('.')[1];
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    const jsonPayload = decodeURIComponent(atob(base64).split('').map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
-    return JSON.parse(jsonPayload);
+    const base64Url = token.split('.')[1]
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
+    const jsonPayload = decodeURIComponent(atob(base64).split('').map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''))
+    return JSON.parse(jsonPayload)
   }
 
   /**
@@ -289,11 +293,16 @@ export class AppService {
    */
   confirmDialog(message: string, callback: any) {
     for (let i = 1; i <= this.modalService.getModalsCount(); i++) {
-      this.modalService.hide(i);
+      this.modalService.hide(i)
     }
 
-    this.getCurrentWindow().show();
-    this.modalService.show(ConfirmationDialogComponent, { backdrop: 'static', animated: false, class: 'confirm-modal', initialState: { message, callback}});
+    this.getCurrentWindow().show()
+    this.modalService.show(ConfirmationDialogComponent, {
+      backdrop: 'static',
+      animated: false,
+      class: 'confirm-modal',
+      initialState: {message, callback}
+    })
 
   }
 
@@ -307,12 +316,17 @@ export class AppService {
    */
   inputDialog(title: string, placeholder: string, message: string, callback: any) {
     for (let i = 1; i <= this.modalService.getModalsCount(); i++) {
-      this.modalService.hide(i);
+      this.modalService.hide(i)
     }
 
-    this.getCurrentWindow().show();
-    this.newNotification('MFA Token needed', message);
-    this.modalService.show(InputDialogComponent, { backdrop: 'static', animated: false, class: 'confirm-modal', initialState: { title, placeholder, message, callback}});
+    this.getCurrentWindow().show()
+    this.newNotification('MFA Token needed', message)
+    this.modalService.show(InputDialogComponent, {
+      backdrop: 'static',
+      animated: false,
+      class: 'confirm-modal',
+      initialState: {title, placeholder, message, callback}
+    })
   }
 
   /**
@@ -321,7 +335,7 @@ export class AppService {
    * @param url - url to open
    */
   openExternalUrl(url) {
-    this.electronService.shell.openExternal(url);
+    this.electronService.shell.openExternal(url)
   }
 
   /**
@@ -331,13 +345,13 @@ export class AppService {
    */
   validateAllFormFields(formGroup: FormGroup) {
     Object.keys(formGroup.controls).forEach(field => {
-      const control = formGroup.get(field);
+      const control = formGroup.get(field)
       if (control instanceof FormControl) {
-        control.markAsTouched({ onlySelf: true });
+        control.markAsTouched({onlySelf: true})
       } else if (control instanceof FormGroup) {
-        this.validateAllFormFields(control);
+        this.validateAllFormFields(control)
       }
-    });
+    })
   }
 
   /**
@@ -349,11 +363,21 @@ export class AppService {
    */
   toast(message: string, type: ToastLevel | LoggerLevel, title?: string): void {
     switch (type) {
-      case ToastLevel.success: this.toastr.success(message, title); break;
-      case ToastLevel.info || LoggerLevel.info: this.toastr.info(message, title); break;
-      case ToastLevel.warn || LoggerLevel.warn: this.toastr.warning(message, title); break;
-      case ToastLevel.error || LoggerLevel.error: this.toastr.error(message, title ? title : 'Invalid Action!'); break;
-      default: this.toastr.error(message, title); break;
+      case ToastLevel.success:
+        this.toastr.success(message, title)
+        break
+      case ToastLevel.info || LoggerLevel.info:
+        this.toastr.info(message, title)
+        break
+      case ToastLevel.warn || LoggerLevel.warn:
+        this.toastr.warning(message, title)
+        break
+      case ToastLevel.error || LoggerLevel.error:
+        this.toastr.error(message, title ? title : 'Invalid Action!')
+        break
+      default:
+        this.toastr.error(message, title)
+        break
     }
   }
 
@@ -389,7 +413,7 @@ export class AppService {
       {region: 'us-gov-west-1'},
       {region: 'us-west-1'},
       {region: 'us-west-2'}
-    ];
+    ]
   }
 
   /**
@@ -461,7 +485,7 @@ export class AppService {
       {location: 'ukwest'},
       {location: 'uaecentral'},
       {location: 'brazilsoutheast'}
-    ];
+    ]
   }
 
   /**
@@ -470,11 +494,11 @@ export class AppService {
    */
   setFilteringForEc2Calls() {
     // Modify the user agent for all requests to the following urls.
-    const filter = { urls: ['https://*.amazonaws.com/'] };
+    const filter = {urls: ['https://*.amazonaws.com/']}
     this.electronService.session.defaultSession.webRequest.onBeforeSendHeaders(filter, (details, callback) => {
-      details.requestHeaders['Origin'] = 'http://localhost:4200';
-      callback({ cancel: false, requestHeaders: details.requestHeaders });
-    });
+      details.requestHeaders['Origin'] = 'http://localhost:4200'
+      callback({cancel: false, requestHeaders: details.requestHeaders})
+    })
   }
 
   /**
@@ -482,11 +506,11 @@ export class AppService {
    */
   cleanCredentialFile() {
     try {
-      const awsCredentialsPath = this.awsCredentialPath();
+      const awsCredentialsPath = this.awsCoreService.awsCredentialPath()
       // Rewrite credential file
-      this.electronService.fs.writeFileSync(awsCredentialsPath, '');
+      this.electronService.fs.writeFileSync(awsCredentialsPath, '')
     } catch (e) {
-      this.electronService.log(`Can\'t delete aws credential file probably missing: ${e.toString()}`, LoggerLevel.warn, this, e.stack);
+      this.electronService.log(`Can\'t delete aws credential file probably missing: ${e.toString()}`, LoggerLevel.warn, this, e.stack)
     }
   }
 
@@ -496,19 +520,19 @@ export class AppService {
    * @param s - the session containing the account
    */
   isAzure(s) {
-   return s.subscriptionId !== null && s.subscriptionId !== undefined;
+    return s.subscriptionId !== null && s.subscriptionId !== undefined
   }
 
   getUrl() {
-    return this.electronService.url;
+    return this.electronService.url
   }
 
   blockDevToolInProductionMode() {
     this.currentBrowserWindow().webContents.on('devtools-opened', () => {
       if (environment.production) {
-        this.electronService.log('Closing Web tools in production mode', LoggerLevel.info, this);
-        this.currentBrowserWindow().webContents.closeDevTools();
+        this.electronService.log('Closing Web tools in production mode', LoggerLevel.info, this)
+        this.currentBrowserWindow().webContents.closeDevTools()
       }
-    });
+    })
   }
 }

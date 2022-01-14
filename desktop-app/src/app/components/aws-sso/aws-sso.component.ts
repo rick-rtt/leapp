@@ -7,6 +7,7 @@ import {AwsSsoOidcService, BrowserWindowClosing} from '../../services/aws-sso-oi
 import { Repository } from '@noovolari/leapp-core/services/repository';
 import {constants} from '@noovolari/leapp-core/models/constants';
 import {AwsSsoRoleService, SsoRoleSession} from "../../services/session/aws/method/aws-sso-role-service";
+import { LeappCoreService } from '../../services/leapp-core.service'
 
 @Component({
   selector: 'app-aws-sso',
@@ -30,13 +31,13 @@ export class AwsSsoComponent implements OnInit, BrowserWindowClosing {
     defaultBrowserOpening: new FormControl('', [Validators.required])
   });
 
-  constructor(
-    private appService: AppService,
-    private awsSsoRoleService: AwsSsoRoleService,
-    private router: Router,
-    private workspaceService: WorkspaceService,
-    private awsSsoOidcService: AwsSsoOidcService
-  ) {}
+  private repository: Repository
+
+  constructor(private appService: AppService, private awsSsoRoleService: AwsSsoRoleService, private router: Router,
+              private workspaceService: WorkspaceService, private awsSsoOidcService: AwsSsoOidcService,
+              leappCoreService: LeappCoreService) {
+    this.repository = leappCoreService.repository
+  }
 
   ngOnInit() {
     this.awsSsoOidcService.listeners.push(this);
@@ -54,17 +55,17 @@ export class AwsSsoComponent implements OnInit, BrowserWindowClosing {
       this.loadingInBrowser = (this.selectedBrowserOpening === constants.inBrowser.toString());
       this.loadingInApp = (this.selectedBrowserOpening === constants.inApp.toString());
 
-      Repository.getInstance().setAwsSsoConfiguration(
+      this.repository.setAwsSsoConfiguration(
         this.selectedRegion,
         this.form.value.portalUrl,
         this.selectedBrowserOpening,
-        Repository.getInstance().getAwsSsoConfiguration().expirationTime
+        this.repository.getAwsSsoConfiguration().expirationTime
       );
 
       try {
         const ssoRoleSessions: SsoRoleSession[] = await this.awsSsoRoleService.sync();
         ssoRoleSessions.forEach(ssoRoleSession => {
-          this.awsSsoRoleService.create(ssoRoleSession, Repository.getInstance().getDefaultProfileId());
+          this.awsSsoRoleService.create(ssoRoleSession, this.repository.getDefaultProfileId());
         });
         this.router.navigate(['/sessions', 'session-selected']);
         this.loadingInBrowser = false;
@@ -111,9 +112,9 @@ export class AwsSsoComponent implements OnInit, BrowserWindowClosing {
 
   setValues() {
     this.regions = this.appService.getRegions();
-    const region = Repository.getInstance().getAwsSsoConfiguration().region;
-    const portalUrl = Repository.getInstance().getAwsSsoConfiguration().portalUrl;
-    this.selectedBrowserOpening = Repository.getInstance().getAwsSsoConfiguration().browserOpening || constants.inApp;
+    const region = this.repository.getAwsSsoConfiguration().region;
+    const portalUrl = this.repository.getAwsSsoConfiguration().portalUrl;
+    this.selectedBrowserOpening = this.repository.getAwsSsoConfiguration().browserOpening || constants.inApp;
 
     this.selectedRegion = region || this.regions[0].region;
     this.portalUrl = portalUrl;

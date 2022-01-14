@@ -5,6 +5,7 @@ import {AppService} from '../../../services/app.service';
 import {HttpClient} from '@angular/common/http';
 import {BsModalService} from 'ngx-bootstrap/modal';
 import { Repository } from "@noovolari/leapp-core/services/repository";
+import { LeappCoreService } from '../../../services/leapp-core.service'
 
 @Component({
   selector: 'app-session',
@@ -32,17 +33,12 @@ export class SessionComponent implements OnInit {
 
   workspace;
 
-  repository: Repository;
+  private repository: Repository;
 
-  constructor(
-    private router: Router,
-    private route: ActivatedRoute,
-    public workspaceService: WorkspaceService,
-    private httpClient: HttpClient,
-    private modalService: BsModalService,
-    private appService: AppService
-  ) {
-    this.repository = Repository.getInstance();
+  constructor(private router: Router, private route: ActivatedRoute, public workspaceService: WorkspaceService,
+              private httpClient: HttpClient, private modalService: BsModalService, private appService: AppService,
+              leappCoreService: LeappCoreService) {
+    this.repository = leappCoreService.repository;
   }
 
   ngOnInit() {
@@ -54,7 +50,7 @@ export class SessionComponent implements OnInit {
    * Go to Account Management
    */
   createAccount() {
-    // Go!
+    // Go! Golang?!? XD
     this.router.navigate(['/managing', 'create-account']).then(_ => {});
   }
 

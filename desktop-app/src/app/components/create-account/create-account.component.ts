@@ -19,6 +19,8 @@ import {
   AwsIamRoleChainedSessionRequest
 } from "../../services/session/aws/method/aws-iam-role-chained-service";
 import {AzureService, AzureSessionRequest} from "../../services/session/azure/azure.service";
+import { LeappCoreService } from '../../services/leapp-core.service'
+import { getLocaleExtraDayPeriodRules } from '@angular/common'
 
 @Component({
   selector: 'app-create-account',
@@ -79,23 +81,23 @@ export class CreateAccountComponent implements OnInit {
     assumerSession: new FormControl('', [Validators.required])
   });
 
-  /* Setup the first account for the application */
-  constructor(
-    private appService: AppService,
-    private router: Router,
-    private activatedRoute: ActivatedRoute,
-    private workspaceService: WorkspaceService,
-    private awsIamRoleFederatedService: AwsIamRoleFederatedService,
-    private awsIamRoleChainedService: AwsIamRoleChainedService,
-    private azureService: AzureService
-  ) {}
+  private repository: Repository
+  private loggingService: LoggingService
+
+  constructor(private appService: AppService, private router: Router, private activatedRoute: ActivatedRoute,
+              private workspaceService: WorkspaceService, private awsIamRoleFederatedService: AwsIamRoleFederatedService,
+              private awsIamRoleChainedService: AwsIamRoleChainedService, private azureService: AzureService,
+              private awsIamUserService: AwsIamUserService, leappCoreService: LeappCoreService) {
+    this.repository = leappCoreService.repository
+    this.loggingService = leappCoreService.loggingService
+  }
 
   ngOnInit() {
 
     this.activatedRoute.queryParams.subscribe(params => {
       // We get all the applicable idp urls
-      if (Repository.getInstance().getIdpUrls() && Repository.getInstance().getIdpUrls().length > 0) {
-        Repository.getInstance().getIdpUrls().forEach(idp => {
+      if (this.repository.getIdpUrls() && this.repository.getIdpUrls().length > 0) {
+        this.repository.getIdpUrls().forEach(idp => {
           if (idp !== null) {
             this.idpUrls.push({value: idp.id, label: idp.url});
           }
@@ -104,7 +106,7 @@ export class CreateAccountComponent implements OnInit {
 
       // We got all the applicable profiles
       // Note: we don't use azure profile so we remove default azure profile from the list
-      Repository.getInstance().getProfiles().forEach(idp => {
+      this.repository.getProfiles().forEach(idp => {
           if (idp !== null && idp.name !== environment.defaultAzureProfileName) {
             this.profiles.push({value: idp.id, label: idp.name});
           }
@@ -130,9 +132,9 @@ export class CreateAccountComponent implements OnInit {
       this.locations = this.appService.getLocations();
 
       // Select default values
-      this.selectedRegion = Repository.getInstance().getDefaultRegion() || environment.defaultRegion || this.regions[0].region;
-      this.selectedLocation = Repository.getInstance().getDefaultLocation() || environment.defaultLocation || this.locations[0].location;
-      this.selectedProfile = Repository.getInstance().getProfiles().filter(p => p.name === 'default').map(p => ({ value: p.id, label: p.name }))[0];
+      this.selectedRegion = this.repository.getDefaultRegion() || environment.defaultRegion || this.regions[0].region;
+      this.selectedLocation = this.repository.getDefaultLocation() || environment.defaultLocation || this.locations[0].location;
+      this.selectedProfile = this.repository.getProfiles().filter(p => p.name === 'default').map(p => ({ value: p.id, label: p.name }))[0];
     });
   }
 
@@ -158,7 +160,7 @@ export class CreateAccountComponent implements OnInit {
    * Save the first account in the workspace
    */
   saveSession() {
-    LoggingService.getInstance().logger(`Saving account...`, LoggerLevel.info, this);
+    this.loggingService.logger(`Saving account...`, LoggerLevel.info, this);
     this.addProfileToWorkspace();
     this.saveNewSsoRolesToWorkspace();
     this.createSession();
@@ -250,7 +252,7 @@ export class CreateAccountComponent implements OnInit {
           secretKey: this.form.value.secretKey.trim(),
           mfaDevice: this.form.value.mfaDevice.trim()
         };
-        AwsIamUserService.getInstance().create(awsIamUserSessionRequest, this.selectedProfile.value);
+        this.awsIamUserService.create(awsIamUserSessionRequest, this.selectedProfile.value);
         break;
       case (SessionType.awsIamRoleChained):
         const awsIamRoleChainedAccountRequest: AwsIamRoleChainedSessionRequest = {
@@ -283,8 +285,8 @@ export class CreateAccountComponent implements OnInit {
     if(this.sessionType === SessionType.awsIamRoleFederated) {
       try {
         const ipdUrl = { id: this.selectedIdpUrl.value, url: this.selectedIdpUrl.label };
-        if(!Repository.getInstance().getIdpUrl(ipdUrl.id)) {
-          Repository.getInstance().addIdpUrl(ipdUrl);
+        if(!this.repository.getIdpUrl(ipdUrl.id)) {
+          this.repository.addIdpUrl(ipdUrl);
         }
       } catch(err) {
         throw new LeappParseError(this, err.message);
@@ -300,8 +302,8 @@ export class CreateAccountComponent implements OnInit {
   private addProfileToWorkspace() {
     try {
       const profile = { id: this.selectedProfile.value, name: this.selectedProfile.label };
-      if(!Repository.getInstance().getProfileName(profile.id)) {
-        Repository.getInstance().addProfile(profile);
+      if(!this.repository.getProfileName(profile.id)) {
+        this.repository.addProfile(profile);
       }
     } catch(err) {
       throw new LeappParseError(this, err.message);

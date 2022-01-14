@@ -1,6 +1,7 @@
-import {Component, OnInit} from '@angular/core';
-import {AppService} from '../../../services/app.service';
-import {LoggerLevel, LoggingService} from "@noovolari/leapp-core/services/logging-service";
+import { Component, OnInit } from '@angular/core'
+import { AppService } from '../../../services/app.service'
+import { LoggerLevel, LoggingService } from '@noovolari/leapp-core/services/logging-service'
+import { LeappCoreService } from '../../../services/leapp-core.service'
 
 @Component({
   selector: 'app-profile',
@@ -8,24 +9,22 @@ import {LoggerLevel, LoggingService} from "@noovolari/leapp-core/services/loggin
   styleUrls: ['./profile.component.scss']
 })
 export class ProfileComponent implements OnInit {
+  private loggingService: LoggingService
+  private profileIsOpen = false
 
-  private profileIsOpen = false;
-
-  /* The header that we shows on the app */
-  constructor(
-    private appService: AppService
-  ) {}
+  constructor(leappCoreServices: LeappCoreService, private appService: AppService) {
+    this.loggingService = leappCoreServices.loggingService
+  }
 
   ngOnInit() {
     this.appService.profileOpen.subscribe(res => {
-      this.profileIsOpen = res;
-    });
+      this.profileIsOpen = res
+    })
   }
 
-  // When we toggle profile we emit is opening status
   toggleProfile() {
-    this.profileIsOpen = !this.profileIsOpen; // Toggle status
-    this.appService.profileOpen.emit(this.profileIsOpen); // Emit event for screen
-    LoggingService.getInstance().logger(`Profile open emitting: ${this.profileIsOpen}`, LoggerLevel.info, this);
+    this.profileIsOpen = !this.profileIsOpen // Toggle status
+    this.appService.profileOpen.emit(this.profileIsOpen) // Emit event for screen
+    this.loggingService.logger(`Profile open emitting: ${this.profileIsOpen}`, LoggerLevel.info, this)
   }
 }

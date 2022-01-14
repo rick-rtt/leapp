@@ -15,10 +15,18 @@ import { LoggingService } from '@noovolari/leapp-core/services/logging-service'
   providedIn: 'root'
 })
 export class LeappCoreService {
+  //TODO: All the getter should become Singletons
+  constructor(private workspaceService: WorkspaceService, private mfaCodePrompter: IMfaCodePrompter) {
+  }
 
   private awsIamUserServiceInstance: AwsIamUserService
 
-  constructor(private workspaceService: WorkspaceService, private mfaCodePrompter: IMfaCodePrompter) {
+  public get awsIamUserService(): AwsIamUserService {
+    if (!this.awsIamUserServiceInstance) {
+      this.awsIamUserServiceInstance = new AwsIamUserService(this.workspaceService, this.repository,
+        this.mfaCodePrompter, this.keyChainService, this.fileService, this.awsCoreService)
+    }
+    return this.awsIamUserServiceInstance
   }
 
   get nativeService(): NativeService {
@@ -43,13 +51,5 @@ export class LeappCoreService {
 
   get loggingService(): LoggingService {
     return new LoggingService(this.nativeService)
-  }
-
-  get awsIamUserService(): AwsIamUserService {
-    if (!this.awsIamUserServiceInstance) {
-      this.awsIamUserServiceInstance = new AwsIamUserService(this.workspaceService, this.repository,
-        this.mfaCodePrompter, this.keyChainService, this.fileService, this.awsCoreService)
-    }
-    return this.awsIamUserServiceInstance
   }
 }
