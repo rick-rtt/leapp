@@ -1,7 +1,6 @@
 {
   "root": true,
   "ignorePatterns": [
-    "projects/**/*",
     "electron/**/*"
   ],
   "overrides": [
@@ -9,19 +8,36 @@
       "files": [
         "*.ts"
       ],
-      "parserOptions": {
-        "project": [
-          "**/tsconfig.app.json",
-          "**/e2e/tsconfig.json"
-        ],
-        "createDefaultProgram": true
-      },
+      "parser": "@typescript-eslint/parser",
+      "plugins": [
+        "@typescript-eslint"
+      ],
       "extends": [
+        "eslint:recommended",
+        "plugin:@typescript-eslint/eslint-recommended",
+        "plugin:@typescript-eslint/recommended",
         "plugin:@angular-eslint/ng-cli-compat",
         "plugin:@angular-eslint/ng-cli-compat--formatting-add-on",
         "plugin:@angular-eslint/template/process-inline-templates"
       ],
       "rules": {
+        "arrow-parens": ["off", "always"],
+        "brace-style": ["error", "1tbs"],
+        "id-blacklist": "error",
+        "import/order": "off",
+        "max-len": ["error", {"code": 1024}],
+        "no-trailing-spaces": "off",
+        "no-underscore-dangle": "off",
+        "@typescript-eslint/consistent-type-definitions": "error",
+        "@typescript-eslint/dot-notation": "off",
+        "@typescript-eslint/explicit-member-accessibility": [
+          "off",
+          {
+            "accessibility": "explicit"
+          }
+        ],
+        "@typescript-eslint/no-use-before-define": "error",
+        "@typescript-eslint/prefer-for-of": "off",
         "@angular-eslint/component-selector": [
           "error",
           {
@@ -37,35 +53,7 @@
             "prefix": "app",
             "style": "camelCase"
           }
-        ],
-        "@typescript-eslint/consistent-type-definitions": "error",
-        "@typescript-eslint/dot-notation": "off",
-        "@typescript-eslint/explicit-member-accessibility": [
-          "off",
-          {
-            "accessibility": "explicit"
-          }
-        ],
-        "@typescript-eslint/no-use-before-define": "error",
-        "@typescript-eslint/prefer-for-of": "off",
-        "arrow-parens": [
-          "off",
-          "always"
-        ],
-        "brace-style": [
-          "error",
-          "1tbs"
-        ],
-        "id-blacklist": "error",
-        "import/order": "off",
-        "max-len": [
-          "error",
-          {
-            "code": 1024
-          }
-        ],
-        "no-trailing-spaces": "off",
-        "no-underscore-dangle": "off"
+        ]
       }
     },
     {
