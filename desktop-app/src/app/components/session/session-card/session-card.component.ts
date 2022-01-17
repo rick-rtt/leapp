@@ -6,7 +6,7 @@ import { WorkspaceService } from '../../../services/workspace.service'
 import { environment } from '../../../../environments/environment'
 import * as uuid from 'uuid'
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal'
-import { SessionFactoryService } from '../../../services/session-factory.service'
+import { SessionServiceFactory } from '../../../services/session-service-factory'
 import { SessionService } from '@noovolari/leapp-core/services/session/session.service'
 import { Session } from '@noovolari/leapp-core/models/session'
 import { SessionType } from '@noovolari/leapp-core/models/session-type'
@@ -61,18 +61,19 @@ export class SessionCardComponent implements OnInit {
   private sessionService: SessionService
   private loggingService: LoggingService
   private repository: Repository
+  private sessionServiceFactory: SessionServiceFactory
 
   constructor(private workspaceService: WorkspaceService, private appService: AppService, private router: Router,
-              private ssmService: SsmService, private sessionProviderService: SessionFactoryService,
-              private modalService: BsModalService, private awsIamUserService: AwsIamUserService,
-              leappCoreService: LeappCoreService) {
+              private ssmService: SsmService, private modalService: BsModalService,
+              private awsIamUserService: AwsIamUserService, leappCoreService: LeappCoreService) {
     this.repository = leappCoreService.repository
     this.loggingService = leappCoreService.loggingService
+    this.sessionServiceFactory = leappCoreService.sessionServiceFactory
   }
 
   ngOnInit() {
     // Generate a singleton service for the concrete implementation of SessionService
-    this.sessionService = this.sessionProviderService.getService(this.session.type)
+    this.sessionService = this.sessionServiceFactory.getSessionService(this.session.type)
 
     // Set regions and locations
     this.awsRegions = this.appService.getRegions()

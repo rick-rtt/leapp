@@ -1,7 +1,5 @@
 import { AwsSessionService } from '@noovolari/leapp-core/services/session/aws/aws-session-service'
 import * as AWS from 'aws-sdk'
-import { AwsIamRoleFederatedService } from './aws-iam-role-federated-service'
-import { AwsSsoRoleService } from './aws-sso-role-service'
 import { AwsSsoOidcService } from '../../../aws-sso-oidc.service'
 import { ISessionNotifier } from '@noovolari/leapp-core/interfaces/i-session-notifier'
 import { LeappAwsStsError } from '@noovolari/leapp-core/errors/leapp-aws-sts-error'
@@ -12,9 +10,9 @@ import { CredentialsInfo } from '@noovolari/leapp-core/models/credentials-info'
 import { Repository } from '@noovolari/leapp-core/services/repository'
 import { FileService } from '@noovolari/leapp-core/services/file-service'
 import { Session } from '@noovolari/leapp-core/models/session'
-import { SessionType } from '@noovolari/leapp-core/models/session-type'
 import { AwsIamUserService } from '@noovolari/leapp-core/services/session/aws/method/aws-iam-user-service'
 import { AwsCoreService } from '@noovolari/leapp-core/services/aws-core-service'
+import { SessionServiceFactory } from '../../../session-service-factory'
 
 export interface AwsIamRoleChainedSessionRequest {
   accountName: string;
@@ -25,9 +23,9 @@ export interface AwsIamRoleChainedSessionRequest {
 }
 
 export class AwsIamRoleChainedService extends AwsSessionService {
-  private constructor(iSessionNotifier: ISessionNotifier, repository: Repository, private awsCoreService: AwsCoreService,
-                      private awsSsoOidcService: AwsSsoOidcService, private fileService: FileService,
-                      private awsIamUserService: AwsIamUserService) {
+  public constructor(iSessionNotifier: ISessionNotifier, repository: Repository, private awsCoreService: AwsCoreService,
+                     private awsSsoOidcService: AwsSsoOidcService, private fileService: FileService,
+                     private awsIamUserService: AwsIamUserService, private sessionFactoryService: SessionServiceFactory) {
     super(iSessionNotifier, repository)
   }
 
@@ -88,17 +86,7 @@ export class AwsIamRoleChainedService extends AwsSessionService {
     }
 
     // Generate a credential set from Parent Session
-    let parentSessionService
-
-    // TODO: try to reuse SessionFactoryService
-    if (parentSession.type === SessionType.awsIamRoleFederated) {
-      parentSessionService = AwsIamRoleFederatedService.getInstance() as AwsSessionService
-    } else if (parentSession.type === SessionType.awsIamUser) {
-      parentSessionService = this.awsIamUserService as AwsSessionService
-    } else if (parentSession.type === SessionType.awsSsoRole) {
-      parentSessionService = AwsSsoRoleService.getInstance() as AwsSessionService
-    }
-
+    const parentSessionService = this.sessionFactoryService.getSessionService(parentSession.type)  as AwsSessionService
     const parentCredentialsInfo = await parentSessionService.generateCredentials(parentSession.sessionId)
 
     // Make second jump: configure aws SDK with parent credentials set

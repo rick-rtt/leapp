@@ -25,7 +25,7 @@ export interface ResponseHookDetails {
 }
 
 export class AwsIamRoleFederatedService extends AwsSessionService {
-  private constructor(iSessionNotifier: ISessionNotifier, repository: Repository, private fileService: FileService,
+  constructor(iSessionNotifier: ISessionNotifier, repository: Repository, private fileService: FileService,
                       private awsCoreService: AwsCoreService, private appService: AppService) {
     super(iSessionNotifier, repository)
   }

@@ -5,7 +5,7 @@ import { Router } from '@angular/router'
 import { environment } from '../../../../environments/environment'
 import * as uuid from 'uuid'
 import { WorkspaceService } from '../../../services/workspace.service'
-import { SessionFactoryService } from '../../../services/session-factory.service'
+import { SessionServiceFactory } from '../../../services/session-service-factory'
 import { constants } from '@noovolari/leapp-core/models/constants'
 import { Repository } from '@noovolari/leapp-core/services/repository'
 import { LoggerLevel, LoggingService } from '@noovolari/leapp-core/services/logging-service'
@@ -57,15 +57,16 @@ export class ProfilePageComponent implements OnInit {
 
 
   /* Simple profile page: shows the Idp Url and the workspace json */
+  repository: Repository
   private sessionService: any
   private loggingService: LoggingService
-  private repository: Repository
+  private sessionServiceFactory: SessionServiceFactory
 
-  constructor(public workspaceService: WorkspaceService, private appService: AppService,
-              private sessionProviderService: SessionFactoryService, private router: Router,
+  constructor(public workspaceService: WorkspaceService, private appService: AppService, private router: Router,
               private leappCoreService: LeappCoreService) {
     this.repository = leappCoreService.repository
     this.loggingService = leappCoreService.loggingService
+    this.sessionServiceFactory = leappCoreService.sessionServiceFactory
   }
 
   ngOnInit() {
@@ -178,7 +179,7 @@ export class ProfilePageComponent implements OnInit {
 
   deleteIdpUrl(id) {
     // Assumable sessions with this id
-    this.sessionService = this.sessionProviderService.getService(SessionType.awsIamRoleFederated)
+    this.sessionService = this.sessionServiceFactory.getSessionService(SessionType.awsIamRoleFederated)
     let sessions = this.workspaceService.sessions.filter(s => (s as AwsIamRoleFederatedSession).idpUrlId === id)
 
     // Add iam Role Chained from iam role iam_federated_role
@@ -218,7 +219,7 @@ export class ProfilePageComponent implements OnInit {
 
         for (let i = 0; i < this.workspaceService.sessions.length; i++) {
           const sess = this.workspaceService.sessions[i]
-          this.sessionService = this.sessionProviderService.getService(sess.type)
+          this.sessionService = this.sessionServiceFactory.getSessionService(sess.type)
 
           if ((sess as any).profileId === id.toString()) {
             if ((sess as any).status === SessionStatus.active) {
@@ -259,7 +260,7 @@ export class ProfilePageComponent implements OnInit {
         // Reverting all sessions to default profile
         for (let i = 0; i < sessions.length; i++) {
           const sess = sessions[i]
-          this.sessionService = this.sessionProviderService.getService(sess.type)
+          this.sessionService = this.sessionServiceFactory.getSessionService(sess.type)
 
           let wasActive = false
           if ((sess as any).status === SessionStatus.active) {

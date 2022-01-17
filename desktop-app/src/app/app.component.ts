@@ -5,7 +5,7 @@ import { Router } from '@angular/router'
 import { WorkspaceService } from './services/workspace.service'
 import { setTheme } from 'ngx-bootstrap/utils'
 import { RotationService } from './services/rotation.service'
-import { SessionFactoryService } from './services/session-factory.service'
+import { SessionServiceFactory } from './services/session-service-factory'
 import { UpdaterService } from './services/updater.service'
 import compareVersions from 'compare-versions'
 import { RetrocompatibilityService } from './services/retrocompatibility.service'
@@ -19,10 +19,6 @@ import { FileService } from '@noovolari/leapp-core/services/file-service'
 import { AwsCoreService } from '@noovolari/leapp-core/services/aws-core-service'
 import { AwsSsoOidcService } from './services/aws-sso-oidc.service'
 import { ExecuteService } from './services/execute.service'
-import { AwsIamRoleChainedService } from './services/session/aws/method/aws-iam-role-chained-service'
-import { AwsIamRoleFederatedService } from './services/session/aws/method/aws-iam-role-federated-service'
-import { AwsSsoRoleService } from './services/session/aws/method/aws-sso-role-service'
-import { AzureService } from './services/session/azure/azure.service'
 import { LeappCoreService } from './services/leapp-core.service'
 
 @Component({
@@ -31,40 +27,28 @@ import { LeappCoreService } from './services/leapp-core.service'
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
-
   private fileService: FileService
   private repository: Repository
   private awsCoreService: AwsCoreService
   private loggingService: LoggingService
+  private timerService: TimerService
+  private sessionServiceFactory: SessionServiceFactory
 
   /* Main app file: launches the Angular framework inside Electron app */
-  constructor(
-    private app: AppService,
-    private workspaceService: WorkspaceService,
-    private retrocompatibilityService: RetrocompatibilityService,
-    private rotationService: RotationService,
-    private sessionProviderService: SessionFactoryService,
-    private router: Router,
-    private updaterService: UpdaterService,
-    private mfaCodePromptService: MfaCodePromptService,
-    private awsSsoOidcService: AwsSsoOidcService,
-    private executeService: ExecuteService,
-    private leappCoreService: LeappCoreService
-  ) {
+  constructor(private app: AppService, private workspaceService: WorkspaceService,
+              private retrocompatibilityService: RetrocompatibilityService, private rotationService: RotationService,
+              private router: Router, private updaterService: UpdaterService, private mfaCodePromptService: MfaCodePromptService,
+              private awsSsoOidcService: AwsSsoOidcService, private executeService: ExecuteService,
+              private leappCoreService: LeappCoreService) {
+    this.repository = leappCoreService.repository
     this.fileService = leappCoreService.fileService
     this.awsCoreService = leappCoreService.awsCoreService
-    this.repository = leappCoreService.repository
     this.loggingService = leappCoreService.loggingService
+    this.timerService = leappCoreService.timerService
+    this.sessionServiceFactory = leappCoreService.sessionServiceFactory
   }
 
   async ngOnInit() {
-    // TODO: remove all inits
-    //AwsIamUserService.init(this.workspaceService, this.mfaCodePromptService);
-    AwsIamRoleChainedService.init(this.workspaceService, this.app, this.awsSsoOidcService)
-    AwsIamRoleFederatedService.init(this.workspaceService, this.app)
-    AwsSsoRoleService.init(this.workspaceService, this.app, this.awsSsoOidcService)
-    AzureService.init(this.workspaceService, this.app, this.executeService)
-
     // We get the right moment to set an hook to app close
     const ipc = this.app.getIpcRenderer()
     ipc.on('app-close', () => {
@@ -107,13 +91,13 @@ export class AppComponent implements OnInit {
     // All sessions start stopped when app is launched
     if (this.workspaceService.sessions.length > 0) {
       this.workspaceService.sessions.forEach(sess => {
-        const concreteSessionService = this.sessionProviderService.getService(sess.type)
+        const concreteSessionService = this.sessionServiceFactory.getSessionService(sess.type)
         concreteSessionService.stop(sess.sessionId)
       })
     }
 
     // Start Global Timer (1s)
-    TimerService.getInstance().start(this.rotationService.rotate.bind(this.rotationService))
+    this.timerService.start(this.rotationService.rotate.bind(this.rotationService))
 
     // Launch Auto Updater Routines
     this.manageAutoUpdate()

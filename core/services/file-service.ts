@@ -231,6 +231,8 @@ export class FileService {
     return this.nativeService.ini.parse(this.readFileSync(filePath));
   }
 
+
+  //TODO: move these methods under another service, or try to replace them with encryptionService stuff from leapp-basement
   /**
    * Encrypt Text
    */

@@ -8,6 +8,7 @@ import {AwsIamRoleChainedSession} from '@noovolari/leapp-core/models/aws-iam-rol
 import {ISessionNotifier} from '@noovolari/leapp-core/interfaces/i-session-notifier';
 import { LeappCoreService } from './leapp-core.service'
 
+//TODO: Move this under core module
 @Injectable({
   providedIn: 'root'
 })

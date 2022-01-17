@@ -1,31 +1,23 @@
 export class TimerService {
+  private timeOutTimer: NodeJS.Timeout
+  private timeInterval = 10000
 
-  private static instance: TimerService;
-  private _timer: NodeJS.Timeout;
-  private timeInterval = 10000;
-
-  private constructor() { }
-
-  static getInstance(): TimerService {
-    if(!this.instance) {
-      this.instance = new TimerService();
-    }
-    return this.instance;
+  public constructor() {
   }
 
   set timer(value: NodeJS.Timeout) {
-    this._timer = value;
+    this.timeOutTimer = value
   }
 
   get timer(): NodeJS.Timeout {
-    return this._timer;
+    return this.timeOutTimer
   }
 
   start(callback: () => void) {
     if (!this.timer) {
       this.timer = setInterval(() => {
-        callback();
-      }, this.timeInterval);
+        callback()
+      }, this.timeInterval)
     }
   }
 }

@@ -31,7 +31,7 @@ export interface AzureSessionToken {
 }
 
 export class AzureService extends SessionService {
-  private constructor(iSessionNotifier: ISessionNotifier, repository: Repository, private fileService: FileService,
+  public constructor(iSessionNotifier: ISessionNotifier, repository: Repository, private fileService: FileService,
                       private appService: AppService, private executeService: ExecuteService) {
     super(iSessionNotifier, repository)
   }

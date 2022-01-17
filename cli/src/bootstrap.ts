@@ -1,13 +1,14 @@
 import { Repository } from '@noovolari/leapp-core/services/repository'
 import { ISessionNotifier } from '@noovolari/leapp-core/interfaces/i-session-notifier'
 import { Session } from '@noovolari/leapp-core/models/session'
-import NativeService from './native-service'
+import { CliNativeService } from './cli-native-service'
 import { FileService } from '@noovolari/leapp-core/services/file-service'
-import { AwsIamUserService, IMfaCodePrompter }
-  from '@noovolari/leapp-core/services/session/aws/method/aws-iam-user-service'
+import {
+  AwsIamUserService,
+  IMfaCodePrompter
+} from '@noovolari/leapp-core/services/session/aws/method/aws-iam-user-service'
 import { KeychainService } from '@noovolari/leapp-core/services/keychain-service'
-import AppService from '@noovolari/leapp-core/services/app-service'
-
+import { AwsCoreService } from '@noovolari/leapp-core/services/aws-core-service'
 
 class SessionNotifier implements ISessionNotifier {
 
@@ -49,9 +50,9 @@ class SessionNotifier implements ISessionNotifier {
   }
 }
 
-const nativeService: NativeService = new NativeService()
-const fileService: FileService = new FileService(nativeService)
-const repository: Repository = new Repository(nativeService, fileService)
+const cliNativeService: CliNativeService = new CliNativeService()
+const fileService: FileService = new FileService(cliNativeService)
+const repository: Repository = new Repository(cliNativeService, fileService)
 
 class MfaCodePrompter implements IMfaCodePrompter {
   promptForMFACode(sessionName: string, callback: any): void {
@@ -62,8 +63,8 @@ class MfaCodePrompter implements IMfaCodePrompter {
   }
 }
 
-const keychainService: KeychainService = new KeychainService(nativeService)
-const appService: AppService = new AppService(nativeService)
+const keychainService = new KeychainService(cliNativeService)
+const awsCoreService = new AwsCoreService(cliNativeService)
 
 export const awsIamUserService = new AwsIamUserService(new SessionNotifier(), repository, new MfaCodePrompter(),
-  keychainService, fileService, appService)
+  keychainService, fileService, awsCoreService)

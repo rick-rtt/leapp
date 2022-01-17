@@ -3,7 +3,7 @@ import { WorkspaceService } from '../../../services/workspace.service'
 import { AppService } from '../../../services/app.service'
 import { environment } from '../../../../environments/environment'
 import { UpdaterService } from '../../../services/updater.service'
-import { SessionFactoryService } from '../../../services/session-factory.service'
+import { SessionServiceFactory } from '../../../services/session-service-factory'
 import { Session } from '@noovolari/leapp-core/models/session'
 import { SessionType } from '@noovolari/leapp-core/models/session-type'
 import { SessionStatus } from '@noovolari/leapp-core/models/session-status'
@@ -26,12 +26,13 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
   private subscribed
   private loggingService: LoggingService
   private repository: Repository
+  private sessionServiceFactory: SessionServiceFactory
 
   constructor(private workspaceService: WorkspaceService, private updaterService: UpdaterService,
-              private sessionProviderService: SessionFactoryService, private appService: AppService,
-              leappCoreService: LeappCoreService) {
+              private appService: AppService, leappCoreService: LeappCoreService) {
     this.repository = leappCoreService.repository
     this.loggingService = leappCoreService.loggingService
+    this.sessionServiceFactory = leappCoreService.sessionServiceFactory
   }
 
   ngOnInit() {
@@ -85,7 +86,7 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
           type: 'normal',
           icon,
           click: async () => {
-            const factorizedSessionService = this.sessionProviderService.getService(session.type)
+            const factorizedSessionService = this.sessionServiceFactory.getSessionService(session.type)
 
             if (session.status !== SessionStatus.active) {
               await factorizedSessionService.start(session.sessionId)
@@ -185,7 +186,7 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
       // Stop the sessions...
       const activeSessions = this.workspaceService.listActive()
       activeSessions.forEach(sess => {
-        const factorizedService = this.sessionProviderService.getService(sess.type)
+        const factorizedService = this.sessionServiceFactory.getSessionService(sess.type)
         factorizedService.stop(sess.sessionId)
       })
 
@@ -202,5 +203,4 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.subscribed.unsubscribe()
   }
-
 }

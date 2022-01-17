@@ -2,8 +2,6 @@ import {INativeService} from "../interfaces/i-native-service";
 
 
 export class KeychainService {
-  private static instance: KeychainService;
-
   constructor(private nativeService: INativeService) {}
 
   /**

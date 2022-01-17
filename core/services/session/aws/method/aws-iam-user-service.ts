@@ -36,14 +36,9 @@ export interface IMfaCodePrompter {
 
 export class AwsIamUserService extends AwsSessionService {
 
-  constructor(
-    iSessionNotifier: ISessionNotifier,
-    repository: Repository,
-    private mfaCodePrompter: IMfaCodePrompter,
-    private keychainService: KeychainService,
-    private fileService: FileService,
-    private awsCoreService: AwsCoreService
-  ) {
+  constructor(iSessionNotifier: ISessionNotifier, repository: Repository, private mfaCodePrompter: IMfaCodePrompter,
+              private keychainService: KeychainService, private fileService: FileService,
+              private awsCoreService: AwsCoreService) {
     super(iSessionNotifier, repository)
   }
 

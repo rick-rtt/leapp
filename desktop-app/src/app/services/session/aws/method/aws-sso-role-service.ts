@@ -1,4 +1,4 @@
-import {AppService} from '../../../../services/app.service';
+import { AppService } from '../../../../services/app.service'
 
 import SSO, {
   AccountInfo,
@@ -8,20 +8,19 @@ import SSO, {
   ListAccountsRequest,
   LogoutRequest,
   RoleInfo
-} from 'aws-sdk/clients/sso';
+} from 'aws-sdk/clients/sso'
 
-import {AwsSessionService} from '@noovolari/leapp-core/services/session/aws/aws-session-service';
-import {AwsSsoOidcService, BrowserWindowClosing} from "../../../aws-sso-oidc.service";
-import {ISessionNotifier} from "@noovolari/leapp-core/interfaces/i-session-notifier";
-import {LeappBaseError} from "@noovolari/leapp-core/errors/leapp-base-error";
-import {LoggerLevel} from "@noovolari/leapp-core/services/logging-service";
-import {AwsSsoRoleSession} from "@noovolari/leapp-core/models/aws-sso-role-session";
-import {CredentialsInfo} from "@noovolari/leapp-core/models/credentials-info";
-import { Repository } from "@noovolari/leapp-core/services/repository";
-import {FileService} from "@noovolari/leapp-core/services/file-service";
-import {environment} from "../../../../../environments/environment";
-import {KeychainService} from "@noovolari/leapp-core/services/keychain-service";
-import {SessionType} from "@noovolari/leapp-core/models/session-type";
+import { AwsSessionService } from '@noovolari/leapp-core/services/session/aws/aws-session-service'
+import { AwsSsoOidcService, BrowserWindowClosing } from '../../../aws-sso-oidc.service'
+import { ISessionNotifier } from '@noovolari/leapp-core/interfaces/i-session-notifier'
+import { AwsSsoRoleSession } from '@noovolari/leapp-core/models/aws-sso-role-session'
+import { CredentialsInfo } from '@noovolari/leapp-core/models/credentials-info'
+import { Repository } from '@noovolari/leapp-core/services/repository'
+import { FileService } from '@noovolari/leapp-core/services/file-service'
+import { AwsCoreService } from '@noovolari/leapp-core/services/aws-core-service'
+import { environment } from '../../../../../environments/environment'
+import { KeychainService } from '@noovolari/leapp-core/services/keychain-service'
+import { SessionType } from '@noovolari/leapp-core/models/session-type'
 
 export interface AwsSsoRoleSessionRequest {
   sessionName: string;
@@ -73,48 +72,19 @@ export interface SsoRoleSession {
 }
 
 export class AwsSsoRoleService extends AwsSessionService implements BrowserWindowClosing {
+  private appService: AppService
+  private awsSsoOidcService
+  private ssoPortal: SSO
 
-  private static instance: AwsSsoRoleService;
-  private appService: AppService;
-  private awsSsoOidcService;
-  private ssoPortal: SSO;
-
-  private constructor(
-    iSessionNotifier: ISessionNotifier,
-    appService: AppService,
-    awsSsoOidcService: AwsSsoOidcService
-  ) {
-    super(iSessionNotifier);
-    this.appService = appService;
-    this.awsSsoOidcService = awsSsoOidcService;
-    this.awsSsoOidcService.listeners.push(this);
+  public constructor(iSessionNotifier: ISessionNotifier, repository: Repository, private fileService: FileService,
+                     private keyChainService: KeychainService, private awsCoreService: AwsCoreService,
+                     appService: AppService, awsSsoOidcService: AwsSsoOidcService) {
+    super(iSessionNotifier, repository)
+    this.appService = appService
+    this.awsSsoOidcService = awsSsoOidcService
+    this.awsSsoOidcService.listeners.push(this)
   }
 
-  static getInstance() {
-    if(!this.instance) {
-      // TODO: understand if we need to move Leapp Errors in a core folder
-      throw new LeappBaseError('Not initialized service error', this, LoggerLevel.error,
-        'Service needs to be initialized');
-    }
-    return this.instance;
-  }
-
-  static init(iSessionNotifier: ISessionNotifier, appService: AppService, awsSsoOidcService: AwsSsoOidcService) {
-    if(this.instance) {
-      // TODO: understand if we need to move Leapp Errors in a core folder
-      throw new LeappBaseError('Already initialized service error', this, LoggerLevel.error,
-        'Service already initialized');
-    }
-    this.instance = new AwsSsoRoleService(iSessionNotifier, appService, awsSsoOidcService);
-  }
-
-  static getProtocol(aliasedUrl: string): string {
-    let protocol = aliasedUrl.split('://')[0];
-    if (protocol.indexOf('http') === -1) {
-      protocol = 'https';
-    }
-    return protocol;
-  }
 
   static sessionTokenFromGetSessionTokenResponse(getRoleCredentialResponse: SSO.GetRoleCredentialsResponse): { sessionToken: any } {
     return {
@@ -126,29 +96,29 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
         // eslint-disable-next-line @typescript-eslint/naming-convention
         aws_session_token: getRoleCredentialResponse.roleCredentials.sessionToken.trim(),
       }
-    };
+    }
   }
 
   async catchClosingBrowserWindow(): Promise<void> {
-    // Get all current sessions if any
-    const sessions = this.iSessionNotifier.listAwsSsoRoles();
-
+    const sessions = this.iSessionNotifier.listAwsSsoRoles()
     for (let i = 0; i < sessions.length; i++) {
       // Stop session
-      const sess = sessions[i];
-      await this.stop(sess.sessionId).then(_ => {});
+      const currentSession = sessions[i]
+      await this.stop(currentSession.sessionId).then(_ => {
+      })
     }
   }
 
   create(accountRequest: AwsSsoRoleSessionRequest, profileId: string): void {
-    const session = new AwsSsoRoleSession(accountRequest.sessionName, accountRequest.region, accountRequest.roleArn, profileId, accountRequest.email);
-    this.iSessionNotifier.addSession(session);
+    const session = new AwsSsoRoleSession(accountRequest.sessionName, accountRequest.region, accountRequest.roleArn,
+      profileId, accountRequest.email)
+    this.iSessionNotifier.addSession(session)
   }
 
   async applyCredentials(sessionId: string, credentialsInfo: CredentialsInfo): Promise<void> {
-    const session = this.iSessionNotifier.getSessionById(sessionId);
-    const profileName = Repository.getInstance().getProfileName((session as AwsSsoRoleSession).profileId);
-    const credentialObject = {};
+    const session = this.iSessionNotifier.getSessionById(sessionId)
+    const profileName = this.repository.getProfileName((session as AwsSsoRoleSession).profileId)
+    const credentialObject = {}
     credentialObject[profileName] = {
       // eslint-disable-next-line @typescript-eslint/naming-convention
       aws_access_key_id: credentialsInfo.sessionToken.aws_access_key_id,
@@ -157,263 +127,280 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
       // eslint-disable-next-line @typescript-eslint/naming-convention
       aws_session_token: credentialsInfo.sessionToken.aws_session_token,
       region: session.region
-    };
-    return await FileService.getInstance().iniWriteSync(this.appService.awsCredentialPath(), credentialObject);
+    }
+    return await this.fileService.iniWriteSync(this.awsCoreService.awsCredentialPath(), credentialObject)
   }
 
   async deApplyCredentials(sessionId: string): Promise<void> {
-    const session = this.iSessionNotifier.getSessionById(sessionId);
-    const profileName = Repository.getInstance().getProfileName((session as AwsSsoRoleSession).profileId);
-    const credentialsFile = await FileService.getInstance().iniParseSync(this.appService.awsCredentialPath());
-    delete credentialsFile[profileName];
-    await FileService.getInstance().replaceWriteSync(this.appService.awsCredentialPath(), credentialsFile);
+    const session = this.iSessionNotifier.getSessionById(sessionId)
+    const profileName = this.repository.getProfileName((session as AwsSsoRoleSession).profileId)
+    const credentialsFile = await this.fileService.iniParseSync(this.awsCoreService.awsCredentialPath())
+    delete credentialsFile[profileName]
+    await this.fileService.replaceWriteSync(this.awsCoreService.awsCredentialPath(), credentialsFile)
   }
 
   async generateCredentials(sessionId: string): Promise<CredentialsInfo> {
-    const region = Repository.getInstance().getAwsSsoConfiguration().region;
-    const portalUrl = Repository.getInstance().getAwsSsoConfiguration().portalUrl;
-    const roleArn = (this.iSessionNotifier.getSessionById(sessionId) as AwsSsoRoleSession).roleArn;
+    const region = this.repository.getAwsSsoConfiguration().region
+    const portalUrl = this.repository.getAwsSsoConfiguration().portalUrl
+    const roleArn = (this.iSessionNotifier.getSessionById(sessionId) as AwsSsoRoleSession).roleArn
 
-    const accessToken = await this.getAccessToken(region, portalUrl);
-    const credentials = await this.getRoleCredentials(accessToken, region, roleArn);
+    const accessToken = await this.getAccessToken(region, portalUrl)
+    const credentials = await this.getRoleCredentials(accessToken, region, roleArn)
 
-    return AwsSsoRoleService.sessionTokenFromGetSessionTokenResponse(credentials);
+    return AwsSsoRoleService.sessionTokenFromGetSessionTokenResponse(credentials)
   }
 
   sessionDeactivated(sessionId: string) {
-    super.sessionDeactivated(sessionId);
+    super.sessionDeactivated(sessionId)
   }
 
-  removeSecrets(sessionId: string): void {}
+  removeSecrets(sessionId: string): void {
+  }
 
   interrupt() {
-    this.awsSsoOidcService.interrupt();
+    this.awsSsoOidcService.interrupt()
   }
 
   async sync(): Promise<SsoRoleSession[]> {
-    const region = Repository.getInstance().getAwsSsoConfiguration().region;
-    const portalUrl = Repository.getInstance().getAwsSsoConfiguration().portalUrl;
+    const region = this.repository.getAwsSsoConfiguration().region
+    const portalUrl = this.repository.getAwsSsoConfiguration().portalUrl
 
-    const accessToken = await this.getAccessToken(region, portalUrl);
+    const accessToken = await this.getAccessToken(region, portalUrl)
 
     // Get AWS SSO Role sessions
-    const sessions = await this.getSessions(accessToken, region);
+    const sessions = await this.getSessions(accessToken, region)
 
     // Remove all old AWS SSO Role sessions from workspace
-    await this.removeSsoSessionsFromWorkspace();
+    await this.removeSsoSessionsFromWorkspace()
 
-    return sessions;
+    return sessions
   }
 
   async logout(): Promise<void> {
     // Obtain region and access token
-    const region = Repository.getInstance().getAwsSsoConfiguration().region;
-    const savedAccessToken = await this.getAccessTokenFromKeychain();
+    const region = this.repository.getAwsSsoConfiguration().region
+    const savedAccessToken = await this.getAccessTokenFromKeychain()
 
     // Configure Sso Portal Client
-    this.getSsoPortalClient(region);
+    this.getSsoPortalClient(region)
 
     // Make a logout request to Sso
-    const logoutRequest: LogoutRequest = { accessToken: savedAccessToken };
+    const logoutRequest: LogoutRequest = {accessToken: savedAccessToken}
 
-    this.ssoPortal.logout(logoutRequest).promise().then(_ => {}, _ => {
+    this.ssoPortal.logout(logoutRequest).promise().then(_ => {
+    }, _ => {
       // Clean clients
-      this.ssoPortal = null;
+      this.ssoPortal = null
 
       // Delete access token and remove sso configuration info from workspace
-      KeychainService.getInstance().deletePassword(environment.appName, 'aws-sso-access-token');
-      Repository.getInstance().removeExpirationTimeFromAwsSsoConfiguration();
+      this.keyChainService.deletePassword(environment.appName, 'aws-sso-access-token')
+      this.repository.removeExpirationTimeFromAwsSsoConfiguration()
 
-      this.removeSsoSessionsFromWorkspace();
-    });
+      this.removeSsoSessionsFromWorkspace()
+    })
   }
 
   async getAccessToken(region: string, portalUrl: string): Promise<string> {
     if (this.ssoExpired()) {
-      const loginResponse = await this.login(region, portalUrl);
+      const loginResponse = await this.login(region, portalUrl)
 
       this.configureAwsSso(
         region,
         loginResponse.portalUrlUnrolled,
         loginResponse.expirationTime.toISOString(),
         loginResponse.accessToken
-      );
+      )
 
-      return loginResponse.accessToken;
+      return loginResponse.accessToken
     } else {
-      return await this.getAccessTokenFromKeychain();
+      return await this.getAccessTokenFromKeychain()
     }
   }
 
   async getRoleCredentials(accessToken: string, region: string, roleArn: string): Promise<GetRoleCredentialsResponse> {
-    this.getSsoPortalClient(region);
+    this.getSsoPortalClient(region)
 
     const getRoleCredentialsRequest: GetRoleCredentialsRequest = {
       accountId: roleArn.substring(13, 25),
       roleName: roleArn.split('/')[1],
       accessToken
-    };
+    }
 
-    return this.ssoPortal.getRoleCredentials(getRoleCredentialsRequest).promise();
+    return this.ssoPortal.getRoleCredentials(getRoleCredentialsRequest).promise()
   }
 
   async awsSsoActive(): Promise<boolean> {
-    const ssoToken = await this.getAccessTokenFromKeychain();
-    return !this.ssoExpired() && ssoToken !== undefined;
+    const ssoToken = await this.getAccessTokenFromKeychain()
+    return !this.ssoExpired() && ssoToken !== undefined
   }
 
   private ssoExpired(): boolean {
-    const expirationTime = Repository.getInstance().getAwsSsoConfiguration().expirationTime;
-    return !expirationTime || Date.parse(expirationTime) < Date.now();
+    const expirationTime = this.repository.getAwsSsoConfiguration().expirationTime
+    return !expirationTime || Date.parse(expirationTime) < Date.now()
+  }
+
+  private getProtocol(aliasedUrl: string): string {
+    let protocol = aliasedUrl.split('://')[0]
+    if (protocol.indexOf('http') === -1) {
+      protocol = 'https'
+    }
+    return protocol
   }
 
   private async login(region: string, portalUrl: string): Promise<LoginResponse> {
-    const followRedirectClient = this.appService.getFollowRedirects()[AwsSsoRoleService.getProtocol(portalUrl)];
+    const followRedirectClient = this.appService.getFollowRedirects()[this.getProtocol(portalUrl)]
 
-    portalUrl = await new Promise( (resolve, _) => {
-      const request = followRedirectClient.request(portalUrl, response => resolve(response.responseUrl));
-      request.end();
-    });
+    portalUrl = await new Promise((resolve, _) => {
+      const request = followRedirectClient.request(portalUrl, response => resolve(response.responseUrl))
+      request.end()
+    })
 
-    const generateSsoTokenResponse = await this.awsSsoOidcService.login(region, portalUrl);
-    return { portalUrlUnrolled: portalUrl, accessToken: generateSsoTokenResponse.accessToken, region, expirationTime: generateSsoTokenResponse.expirationTime };
+    const generateSsoTokenResponse = await this.awsSsoOidcService.login(region, portalUrl)
+    return {
+      portalUrlUnrolled: portalUrl,
+      accessToken: generateSsoTokenResponse.accessToken,
+      region,
+      expirationTime: generateSsoTokenResponse.expirationTime
+    }
   }
 
   private async getSessions(accessToken: string, region: string): Promise<SsoRoleSession[]> {
-    const accounts: AccountInfo[] = await this.listAccounts(accessToken, region);
+    const accounts: AccountInfo[] = await this.listAccounts(accessToken, region)
 
-    const promiseArray: Promise<SsoRoleSession[]>[] = [];
+    const promiseArray: Promise<SsoRoleSession[]>[] = []
 
     accounts.forEach((account) => {
-      promiseArray.push(this.getSessionsFromAccount(account, accessToken, region));
-    });
+      promiseArray.push(this.getSessionsFromAccount(account, accessToken, region))
+    })
 
-    return new Promise( (resolve, _) => {
-      Promise.all(promiseArray).then( (sessionMatrix: SsoRoleSession[][]) => {
-        resolve(sessionMatrix.flat());
-      });
-    });
+    return new Promise((resolve, _) => {
+      Promise.all(promiseArray).then((sessionMatrix: SsoRoleSession[][]) => {
+        resolve(sessionMatrix.flat())
+      })
+    })
   }
 
   private async getSessionsFromAccount(accountInfo: AccountInfo, accessToken: string, region: string): Promise<SsoRoleSession[]> {
-    this.getSsoPortalClient(region);
+    this.getSsoPortalClient(region)
 
     const listAccountRolesRequest: ListAccountRolesRequest = {
       accountId: accountInfo.accountId,
       accessToken,
       maxResults: 30 // TODO: find a proper value
-    };
+    }
 
-    const accountRoles: RoleInfo[] = [];
+    const accountRoles: RoleInfo[] = []
 
     await new Promise((resolve, _) => {
-      this.recursiveListRoles(accountRoles, listAccountRolesRequest, resolve);
-    });
+      this.recursiveListRoles(accountRoles, listAccountRolesRequest, resolve)
+    })
 
-    const awsSsoSessions: SsoRoleSession[] = [];
+    const awsSsoSessions: SsoRoleSession[] = []
 
     accountRoles.forEach((accountRole) => {
-      const oldSession = this.findOldSession(accountInfo, accountRole);
+      const oldSession = this.findOldSession(accountInfo, accountRole)
 
       const awsSsoSession = {
         email: accountInfo.emailAddress,
-        region: oldSession?.region || Repository.getInstance().getDefaultRegion() || environment.defaultRegion,
+        region: oldSession?.region || this.repository.getDefaultRegion() || environment.defaultRegion,
         roleArn: `arn:aws:iam::${accountInfo.accountId}/${accountRole.roleName}`,
         sessionName: accountInfo.accountName,
-        profileId: oldSession?.profileId || Repository.getInstance().getDefaultProfileId()
-      };
+        profileId: oldSession?.profileId || this.repository.getDefaultProfileId()
+      }
 
-      awsSsoSessions.push(awsSsoSession);
-    });
+      awsSsoSessions.push(awsSsoSession)
+    })
 
-    return awsSsoSessions;
+    return awsSsoSessions
   }
 
   private recursiveListRoles(accountRoles: RoleInfo[], listAccountRolesRequest: ListAccountRolesRequest, promiseCallback: any) {
     this.ssoPortal.listAccountRoles(listAccountRolesRequest).promise().then(response => {
-      accountRoles.push(...response.roleList);
+      accountRoles.push(...response.roleList)
 
       if (response.nextToken !== null) {
-        listAccountRolesRequest.nextToken = response.nextToken;
-        this.recursiveListRoles(accountRoles, listAccountRolesRequest, promiseCallback);
+        listAccountRolesRequest.nextToken = response.nextToken
+        this.recursiveListRoles(accountRoles, listAccountRolesRequest, promiseCallback)
       } else {
-        promiseCallback(accountRoles);
+        promiseCallback(accountRoles)
       }
-    });
+    })
   }
 
   private async listAccounts(accessToken: string, region: string): Promise<AccountInfo[]> {
-    this.getSsoPortalClient(region);
+    this.getSsoPortalClient(region)
 
-    const listAccountsRequest: ListAccountsRequest = { accessToken, maxResults: 30 };
-    const accountList: AccountInfo[] = [];
+    const listAccountsRequest: ListAccountsRequest = {accessToken, maxResults: 30}
+    const accountList: AccountInfo[] = []
 
-    return new Promise( (resolve, _) => {
-      this.recursiveListAccounts(accountList, listAccountsRequest, resolve);
-    });
+    return new Promise((resolve, _) => {
+      this.recursiveListAccounts(accountList, listAccountsRequest, resolve)
+    })
   }
 
   private recursiveListAccounts(accountList: AccountInfo[], listAccountsRequest: ListAccountsRequest, promiseCallback: any) {
     this.ssoPortal.listAccounts(listAccountsRequest).promise().then(response => {
-      accountList.push(...response.accountList);
+      accountList.push(...response.accountList)
 
       if (response.nextToken !== null) {
-        listAccountsRequest.nextToken = response.nextToken;
-        this.recursiveListAccounts(accountList, listAccountsRequest, promiseCallback);
+        listAccountsRequest.nextToken = response.nextToken
+        this.recursiveListAccounts(accountList, listAccountsRequest, promiseCallback)
       } else {
-        promiseCallback(accountList);
+        promiseCallback(accountList)
       }
-    });
+    })
   }
 
   private async removeSsoSessionsFromWorkspace(): Promise<void> {
-    const sessions = this.iSessionNotifier.listAwsSsoRoles();
+    const sessions = this.iSessionNotifier.listAwsSsoRoles()
 
     for (let i = 0; i < sessions.length; i++) {
-      const sess = sessions[i];
+      const sess = sessions[i]
 
-      const iamRoleChainedSessions = this.iSessionNotifier.listIamRoleChained(sess);
+      const iamRoleChainedSessions = this.iSessionNotifier.listIamRoleChained(sess)
 
       for (let j = 0; j < iamRoleChainedSessions.length; j++) {
-        await this.delete(iamRoleChainedSessions[j].sessionId);
+        await this.delete(iamRoleChainedSessions[j].sessionId)
       }
 
-      await this.stop(sess.sessionId);
+      await this.stop(sess.sessionId)
 
-      this.iSessionNotifier.deleteSession(sess.sessionId);
-      Repository.getInstance().deleteSession(sess.sessionId);
+      this.iSessionNotifier.deleteSession(sess.sessionId)
+      this.repository.deleteSession(sess.sessionId)
     }
   }
 
   private configureAwsSso(region: string, portalUrl: string, expirationTime: string, accessToken: string) {
-    Repository.getInstance().configureAwsSso(region, portalUrl, expirationTime);
-    KeychainService.getInstance().saveSecret(environment.appName, 'aws-sso-access-token', accessToken).then(_ => {});
+    this.repository.configureAwsSso(region, portalUrl, expirationTime)
+    this.keyChainService.saveSecret(environment.appName, 'aws-sso-access-token', accessToken).then(_ => {
+    })
   }
 
   private getSsoPortalClient(region: string): void {
     if (!this.ssoPortal) {
-      this.ssoPortal = new SSO({region});
+      this.ssoPortal = new SSO({region})
     }
   }
 
   private async getAccessTokenFromKeychain(): Promise<string> {
-    return KeychainService.getInstance().getSecret(environment.appName, 'aws-sso-access-token');
+    return this.keyChainService.getSecret(environment.appName, 'aws-sso-access-token')
   }
 
   private findOldSession(accountInfo: SSO.AccountInfo, accountRole: SSO.RoleInfo): { region: string; profileId: string } {
+    //TODO: use map and filter in order to make this method more readable
     for (let i = 0; i < this.iSessionNotifier.getSessions().length; i++) {
-      const sess = this.iSessionNotifier.getSessions()[i];
+      const sess = this.iSessionNotifier.getSessions()[i]
 
-      if(sess.type === SessionType.awsSsoRole) {
+      if (sess.type === SessionType.awsSsoRole) {
         if (
-          ((sess as AwsSsoRoleSession).email === accountInfo.emailAddress ) &&
-          ((sess as AwsSsoRoleSession).roleArn === `arn:aws:iam::${accountInfo.accountId}/${accountRole.roleName}` )
+          ((sess as AwsSsoRoleSession).email === accountInfo.emailAddress) &&
+          ((sess as AwsSsoRoleSession).roleArn === `arn:aws:iam::${accountInfo.accountId}/${accountRole.roleName}`)
         ) {
-          return { region: (sess as AwsSsoRoleSession).region, profileId: (sess as AwsSsoRoleSession).profileId };
+          return {region: (sess as AwsSsoRoleSession).region, profileId: (sess as AwsSsoRoleSession).profileId}
         }
       }
     }
 
-    return undefined;
+    return undefined
   }
 }

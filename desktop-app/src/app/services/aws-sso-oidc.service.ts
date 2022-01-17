@@ -16,6 +16,7 @@ import {
   StartDeviceAuthorizationResponse,
   VerificationResponse
 } from './session/aws/method/aws-sso-role-service'
+import { LeappCoreService } from './leapp-core.service'
 
 export interface BrowserWindowClosing {
   catchClosingBrowserWindow(): void;
@@ -43,7 +44,8 @@ export class AwsSsoOidcService {
   private index: number
   private repository: Repository
 
-  constructor(private appService: AppService, private electronService: ElectronService, private leappCoreService) {
+  constructor(private appService: AppService, private electronService: ElectronService,
+              private leappCoreService: LeappCoreService) {
     this.listeners = []
     this.ssoOidc = null
     this.ssoWindow = null

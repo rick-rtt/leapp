@@ -10,16 +10,10 @@ import {LeappNotFoundError} from "../errors/leapp-not-found-error";
 import {INativeService} from "../interfaces/i-native-service";
 
 export class Repository {
-
-  private static instance: Repository;
-
   // Private singleton workspace
   private _workspace: Workspace;
 
-  constructor(
-    private nativeService: INativeService,
-    private fileService: FileService
-  ) {
+  constructor(private nativeService: INativeService, private fileService: FileService) {
     // TODO: check if it can be moved to a bootstrap phase
     this.createWorkspace();
   }
