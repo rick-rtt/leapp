@@ -1,9 +1,8 @@
 import { SessionService } from '@noovolari/leapp-core/services/session/session.service'
-import { AppService } from '../../app.service'
-import { ExecuteService } from '../../execute.service'
 import { ISessionNotifier } from '@noovolari/leapp-core/interfaces/i-session-notifier'
 import { AzureSession } from '@noovolari/leapp-core/models/azure-session'
 import { Repository } from '@noovolari/leapp-core/services/repository'
+import { ExecuteService } from '@noovolari/leapp-core/services/execute.service'
 import { LeappExecuteError } from '@noovolari/leapp-core/errors/leapp-execute-error'
 import { LeappParseError } from '@noovolari/leapp-core/errors/leapp-parse-error'
 import { FileService } from '@noovolari/leapp-core/services/file-service'
@@ -32,7 +31,7 @@ export interface AzureSessionToken {
 
 export class AzureService extends SessionService {
   public constructor(iSessionNotifier: ISessionNotifier, repository: Repository, private fileService: FileService,
-                      private appService: AppService, private executeService: ExecuteService) {
+                     private executeService: ExecuteService) {
     super(iSessionNotifier, repository)
   }
 
@@ -126,13 +125,13 @@ export class AzureService extends SessionService {
   }
 
   private deleteRefreshToken(): void {
-    const accessTokensString = this.fileService.readFileSync(`${this.appService.getOS().homedir()}/${environment.azureAccessTokens}`)
+    const accessTokensString = this.fileService.readFileSync(`${this.fileService.homeDir()}/${environment.azureAccessTokens}`)
     let azureSessionTokens = JSON.parse(accessTokensString) as AzureSessionToken[]
     azureSessionTokens = azureSessionTokens.map(azureSessionToken => {
       delete azureSessionToken.refreshToken
       return azureSessionToken
     })
-    this.fileService.writeFileSync(`${this.appService.getOS().homedir()}/${environment.azureAccessTokens}`, JSON.stringify(azureSessionTokens))
+    this.fileService.writeFileSync(`${this.fileService.homeDir()}/${environment.azureAccessTokens}`, JSON.stringify(azureSessionTokens))
   }
 
   private parseAccessTokens(): AzureSessionToken[] {
@@ -140,11 +139,11 @@ export class AzureService extends SessionService {
       return undefined
     }
 
-    const accessTokensString = this.fileService.readFileSync(`${this.appService.getOS().homedir()}/${environment.azureAccessTokens}`)
+    const accessTokensString = this.fileService.readFileSync(`${this.fileService.homeDir()}/${environment.azureAccessTokens}`)
     return JSON.parse(accessTokensString) as AzureSessionToken[]
   }
 
   private accessTokenFileExists(): boolean {
-    return this.fileService.exists(`${this.appService.getOS().homedir()}/${environment.azureAccessTokens}`)
+    return this.fileService.exists(`${this.fileService.homeDir()}/${environment.azureAccessTokens}`)
   }
 }

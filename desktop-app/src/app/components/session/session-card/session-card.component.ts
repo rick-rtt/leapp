@@ -2,7 +2,6 @@ import { Component, Input, OnInit, TemplateRef, ViewChild } from '@angular/core'
 import { AppService, ToastLevel } from '../../../services/app.service'
 import { Router } from '@angular/router'
 import { SsmService } from '../../../services/ssm.service'
-import { WorkspaceService } from '../../../services/workspace.service'
 import { environment } from '../../../../environments/environment'
 import * as uuid from 'uuid'
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal'
@@ -12,6 +11,7 @@ import { Session } from '@noovolari/leapp-core/models/session'
 import { SessionType } from '@noovolari/leapp-core/models/session-type'
 import { SessionStatus } from '@noovolari/leapp-core/models/session-status'
 import { Repository } from '@noovolari/leapp-core/services/repository'
+import { WorkspaceService } from '@noovolari/leapp-core/services/workspace.service'
 import { constants } from '@noovolari/leapp-core/models/constants'
 import { AwsIamRoleFederatedSession } from '@noovolari/leapp-core/models/aws-iam-role-federated-session'
 import { AwsIamUserService } from '@noovolari/leapp-core/services/session/aws/method/aws-iam-user-service'
@@ -62,13 +62,15 @@ export class SessionCardComponent implements OnInit {
   private loggingService: LoggingService
   private repository: Repository
   private sessionServiceFactory: SessionServiceFactory
+  private workspaceService: WorkspaceService
 
-  constructor(private workspaceService: WorkspaceService, private appService: AppService, private router: Router,
-              private ssmService: SsmService, private modalService: BsModalService,
-              private awsIamUserService: AwsIamUserService, leappCoreService: LeappCoreService) {
+  constructor(private appService: AppService, private router: Router, private ssmService: SsmService,
+              private modalService: BsModalService, private awsIamUserService: AwsIamUserService,
+              leappCoreService: LeappCoreService) {
     this.repository = leappCoreService.repository
     this.loggingService = leappCoreService.loggingService
     this.sessionServiceFactory = leappCoreService.sessionServiceFactory
+    this.workspaceService = leappCoreService.workspaceService
   }
 
   ngOnInit() {

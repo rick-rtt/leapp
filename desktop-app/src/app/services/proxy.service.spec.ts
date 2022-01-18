@@ -2,7 +2,7 @@ import {TestBed} from '@angular/core/testing';
 
 import {ProxyService} from './proxy.service';
 import {mustInjected} from '../../base-injectables';
-import {WorkspaceService} from './workspace.service';
+import {WorkspaceService} from '../../../../core/services/workspace.service';
 import {serialize} from 'class-transformer';
 import {Workspace} from '@noovolari/leapp-core/models/workspace';
 import {AppService} from './app.service';

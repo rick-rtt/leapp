@@ -1,26 +1,28 @@
-import {Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
-import {FormControl, FormGroup, Validators} from '@angular/forms';
-import {AppService} from '../../services/app.service';
-import {ActivatedRoute, Router} from '@angular/router';
-import {WorkspaceService} from '../../services/workspace.service';
-import {environment} from '../../../environments/environment';
-import * as uuid from 'uuid';
-import {SessionType} from '@noovolari/leapp-core/models/session-type';
-import { Repository } from '@noovolari/leapp-core/services/repository';
-import {LoggerLevel, LoggingService} from '@noovolari/leapp-core/services/logging-service';
-import {AwsIamUserService, AwsIamUserSessionRequest} from '@noovolari/leapp-core/services/session/aws/method/aws-iam-user-service';
-import {LeappParseError} from '@noovolari/leapp-core/errors/leapp-parse-error';
+import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core'
+import { FormControl, FormGroup, Validators } from '@angular/forms'
+import { AppService } from '../../services/app.service'
+import { ActivatedRoute, Router } from '@angular/router'
+import { environment } from '../../../environments/environment'
+import * as uuid from 'uuid'
+import { SessionType } from '@noovolari/leapp-core/models/session-type'
+import { Repository } from '@noovolari/leapp-core/services/repository'
+import { LoggerLevel, LoggingService } from '@noovolari/leapp-core/services/logging-service'
+import { WorkspaceService } from '@noovolari/leapp-core/services/workspace.service'
+import {
+  AwsIamUserService,
+  AwsIamUserSessionRequest
+} from '@noovolari/leapp-core/services/session/aws/method/aws-iam-user-service'
+import { LeappParseError } from '@noovolari/leapp-core/errors/leapp-parse-error'
 import {
   AwsIamRoleFederatedService,
   AwsIamRoleFederatedSessionRequest
-} from "../../services/session/aws/method/aws-iam-role-federated-service";
+} from '../../services/session/aws/method/aws-iam-role-federated-service'
 import {
   AwsIamRoleChainedService,
   AwsIamRoleChainedSessionRequest
-} from "../../services/session/aws/method/aws-iam-role-chained-service";
-import {AzureService, AzureSessionRequest} from "../../services/session/azure/azure.service";
+} from '../../services/session/aws/method/aws-iam-role-chained-service'
+import { AzureService, AzureSessionRequest } from '../../services/session/azure/azure.service'
 import { LeappCoreService } from '../../services/leapp-core.service'
-import { getLocaleExtraDayPeriodRules } from '@angular/common'
 
 @Component({
   selector: 'app-create-account',
@@ -29,36 +31,36 @@ import { getLocaleExtraDayPeriodRules } from '@angular/common'
 })
 export class CreateAccountComponent implements OnInit {
 
-  @Input() selectedSession;
-  @Input() selectedAccountNumber = '';
-  @Input() selectedRole = '';
-  @Input() selectedSamlUrl = '';
+  @Input() selectedSession
+  @Input() selectedAccountNumber = ''
+  @Input() selectedRole = ''
+  @Input() selectedSamlUrl = ''
 
-  @ViewChild('roleInput', {static: false}) roleInput: ElementRef;
+  @ViewChild('roleInput', {static: false}) roleInput: ElementRef
 
-  firstTime = false;
-  providerSelected = false;
-  typeSelection = false;
-  hasOneGoodSession = false;
-  hasSsoUrl = false;
+  firstTime = false
+  providerSelected = false
+  typeSelection = false
+  hasOneGoodSession = false
+  hasSsoUrl = false
 
-  sessionType;
-  provider;
+  sessionType
+  provider
 
-  idpUrls: { value: string; label: string}[] = [];
-  selectedIdpUrl: {value: string; label: string};
+  idpUrls: { value: string; label: string }[] = []
+  selectedIdpUrl: { value: string; label: string }
 
-  profiles: { value: string; label: string}[] = [];
-  selectedProfile: {value: string; label: string};
+  profiles: { value: string; label: string }[] = []
+  selectedProfile: { value: string; label: string }
 
-  assumerAwsSessions = [];
+  assumerAwsSessions = []
 
-  regions = [];
-  selectedRegion;
-  locations = [];
-  selectedLocation;
+  regions = []
+  selectedRegion
+  locations = []
+  selectedLocation
 
-  eSessionType = SessionType;
+  eSessionType = SessionType
 
   public form = new FormGroup({
     idpArn: new FormControl('', [Validators.required]),
@@ -79,17 +81,19 @@ export class CreateAccountComponent implements OnInit {
     awsProfile: new FormControl('', [Validators.required]),
     azureLocation: new FormControl('', [Validators.required]),
     assumerSession: new FormControl('', [Validators.required])
-  });
+  })
 
+  private workspaceService: WorkspaceService
   private repository: Repository
   private loggingService: LoggingService
 
   constructor(private appService: AppService, private router: Router, private activatedRoute: ActivatedRoute,
-              private workspaceService: WorkspaceService, private awsIamRoleFederatedService: AwsIamRoleFederatedService,
+              private awsIamRoleFederatedService: AwsIamRoleFederatedService,
               private awsIamRoleChainedService: AwsIamRoleChainedService, private azureService: AzureService,
               private awsIamUserService: AwsIamUserService, leappCoreService: LeappCoreService) {
     this.repository = leappCoreService.repository
     this.loggingService = leappCoreService.loggingService
+    this.workspaceService = leappCoreService.workspaceService
   }
 
   ngOnInit() {
@@ -99,43 +103,46 @@ export class CreateAccountComponent implements OnInit {
       if (this.repository.getIdpUrls() && this.repository.getIdpUrls().length > 0) {
         this.repository.getIdpUrls().forEach(idp => {
           if (idp !== null) {
-            this.idpUrls.push({value: idp.id, label: idp.url});
+            this.idpUrls.push({value: idp.id, label: idp.url})
           }
-        });
+        })
       }
 
       // We got all the applicable profiles
       // Note: we don't use azure profile so we remove default azure profile from the list
       this.repository.getProfiles().forEach(idp => {
-          if (idp !== null && idp.name !== environment.defaultAzureProfileName) {
-            this.profiles.push({value: idp.id, label: idp.name});
-          }
-      });
+        if (idp !== null && idp.name !== environment.defaultAzureProfileName) {
+          this.profiles.push({value: idp.id, label: idp.name})
+        }
+      })
 
       // This way we also fix potential incongruences when you have half saved setup
-      this.hasOneGoodSession = this.workspaceService.sessions.length > 0;
-      this.firstTime = params['firstTime'] || !this.hasOneGoodSession;
+      this.hasOneGoodSession = this.workspaceService.sessions.length > 0
+      this.firstTime = params['firstTime'] || !this.hasOneGoodSession
 
       // Show the assumable accounts
       this.assumerAwsSessions = this.workspaceService.listAssumable().map(session => ({
-          sessionName: session.sessionName,
-          session
-      }));
+        sessionName: session.sessionName,
+        session
+      }))
 
       // Only for start screen: disable IAM Chained creation
       if (this.firstTime) {
-        this.form.controls['federatedOrIamRoleChained'].disable({ onlySelf: true });
+        this.form.controls['federatedOrIamRoleChained'].disable({onlySelf: true})
       }
 
       // Get all regions and locations from app service lists
-      this.regions = this.appService.getRegions();
-      this.locations = this.appService.getLocations();
+      this.regions = this.appService.getRegions()
+      this.locations = this.appService.getLocations()
 
       // Select default values
-      this.selectedRegion = this.repository.getDefaultRegion() || environment.defaultRegion || this.regions[0].region;
-      this.selectedLocation = this.repository.getDefaultLocation() || environment.defaultLocation || this.locations[0].location;
-      this.selectedProfile = this.repository.getProfiles().filter(p => p.name === 'default').map(p => ({ value: p.id, label: p.name }))[0];
-    });
+      this.selectedRegion = this.repository.getDefaultRegion() || environment.defaultRegion || this.regions[0].region
+      this.selectedLocation = this.repository.getDefaultLocation() || environment.defaultLocation || this.locations[0].location
+      this.selectedProfile = this.repository.getProfiles().filter(p => p.name === 'default').map(p => ({
+        value: p.id,
+        label: p.name
+      }))[0]
+    })
   }
 
   /**
@@ -144,7 +151,7 @@ export class CreateAccountComponent implements OnInit {
    * @param tag
    */
   addNewSSO(tag: string): { value: string; label: string } {
-   return { value: uuid.v4(), label: tag };
+    return {value: uuid.v4(), label: tag}
   }
 
   /**
@@ -153,18 +160,19 @@ export class CreateAccountComponent implements OnInit {
    * @param tag
    */
   addNewProfile(tag: string): { value: string; label: string } {
-   return { value: uuid.v4(), label: tag };
+    return {value: uuid.v4(), label: tag}
   }
 
   /**
    * Save the first account in the workspace
    */
   saveSession() {
-    this.loggingService.logger(`Saving account...`, LoggerLevel.info, this);
-    this.addProfileToWorkspace();
-    this.saveNewSsoRolesToWorkspace();
-    this.createSession();
-    this.router.navigate(['/sessions', 'session-selected']).then(_ => {});
+    this.loggingService.logger(`Saving account...`, LoggerLevel.info, this)
+    this.addProfileToWorkspace()
+    this.saveNewSsoRolesToWorkspace()
+    this.createSession()
+    this.router.navigate(['/sessions', 'session-selected']).then(_ => {
+    })
   }
 
   /**
@@ -172,7 +180,7 @@ export class CreateAccountComponent implements OnInit {
    */
   formValid() {
     // TODO: validate form
-    return true;
+    return true
   }
 
   /**
@@ -181,13 +189,13 @@ export class CreateAccountComponent implements OnInit {
    * @param name
    */
   setProvider(name) {
-    this.provider = name;
-    this.providerSelected = true;
+    this.provider = name
+    this.providerSelected = true
     if (name === SessionType.azure) {
-      this.sessionType = SessionType.azure;
+      this.sessionType = SessionType.azure
     }
     if (name === SessionType.awsIamRoleFederated) {
-      this.typeSelection = true;
+      this.typeSelection = true
     }
   }
 
@@ -197,9 +205,9 @@ export class CreateAccountComponent implements OnInit {
    * @param strategy
    */
   setAccessStrategy(strategy) {
-    this.sessionType = strategy;
-    this.provider = strategy;
-    this.typeSelection = false;
+    this.sessionType = strategy
+    this.provider = strategy
+    this.typeSelection = false
   }
 
   /**
@@ -207,7 +215,7 @@ export class CreateAccountComponent implements OnInit {
    *
    */
   openAccessStrategyDocumentation() {
-    this.appService.openExternalUrl('https://github.com/Noovolari/leapp/wiki');
+    this.appService.openExternalUrl('https://github.com/Noovolari/leapp/wiki')
   }
 
   /**
@@ -215,7 +223,8 @@ export class CreateAccountComponent implements OnInit {
    *
    */
   goToAwsSso() {
-    this.router.navigate(['/', 'aws-sso']).then(_ => {});
+    this.router.navigate(['/', 'aws-sso']).then(_ => {
+    })
   }
 
   /**
@@ -224,7 +233,8 @@ export class CreateAccountComponent implements OnInit {
    *
    */
   goBack() {
-    this.router.navigate(['/sessions', 'session-selected']).then(_ => {});
+    this.router.navigate(['/sessions', 'session-selected']).then(_ => {
+    })
   }
 
   /**
@@ -241,9 +251,9 @@ export class CreateAccountComponent implements OnInit {
           idpUrl: this.selectedIdpUrl.value.trim(),
           idpArn: this.form.value.idpArn.trim(),
           roleArn: this.form.value.roleArn.trim()
-        };
-        this.awsIamRoleFederatedService.create(awsFederatedAccountRequest, this.selectedProfile.value);
-        break;
+        }
+        this.awsIamRoleFederatedService.create(awsFederatedAccountRequest, this.selectedProfile.value)
+        break
       case (SessionType.awsIamUser):
         const awsIamUserSessionRequest: AwsIamUserSessionRequest = {
           accountName: this.form.value.name.trim(),
@@ -251,9 +261,9 @@ export class CreateAccountComponent implements OnInit {
           accessKey: this.form.value.accessKey.trim(),
           secretKey: this.form.value.secretKey.trim(),
           mfaDevice: this.form.value.mfaDevice.trim()
-        };
-        this.awsIamUserService.create(awsIamUserSessionRequest, this.selectedProfile.value);
-        break;
+        }
+        this.awsIamUserService.create(awsIamUserSessionRequest, this.selectedProfile.value)
+        break
       case (SessionType.awsIamRoleChained):
         const awsIamRoleChainedAccountRequest: AwsIamRoleChainedSessionRequest = {
           accountName: this.form.value.name.trim(),
@@ -261,18 +271,18 @@ export class CreateAccountComponent implements OnInit {
           roleArn: this.form.value.roleArn.trim(),
           roleSessionName: this.form.value.roleSessionName.trim(),
           parentSessionId: this.selectedSession.sessionId
-        };
-        this.awsIamRoleChainedService.create(awsIamRoleChainedAccountRequest, this.selectedProfile.value);
-        break;
+        }
+        this.awsIamRoleChainedService.create(awsIamRoleChainedAccountRequest, this.selectedProfile.value)
+        break
       case (SessionType.azure):
         const azureSessionRequest: AzureSessionRequest = {
           region: this.selectedLocation,
           sessionName: this.form.value.name,
           subscriptionId: this.form.value.subscriptionId,
           tenantId: this.form.value.tenantId
-        };
-        this.azureService.create(azureSessionRequest);
-        break;
+        }
+        this.azureService.create(azureSessionRequest)
+        break
     }
   }
 
@@ -282,14 +292,14 @@ export class CreateAccountComponent implements OnInit {
    * @private
    */
   private saveNewSsoRolesToWorkspace() {
-    if(this.sessionType === SessionType.awsIamRoleFederated) {
+    if (this.sessionType === SessionType.awsIamRoleFederated) {
       try {
-        const ipdUrl = { id: this.selectedIdpUrl.value, url: this.selectedIdpUrl.label };
-        if(!this.repository.getIdpUrl(ipdUrl.id)) {
-          this.repository.addIdpUrl(ipdUrl);
+        const ipdUrl = {id: this.selectedIdpUrl.value, url: this.selectedIdpUrl.label}
+        if (!this.repository.getIdpUrl(ipdUrl.id)) {
+          this.repository.addIdpUrl(ipdUrl)
         }
-      } catch(err) {
-        throw new LeappParseError(this, err.message);
+      } catch (err) {
+        throw new LeappParseError(this, err.message)
       }
     }
   }
@@ -301,12 +311,12 @@ export class CreateAccountComponent implements OnInit {
    */
   private addProfileToWorkspace() {
     try {
-      const profile = { id: this.selectedProfile.value, name: this.selectedProfile.label };
-      if(!this.repository.getProfileName(profile.id)) {
-        this.repository.addProfile(profile);
+      const profile = {id: this.selectedProfile.value, name: this.selectedProfile.label}
+      if (!this.repository.getProfileName(profile.id)) {
+        this.repository.addProfile(profile)
       }
-    } catch(err) {
-      throw new LeappParseError(this, err.message);
+    } catch (err) {
+      throw new LeappParseError(this, err.message)
     }
   }
 }

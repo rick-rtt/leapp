@@ -1,11 +1,8 @@
 import { Component, OnInit, Renderer2 } from '@angular/core'
 import { AppService } from '../../../services/app.service'
 import { Router } from '@angular/router'
-import { HttpClient } from '@angular/common/http'
-import { ExecuteService } from '../../../services/execute.service'
-import { ProxyService } from '../../../services/proxy.service'
-import { WorkspaceService } from '../../../services/workspace.service'
 import { LoggerLevel, LoggingService } from '@noovolari/leapp-core/services/logging-service'
+import { WorkspaceService } from '@noovolari/leapp-core/services/workspace.service'
 import { LeappCoreService } from '../../../services/leapp-core.service'
 
 @Component({
@@ -15,16 +12,16 @@ import { LeappCoreService } from '../../../services/leapp-core.service'
 })
 export class ProfileSidebarComponent implements OnInit {
   private loggingService: LoggingService
+  private workspaceService: WorkspaceService
 
   profileOpen = false
   test: any
   version
 
-  constructor(private appService: AppService, private router: Router, private httpClient: HttpClient,
-              private executeService: ExecuteService, private proxyService: ProxyService,
-              private workspaceService: WorkspaceService, private renderer: Renderer2,
-              private leappCoreService: LeappCoreService) {
+  constructor(private appService: AppService, private router: Router, private renderer: Renderer2,
+              leappCoreService: LeappCoreService) {
     this.loggingService = leappCoreService.loggingService
+    this.workspaceService = leappCoreService.workspaceService
   }
 
   /**

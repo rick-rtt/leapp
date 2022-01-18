@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import {SessionServiceFactory} from './session-service-factory';
-import {WorkspaceService} from './workspace.service';
+import {WorkspaceService} from '@noovolari/leapp-core/services/workspace.service';
 import { LeappCoreService } from './leapp-core.service'
 
 
@@ -10,8 +10,10 @@ import { LeappCoreService } from './leapp-core.service'
 })
 export class RotationService {
   private sessionServiceFactory: SessionServiceFactory
+  private workspaceService: WorkspaceService
 
-  constructor(private workspaceService: WorkspaceService, leappCoreService: LeappCoreService) {
+  constructor(leappCoreService: LeappCoreService) {
+    this.workspaceService = leappCoreService.workspaceService
     this.sessionServiceFactory = leappCoreService.sessionServiceFactory
   }
 

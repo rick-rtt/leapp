@@ -1,9 +1,7 @@
-import {Injectable} from '@angular/core';
-import {ElectronService} from './electron.service';
+import { INativeService } from '../interfaces/i-native-service'
 
-@Injectable({ providedIn: 'root' })
 export class ExecuteService {
-  constructor(private electronService: ElectronService) {
+  constructor(private nativeService: INativeService) {
   }
 
   /**
@@ -19,30 +17,30 @@ export class ExecuteService {
   public execute(command: string, env?: boolean): Promise<string> {
     return new Promise(
       (resolve, reject) => {
-        let exec = this.electronService.exec;
+        let exec = this.nativeService.exec
         if (command.startsWith('sudo')) {
-          exec = this.electronService.sudo.exec;
-          command = command.substring(5, command.length);
+          exec = this.nativeService.sudo.exec
+          command = command.substring(5, command.length)
         }
 
-        if (this.electronService.process.platform === 'darwin') {
+        if (this.nativeService.process.platform === 'darwin') {
           if (command.indexOf('osascript') === -1) {
-            command = '/usr/local/bin/' + command;
+            command = '/usr/local/bin/' + command
           } else {
-            command = '/usr/bin/' + command;
+            command = '/usr/bin/' + command
           }
         }
 
-        exec(command, {env, name: 'Leapp', timeout: 60000 }, (err, stdout, stderr) => {
-          this.electronService.log.info('execute from Leapp: ', {error: err, standardout: stdout, standarderror: stderr});
+        exec(command, {env, name: 'Leapp', timeout: 60000}, (err, stdout, stderr) => {
+          this.nativeService.log.info('execute from Leapp: ', {error: err, standardout: stdout, standarderror: stderr})
           if (err) {
-            reject(err);
+            reject(err)
           } else {
-            resolve(stdout ? stdout : stderr);
+            resolve(stdout ? stdout : stderr)
           }
-        });
+        })
       }
-    );
+    )
   }
 
   /**
@@ -53,14 +51,14 @@ export class ExecuteService {
    * @returns an {Observable<any>} to subscribe to
    */
   public openTerminal(command: string, env?: any): Promise<string> {
-    if (this.electronService.process.platform === 'darwin') {
+    if (this.nativeService.process.platform === 'darwin') {
       return this.execute(`osascript -e "tell app \\"Terminal\\"
                               do script \\"${command}\\"
-                              end tell"`, env);
-    } else if (this.electronService.process.platform === 'win32') {
-      return this.execute(`start cmd /k ${command}`, env);
+                              end tell"`, env)
+    } else if (this.nativeService.process.platform === 'win32') {
+      return this.execute(`start cmd /k ${command}`, env)
     } else {
-      return this.execute(`gnome-terminal -- sh -c "${command}; bash"`, Object.assign(this.electronService.process.env, env));
+      return this.execute(`gnome-terminal -- sh -c "${command}; bash"`, Object.assign(this.nativeService.process.env, env))
     }
   }
 }

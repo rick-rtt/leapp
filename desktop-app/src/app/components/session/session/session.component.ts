@@ -1,11 +1,11 @@
 import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
-import {WorkspaceService} from '../../../services/workspace.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {AppService} from '../../../services/app.service';
 import {HttpClient} from '@angular/common/http';
 import {BsModalService} from 'ngx-bootstrap/modal';
 import { Workspace } from "@noovolari/leapp-core/models/Workspace";
 import { Repository } from "@noovolari/leapp-core/services/repository";
+import { WorkspaceService } from "@noovolari/leapp-core/services/workspace.service";
 import { LeappCoreService } from '../../../services/leapp-core.service'
 
 @Component({
@@ -34,11 +34,13 @@ export class SessionComponent implements OnInit {
 
   workspace: Workspace;
   repository: Repository;
+  workspaceService: WorkspaceService
 
-  constructor(private router: Router, private route: ActivatedRoute, public workspaceService: WorkspaceService,
-              private httpClient: HttpClient, private modalService: BsModalService, private appService: AppService,
+  constructor(private router: Router, private route: ActivatedRoute, private httpClient: HttpClient,
+              private modalService: BsModalService, private appService: AppService,
               leappCoreService: LeappCoreService) {
     this.repository = leappCoreService.repository;
+    this.workspaceService = leappCoreService.workspaceService;
   }
 
   ngOnInit() {

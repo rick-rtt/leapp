@@ -1,5 +1,4 @@
 import { Component, OnDestroy, OnInit } from '@angular/core'
-import { WorkspaceService } from '../../../services/workspace.service'
 import { AppService } from '../../../services/app.service'
 import { environment } from '../../../../environments/environment'
 import { UpdaterService } from '../../../services/updater.service'
@@ -8,6 +7,7 @@ import { Session } from '@noovolari/leapp-core/models/session'
 import { SessionType } from '@noovolari/leapp-core/models/session-type'
 import { SessionStatus } from '@noovolari/leapp-core/models/session-status'
 import { Repository } from '@noovolari/leapp-core/services/repository'
+import { WorkspaceService } from '@noovolari/leapp-core/services/workspace.service'
 import { AwsIamRoleFederatedSession } from '@noovolari/leapp-core/models/aws-iam-role-federated-session'
 import { AwsIamRoleChainedSession } from '@noovolari/leapp-core/models/aws-iam-role-chained-session'
 import { constants } from '@noovolari/leapp-core/models/constants'
@@ -27,12 +27,13 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
   private loggingService: LoggingService
   private repository: Repository
   private sessionServiceFactory: SessionServiceFactory
+  private workspaceService: WorkspaceService
 
-  constructor(private workspaceService: WorkspaceService, private updaterService: UpdaterService,
-              private appService: AppService, leappCoreService: LeappCoreService) {
+  constructor(private updaterService: UpdaterService, private appService: AppService, leappCoreService: LeappCoreService) {
     this.repository = leappCoreService.repository
     this.loggingService = leappCoreService.loggingService
     this.sessionServiceFactory = leappCoreService.sessionServiceFactory
+    this.workspaceService = leappCoreService.workspaceService
   }
 
   ngOnInit() {

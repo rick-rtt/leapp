@@ -2,23 +2,20 @@ import { Component, OnInit } from '@angular/core'
 import { environment } from '../environments/environment'
 import { AppService } from './services/app.service'
 import { Router } from '@angular/router'
-import { WorkspaceService } from './services/workspace.service'
 import { setTheme } from 'ngx-bootstrap/utils'
 import { RotationService } from './services/rotation.service'
 import { SessionServiceFactory } from './services/session-service-factory'
 import { UpdaterService } from './services/updater.service'
 import compareVersions from 'compare-versions'
 import { RetrocompatibilityService } from './services/retrocompatibility.service'
-import { MfaCodePromptService } from './services/mfa-code-prompt.service'
 import { LoggerLevel, LoggingService } from '@noovolari/leapp-core/services/logging-service'
 import { Repository } from '@noovolari/leapp-core/services/repository'
+import { WorkspaceService } from '@noovolari/leapp-core/services/workspace.service'
 import { LeappParseError } from '@noovolari/leapp-core/errors/leapp-parse-error'
 import { TimerService } from '@noovolari/leapp-core/services/timer-service'
 import { constants } from '@noovolari/leapp-core/models/constants'
 import { FileService } from '@noovolari/leapp-core/services/file-service'
 import { AwsCoreService } from '@noovolari/leapp-core/services/aws-core-service'
-import { AwsSsoOidcService } from './services/aws-sso-oidc.service'
-import { ExecuteService } from './services/execute.service'
 import { LeappCoreService } from './services/leapp-core.service'
 
 @Component({
@@ -33,19 +30,19 @@ export class AppComponent implements OnInit {
   private loggingService: LoggingService
   private timerService: TimerService
   private sessionServiceFactory: SessionServiceFactory
+  private workspaceService: WorkspaceService
 
   /* Main app file: launches the Angular framework inside Electron app */
-  constructor(private app: AppService, private workspaceService: WorkspaceService,
-              private retrocompatibilityService: RetrocompatibilityService, private rotationService: RotationService,
-              private router: Router, private updaterService: UpdaterService, private mfaCodePromptService: MfaCodePromptService,
-              private awsSsoOidcService: AwsSsoOidcService, private executeService: ExecuteService,
-              private leappCoreService: LeappCoreService) {
+  constructor(private app: AppService, private retrocompatibilityService: RetrocompatibilityService,
+              private rotationService: RotationService, private router: Router, private updaterService: UpdaterService,
+              leappCoreService: LeappCoreService) {
     this.repository = leappCoreService.repository
     this.fileService = leappCoreService.fileService
     this.awsCoreService = leappCoreService.awsCoreService
     this.loggingService = leappCoreService.loggingService
     this.timerService = leappCoreService.timerService
     this.sessionServiceFactory = leappCoreService.sessionServiceFactory
+    this.workspaceService = leappCoreService.workspaceService
   }
 
   async ngOnInit() {
@@ -96,7 +93,7 @@ export class AppComponent implements OnInit {
       })
     }
 
-    // Start Global Timer (1s)
+    // Start Global Timer
     this.timerService.start(this.rotationService.rotate.bind(this.rotationService))
 
     // Launch Auto Updater Routines

@@ -4,12 +4,12 @@ import { AppService } from './app.service'
 import { environment } from '../../environments/environment'
 import { UpdateDialogComponent } from '../components/shared/update-dialog/update-dialog.component'
 import compareVersions from 'compare-versions'
-import { WorkspaceService } from './workspace.service'
 import { HttpClient } from '@angular/common/http'
 import md from 'markdown-it'
 import { ElectronService } from './electron.service'
 import { constants } from '@noovolari/leapp-core/models/constants'
 import { Repository } from '@noovolari/leapp-core/services/repository'
+import { WorkspaceService } from '@noovolari/leapp-core/services/workspace.service'
 import { LeappCoreService } from './leapp-core.service'
 
 @Injectable({
@@ -23,12 +23,13 @@ export class UpdaterService {
   bsModalRef: BsModalRef
   markdown: any
   private repository: Repository
+  private workspaceService: WorkspaceService
 
-  constructor(private appService: AppService, private workspaceService: WorkspaceService,
-              private bsModalService: BsModalService, private httpClient: HttpClient,
+  constructor(private appService: AppService, private bsModalService: BsModalService, private httpClient: HttpClient,
               private electronService: ElectronService, leappCoreService: LeappCoreService) {
     this.markdown = md()
     this.repository = leappCoreService.repository
+    this.workspaceService = leappCoreService.workspaceService
   }
 
   isUpdateNeeded(): boolean {

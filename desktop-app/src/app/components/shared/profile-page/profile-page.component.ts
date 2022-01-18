@@ -4,10 +4,10 @@ import { AppService, ToastLevel } from '../../../services/app.service'
 import { Router } from '@angular/router'
 import { environment } from '../../../../environments/environment'
 import * as uuid from 'uuid'
-import { WorkspaceService } from '../../../services/workspace.service'
 import { SessionServiceFactory } from '../../../services/session-service-factory'
 import { constants } from '@noovolari/leapp-core/models/constants'
 import { Repository } from '@noovolari/leapp-core/services/repository'
+import { WorkspaceService } from '@noovolari/leapp-core/services/workspace.service'
 import { LoggerLevel, LoggingService } from '@noovolari/leapp-core/services/logging-service'
 import { SessionType } from '@noovolari/leapp-core/models/session-type'
 import { AwsIamRoleFederatedSession } from '@noovolari/leapp-core/models/aws-iam-role-federated-session'
@@ -59,14 +59,15 @@ export class ProfilePageComponent implements OnInit {
   /* Simple profile page: shows the Idp Url and the workspace json */
   repository: Repository
   private sessionService: any
+  private workspaceService: WorkspaceService
   private loggingService: LoggingService
   private sessionServiceFactory: SessionServiceFactory
 
-  constructor(public workspaceService: WorkspaceService, private appService: AppService, private router: Router,
-              private leappCoreService: LeappCoreService) {
+  constructor(private appService: AppService, private router: Router, leappCoreService: LeappCoreService) {
     this.repository = leappCoreService.repository
     this.loggingService = leappCoreService.loggingService
     this.sessionServiceFactory = leappCoreService.sessionServiceFactory
+    this.workspaceService = leappCoreService.workspaceService
   }
 
   ngOnInit() {
