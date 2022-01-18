@@ -2,12 +2,12 @@ import { Component, ElementRef, OnInit, ViewChild } from '@angular/core'
 import { FormControl, FormGroup, Validators } from '@angular/forms'
 import { AppService, ToastLevel } from '../../services/app.service'
 import { ActivatedRoute, Router } from '@angular/router'
-import { WorkspaceService } from '../../services/workspace.service'
 import { environment } from '../../../environments/environment'
 import { SessionType } from '@noovolari/leapp-core/models/session-type'
 import { AwsIamUserSession } from '@noovolari/leapp-core/models/aws-iam-user-session'
 import { Workspace } from '@noovolari/leapp-core/models/workspace'
 import { KeychainService } from '@noovolari/leapp-core/services/keychain-service'
+import { WorkspaceService } from '@noovolari/leapp-core/services/workspace.service'
 import { LeappCoreService } from '../../services/leapp-core.service'
 
 @Component({
@@ -38,12 +38,13 @@ export class EditAccountComponent implements OnInit {
   })
 
   private keychainService: KeychainService
-
+  private workspaceService: WorkspaceService
 
   /* Setup the first account for the application */
   constructor(private appService: AppService, private router: Router, private activatedRoute: ActivatedRoute,
-              private workspaceService: WorkspaceService, leappCoreService: LeappCoreService) {
+              leappCoreService: LeappCoreService) {
     this.keychainService = leappCoreService.keyChainService
+    this.workspaceService = leappCoreService.workspaceService
   }
 
   ngOnInit() {

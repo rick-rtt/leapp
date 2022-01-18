@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core'
-import { ExecuteService } from './execute.service'
 import { AppService } from './app.service'
 import { CredentialsInfo } from '@noovolari/leapp-core/models/credentials-info'
 import { LeappBaseError } from '@noovolari/leapp-core/errors/leapp-base-error'
 import { LoggerLevel, LoggingService } from '@noovolari/leapp-core/services/logging-service'
+import { ExecuteService } from '@noovolari/leapp-core/services/execute.service'
 import { LeappCoreService } from './leapp-core.service'
 
 const AWS = require('aws-sdk')
@@ -13,12 +13,13 @@ const AWS = require('aws-sdk')
 })
 export class SsmService {
   private loggingService: LoggingService
-
+  private executeService: ExecuteService
   ssmClient
   ec2Client
 
-  constructor(private app: AppService, private exec: ExecuteService, private leappCoreService: LeappCoreService) {
+  constructor(private appService: AppService, leappCoreService: LeappCoreService) {
     this.loggingService = leappCoreService.loggingService
+    this.executeService = leappCoreService.executeService
   }
 
   /**
@@ -51,7 +52,7 @@ export class SsmService {
     this.ec2Client = new AWS.EC2()
 
     // Fix for Ec2 clients from electron app
-    this.app.setFilteringForEc2Calls()
+    this.appService.setFilteringForEc2Calls()
 
     // Get Ssm instances info data
     const instances = await this.requestSsmInstances()
@@ -66,7 +67,7 @@ export class SsmService {
    * @param region - aws System Manager start a session from a defined region
    */
   startSession(credentials: CredentialsInfo, instanceId, region) {
-    const hypen = this.app.getProcess().platform === 'darwin' ? '\'' : ''
+    const hypen = this.appService.getProcess().platform === 'darwin' ? '\'' : ''
 
     const env = {
       // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -77,7 +78,7 @@ export class SsmService {
       AWS_SESSION_TOKEN: credentials.sessionToken.aws_session_token
     }
 
-    this.exec.openTerminal(`aws ssm start-session --region ${region} --target ${hypen}${instanceId}${hypen}`, env).then(() => {
+    this.executeService.openTerminal(`aws ssm start-session --region ${region} --target ${hypen}${instanceId}${hypen}`, env).then(() => {
     }, err => {
       throw new LeappBaseError('Start SSM error', this, LoggerLevel.error, err.message)
     })

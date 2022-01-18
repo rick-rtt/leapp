@@ -2,9 +2,9 @@ import {Component, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {AppService} from '../../services/app.service';
-import {WorkspaceService} from '../../services/workspace.service';
 import {AwsSsoOidcService, BrowserWindowClosing} from '../../services/aws-sso-oidc.service';
 import { Repository } from '@noovolari/leapp-core/services/repository';
+import { WorkspaceService } from '@noovolari/leapp-core/services/workspace.service';
 import {constants} from '@noovolari/leapp-core/models/constants';
 import {AwsSsoRoleService, SsoRoleSession} from "../../services/session/aws/method/aws-sso-role-service";
 import { LeappCoreService } from '../../services/leapp-core.service'
@@ -32,11 +32,12 @@ export class AwsSsoComponent implements OnInit, BrowserWindowClosing {
   });
 
   private repository: Repository
+  private workspaceService: WorkspaceService
 
   constructor(private appService: AppService, private awsSsoRoleService: AwsSsoRoleService, private router: Router,
-              private workspaceService: WorkspaceService, private awsSsoOidcService: AwsSsoOidcService,
-              leappCoreService: LeappCoreService) {
+              private awsSsoOidcService: AwsSsoOidcService, leappCoreService: LeappCoreService) {
     this.repository = leappCoreService.repository
+    this.workspaceService = leappCoreService.workspaceService
   }
 
   ngOnInit() {

@@ -2,13 +2,13 @@ import { Injectable } from '@angular/core'
 import { AppService } from './app.service'
 import { environment } from '../../environments/environment'
 import { serialize } from 'class-transformer'
-import { WorkspaceService } from './workspace.service'
 import { Workspace } from '@noovolari/leapp-core/models/workspace'
 import { AwsIamRoleFederatedSession } from '@noovolari/leapp-core/models/aws-iam-role-federated-session'
 import { AwsIamRoleChainedSession } from '@noovolari/leapp-core/models/aws-iam-role-chained-session'
 import { AwsSsoRoleSession } from '@noovolari/leapp-core/models/aws-sso-role-session'
 import { AzureSession } from '@noovolari/leapp-core/models/azure-session'
 import { FileService } from '@noovolari/leapp-core/services/file-service'
+import { WorkspaceService } from '@noovolari/leapp-core/services/workspace.service'
 import { KeychainService } from '@noovolari/leapp-core/services/keychain-service'
 import { constants } from '@noovolari/leapp-core/models/constants'
 import { AwsIamUserSession } from '@noovolari/leapp-core/models/aws-iam-user-session'
@@ -20,11 +20,12 @@ import { LeappCoreService } from './leapp-core.service'
 export class RetrocompatibilityService {
   private fileService: FileService
   private keyChainService: KeychainService
+  private workspaceService: WorkspaceService
 
-  constructor(private appService: AppService, private workspaceService: WorkspaceService,
-              private leappCoreService: LeappCoreService) {
+  constructor(private appService: AppService, private leappCoreService: LeappCoreService) {
     this.fileService = leappCoreService.fileService
     this.keyChainService = leappCoreService.keyChainService
+    this.workspaceService = leappCoreService.workspaceService
   }
 
   private static adaptIdpUrls(oldWorkspace: any, workspace: Workspace) {

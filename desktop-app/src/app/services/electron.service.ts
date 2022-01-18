@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core'
 import * as Keytar from 'keytar'
 import { INativeService } from '@noovolari/leapp-core/interfaces/i-native-service'
 
-
 @Injectable({providedIn: 'root'})
 export class ElectronService implements INativeService {
   url: any

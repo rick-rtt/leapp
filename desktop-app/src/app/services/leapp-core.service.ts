@@ -1,14 +1,11 @@
 import { Injectable } from '@angular/core'
-import { WorkspaceService } from './workspace.service'
-import {
-  AwsIamUserService,
-  IMfaCodePrompter
-} from '@noovolari/leapp-core/services/session/aws/method/aws-iam-user-service'
+import { AwsIamUserService } from '@noovolari/leapp-core/services/session/aws/method/aws-iam-user-service'
 import { Repository } from '@noovolari/leapp-core/services/repository'
 import { FileService } from '@noovolari/leapp-core/services/file-service'
 import { KeychainService } from '@noovolari/leapp-core/services/keychain-service'
 import { AwsCoreService } from '@noovolari/leapp-core/services/aws-core-service'
 import { LoggingService } from '@noovolari/leapp-core/services/logging-service'
+import { WorkspaceService } from '@noovolari/leapp-core/services/workspace.service'
 import { TimerService } from '@noovolari/leapp-core/services/timer-service'
 import { AwsIamRoleFederatedService } from './session/aws/method/aws-iam-role-federated-service'
 import { AwsIamRoleChainedService } from './session/aws/method/aws-iam-role-chained-service'
@@ -17,13 +14,23 @@ import { AwsSsoRoleService } from './session/aws/method/aws-sso-role-service'
 import { AzureService } from './session/azure/azure.service'
 import { SessionServiceFactory } from './session-service-factory'
 import { MfaCodePromptService } from './mfa-code-prompt.service'
+import { ExecuteService } from '@noovolari/leapp-core/services/execute.service'
 
 @Injectable({
   providedIn: 'root'
 })
 export class LeappCoreService {
-  constructor(private workspaceService: WorkspaceService, private mfaCodePrompter: MfaCodePromptService,
-              private electronService: ElectronService) {
+  constructor(private mfaCodePrompter: MfaCodePromptService, private electronService: ElectronService) {
+  }
+
+  private workspaceServiceInstance: WorkspaceService
+
+  public get workspaceService(): WorkspaceService {
+    if (!this.workspaceServiceInstance) {
+      this.workspaceServiceInstance = new WorkspaceService(this.repository)
+    }
+
+    return this.workspaceServiceInstance
   }
 
   private awsIamUserServiceInstance: AwsIamUserService
@@ -37,7 +44,6 @@ export class LeappCoreService {
     return this.awsIamUserServiceInstance
   }
 
-
   private awsIamRoleFederatedServiceInstance: AwsIamRoleFederatedService
 
   get awsIamRoleFederatedService(): AwsIamRoleFederatedService {
@@ -48,7 +54,6 @@ export class LeappCoreService {
 
     return this.awsIamRoleFederatedServiceInstance
   }
-
 
   private awsIamRoleChainedServiceInstance: AwsIamRoleChainedService
 
@@ -62,6 +67,7 @@ export class LeappCoreService {
   }
 
   private awsSsoRoleServiceInstance: AwsSsoRoleService
+
   get awsSsoRoleService(): AwsSsoRoleService {
     if (!this.awsSsoRoleServiceInstance) {
       this.awsSsoRoleServiceInstance = new AwsSsoRoleService(this.workspaceService, this.repository, this.fileService,
@@ -83,10 +89,11 @@ export class LeappCoreService {
 
 
   private azureServiceInstance: AzureService
+
   get azureService(): AzureService {
     if (!this.azureServiceInstance) {
-      this.azureServiceInstance = new AzureService(this.workspaceService, this.repository, this.fileService, appService,
-        executeService)
+      this.azureServiceInstance = new AzureService(this.workspaceService, this.repository, this.fileService,
+        this.executeService)
     }
 
     return this.azureServiceInstance
@@ -126,6 +133,7 @@ export class LeappCoreService {
   }
 
   private keyChainServiceInstance: KeychainService
+
   get keyChainService(): KeychainService {
     if (!this.keyChainServiceInstance) {
       this.keyChainServiceInstance = new KeychainService(this.electronService)
@@ -135,6 +143,7 @@ export class LeappCoreService {
   }
 
   private loggingServiceInstance: LoggingService
+
   get loggingService(): LoggingService {
     if (!this.loggingServiceInstance) {
       this.loggingServiceInstance = new LoggingService(this.electronService)
@@ -144,11 +153,22 @@ export class LeappCoreService {
   }
 
   private timerServiceInstance: TimerService
+
   get timerService(): TimerService {
     if (!this.timerServiceInstance) {
       this.timerServiceInstance = new TimerService()
     }
 
     return this.timerServiceInstance
+  }
+
+  private executeServiceInstance: ExecuteService
+
+  get executeService(): ExecuteService {
+    if (!this.executeServiceInstance) {
+      this.executeServiceInstance = new ExecuteService(this.electronService)
+    }
+
+    return this.executeServiceInstance
   }
 }
