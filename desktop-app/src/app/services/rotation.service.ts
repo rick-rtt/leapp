@@ -1,29 +1,18 @@
-import { Injectable } from '@angular/core';
-import {SessionServiceFactory} from './session-service-factory';
-import {WorkspaceService} from '@noovolari/leapp-core/services/workspace.service';
-import { LeappCoreService } from './leapp-core.service'
+import { SessionFactory } from './session-factory'
+import { WorkspaceService } from '@noovolari/leapp-core/services/workspace.service'
 
-
-//TODO: Move this under core module
-@Injectable({
-  providedIn: 'root'
-})
 export class RotationService {
-  private sessionServiceFactory: SessionServiceFactory
-  private workspaceService: WorkspaceService
-
-  constructor(leappCoreService: LeappCoreService) {
-    this.workspaceService = leappCoreService.workspaceService
-    this.sessionServiceFactory = leappCoreService.sessionServiceFactory
+  constructor(private sessionServiceFactory: SessionFactory, private workspaceService: WorkspaceService) {
   }
 
   rotate(): void {
-    const activeSessions = this.workspaceService.listActive();
+    const activeSessions = this.workspaceService.listActive()
     activeSessions.forEach(session => {
       if (session.expired()) {
-        const concreteSessionService = this.sessionServiceFactory.getSessionService(session.type);
-        concreteSessionService.rotate(session.sessionId).then(_ => {});
+        const concreteSessionService = this.sessionServiceFactory.getSessionService(session.type)
+        concreteSessionService.rotate(session.sessionId).then(_ => {
+        })
       }
-    });
+    })
   }
 }

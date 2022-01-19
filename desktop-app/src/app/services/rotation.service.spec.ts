@@ -3,7 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { RotationService } from './rotation.service';
 import {mustInjected} from '../../base-injectables';
 import {AwsSessionService} from '@noovolari/leapp-core/services/session/aws/aws-session-service';
-import {SessionServiceFactory} from './session-service-factory';
+import {SessionFactory} from './session-factory';
 import {Session} from '@noovolari/leapp-core/models/session';
 
 describe('RotationService', () => {
@@ -29,7 +29,7 @@ describe('RotationService', () => {
     TestBed.configureTestingModule({
       providers: [
         { provide: AwsSessionService, useValue: spySessionService },
-        { provide: SessionServiceFactory, useValue: spySessionProviderService },
+        { provide: SessionFactory, useValue: spySessionProviderService },
       ].concat(mustInjected())
     });
     rotationService = TestBed.inject(RotationService);

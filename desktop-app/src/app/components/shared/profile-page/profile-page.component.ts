@@ -4,7 +4,7 @@ import { AppService, ToastLevel } from '../../../services/app.service'
 import { Router } from '@angular/router'
 import { environment } from '../../../../environments/environment'
 import * as uuid from 'uuid'
-import { SessionServiceFactory } from '../../../services/session-service-factory'
+import { SessionFactory } from '../../../services/session-factory'
 import { constants } from '@noovolari/leapp-core/models/constants'
 import { Repository } from '@noovolari/leapp-core/services/repository'
 import { WorkspaceService } from '@noovolari/leapp-core/services/workspace.service'
@@ -61,12 +61,12 @@ export class ProfilePageComponent implements OnInit {
   private sessionService: any
   private workspaceService: WorkspaceService
   private loggingService: LoggingService
-  private sessionServiceFactory: SessionServiceFactory
+  private sessionServiceFactory: SessionFactory
 
   constructor(private appService: AppService, private router: Router, leappCoreService: LeappCoreService) {
     this.repository = leappCoreService.repository
     this.loggingService = leappCoreService.loggingService
-    this.sessionServiceFactory = leappCoreService.sessionServiceFactory
+    this.sessionServiceFactory = leappCoreService.sessionFactory
     this.workspaceService = leappCoreService.workspaceService
   }
 

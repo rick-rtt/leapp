@@ -11,6 +11,8 @@ const AWS = require('aws-sdk')
 @Injectable({
   providedIn: 'root'
 })
+
+//TODO: move into core module in near future
 export class SsmService {
   private loggingService: LoggingService
   private executeService: ExecuteService
@@ -47,11 +49,13 @@ export class SsmService {
    */
   async getSsmInstances(credentials: CredentialsInfo, region): Promise<any> {
     // Set your SSM client and EC2 client
+
     AWS.config.update(SsmService.setConfig(credentials, region))
     this.ssmClient = new AWS.SSM()
     this.ec2Client = new AWS.EC2()
 
     // Fix for Ec2 clients from electron app
+    //TODO: find a way to inject the origin header without using setFilteringForEc2Calls
     this.appService.setFilteringForEc2Calls()
 
     // Get Ssm instances info data

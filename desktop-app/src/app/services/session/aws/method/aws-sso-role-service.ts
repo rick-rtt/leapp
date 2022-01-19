@@ -1,5 +1,3 @@
-import { AppService } from '../../../../services/app.service'
-
 import SSO, {
   AccountInfo,
   GetRoleCredentialsRequest,
@@ -18,9 +16,9 @@ import { CredentialsInfo } from '@noovolari/leapp-core/models/credentials-info'
 import { Repository } from '@noovolari/leapp-core/services/repository'
 import { FileService } from '@noovolari/leapp-core/services/file-service'
 import { AwsCoreService } from '@noovolari/leapp-core/services/aws-core-service'
-import { environment } from '../../../../../environments/environment'
 import { KeychainService } from '@noovolari/leapp-core/services/keychain-service'
 import { SessionType } from '@noovolari/leapp-core/models/session-type'
+import { INativeService } from '@noovolari/leapp-core/interfaces/i-native-service'
 
 export interface AwsSsoRoleSessionRequest {
   sessionName: string;
@@ -72,17 +70,14 @@ export interface SsoRoleSession {
 }
 
 export class AwsSsoRoleService extends AwsSessionService implements BrowserWindowClosing {
-  private appService: AppService
-  private awsSsoOidcService
   private ssoPortal: SSO
 
   public constructor(iSessionNotifier: ISessionNotifier, repository: Repository, private fileService: FileService,
                      private keyChainService: KeychainService, private awsCoreService: AwsCoreService,
-                     appService: AppService, awsSsoOidcService: AwsSsoOidcService) {
+                     private nativeService: INativeService, private awsSsoOidcService: AwsSsoOidcService,
+                     private appName: string, private defaultRegion: string) {
     super(iSessionNotifier, repository)
-    this.appService = appService
-    this.awsSsoOidcService = awsSsoOidcService
-    this.awsSsoOidcService.listeners.push(this)
+    awsSsoOidcService.listeners.push(this)
   }
 
 
@@ -193,7 +188,7 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
       this.ssoPortal = null
 
       // Delete access token and remove sso configuration info from workspace
-      this.keyChainService.deletePassword(environment.appName, 'aws-sso-access-token')
+      this.keyChainService.deletePassword(this.appName, 'aws-sso-access-token')
       this.repository.removeExpirationTimeFromAwsSsoConfiguration()
 
       this.removeSsoSessionsFromWorkspace()
@@ -239,19 +234,10 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
     return !expirationTime || Date.parse(expirationTime) < Date.now()
   }
 
-  private getProtocol(aliasedUrl: string): string {
-    let protocol = aliasedUrl.split('://')[0]
-    if (protocol.indexOf('http') === -1) {
-      protocol = 'https'
-    }
-    return protocol
-  }
-
   private async login(region: string, portalUrl: string): Promise<LoginResponse> {
-    const followRedirectClient = this.appService.getFollowRedirects()[this.getProtocol(portalUrl)]
-
+    const redirectClient = this.nativeService.followRedirects.getFollowRedirects()[this.getProtocol(portalUrl)]
     portalUrl = await new Promise((resolve, _) => {
-      const request = followRedirectClient.request(portalUrl, response => resolve(response.responseUrl))
+      const request = redirectClient.request(portalUrl, response => resolve(response.responseUrl))
       request.end()
     })
 
@@ -262,6 +248,14 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
       region,
       expirationTime: generateSsoTokenResponse.expirationTime
     }
+  }
+
+  private getProtocol(aliasedUrl: string): string {
+    let protocol = aliasedUrl.split('://')[0]
+    if (protocol.indexOf('http') === -1) {
+      protocol = 'https'
+    }
+    return protocol
   }
 
   private async getSessions(accessToken: string, region: string): Promise<SsoRoleSession[]> {
@@ -302,7 +296,7 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
 
       const awsSsoSession = {
         email: accountInfo.emailAddress,
-        region: oldSession?.region || this.repository.getDefaultRegion() || environment.defaultRegion,
+        region: oldSession?.region || this.repository.getDefaultRegion() || this.defaultRegion,
         roleArn: `arn:aws:iam::${accountInfo.accountId}/${accountRole.roleName}`,
         sessionName: accountInfo.accountName,
         profileId: oldSession?.profileId || this.repository.getDefaultProfileId()
@@ -372,7 +366,7 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
 
   private configureAwsSso(region: string, portalUrl: string, expirationTime: string, accessToken: string) {
     this.repository.configureAwsSso(region, portalUrl, expirationTime)
-    this.keyChainService.saveSecret(environment.appName, 'aws-sso-access-token', accessToken).then(_ => {
+    this.keyChainService.saveSecret(this.appName, 'aws-sso-access-token', accessToken).then(_ => {
     })
   }
 
@@ -383,7 +377,7 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
   }
 
   private async getAccessTokenFromKeychain(): Promise<string> {
-    return this.keyChainService.getSecret(environment.appName, 'aws-sso-access-token')
+    return this.keyChainService.getSecret(this.appName, 'aws-sso-access-token')
   }
 
   private findOldSession(accountInfo: SSO.AccountInfo, accountRole: SSO.RoleInfo): { region: string; profileId: string } {

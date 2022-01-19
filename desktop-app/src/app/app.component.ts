@@ -4,10 +4,9 @@ import { AppService } from './services/app.service'
 import { Router } from '@angular/router'
 import { setTheme } from 'ngx-bootstrap/utils'
 import { RotationService } from './services/rotation.service'
-import { SessionServiceFactory } from './services/session-service-factory'
+import { SessionFactory } from './services/session-factory'
 import { UpdaterService } from './services/updater.service'
 import compareVersions from 'compare-versions'
-import { RetrocompatibilityService } from './services/retrocompatibility.service'
 import { LoggerLevel, LoggingService } from '@noovolari/leapp-core/services/logging-service'
 import { Repository } from '@noovolari/leapp-core/services/repository'
 import { WorkspaceService } from '@noovolari/leapp-core/services/workspace.service'
@@ -16,6 +15,7 @@ import { TimerService } from '@noovolari/leapp-core/services/timer-service'
 import { constants } from '@noovolari/leapp-core/models/constants'
 import { FileService } from '@noovolari/leapp-core/services/file-service'
 import { AwsCoreService } from '@noovolari/leapp-core/services/aws-core-service'
+import { RetroCompatibilityService } from '@noovolari/leapp-core/services/retro-compatibility.service'
 import { LeappCoreService } from './services/leapp-core.service'
 
 @Component({
@@ -29,20 +29,23 @@ export class AppComponent implements OnInit {
   private awsCoreService: AwsCoreService
   private loggingService: LoggingService
   private timerService: TimerService
-  private sessionServiceFactory: SessionServiceFactory
+  private sessionServiceFactory: SessionFactory
   private workspaceService: WorkspaceService
+  private retroCompatibilityService: RetroCompatibilityService
+  private rotationService: RotationService
 
   /* Main app file: launches the Angular framework inside Electron app */
-  constructor(private app: AppService, private retrocompatibilityService: RetrocompatibilityService,
-              private rotationService: RotationService, private router: Router, private updaterService: UpdaterService,
+  constructor(private app: AppService, private router: Router, private updaterService: UpdaterService,
               leappCoreService: LeappCoreService) {
     this.repository = leappCoreService.repository
     this.fileService = leappCoreService.fileService
     this.awsCoreService = leappCoreService.awsCoreService
     this.loggingService = leappCoreService.loggingService
     this.timerService = leappCoreService.timerService
-    this.sessionServiceFactory = leappCoreService.sessionServiceFactory
+    this.sessionServiceFactory = leappCoreService.sessionFactory
     this.workspaceService = leappCoreService.workspaceService
+    this.retroCompatibilityService = leappCoreService.retroCompatibilityService
+    this.rotationService = leappCoreService.rotationService
   }
 
   async ngOnInit() {
@@ -70,8 +73,8 @@ export class AppComponent implements OnInit {
 
     // Before retrieving an actual copy of the workspace we
     // check and in case apply, our retro compatibility service
-    if (this.retrocompatibilityService.isRetroPatchNecessary()) {
-      await this.retrocompatibilityService.adaptOldWorkspaceFile()
+    if (this.retroCompatibilityService.isRetroPatchNecessary()) {
+      await this.retroCompatibilityService.adaptOldWorkspaceFile()
     }
 
     try {

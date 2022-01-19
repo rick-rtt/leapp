@@ -1,16 +1,15 @@
-import { AppService } from '../../../app.service'
-import { ISessionNotifier } from '@noovolari/leapp-core/interfaces/i-session-notifier'
-import { CredentialsInfo } from '@noovolari/leapp-core/models/credentials-info'
-import { Repository } from '@noovolari/leapp-core/services/repository'
-import { AwsIamRoleFederatedSession } from '@noovolari/leapp-core/models/aws-iam-role-federated-session'
-import { FileService } from '@noovolari/leapp-core/services/file-service'
-import { LeappSamlError } from '@noovolari/leapp-core/errors/leapp-saml-error'
-import { LeappParseError } from '@noovolari/leapp-core/errors/leapp-parse-error'
+import { ISessionNotifier } from '../../../interfaces/i-session-notifier'
+import { CredentialsInfo } from '../../../models/credentials-info'
+import { Repository } from '../../repository'
+import { FileService } from '../../file-service'
+import { LeappSamlError } from '../../../errors/leapp-saml-error'
+import { LeappParseError } from '../../../errors/leapp-parse-error'
 import * as Aws from 'aws-sdk'
-import { environment } from '../../../../../environments/environment'
-import { LeappAwsStsError } from '@noovolari/leapp-core/errors/leapp-aws-sts-error'
-import { AwsSessionService } from '@noovolari/leapp-core/services/session/aws/aws-session-service'
-import { AwsCoreService } from '@noovolari/leapp-core/services/aws-core-service'
+import { LeappAwsStsError } from '../../../errors/leapp-aws-sts-error'
+import { AwsCoreService } from '../../aws-core-service'
+import { AwsSessionService } from './aws-session-service'
+import { AwsIamRoleFederatedSession } from '../../../models/aws-iam-role-federated-session'
+import { IAwsAuthenticationService } from '../../../interfaces/i-aws-authentication.service'
 
 export interface AwsIamRoleFederatedSessionRequest {
   accountName: string;
@@ -26,7 +25,8 @@ export interface ResponseHookDetails {
 
 export class AwsIamRoleFederatedService extends AwsSessionService {
   constructor(iSessionNotifier: ISessionNotifier, repository: Repository, private fileService: FileService,
-                      private awsCoreService: AwsCoreService, private appService: AppService) {
+              private awsCoreService: AwsCoreService, private awsAuthenticationService: IAwsAuthenticationService,
+              private samlRoleSessionDuration) {
     super(iSessionNotifier, repository)
   }
 
@@ -96,7 +96,7 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
     // Check if we need to authenticate
     let needToAuthenticate
     try {
-      needToAuthenticate = await this.needAuthentication(idpUrl)
+      needToAuthenticate = await this.awsAuthenticationService.needAuthentication(idpUrl)
     } catch (err) {
       throw new LeappSamlError(this, err.message)
     }
@@ -104,7 +104,7 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
     // AwsSignIn: retrieve the response hook
     let responseHookDetails
     try {
-      responseHookDetails = await this.awsSignIn(idpUrl, needToAuthenticate)
+      responseHookDetails = await this.awsAuthenticationService.awsSignIn(idpUrl, needToAuthenticate)
     } catch (err) {
       throw new LeappParseError(this, err.message)
     }
@@ -129,7 +129,7 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
       // eslint-disable-next-line @typescript-eslint/naming-convention
       SAMLAssertion: samlResponse,
       // eslint-disable-next-line @typescript-eslint/naming-convention
-      DurationSeconds: environment.samlRoleSessionDuration,
+      DurationSeconds: this.samlRoleSessionDuration,
     }
 
     // Invoke assumeRoleWithSAML
@@ -145,95 +145,5 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
   }
 
   removeSecrets(sessionId: string): void {
-  }
-
-  private async needAuthentication(idpUrl: string): Promise<boolean> {
-    return new Promise((resolve, _) => {
-      // Get active window position for extracting new windows coordinate
-      const activeWindowPosition = this.appService.getCurrentWindow().getPosition()
-      const nearX = 200
-      const nearY = 50
-      // Generate a new singleton browser window for the check
-      let idpWindow = this.appService.newWindow(idpUrl, false, '', activeWindowPosition[0] + nearX, activeWindowPosition[1] + nearY)
-      // This filter is used to listen to go to a specific callback url (or the generic one)
-      const filter = {
-        urls: [
-          'https://*.onelogin.com/*',
-          'https://*.okta.com/*',
-          'https://accounts.google.com/ServiceLogin*',
-          'https://login.microsoftonline.com/*',
-          'https://signin.aws.amazon.com/saml'
-        ]
-      }
-
-      // Our request filter call the generic hook filter passing the idp response type
-      // to construct the ideal method to deal with the construction of the response
-      idpWindow.webContents.session.webRequest.onBeforeRequest(filter, (details, callback) => {
-        // G Suite
-        if (details.url.indexOf('https://accounts.google.com/ServiceLogin') !== -1) {
-          idpWindow = null
-          resolve(true)
-        }
-        // One Login
-        if (details.url.indexOf('.onelogin.com/login') !== -1) {
-          idpWindow = null
-          resolve(true)
-        }
-        // OKTA
-        if (details.url.indexOf('.okta.com/discovery/iframe.html') !== -1) {
-          idpWindow = null
-          resolve(true)
-        }
-        // AzureAD
-        if (details.url.indexOf('https://login.microsoftonline.com') !== -1 && details.url.indexOf('/oauth2/authorize') !== -1) {
-          idpWindow = null
-          resolve(true)
-        }
-        // Do not show window: already logged by means of session cookies
-        if (details.url.indexOf('https://signin.aws.amazon.com/saml') !== -1) {
-          idpWindow = null
-          resolve(false)
-        }
-        // Callback is used by filter to keep traversing calls until one of the filters apply
-        callback({
-          requestHeaders: details.requestHeaders,
-          url: details.url,
-        })
-      })
-      // Start the process
-      idpWindow.loadURL(idpUrl)
-    })
-  }
-
-  private async awsSignIn(idpUrl: string, needToAuthenticate: boolean): Promise<any> {
-    // 1. Show or not browser window depending on needToAuthenticate
-    const activeWindowPosition = this.appService.getCurrentWindow().getPosition()
-    const nearX = 200
-    const nearY = 50
-    // 2. Prepare browser window
-    let idpWindow = this.appService.newWindow(idpUrl, needToAuthenticate, 'IDP - Login', activeWindowPosition[0] + nearX, activeWindowPosition[1] + nearY)
-    // 3. Prepare filters and configure callback
-    const filter = {urls: ['https://signin.aws.amazon.com/saml']}
-    // Catch filter url: extract SAML response
-    // Our request filter call the generic hook filter passing the idp response type
-    // to construct the ideal method to deal with the construction of the response
-    return new Promise((resolve, _) => {
-      idpWindow.webContents.session.webRequest.onBeforeRequest(filter, (details, callback) => {
-        // it will throw an error as we have altered the original response
-        // Setting that everything is ok if we have arrived here
-        idpWindow.close()
-        idpWindow = null
-
-        // Shut down the filter action: we don't need it anymore
-        if (callback) {
-          callback({cancel: true})
-        }
-
-        // Return the details
-        resolve(details)
-      })
-      // 4. Navigate to idpUrl
-      idpWindow.loadURL(idpUrl)
-    })
   }
 }

@@ -16,12 +16,12 @@ import { LeappParseError } from '@noovolari/leapp-core/errors/leapp-parse-error'
 import {
   AwsIamRoleFederatedService,
   AwsIamRoleFederatedSessionRequest
-} from '../../services/session/aws/method/aws-iam-role-federated-service'
+} from '../../../../../core/services/session/aws/aws-iam-role-federated-service'
 import {
   AwsIamRoleChainedService,
   AwsIamRoleChainedSessionRequest
-} from '../../services/session/aws/method/aws-iam-role-chained-service'
-import { AzureService, AzureSessionRequest } from '../../services/session/azure/azure.service'
+} from '../../../../../core/services/session/aws/aws-iam-role-chained-service'
+import { AzureService, AzureSessionRequest } from '../../../../../core/services/session/azure/azure.service'
 import { LeappCoreService } from '../../services/leapp-core.service'
 
 @Component({

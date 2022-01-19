@@ -1,31 +1,19 @@
-import { Injectable } from '@angular/core'
-import { AppService } from './app.service'
-import { environment } from '../../environments/environment'
 import { serialize } from 'class-transformer'
-import { Workspace } from '@noovolari/leapp-core/models/workspace'
-import { AwsIamRoleFederatedSession } from '@noovolari/leapp-core/models/aws-iam-role-federated-session'
-import { AwsIamRoleChainedSession } from '@noovolari/leapp-core/models/aws-iam-role-chained-session'
-import { AwsSsoRoleSession } from '@noovolari/leapp-core/models/aws-sso-role-session'
-import { AzureSession } from '@noovolari/leapp-core/models/azure-session'
-import { FileService } from '@noovolari/leapp-core/services/file-service'
-import { WorkspaceService } from '@noovolari/leapp-core/services/workspace.service'
-import { KeychainService } from '@noovolari/leapp-core/services/keychain-service'
-import { constants } from '@noovolari/leapp-core/models/constants'
-import { AwsIamUserSession } from '@noovolari/leapp-core/models/aws-iam-user-session'
-import { LeappCoreService } from './leapp-core.service'
+import { Workspace } from '../models/workspace'
+import { AwsIamRoleFederatedSession } from '../models/aws-iam-role-federated-session'
+import { AwsIamRoleChainedSession } from '../models/aws-iam-role-chained-session'
+import { AwsSsoRoleSession } from '../models/aws-sso-role-session'
+import { AzureSession } from '../models/azure-session'
+import { FileService } from './file-service'
+import { WorkspaceService } from './workspace.service'
+import { KeychainService } from './keychain-service'
+import { constants } from '../models/constants'
+import { AwsIamUserSession } from '../models/aws-iam-user-session'
 
-@Injectable({
-  providedIn: 'root'
-})
-export class RetrocompatibilityService {
-  private fileService: FileService
-  private keyChainService: KeychainService
-  private workspaceService: WorkspaceService
+export class RetroCompatibilityService {
 
-  constructor(private appService: AppService, private leappCoreService: LeappCoreService) {
-    this.fileService = leappCoreService.fileService
-    this.keyChainService = leappCoreService.keyChainService
-    this.workspaceService = leappCoreService.workspaceService
+  constructor(private fileService: FileService, private keyChainService: KeychainService,
+              private workspaceService: WorkspaceService, private appName: string, private lockFileDestination: string) {
   }
 
   private static adaptIdpUrls(oldWorkspace: any, workspace: Workspace) {
@@ -95,7 +83,7 @@ export class RetrocompatibilityService {
   }
 
   isRetroPatchNecessary(): boolean {
-    if (this.fileService.exists(this.appService.getOS().homedir() + '/' + environment.lockFileDestination)) {
+    if (this.fileService.exists(this.fileService.homeDir() + '/' + this.lockFileDestination)) {
       const workspaceParsed = this.parseWorkspaceFile()
       // use a never more used property to check if workspace has changed to new version
       return workspaceParsed.defaultWorkspace === 'default'
@@ -116,9 +104,9 @@ export class RetrocompatibilityService {
       this.persists(workspace)
     } else {
       // Adapt data structure
-      RetrocompatibilityService.adaptIdpUrls(oldWorkspace, workspace)
-      RetrocompatibilityService.adaptProxyConfig(oldWorkspace, workspace)
-      RetrocompatibilityService.adaptGeneralProperties(oldWorkspace, workspace)
+      RetroCompatibilityService.adaptIdpUrls(oldWorkspace, workspace)
+      RetroCompatibilityService.adaptProxyConfig(oldWorkspace, workspace)
+      RetroCompatibilityService.adaptGeneralProperties(oldWorkspace, workspace)
       await this.adaptAwsSsoConfig(oldWorkspace, workspace)
       await this.adaptSessions(oldWorkspace, workspace)
 
@@ -134,15 +122,15 @@ export class RetrocompatibilityService {
 
   private parseWorkspaceFile(): any {
     const workspaceJSON = this.fileService.decryptText(
-      this.fileService.readFileSync(this.appService.getOS().homedir() + '/' + environment.lockFileDestination)
+      this.fileService.readFileSync(this.fileService.homeDir() + '/' + this.lockFileDestination)
     )
     return JSON.parse(workspaceJSON)
   }
 
   private persists(workspace: Workspace): void {
-    // this.appService.getFs().unlinkSync(this.appService.getOS().homedir() + '/' + environment.lockFileDestination);
+    // this.appService.getFs().unlinkSync(this.fileService.homeDir() + '/' + this.lockFileDestination);
     this.fileService.writeFileSync(
-      this.appService.getOS().homedir() + '/' + environment.lockFileDestination,
+      this.fileService.homeDir() + '/' + this.lockFileDestination,
       this.fileService.encryptText(serialize(workspace))
     )
   }
@@ -155,19 +143,19 @@ export class RetrocompatibilityService {
       const sessionType = session.account.type
       switch (sessionType) {
         case 'AWS':
-          RetrocompatibilityService.createNewAwsFederatedOrIamRoleChainedSession(session, workspace)
+          RetroCompatibilityService.createNewAwsFederatedOrIamRoleChainedSession(session, workspace)
           break
         case 'AWS_TRUSTER':
-          RetrocompatibilityService.createNewAwsFederatedOrIamRoleChainedSession(session, workspace)
+          RetroCompatibilityService.createNewAwsFederatedOrIamRoleChainedSession(session, workspace)
           break
         case 'AWS_PLAIN_USER':
           await this.createNewAwsIamUserSession(session, workspace)
           break
         case 'aws_sso':
-          RetrocompatibilityService.createNewAwsSingleSignOnSession(session, workspace)
+          RetroCompatibilityService.createNewAwsSingleSignOnSession(session, workspace)
           break
         case 'azure':
-          RetrocompatibilityService.createNewAzureSession(session, workspace)
+          RetroCompatibilityService.createNewAzureSession(session, workspace)
           break
       }
     }
@@ -187,9 +175,9 @@ export class RetrocompatibilityService {
         let expirationTime
         let browserOpening
         try {
-          region = await this.keyChainService.getSecret(environment.appName, 'AWS_SSO_REGION')
-          portalUrl = await this.keyChainService.getSecret(environment.appName, 'AWS_SSO_PORTAL_URL')
-          expirationTime = await this.keyChainService.getSecret(environment.appName, 'AWS_SSO_EXPIRATION_TIME')
+          region = await this.keyChainService.getSecret(this.appName, 'AWS_SSO_REGION')
+          portalUrl = await this.keyChainService.getSecret(this.appName, 'AWS_SSO_PORTAL_URL')
+          expirationTime = await this.keyChainService.getSecret(this.appName, 'AWS_SSO_EXPIRATION_TIME')
           browserOpening = constants.inApp.toString()
         } catch (err) {
           // we need all or nothing, otherwise it means that configuration is incomplete so its better
@@ -217,13 +205,13 @@ export class RetrocompatibilityService {
     iamUserSession.sessionId = session.id
 
     const accessKey = await this.keyChainService.getSecret(
-      environment.appName, `${session.account.accountName}___${session.account.user}___accessKey`)
+      this.appName, `${session.account.accountName}___${session.account.user}___accessKey`)
 
     const secretKey = await this.keyChainService.getSecret(
-      environment.appName, `${session.account.accountName}___${session.account.user}___secretKey`)
+      this.appName, `${session.account.accountName}___${session.account.user}___secretKey`)
 
-    await this.keyChainService.saveSecret(environment.appName, `${session.id}-iam-user-aws-session-access-key-id`, accessKey)
-    await this.keyChainService.saveSecret(environment.appName, `${session.id}-iam-user-aws-session-secret-access-key`, secretKey)
+    await this.keyChainService.saveSecret(this.appName, `${session.id}-iam-user-aws-session-access-key-id`, accessKey)
+    await this.keyChainService.saveSecret(this.appName, `${session.id}-iam-user-aws-session-secret-access-key`, secretKey)
 
     workspace.sessions.push(iamUserSession)
   }

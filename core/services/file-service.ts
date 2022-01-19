@@ -104,17 +104,6 @@ export class FileService {
   }
 
   /**
-   * Choose a uses the os filedialog to lewt you choose a file
-   *
-   * @returns - {string} - the path of the file to open
-   */
-  chooseFile(): string {
-    // TODO: implement it!
-    //return this.nativeService.dialog.showOpenDialog({properties: ['openFile']});
-    return 'to be implemented';
-  }
-
-  /**
    * Write a generic file in an asynchronous way
    *
    * @returns - {Observable<any>}

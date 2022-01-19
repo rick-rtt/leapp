@@ -5,7 +5,7 @@ import { SsmService } from '../../../services/ssm.service'
 import { environment } from '../../../../environments/environment'
 import * as uuid from 'uuid'
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal'
-import { SessionServiceFactory } from '../../../services/session-service-factory'
+import { SessionFactory } from '../../../services/session-factory'
 import { SessionService } from '@noovolari/leapp-core/services/session/session.service'
 import { Session } from '@noovolari/leapp-core/models/session'
 import { SessionType } from '@noovolari/leapp-core/models/session-type'
@@ -61,7 +61,7 @@ export class SessionCardComponent implements OnInit {
   private sessionService: SessionService
   private loggingService: LoggingService
   private repository: Repository
-  private sessionServiceFactory: SessionServiceFactory
+  private sessionServiceFactory: SessionFactory
   private workspaceService: WorkspaceService
 
   constructor(private appService: AppService, private router: Router, private ssmService: SsmService,
@@ -69,7 +69,7 @@ export class SessionCardComponent implements OnInit {
               leappCoreService: LeappCoreService) {
     this.repository = leappCoreService.repository
     this.loggingService = leappCoreService.loggingService
-    this.sessionServiceFactory = leappCoreService.sessionServiceFactory
+    this.sessionServiceFactory = leappCoreService.sessionFactory
     this.workspaceService = leappCoreService.workspaceService
   }
 

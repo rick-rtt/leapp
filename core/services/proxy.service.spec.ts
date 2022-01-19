@@ -1,4 +1,4 @@
-import {TestBed} from '@angular/core/testing';
+/*import {TestBed} from '@angular/core/testing';
 
 import {ProxyService} from './proxy.service';
 import {mustInjected} from '../../base-injectables';
@@ -43,3 +43,4 @@ describe('ProxyService', () => {
     expect(service).toBeTruthy();
   });
 });
+*/

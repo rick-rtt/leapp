@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core'
 import { AppService } from '../../../services/app.service'
 import { environment } from '../../../../environments/environment'
 import { UpdaterService } from '../../../services/updater.service'
-import { SessionServiceFactory } from '../../../services/session-service-factory'
+import { SessionFactory } from '../../../services/session-factory'
 import { Session } from '@noovolari/leapp-core/models/session'
 import { SessionType } from '@noovolari/leapp-core/models/session-type'
 import { SessionStatus } from '@noovolari/leapp-core/models/session-status'
@@ -26,13 +26,13 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
   private subscribed
   private loggingService: LoggingService
   private repository: Repository
-  private sessionServiceFactory: SessionServiceFactory
+  private sessionServiceFactory: SessionFactory
   private workspaceService: WorkspaceService
 
   constructor(private updaterService: UpdaterService, private appService: AppService, leappCoreService: LeappCoreService) {
     this.repository = leappCoreService.repository
     this.loggingService = leappCoreService.loggingService
-    this.sessionServiceFactory = leappCoreService.sessionServiceFactory
+    this.sessionServiceFactory = leappCoreService.sessionFactory
     this.workspaceService = leappCoreService.workspaceService
   }
 

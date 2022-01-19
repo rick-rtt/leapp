@@ -70,14 +70,6 @@ export class AppService {
     return this.electronService.currentWindow
   }
 
-  getFollowRedirects() {
-    return this.electronService.followRedirects
-  }
-
-  getHttpsProxyAgent() {
-    return this.electronService.httpsProxyAgent
-  }
-
   /**
    * Return the dialog native object
    */

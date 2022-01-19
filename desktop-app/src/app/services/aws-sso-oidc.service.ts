@@ -1,8 +1,4 @@
-import SSOOIDC, {
-  CreateTokenRequest,
-  RegisterClientRequest,
-  StartDeviceAuthorizationRequest
-} from 'aws-sdk/clients/ssooidc'
+import SSOOIDC, { CreateTokenRequest, RegisterClientRequest, StartDeviceAuthorizationRequest } from 'aws-sdk/clients/ssooidc'
 import { Injectable } from '@angular/core'
 import { AppService } from './app.service'
 import { ElectronService } from './electron.service'

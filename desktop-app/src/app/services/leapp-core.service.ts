@@ -7,20 +7,26 @@ import { AwsCoreService } from '@noovolari/leapp-core/services/aws-core-service'
 import { LoggingService } from '@noovolari/leapp-core/services/logging-service'
 import { WorkspaceService } from '@noovolari/leapp-core/services/workspace.service'
 import { TimerService } from '@noovolari/leapp-core/services/timer-service'
-import { AwsIamRoleFederatedService } from './session/aws/method/aws-iam-role-federated-service'
-import { AwsIamRoleChainedService } from './session/aws/method/aws-iam-role-chained-service'
+import { AwsIamRoleFederatedService } from '@noovolari/leapp-core/services/session/aws/aws-iam-role-federated-service'
+import { AzureService } from '@noovolari/leapp-core/services/session/azure/azure.service'
+import { AwsIamRoleChainedService } from '../../../../core/services/session/aws/aws-iam-role-chained-service'
 import { ElectronService } from './electron.service'
 import { AwsSsoRoleService } from './session/aws/method/aws-sso-role-service'
-import { AzureService } from './session/azure/azure.service'
-import { SessionServiceFactory } from './session-service-factory'
+import { SessionFactory } from './session-factory'
 import { MfaCodePromptService } from './mfa-code-prompt.service'
 import { ExecuteService } from '@noovolari/leapp-core/services/execute.service'
+import { RetroCompatibilityService } from '@noovolari/leapp-core/services/retro-compatibility.service'
+import { AwsAuthenticationService } from './session/aws/method/aws-authentication.service'
+import { environment } from '../../environments/environment'
+import { RotationService } from './rotation.service'
+import { AwsParentSessionFactory } from '@noovolari/leapp-core/services/session/aws/aws-parent-session.factory'
 
 @Injectable({
   providedIn: 'root'
 })
 export class LeappCoreService {
-  constructor(private mfaCodePrompter: MfaCodePromptService, private electronService: ElectronService) {
+  constructor(private mfaCodePrompter: MfaCodePromptService, private awsAuthenticationService: AwsAuthenticationService,
+              private electronService: ElectronService) {
   }
 
   private workspaceServiceInstance: WorkspaceService
@@ -49,7 +55,7 @@ export class LeappCoreService {
   get awsIamRoleFederatedService(): AwsIamRoleFederatedService {
     if (!this.awsIamRoleFederatedServiceInstance) {
       this.awsIamRoleFederatedServiceInstance = new AwsIamRoleFederatedService(this.workspaceService, this.repository,
-        this.fileService, this.awsCoreService, appService)
+        this.fileService, this.awsCoreService, this.awsAuthenticationService, environment.samlRoleSessionDuration)
     }
 
     return this.awsIamRoleFederatedServiceInstance
@@ -60,7 +66,7 @@ export class LeappCoreService {
   get awsIamRoleChainedService(): AwsIamRoleChainedService {
     if (!this.awsIamRoleChainedServiceInstance) {
       this.awsIamRoleChainedServiceInstance = new AwsIamRoleChainedService(this.workspaceService, this.repository,
-        this.awsCoreService, awsSsoOidcService, this.fileService, this.awsIamUserService, this.sessionServiceFactory)
+        this.awsCoreService, this.fileService, this.awsIamUserService, this.awsParentSessionFactory)
     }
 
     return this.awsIamRoleChainedServiceInstance
@@ -71,7 +77,8 @@ export class LeappCoreService {
   get awsSsoRoleService(): AwsSsoRoleService {
     if (!this.awsSsoRoleServiceInstance) {
       this.awsSsoRoleServiceInstance = new AwsSsoRoleService(this.workspaceService, this.repository, this.fileService,
-        this.keyChainService, this.awsCoreService, appService, awsSsoOidcService)
+        this.keyChainService, this.awsCoreService, this.electronService, awsSsoOidcService, environment.appName,
+        environment.defaultRegion)
     }
 
     return this.awsSsoRoleServiceInstance
@@ -93,23 +100,33 @@ export class LeappCoreService {
   get azureService(): AzureService {
     if (!this.azureServiceInstance) {
       this.azureServiceInstance = new AzureService(this.workspaceService, this.repository, this.fileService,
-        this.executeService)
+        this.executeService, environment.azureAccessTokens)
     }
 
     return this.azureServiceInstance
   }
 
+  private sessionFactoryInstance: SessionFactory
 
-  private sessionFactoryServiceInstance: SessionServiceFactory
-
-  get sessionServiceFactory(): SessionServiceFactory {
-    if (!this.sessionFactoryServiceInstance) {
-      this.sessionFactoryServiceInstance = new SessionServiceFactory(this.awsIamUserService,
+  get sessionFactory(): SessionFactory {
+    if (!this.sessionFactoryInstance) {
+      this.sessionFactoryInstance = new SessionFactory(this.awsIamUserService,
         this.awsIamRoleFederatedService, this.awsIamRoleChainedService, this.awsSsoRoleService,
         this.azureService)
     }
 
-    return this.sessionFactoryServiceInstance
+    return this.sessionFactoryInstance
+  }
+
+  private awsParentSessionFactoryInstance: AwsParentSessionFactory
+
+  get awsParentSessionFactory(): AwsParentSessionFactory {
+    if (!this.awsParentSessionFactoryInstance) {
+      this.awsParentSessionFactoryInstance = new AwsParentSessionFactory(this.awsIamUserService,
+        this.awsIamRoleFederatedService, /*this.awsSsoRoleService*/)
+    }
+
+    return this.awsParentSessionFactoryInstance
   }
 
   private fileServiceInstance: FileService
@@ -170,5 +187,26 @@ export class LeappCoreService {
     }
 
     return this.executeServiceInstance
+  }
+
+  private rotationServiceInstance: RotationService
+
+  get rotationService(): RotationService {
+    if (!this.rotationServiceInstance) {
+      this.rotationServiceInstance = new RotationService(this.sessionFactory, this.workspaceService)
+    }
+
+    return this.rotationServiceInstance
+  }
+
+  private retroCompatibilityServiceInstance: RetroCompatibilityService
+
+  get retroCompatibilityService(): RetroCompatibilityService {
+    if (!this.retroCompatibilityServiceInstance) {
+      this.retroCompatibilityServiceInstance = new RetroCompatibilityService(this.fileService, this.keyChainService,
+        this.workspaceService, environment.appName, environment.lockFileDestination)
+    }
+
+    return this.retroCompatibilityServiceInstance
   }
 }
