@@ -152,10 +152,6 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
   removeSecrets(sessionId: string): void {
   }
 
-  interrupt() {
-    this.awsSsoOidcService.interrupt()
-  }
-
   async sync(): Promise<SsoRoleSession[]> {
     const region = this.repository.getAwsSsoConfiguration().region
     const portalUrl = this.repository.getAwsSsoConfiguration().portalUrl

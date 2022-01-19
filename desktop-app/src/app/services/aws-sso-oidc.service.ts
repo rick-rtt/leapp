@@ -1,4 +1,8 @@
-import SSOOIDC, { CreateTokenRequest, RegisterClientRequest, StartDeviceAuthorizationRequest } from 'aws-sdk/clients/ssooidc'
+import SSOOIDC, {
+  CreateTokenRequest,
+  RegisterClientRequest,
+  StartDeviceAuthorizationRequest
+} from 'aws-sdk/clients/ssooidc'
 import { Injectable } from '@angular/core'
 import { AppService } from './app.service'
 import { ElectronService } from './electron.service'
@@ -25,11 +29,6 @@ export class AwsSsoOidcService {
   listeners: BrowserWindowClosing[]
   private ssoOidc: SSOOIDC
   private ssoWindow: any
-  private currentRegion: string
-  private currentPortalUrl: string
-  private registerClientResponse: RegisterClientResponse
-  private startDeviceAuthorizationResponse: StartDeviceAuthorizationResponse
-  private startDeviceAuthorizationResponseExpiresAt: number
   private generateSSOTokenResponse: GenerateSSOTokenResponse
   private setIntervalQueue: Array<any>
   private loginMutex: boolean
@@ -45,11 +44,6 @@ export class AwsSsoOidcService {
     this.listeners = []
     this.ssoOidc = null
     this.ssoWindow = null
-    this.currentRegion = null
-    this.currentPortalUrl = null
-    this.registerClientResponse = null
-    this.startDeviceAuthorizationResponse = null
-    this.startDeviceAuthorizationResponseExpiresAt = null
     this.generateSSOTokenResponse = null
     this.setIntervalQueue = []
     this.loginMutex = false
@@ -75,30 +69,14 @@ export class AwsSsoOidcService {
 
       this.ssoOidc = new SSOOIDC({region})
       this.ssoWindow = null
-      this.currentRegion = region
-      this.currentPortalUrl = portalUrl
-      this.registerClientResponse = null
-      this.startDeviceAuthorizationResponse = null
-      this.startDeviceAuthorizationResponseExpiresAt = null
       this.generateSSOTokenResponse = null
       this.setIntervalQueue = []
       this.timeoutOccurred = false
       this.interruptOccurred = false
 
-      await this.registerSsoOidcClient()
-
-      const startDeviceAuthorizationRequest: StartDeviceAuthorizationRequest = {
-        clientId: this.registerClientResponse.clientId,
-        clientSecret: this.registerClientResponse.clientSecret,
-        startUrl: portalUrl
-      }
-
-      const baseTimeInMilliseconds = Date.now()
-      this.startDeviceAuthorizationResponse = await this.getAwsSsoOidcClient().startDeviceAuthorization(startDeviceAuthorizationRequest).promise()
-      this.startDeviceAuthorizationResponseExpiresAt = baseTimeInMilliseconds + this.startDeviceAuthorizationResponse.expiresIn * 1000
-
-      const verificationResponse = await this.openVerificationBrowserWindow(this.registerClientResponse, this.startDeviceAuthorizationResponse)
-
+      const registerClientResponse = await this.registerSsoOidcClient()
+      const startDeviceAuthorizationResponse = await this.startDeviceAuthorization(registerClientResponse, portalUrl)
+      const verificationResponse = await this.openVerificationWindow(registerClientResponse, startDeviceAuthorizationResponse)
       try {
         this.generateSSOTokenResponse = await this.createToken(verificationResponse)
       } catch (err) {
@@ -145,77 +123,101 @@ export class AwsSsoOidcService {
     }
   }
 
-  private async registerSsoOidcClient(): Promise<void> {
+  private async registerSsoOidcClient(): Promise<RegisterClientResponse> {
     const registerClientRequest: RegisterClientRequest = {clientName: 'leapp', clientType: 'public'}
-    this.registerClientResponse = await this.ssoOidc.registerClient(registerClientRequest).promise()
+    return await this.ssoOidc.registerClient(registerClientRequest).promise()
   }
 
-  private async openVerificationBrowserWindow(registerClientResponse: RegisterClientResponse, startDeviceAuthorizationResponse: StartDeviceAuthorizationResponse): Promise<VerificationResponse> {
-    if (this.repository.getAwsSsoConfiguration().browserOpening === constants.inApp.toString()) {
-      const pos = this.electronService.currentWindow.getPosition()
+  private async startDeviceAuthorization(registerClientResponse: RegisterClientResponse, portalUrl: string): Promise<StartDeviceAuthorizationResponse> {
+    const startDeviceAuthorizationRequest: StartDeviceAuthorizationRequest = {
+      clientId: registerClientResponse.clientId,
+      clientSecret: registerClientResponse.clientSecret,
+      startUrl: portalUrl
+    }
 
-      this.ssoWindow = null
-      this.ssoWindow = this.appService.newWindow(startDeviceAuthorizationResponse.verificationUriComplete,
-        true, 'Portal url - Client verification', pos[0] + 200, pos[1] + 50)
-      this.ssoWindow.loadURL(startDeviceAuthorizationResponse.verificationUriComplete)
+    const baseTimeInMilliseconds = Date.now()
+    const startDeviceAuthorizationResponse = await this.getAwsSsoOidcClient().startDeviceAuthorization(startDeviceAuthorizationRequest).promise()
+    //What is this?!?
+    const startDeviceAuthorizationResponseExpiresAt = baseTimeInMilliseconds + startDeviceAuthorizationResponse.expiresIn * 1000
 
-      this.ssoWindow.on('close', (e) => {
-        e.preventDefault()
+    return startDeviceAuthorizationResponse
+  }
 
-        this.loginMutex = false
-
-        this.listeners.forEach(listener => {
-          listener.catchClosingBrowserWindow()
-        })
-      })
-
-      return new Promise((resolve, reject) => {
-        // When the code is verified and the user has been logged in, the window can be closed
-        this.ssoWindow.webContents.session.webRequest.onBeforeRequest({
-          urls: [
-            'https://*.awsapps.com/start/user-consent/login-success.html',
-          ]
-        }, (details, callback) => {
-          this.ssoWindow.close()
-          this.ssoWindow = null
-
-          const verificationResponse: VerificationResponse = {
-            clientId: registerClientResponse.clientId,
-            clientSecret: registerClientResponse.clientSecret,
-            deviceCode: startDeviceAuthorizationResponse.deviceCode
-          }
-
-          resolve(verificationResponse)
-
-          callback({
-            requestHeaders: details.requestHeaders,
-            url: details.url,
-          })
-        })
-
-        this.ssoWindow.webContents.session.webRequest.onErrorOccurred((details) => {
-          if (
-            details.error.indexOf('net::ERR_ABORTED') < 0 &&
-            details.error.indexOf('net::ERR_FAILED') < 0 &&
-            details.error.indexOf('net::ERR_CACHE_MISS') < 0 &&
-            details.error.indexOf('net::ERR_CONNECTION_REFUSED') < 0
-          ) {
-            if (this.ssoWindow) {
-              this.ssoWindow.close()
-              this.ssoWindow = null
-            }
-            reject(details.error.toString())
-          }
-        })
-      })
+  private async openVerificationWindow(registerClientResponse: RegisterClientResponse,
+                                       startDeviceAuthorizationResponse: StartDeviceAuthorizationResponse): Promise<VerificationResponse> {
+    const openInAppWindow = constants.inApp.toString()
+    if (this.repository.getAwsSsoConfiguration().browserOpening === openInAppWindow) {
+      return this.openVerificationBrowserWindow(registerClientResponse, startDeviceAuthorizationResponse)
     } else {
       return this.openExternalVerificationBrowserWindow(registerClientResponse, startDeviceAuthorizationResponse)
     }
   }
 
-  private async openExternalVerificationBrowserWindow(registerClientResponse: RegisterClientResponse, startDeviceAuthorizationResponse: StartDeviceAuthorizationResponse): Promise<VerificationResponse> {
-    const uriComplete = startDeviceAuthorizationResponse.verificationUriComplete
+  private async openVerificationBrowserWindow(registerClientResponse: RegisterClientResponse,
+                                              startDeviceAuthorizationResponse: StartDeviceAuthorizationResponse): Promise<VerificationResponse> {
 
+    const pos = this.electronService.currentWindow.getPosition()
+
+    this.ssoWindow = null
+    this.ssoWindow = this.appService.newWindow(startDeviceAuthorizationResponse.verificationUriComplete,
+      true, 'Portal url - Client verification', pos[0] + 200, pos[1] + 50)
+    this.ssoWindow.loadURL(startDeviceAuthorizationResponse.verificationUriComplete)
+
+    this.ssoWindow.on('close', (e) => {
+      e.preventDefault()
+
+      this.loginMutex = false
+
+      this.listeners.forEach(listener => {
+        listener.catchClosingBrowserWindow()
+      })
+    })
+
+    return new Promise((resolve, reject) => {
+      // When the code is verified and the user has been logged in, the window can be closed
+      this.ssoWindow.webContents.session.webRequest.onBeforeRequest({
+        urls: [
+          'https://*.awsapps.com/start/user-consent/login-success.html',
+        ]
+      }, (details, callback) => {
+        this.ssoWindow.close()
+        this.ssoWindow = null
+
+        const verificationResponse: VerificationResponse = {
+          clientId: registerClientResponse.clientId,
+          clientSecret: registerClientResponse.clientSecret,
+          deviceCode: startDeviceAuthorizationResponse.deviceCode
+        }
+
+        resolve(verificationResponse)
+
+        callback({
+          requestHeaders: details.requestHeaders,
+          url: details.url,
+        })
+      })
+
+      this.ssoWindow.webContents.session.webRequest.onErrorOccurred((details) => {
+        if (
+          details.error.indexOf('net::ERR_ABORTED') < 0 &&
+          details.error.indexOf('net::ERR_FAILED') < 0 &&
+          details.error.indexOf('net::ERR_CACHE_MISS') < 0 &&
+          details.error.indexOf('net::ERR_CONNECTION_REFUSED') < 0
+        ) {
+          if (this.ssoWindow) {
+            this.ssoWindow.close()
+            this.ssoWindow = null
+          }
+          reject(details.error.toString())
+        }
+      })
+    })
+  }
+
+  private async openExternalVerificationBrowserWindow(registerClientResponse: RegisterClientResponse,
+                                                      startDeviceAuthorizationResponse: StartDeviceAuthorizationResponse): Promise<VerificationResponse> {
+
+    const uriComplete = startDeviceAuthorizationResponse.verificationUriComplete
     return new Promise((resolve, _) => {
       // Open external browser window and let authentication begins
       this.appService.openExternalUrl(uriComplete)

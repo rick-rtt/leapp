@@ -106,8 +106,7 @@ export class AwsSsoComponent implements OnInit, BrowserWindowClosing {
   }
 
   gotoWebForm() {
-    // TODO: call aws sso oidc service directly
-    this.awsSsoRoleService.interrupt();
+    this.awsSsoOidcService.interrupt();
     this.login();
   }
 
@@ -123,8 +122,7 @@ export class AwsSsoComponent implements OnInit, BrowserWindowClosing {
   }
 
   closeLoadingScreen() {
-    // TODO: call aws sso oidc service directly
-    this.awsSsoRoleService.interrupt();
+    this.awsSsoOidcService.interrupt();
     this.loadingInBrowser = false;
     this.loadingInApp = false;
   }
