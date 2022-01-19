@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core'
-import { AwsIamUserService } from '@noovolari/leapp-core/services/session/aws/method/aws-iam-user-service'
-import { Repository } from '@noovolari/leapp-core/services/repository'
+import { AwsIamUserService } from '@noovolari/leapp-core/services/session/aws/aws-iam-user-service'
 import { FileService } from '@noovolari/leapp-core/services/file-service'
 import { KeychainService } from '@noovolari/leapp-core/services/keychain-service'
 import { AwsCoreService } from '@noovolari/leapp-core/services/aws-core-service'
@@ -9,7 +8,6 @@ import { WorkspaceService } from '@noovolari/leapp-core/services/workspace.servi
 import { TimerService } from '@noovolari/leapp-core/services/timer-service'
 import { AwsIamRoleFederatedService } from '@noovolari/leapp-core/services/session/aws/aws-iam-role-federated-service'
 import { AzureService } from '@noovolari/leapp-core/services/session/azure/azure.service'
-import { AwsIamRoleChainedService } from '../../../../core/services/session/aws/aws-iam-role-chained-service'
 import { ElectronService } from './electron.service'
 import { AwsSsoRoleService } from './session/aws/method/aws-sso-role-service'
 import { SessionFactory } from './session-factory'
@@ -20,6 +18,8 @@ import { AwsAuthenticationService } from './session/aws/method/aws-authenticatio
 import { environment } from '../../environments/environment'
 import { RotationService } from './rotation.service'
 import { AwsParentSessionFactory } from '@noovolari/leapp-core/services/session/aws/aws-parent-session.factory'
+import { AwsIamRoleChainedService } from '@noovolari/leapp-core/services/session/aws/aws-iam-role-chained-service'
+import { Repository } from '@noovolari/leapp-core/services/repository'
 
 @Injectable({
   providedIn: 'root'

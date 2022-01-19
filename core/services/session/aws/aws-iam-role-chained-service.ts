@@ -6,12 +6,12 @@ import { LeappNotFoundError } from '../../../errors/leapp-not-found-error'
 import { AssumeRoleResponse } from 'aws-sdk/clients/sts'
 import { AwsIamRoleChainedSession } from '../../../models/aws-iam-role-chained-session'
 import { CredentialsInfo } from '../../../models/credentials-info'
-import { Repository } from '../../repository'
 import { FileService } from '../../file-service'
 import { Session } from '../../../models/session'
 import { AwsIamUserService } from './aws-iam-user-service'
 import { AwsCoreService } from '../../aws-core-service'
 import { AwsParentSessionFactory } from './aws-parent-session.factory'
+import { Repository } from '../../repository'
 
 export interface AwsIamRoleChainedSessionRequest {
   accountName: string;

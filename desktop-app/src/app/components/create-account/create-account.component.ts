@@ -8,19 +8,19 @@ import { SessionType } from '@noovolari/leapp-core/models/session-type'
 import { Repository } from '@noovolari/leapp-core/services/repository'
 import { LoggerLevel, LoggingService } from '@noovolari/leapp-core/services/logging-service'
 import { WorkspaceService } from '@noovolari/leapp-core/services/workspace.service'
+import { LeappParseError } from '@noovolari/leapp-core/errors/leapp-parse-error'
 import {
   AwsIamUserService,
   AwsIamUserSessionRequest
-} from '@noovolari/leapp-core/services/session/aws/method/aws-iam-user-service'
-import { LeappParseError } from '@noovolari/leapp-core/errors/leapp-parse-error'
-import {
-  AwsIamRoleFederatedService,
-  AwsIamRoleFederatedSessionRequest
-} from '../../../../../core/services/session/aws/aws-iam-role-federated-service'
+} from '@noovolari/leapp-core/services/session/aws/aws-iam-user-service'
 import {
   AwsIamRoleChainedService,
   AwsIamRoleChainedSessionRequest
 } from '../../../../../core/services/session/aws/aws-iam-role-chained-service'
+import {
+  AwsIamRoleFederatedService,
+  AwsIamRoleFederatedSessionRequest
+} from '@noovolari/leapp-core/services/session/aws/aws-iam-role-federated-service'
 import { AzureService, AzureSessionRequest } from '../../../../../core/services/session/azure/azure.service'
 import { LeappCoreService } from '../../services/leapp-core.service'
 

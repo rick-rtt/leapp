@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core'
-import { IMfaCodePrompter } from '@noovolari/leapp-core/services/session/aws/method/aws-iam-user-service'
+import { IMfaCodePrompter } from '@noovolari/leapp-core/services/session/aws/aws-iam-user-service'
 import { BsModalService } from 'ngx-bootstrap/modal'
 import { InputDialogComponent } from '../components/shared/input-dialog/input-dialog.component'
 import { ElectronService } from './electron.service'
