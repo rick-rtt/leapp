@@ -8,17 +8,16 @@ import { LeappCoreService } from '../leapp-core.service'
   providedIn: 'root'
 })
 export class ErrorService implements ErrorHandler {
-  private loggingService: LoggingService
 
-  constructor(private injector: Injector, private leappCoreService: LeappCoreService) {
-    this.loggingService = leappCoreService.loggingService
-  }
+  // Don't use regular dependency injection but instead use injector!
+  constructor(private injector: Injector) {}
 
   handleError(error: any): void {
     error = error.rejection ? error.rejection : error;
     const appService = this.injector.get(AppService);
+    const loggingService = this.injector.get(LeappCoreService).loggingService;
 
-    this.loggingService.logger((error as LeappBaseError).message, (error as LeappBaseError).severity,
+    loggingService.logger((error as LeappBaseError).message, (error as LeappBaseError).severity,
       (error as LeappBaseError).context, (error as LeappBaseError).stack);
 
     appService.toast((error as LeappBaseError).message, (error as LeappBaseError).severity, (error as LeappBaseError).name);

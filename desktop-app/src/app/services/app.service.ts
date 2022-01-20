@@ -20,6 +20,9 @@ export enum ToastLevel {
   success
 }
 
+// FATAL CD TODO: AppService > LeappCoreService > AwsAuthenticationService > AppService
+// Solution: AppService carpaccio
+
 @Injectable({
   providedIn: 'root'
 })
