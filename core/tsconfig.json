@@ -5,11 +5,11 @@
     "baseUrl": "./",
     "declaration": true,
     "experimentalDecorators": true,
-    "lib": ["ES2021", "DOM"],
+    "lib": ["ES2019", "DOM"],
     "module": "CommonJS",
     "moduleResolution": "Node",
     "sourceMap": true,
-    "target": "ES2021",
+    "target": "ES2019",
     "typeRoots": ["node_modules/@types"],
     "paths": {
       "stream": ["node_modules/stream-browserify"],

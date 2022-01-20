@@ -4,7 +4,6 @@ import { AppService, ToastLevel } from '../../../services/app.service'
 import { Router } from '@angular/router'
 import { environment } from '../../../../environments/environment'
 import * as uuid from 'uuid'
-import { SessionFactory } from '../../../services/session-factory'
 import { constants } from '@noovolari/leapp-core/models/constants'
 import { Repository } from '@noovolari/leapp-core/services/repository'
 import { WorkspaceService } from '@noovolari/leapp-core/services/workspace.service'
@@ -13,6 +12,7 @@ import { SessionType } from '@noovolari/leapp-core/models/session-type'
 import { AwsIamRoleFederatedSession } from '@noovolari/leapp-core/models/aws-iam-role-federated-session'
 import { SessionStatus } from '@noovolari/leapp-core/models/session-status'
 import { LeappCoreService } from '../../../services/leapp-core.service'
+import { SessionFactory } from '@noovolari/leapp-core/services/session-factory'
 
 @Component({
   selector: 'app-profile-page',

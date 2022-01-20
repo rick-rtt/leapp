@@ -4,29 +4,31 @@ import { FileService } from '@noovolari/leapp-core/services/file-service'
 import { KeychainService } from '@noovolari/leapp-core/services/keychain-service'
 import { AwsCoreService } from '@noovolari/leapp-core/services/aws-core-service'
 import { LoggingService } from '@noovolari/leapp-core/services/logging-service'
-import { WorkspaceService } from '@noovolari/leapp-core/services/workspace.service'
 import { TimerService } from '@noovolari/leapp-core/services/timer-service'
 import { AwsIamRoleFederatedService } from '@noovolari/leapp-core/services/session/aws/aws-iam-role-federated-service'
 import { AzureService } from '@noovolari/leapp-core/services/session/azure/azure.service'
 import { ElectronService } from './electron.service'
-import { AwsSsoRoleService } from './session/aws/method/aws-sso-role-service'
-import { SessionFactory } from './session-factory'
 import { MfaCodePromptService } from './mfa-code-prompt.service'
 import { ExecuteService } from '@noovolari/leapp-core/services/execute.service'
 import { RetroCompatibilityService } from '@noovolari/leapp-core/services/retro-compatibility.service'
-import { AwsAuthenticationService } from './session/aws/method/aws-authentication.service'
+import { AwsAuthenticationService } from './session/aws/aws-authentication.service'
 import { environment } from '../../environments/environment'
-import { RotationService } from './rotation.service'
 import { AwsParentSessionFactory } from '@noovolari/leapp-core/services/session/aws/aws-parent-session.factory'
 import { AwsIamRoleChainedService } from '@noovolari/leapp-core/services/session/aws/aws-iam-role-chained-service'
 import { Repository } from '@noovolari/leapp-core/services/repository'
+import { AwsSsoOidcService } from '@noovolari/leapp-core/services/session/aws/aws-sso-oidc.service'
+import { AwsSsoRoleService } from '@noovolari/leapp-core/services/session/aws/aws-sso-role-service'
+import { VerificationWindowService } from './verification-window.service'
+import { WorkspaceService } from '@noovolari/leapp-core/services/workspace.service'
+import { SessionFactory } from '@noovolari/leapp-core/services/session-factory'
+import { RotationService } from '@noovolari/leapp-core/services/rotation.service'
 
 @Injectable({
   providedIn: 'root'
 })
 export class LeappCoreService {
   constructor(private mfaCodePrompter: MfaCodePromptService, private awsAuthenticationService: AwsAuthenticationService,
-              private electronService: ElectronService) {
+              private verificationWindowService: VerificationWindowService, private electronService: ElectronService) {
   }
 
   private workspaceServiceInstance: WorkspaceService
@@ -77,11 +79,21 @@ export class LeappCoreService {
   get awsSsoRoleService(): AwsSsoRoleService {
     if (!this.awsSsoRoleServiceInstance) {
       this.awsSsoRoleServiceInstance = new AwsSsoRoleService(this.workspaceService, this.repository, this.fileService,
-        this.keyChainService, this.awsCoreService, this.electronService, awsSsoOidcService, environment.appName,
+        this.keyChainService, this.awsCoreService, this.electronService, this.awsSsoOidcService, environment.appName,
         environment.defaultRegion)
     }
 
     return this.awsSsoRoleServiceInstance
+  }
+
+  private awsSsoOidcServiceInstance: AwsSsoOidcService
+
+  get awsSsoOidcService(): AwsSsoOidcService {
+    if (!this.awsSsoOidcServiceInstance) {
+      this.awsSsoOidcServiceInstance = new AwsSsoOidcService(this.verificationWindowService, this.repository)
+    }
+
+    return this.awsSsoOidcServiceInstance
   }
 
   private awsCoreServiceInstance: AwsCoreService
@@ -123,7 +135,7 @@ export class LeappCoreService {
   get awsParentSessionFactory(): AwsParentSessionFactory {
     if (!this.awsParentSessionFactoryInstance) {
       this.awsParentSessionFactoryInstance = new AwsParentSessionFactory(this.awsIamUserService,
-        this.awsIamRoleFederatedService, /*this.awsSsoRoleService*/)
+        this.awsIamRoleFederatedService, this.awsSsoRoleService)
     }
 
     return this.awsParentSessionFactoryInstance

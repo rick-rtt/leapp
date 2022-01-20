@@ -8,17 +8,18 @@ import SSO, {
   RoleInfo
 } from 'aws-sdk/clients/sso'
 
-import { AwsSessionService } from '@noovolari/leapp-core/services/session/aws/aws-session-service'
-import { AwsSsoOidcService, BrowserWindowClosing } from '../../../aws-sso-oidc.service'
-import { ISessionNotifier } from '@noovolari/leapp-core/interfaces/i-session-notifier'
-import { AwsSsoRoleSession } from '@noovolari/leapp-core/models/aws-sso-role-session'
-import { CredentialsInfo } from '@noovolari/leapp-core/models/credentials-info'
-import { Repository } from '@noovolari/leapp-core/services/repository'
-import { FileService } from '@noovolari/leapp-core/services/file-service'
-import { AwsCoreService } from '@noovolari/leapp-core/services/aws-core-service'
-import { KeychainService } from '@noovolari/leapp-core/services/keychain-service'
-import { SessionType } from '@noovolari/leapp-core/models/session-type'
-import { INativeService } from '@noovolari/leapp-core/interfaces/i-native-service'
+import { AwsSessionService } from './aws-session-service'
+import { AwsSsoOidcService } from './aws-sso-oidc.service'
+import { ISessionNotifier } from '../../../interfaces/i-session-notifier'
+import { AwsSsoRoleSession } from '../../../models/aws-sso-role-session'
+import { CredentialsInfo } from '../../../models/credentials-info'
+import { Repository } from '../../repository'
+import { FileService } from '../../file-service'
+import { AwsCoreService } from '../../aws-core-service'
+import { KeychainService } from '../../keychain-service'
+import { SessionType } from '../../../models/session-type'
+import { INativeService } from '../../../interfaces/i-native-service'
+import { BrowserWindowClosing } from '../../../interfaces/i-browser-window-closing'
 
 export interface AwsSsoRoleSessionRequest {
   sessionName: string;
@@ -77,7 +78,7 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
                      private nativeService: INativeService, private awsSsoOidcService: AwsSsoOidcService,
                      private appName: string, private defaultRegion: string) {
     super(iSessionNotifier, repository)
-    awsSsoOidcService.listeners.push(this)
+    awsSsoOidcService.appendListener(this)
   }
 
 

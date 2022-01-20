@@ -1,5 +1,5 @@
 import { SessionFactory } from './session-factory'
-import { WorkspaceService } from '@noovolari/leapp-core/services/workspace.service'
+import { WorkspaceService } from './workspace.service'
 
 export class RotationService {
   constructor(private sessionServiceFactory: SessionFactory, private workspaceService: WorkspaceService) {

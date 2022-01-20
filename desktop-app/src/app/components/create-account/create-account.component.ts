@@ -14,15 +14,16 @@ import {
   AwsIamUserSessionRequest
 } from '@noovolari/leapp-core/services/session/aws/aws-iam-user-service'
 import {
-  AwsIamRoleChainedService,
-  AwsIamRoleChainedSessionRequest
-} from '../../../../../core/services/session/aws/aws-iam-role-chained-service'
-import {
   AwsIamRoleFederatedService,
   AwsIamRoleFederatedSessionRequest
 } from '@noovolari/leapp-core/services/session/aws/aws-iam-role-federated-service'
-import { AzureService, AzureSessionRequest } from '../../../../../core/services/session/azure/azure.service'
 import { LeappCoreService } from '../../services/leapp-core.service'
+import {
+  AwsIamRoleChainedService,
+  AwsIamRoleChainedSessionRequest
+} from '@noovolari/leapp-core/services/session/aws/aws-iam-role-chained-service'
+import { AzureService, AzureSessionRequest } from '@noovolari/leapp-core/services/session/azure/azure.service'
+import { SessionFactory } from '@noovolari/leapp-core/services/session-factory'
 
 @Component({
   selector: 'app-create-account',
@@ -86,14 +87,14 @@ export class CreateAccountComponent implements OnInit {
   private workspaceService: WorkspaceService
   private repository: Repository
   private loggingService: LoggingService
+  private sessionFactory: SessionFactory
 
   constructor(private appService: AppService, private router: Router, private activatedRoute: ActivatedRoute,
-              private awsIamRoleFederatedService: AwsIamRoleFederatedService,
-              private awsIamRoleChainedService: AwsIamRoleChainedService, private azureService: AzureService,
-              private awsIamUserService: AwsIamUserService, leappCoreService: LeappCoreService) {
+              leappCoreService: LeappCoreService) {
     this.repository = leappCoreService.repository
     this.loggingService = leappCoreService.loggingService
     this.workspaceService = leappCoreService.workspaceService
+    this.sessionFactory = leappCoreService.sessionFactory
   }
 
   ngOnInit() {
@@ -243,46 +244,42 @@ export class CreateAccountComponent implements OnInit {
    * @private
    */
   private createSession() {
-    switch (this.sessionType) {
-      case (SessionType.awsIamRoleFederated):
-        const awsFederatedAccountRequest: AwsIamRoleFederatedSessionRequest = {
-          accountName: this.form.value.name.trim(),
-          region: this.selectedRegion,
-          idpUrl: this.selectedIdpUrl.value.trim(),
-          idpArn: this.form.value.idpArn.trim(),
-          roleArn: this.form.value.roleArn.trim()
-        }
-        this.awsIamRoleFederatedService.create(awsFederatedAccountRequest, this.selectedProfile.value)
-        break
-      case (SessionType.awsIamUser):
-        const awsIamUserSessionRequest: AwsIamUserSessionRequest = {
-          accountName: this.form.value.name.trim(),
-          region: this.selectedRegion,
-          accessKey: this.form.value.accessKey.trim(),
-          secretKey: this.form.value.secretKey.trim(),
-          mfaDevice: this.form.value.mfaDevice.trim()
-        }
-        this.awsIamUserService.create(awsIamUserSessionRequest, this.selectedProfile.value)
-        break
-      case (SessionType.awsIamRoleChained):
-        const awsIamRoleChainedAccountRequest: AwsIamRoleChainedSessionRequest = {
-          accountName: this.form.value.name.trim(),
-          region: this.selectedRegion,
-          roleArn: this.form.value.roleArn.trim(),
-          roleSessionName: this.form.value.roleSessionName.trim(),
-          parentSessionId: this.selectedSession.sessionId
-        }
-        this.awsIamRoleChainedService.create(awsIamRoleChainedAccountRequest, this.selectedProfile.value)
-        break
-      case (SessionType.azure):
-        const azureSessionRequest: AzureSessionRequest = {
-          region: this.selectedLocation,
-          sessionName: this.form.value.name,
-          subscriptionId: this.form.value.subscriptionId,
-          tenantId: this.form.value.tenantId
-        }
-        this.azureService.create(azureSessionRequest)
-        break
+    const sessionService = this.sessionFactory.getSessionService(this.sessionType)
+    if (sessionService instanceof AwsIamRoleFederatedService) {
+      const awsFederatedAccountRequest: AwsIamRoleFederatedSessionRequest = {
+        accountName: this.form.value.name.trim(),
+        region: this.selectedRegion,
+        idpUrl: this.selectedIdpUrl.value.trim(),
+        idpArn: this.form.value.idpArn.trim(),
+        roleArn: this.form.value.roleArn.trim()
+      }
+      sessionService.create(awsFederatedAccountRequest, this.selectedProfile.value)
+    } else if (sessionService instanceof AwsIamUserService){
+      const awsIamUserSessionRequest: AwsIamUserSessionRequest = {
+        accountName: this.form.value.name.trim(),
+        region: this.selectedRegion,
+        accessKey: this.form.value.accessKey.trim(),
+        secretKey: this.form.value.secretKey.trim(),
+        mfaDevice: this.form.value.mfaDevice.trim()
+      }
+      sessionService.create(awsIamUserSessionRequest, this.selectedProfile.value)
+    }else if (sessionService instanceof AwsIamRoleChainedService) {
+      const awsIamRoleChainedAccountRequest: AwsIamRoleChainedSessionRequest = {
+        accountName: this.form.value.name.trim(),
+        region: this.selectedRegion,
+        roleArn: this.form.value.roleArn.trim(),
+        roleSessionName: this.form.value.roleSessionName.trim(),
+        parentSessionId: this.selectedSession.sessionId
+      }
+      sessionService.create(awsIamRoleChainedAccountRequest, this.selectedProfile.value)
+    }else if (sessionService instanceof AzureService) {
+      const azureSessionRequest: AzureSessionRequest = {
+        region: this.selectedLocation,
+        sessionName: this.form.value.name,
+        subscriptionId: this.form.value.subscriptionId,
+        tenantId: this.form.value.tenantId
+      }
+      sessionService.create(azureSessionRequest)
     }
   }
 

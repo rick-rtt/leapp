@@ -5,7 +5,6 @@ import { SsmService } from '../../../services/ssm.service'
 import { environment } from '../../../../environments/environment'
 import * as uuid from 'uuid'
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal'
-import { SessionFactory } from '../../../services/session-factory'
 import { SessionService } from '@noovolari/leapp-core/services/session/session.service'
 import { Session } from '@noovolari/leapp-core/models/session'
 import { SessionType } from '@noovolari/leapp-core/models/session-type'
@@ -18,6 +17,7 @@ import { AwsIamUserService } from '@noovolari/leapp-core/services/session/aws/aw
 import { LoggerLevel, LoggingService } from '@noovolari/leapp-core/services/logging-service'
 import { AwsSessionService } from '@noovolari/leapp-core/services/session/aws/aws-session-service'
 import { LeappCoreService } from '../../../services/leapp-core.service'
+import { SessionFactory } from '@noovolari/leapp-core/services/session-factory'
 
 @Component({
   selector: 'app-session-card',

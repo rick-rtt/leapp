@@ -3,8 +3,6 @@ import { environment } from '../environments/environment'
 import { AppService } from './services/app.service'
 import { Router } from '@angular/router'
 import { setTheme } from 'ngx-bootstrap/utils'
-import { RotationService } from './services/rotation.service'
-import { SessionFactory } from './services/session-factory'
 import { UpdaterService } from './services/updater.service'
 import compareVersions from 'compare-versions'
 import { LoggerLevel, LoggingService } from '@noovolari/leapp-core/services/logging-service'
@@ -17,6 +15,8 @@ import { FileService } from '@noovolari/leapp-core/services/file-service'
 import { AwsCoreService } from '@noovolari/leapp-core/services/aws-core-service'
 import { RetroCompatibilityService } from '@noovolari/leapp-core/services/retro-compatibility.service'
 import { LeappCoreService } from './services/leapp-core.service'
+import { SessionFactory } from '@noovolari/leapp-core/services/session-factory'
+import { RotationService } from '@noovolari/leapp-core/services/rotation.service'
 
 @Component({
   selector: 'app-root',

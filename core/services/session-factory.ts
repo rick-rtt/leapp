@@ -1,12 +1,11 @@
-import { SessionService } from '@noovolari/leapp-core/services/session/session.service'
-import { SessionType } from '@noovolari/leapp-core/models/session-type'
-import { AwsIamRoleFederatedService } from '@noovolari/leapp-core/services/session/aws/aws-iam-role-federated-service'
-import { AzureService } from '@noovolari/leapp-core/services/session/azure/azure.service'
-import { AwsIamUserService } from '@noovolari/leapp-core/services/session/aws/aws-iam-user-service'
-import { AwsIamRoleChainedService } from '@noovolari/leapp-core/services/session/aws/aws-iam-role-chained-service'
-import { AwsSsoRoleService } from './session/aws/method/aws-sso-role-service'
+import { SessionService } from './session/session.service'
+import { SessionType } from '../models/session-type'
+import { AwsIamRoleFederatedService } from './session/aws/aws-iam-role-federated-service'
+import { AzureService } from './session/azure/azure.service'
+import { AwsIamUserService } from './session/aws/aws-iam-user-service'
+import { AwsIamRoleChainedService } from './session/aws/aws-iam-role-chained-service'
+import { AwsSsoRoleService } from './session/aws/aws-sso-role-service'
 
-//TODO: move under core module
 export class SessionFactory {
   constructor(
     private readonly awsIamUserService: AwsIamUserService,

@@ -2,12 +2,13 @@ import {Component, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {AppService} from '../../services/app.service';
-import {AwsSsoOidcService, BrowserWindowClosing} from '../../services/aws-sso-oidc.service';
 import { Repository } from '@noovolari/leapp-core/services/repository';
 import { WorkspaceService } from '@noovolari/leapp-core/services/workspace.service';
 import {constants} from '@noovolari/leapp-core/models/constants';
-import {AwsSsoRoleService, SsoRoleSession} from "../../services/session/aws/method/aws-sso-role-service";
 import { LeappCoreService } from '../../services/leapp-core.service'
+import { AwsSsoOidcService } from '@noovolari/leapp-core/services/session/aws/aws-sso-oidc.service'
+import { BrowserWindowClosing } from '@noovolari/leapp-core/interfaces/i-browser-window-closing'
+import { AwsSsoRoleService, SsoRoleSession } from '@noovolari/leapp-core/services/session/aws/aws-sso-role-service'
 
 @Component({
   selector: 'app-aws-sso',
@@ -33,15 +34,18 @@ export class AwsSsoComponent implements OnInit, BrowserWindowClosing {
 
   private repository: Repository
   private workspaceService: WorkspaceService
+  private awsSsoRoleService: AwsSsoRoleService
+  private awsSsoOidcService: AwsSsoOidcService
 
-  constructor(private appService: AppService, private awsSsoRoleService: AwsSsoRoleService, private router: Router,
-              private awsSsoOidcService: AwsSsoOidcService, leappCoreService: LeappCoreService) {
+  constructor(private appService: AppService,private router: Router, leappCoreService: LeappCoreService) {
     this.repository = leappCoreService.repository
     this.workspaceService = leappCoreService.workspaceService
+    this.awsSsoRoleService = leappCoreService.awsSsoRoleService
+    this.awsSsoOidcService = leappCoreService.awsSsoOidcService
   }
 
   ngOnInit() {
-    this.awsSsoOidcService.listeners.push(this);
+    this.awsSsoOidcService.appendListener(this);
 
     this.awsSsoRoleService.awsSsoActive().then(res => {
       this.isAwsSsoActive = res;

@@ -6,7 +6,7 @@ import { FileService } from '@noovolari/leapp-core/services/file-service'
 import {
   AwsIamUserService,
   IMfaCodePrompter
-} from '@noovolari/leapp-core/services/session/aws/method/aws-iam-user-service'
+} from '@noovolari/leapp-core/services/session/aws/aws-iam-user-service'
 import { KeychainService } from '@noovolari/leapp-core/services/keychain-service'
 import { AwsCoreService } from '@noovolari/leapp-core/services/aws-core-service'
 

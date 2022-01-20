@@ -2,7 +2,6 @@ import { Component, OnDestroy, OnInit } from '@angular/core'
 import { AppService } from '../../../services/app.service'
 import { environment } from '../../../../environments/environment'
 import { UpdaterService } from '../../../services/updater.service'
-import { SessionFactory } from '../../../services/session-factory'
 import { Session } from '@noovolari/leapp-core/models/session'
 import { SessionType } from '@noovolari/leapp-core/models/session-type'
 import { SessionStatus } from '@noovolari/leapp-core/models/session-status'
@@ -13,6 +12,7 @@ import { AwsIamRoleChainedSession } from '@noovolari/leapp-core/models/aws-iam-r
 import { constants } from '@noovolari/leapp-core/models/constants'
 import { LoggerLevel, LoggingService } from '@noovolari/leapp-core/services/logging-service'
 import { LeappCoreService } from '../../../services/leapp-core.service'
+import { SessionFactory } from '@noovolari/leapp-core/services/session-factory'
 
 @Component({
   selector: 'app-tray-menu',
