@@ -13,6 +13,7 @@ import { AwsIamRoleFederatedSession } from '@noovolari/leapp-core/models/aws-iam
 import { SessionStatus } from '@noovolari/leapp-core/models/session-status'
 import { LeappCoreService } from '../../../services/leapp-core.service'
 import { SessionFactory } from '@noovolari/leapp-core/services/session-factory'
+import { WindowService } from '../../../services/window.service'
 
 @Component({
   selector: 'app-profile-page',
@@ -63,7 +64,8 @@ export class ProfilePageComponent implements OnInit {
   private loggingService: LoggingService
   private sessionServiceFactory: SessionFactory
 
-  constructor(private appService: AppService, private router: Router, leappCoreService: LeappCoreService) {
+  constructor(private appService: AppService, private router: Router, private windowService: WindowService,
+              leappCoreService: LeappCoreService) {
     this.repository = leappCoreService.repository
     this.loggingService = leappCoreService.loggingService
     this.sessionServiceFactory = leappCoreService.sessionFactory
@@ -121,7 +123,7 @@ export class ProfilePageComponent implements OnInit {
 
       if (this.checkIfNeedDialogBox()) {
 
-        this.appService.confirmDialog('You\'ve set a proxy url: the app must be restarted to update the configuration.', (res) => {
+        this.windowService.confirmDialog('You\'ve set a proxy url: the app must be restarted to update the configuration.', (res) => {
           if (res !== constants.confirmClosed) {
             this.loggingService.logger('User have set a proxy url: the app must be restarted to update the configuration.', LoggerLevel.info, this)
             this.appService.restart()
@@ -196,7 +198,7 @@ export class ProfilePageComponent implements OnInit {
     }
 
     // Ask for deletion
-    this.appService.confirmDialog(`Deleting this Idp url will also remove these sessions: <br><ul>${sessionsNames.join('')}</ul>Do you want to proceed?`, (res) => {
+    this.windowService.confirmDialog(`Deleting this Idp url will also remove these sessions: <br><ul>${sessionsNames.join('')}</ul>Do you want to proceed?`, (res) => {
       if (res !== constants.confirmClosed) {
         this.loggingService.logger(`Removing idp url with id: ${id}`, LoggerLevel.info, this)
 
@@ -254,7 +256,7 @@ export class ProfilePageComponent implements OnInit {
     }
 
     // Ask for deletion
-    this.appService.confirmDialog(`Deleting this profile will set default to these sessions: <br><ul>${sessionsNames.join('')}</ul>Do you want to proceed?`, async (res) => {
+    this.windowService.confirmDialog(`Deleting this profile will set default to these sessions: <br><ul>${sessionsNames.join('')}</ul>Do you want to proceed?`, async (res) => {
       if (res !== constants.confirmClosed) {
         this.loggingService.logger(`Reverting to default profile with id: ${id}`, LoggerLevel.info, this)
         this.repository.removeProfile(id)

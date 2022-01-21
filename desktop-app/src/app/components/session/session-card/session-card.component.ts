@@ -18,6 +18,7 @@ import { LoggerLevel, LoggingService } from '@noovolari/leapp-core/services/logg
 import { AwsSessionService } from '@noovolari/leapp-core/services/session/aws/aws-session-service'
 import { LeappCoreService } from '../../../services/leapp-core.service'
 import { SessionFactory } from '@noovolari/leapp-core/services/session-factory'
+import { WindowService } from '../../../services/window.service'
 
 @Component({
   selector: 'app-session-card',
@@ -66,7 +67,7 @@ export class SessionCardComponent implements OnInit {
 
   constructor(private appService: AppService, private router: Router, private ssmService: SsmService,
               private modalService: BsModalService, private awsIamUserService: AwsIamUserService,
-              leappCoreService: LeappCoreService) {
+              private windowService: WindowService, leappCoreService: LeappCoreService) {
     this.repository = leappCoreService.repository
     this.loggingService = leappCoreService.loggingService
     this.sessionServiceFactory = leappCoreService.sessionFactory
@@ -133,7 +134,7 @@ export class SessionCardComponent implements OnInit {
 
     const dialogMessage = this.generateDeleteDialogMessage(session)
 
-    this.appService.confirmDialog(dialogMessage, (status) => {
+    this.windowService.confirmDialog(dialogMessage, (status) => {
       if (status === constants.confirmed) {
         this.sessionService.delete(session.sessionId).then(_ => {
         })

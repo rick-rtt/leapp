@@ -17,6 +17,7 @@ import { RetroCompatibilityService } from '@noovolari/leapp-core/services/retro-
 import { LeappCoreService } from './services/leapp-core.service'
 import { SessionFactory } from '@noovolari/leapp-core/services/session-factory'
 import { RotationService } from '@noovolari/leapp-core/services/rotation.service'
+import { WindowService } from './services/window.service'
 
 @Component({
   selector: 'app-root',
@@ -36,7 +37,7 @@ export class AppComponent implements OnInit {
 
   /* Main app file: launches the Angular framework inside Electron app */
   constructor(private app: AppService, private router: Router, private updaterService: UpdaterService,
-              leappCoreService: LeappCoreService) {
+              private windowService: WindowService, leappCoreService: LeappCoreService) {
     this.repository = leappCoreService.repository
     this.fileService = leappCoreService.fileService
     this.awsCoreService = leappCoreService.awsCoreService
@@ -69,7 +70,7 @@ export class AppComponent implements OnInit {
     }
 
     // Prevent Dev Tool to show on production mode
-    this.app.blockDevToolInProductionMode()
+    this.windowService.blockDevToolInProductionMode()
 
     // Before retrieving an actual copy of the workspace we
     // check and in case apply, our retro compatibility service

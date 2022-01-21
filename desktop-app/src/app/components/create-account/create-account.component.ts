@@ -24,6 +24,7 @@ import {
 } from '@noovolari/leapp-core/services/session/aws/aws-iam-role-chained-service'
 import { AzureService, AzureSessionRequest } from '@noovolari/leapp-core/services/session/azure/azure.service'
 import { SessionFactory } from '@noovolari/leapp-core/services/session-factory'
+import { WindowService } from '../../services/window.service'
 
 @Component({
   selector: 'app-create-account',
@@ -90,7 +91,7 @@ export class CreateAccountComponent implements OnInit {
   private sessionFactory: SessionFactory
 
   constructor(private appService: AppService, private router: Router, private activatedRoute: ActivatedRoute,
-              leappCoreService: LeappCoreService) {
+              private windowService: WindowService, leappCoreService: LeappCoreService) {
     this.repository = leappCoreService.repository
     this.loggingService = leappCoreService.loggingService
     this.workspaceService = leappCoreService.workspaceService
@@ -216,7 +217,7 @@ export class CreateAccountComponent implements OnInit {
    *
    */
   openAccessStrategyDocumentation() {
-    this.appService.openExternalUrl('https://github.com/Noovolari/leapp/wiki')
+    this.windowService.openExternalUrl('https://github.com/Noovolari/leapp/wiki')
   }
 
   /**

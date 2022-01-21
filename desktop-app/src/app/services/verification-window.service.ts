@@ -1,16 +1,15 @@
 import { constants } from '@noovolari/leapp-core/models/constants'
 import { Injectable } from '@angular/core'
-import { ElectronService } from './electron.service'
-import { AppService } from './app.service'
 import {
   RegisterClientResponse,
   StartDeviceAuthorizationResponse, VerificationResponse
 } from '@noovolari/leapp-core/services/session/aws/aws-sso-role-service'
 import { IVerificationWindowService } from '@noovolari/leapp-core/interfaces/i-verification-window.service'
+import { WindowService } from './window.service'
 
 @Injectable({providedIn: 'root'})
 export class VerificationWindowService implements IVerificationWindowService {
-  public constructor(private appService: AppService, private electronService: ElectronService) {
+  public constructor(private windowService: WindowService) {
   }
 
   async openVerificationWindow(registerClientResponse: RegisterClientResponse,
@@ -28,8 +27,8 @@ export class VerificationWindowService implements IVerificationWindowService {
                                               startDeviceAuthorizationResponse: StartDeviceAuthorizationResponse,
                                               onWindowClose: () => void): Promise<VerificationResponse> {
 
-    const parentWindowPosition = this.electronService.currentWindow.getPosition()
-    const verificationWindow = this.appService.newWindow(startDeviceAuthorizationResponse.verificationUriComplete,
+    const parentWindowPosition = this.windowService.getCurrentWindow().getPosition()
+    const verificationWindow = this.windowService.newWindow(startDeviceAuthorizationResponse.verificationUriComplete,
       true, 'Portal url - Client verification', parentWindowPosition[0] + 200, parentWindowPosition[1] + 50)
     verificationWindow.loadURL(startDeviceAuthorizationResponse.verificationUriComplete)
     verificationWindow.on('close',
@@ -80,7 +79,7 @@ export class VerificationWindowService implements IVerificationWindowService {
     const uriComplete = startDeviceAuthorizationResponse.verificationUriComplete
     return new Promise((resolve, _) => {
       // Open external browser window and let authentication begins
-      this.appService.openExternalUrl(uriComplete)
+      this.windowService.openExternalUrl(uriComplete)
 
       // Return the code to be used after
       const verificationResponse: VerificationResponse = {

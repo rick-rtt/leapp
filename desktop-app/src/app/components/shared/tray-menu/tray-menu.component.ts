@@ -13,6 +13,7 @@ import { constants } from '@noovolari/leapp-core/models/constants'
 import { LoggerLevel, LoggingService } from '@noovolari/leapp-core/services/logging-service'
 import { LeappCoreService } from '../../../services/leapp-core.service'
 import { SessionFactory } from '@noovolari/leapp-core/services/session-factory'
+import { WindowService } from '../../../services/window.service'
 
 @Component({
   selector: 'app-tray-menu',
@@ -29,7 +30,8 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
   private sessionServiceFactory: SessionFactory
   private workspaceService: WorkspaceService
 
-  constructor(private updaterService: UpdaterService, private appService: AppService, leappCoreService: LeappCoreService) {
+  constructor(private updaterService: UpdaterService, private appService: AppService,
+              private windowService: WindowService, leappCoreService: LeappCoreService) {
     this.repository = leappCoreService.repository
     this.loggingService = leappCoreService.loggingService
     this.sessionServiceFactory = leappCoreService.sessionFactory
@@ -103,12 +105,12 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
       {type: 'separator'},
       {
         label: 'Show', type: 'normal', click: () => {
-          this.appService.getCurrentWindow().show()
+          this.windowService.getCurrentWindow().show()
         }
       },
       {
         label: 'About', type: 'normal', click: () => {
-          this.appService.getCurrentWindow().show()
+          this.windowService.getCurrentWindow().show()
           this.appService.getDialog().showMessageBox({
             icon: __dirname + `/assets/images/Leapp.png`,
             message: `Leapp\n` + `Version ${version} (${version})\n` + '© 2021 Noovolari',

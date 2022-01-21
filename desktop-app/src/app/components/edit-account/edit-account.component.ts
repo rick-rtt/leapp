@@ -9,6 +9,7 @@ import { Workspace } from '@noovolari/leapp-core/models/workspace'
 import { KeychainService } from '@noovolari/leapp-core/services/keychain-service'
 import { WorkspaceService } from '@noovolari/leapp-core/services/workspace.service'
 import { LeappCoreService } from '../../services/leapp-core.service'
+import { WindowService } from '../../services/window.service'
 
 @Component({
   selector: 'app-edit-account',
@@ -42,7 +43,7 @@ export class EditAccountComponent implements OnInit {
 
   /* Setup the first account for the application */
   constructor(private appService: AppService, private router: Router, private activatedRoute: ActivatedRoute,
-              leappCoreService: LeappCoreService) {
+              private windowService: WindowService, leappCoreService: LeappCoreService) {
     this.keychainService = leappCoreService.keyChainService
     this.workspaceService = leappCoreService.workspaceService
   }
@@ -93,6 +94,6 @@ export class EditAccountComponent implements OnInit {
   }
 
   openAccessStrategyDocumentation() {
-    this.appService.openExternalUrl('https://github.com/Noovolari/leapp/blob/master/README.md')
+    this.windowService.openExternalUrl('https://github.com/Noovolari/leapp/blob/master/README.md')
   }
 }

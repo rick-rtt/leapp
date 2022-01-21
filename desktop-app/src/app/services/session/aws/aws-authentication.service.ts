@@ -1,20 +1,20 @@
 import { Injectable } from '@angular/core'
-import { AppService } from '../../app.service'
 import { IAwsAuthenticationService } from '@noovolari/leapp-core/interfaces/i-aws-authentication.service'
+import { WindowService } from '../../window.service'
 
 @Injectable({providedIn: 'root'})
 export class AwsAuthenticationService implements IAwsAuthenticationService {
-  public constructor(private appService: AppService) {
+  public constructor(private windowService: WindowService) {
   }
 
   async needAuthentication(idpUrl: string): Promise<boolean> {
     return new Promise((resolve, _) => {
       // Get active window position for extracting new windows coordinate
-      const activeWindowPosition = this.appService.getCurrentWindow().getPosition()
+      const activeWindowPosition = this.windowService.getCurrentWindow().getPosition()
       const nearX = 200
       const nearY = 50
       // Generate a new singleton browser window for the check
-      let idpWindow = this.appService.newWindow(idpUrl, false, '', activeWindowPosition[0] + nearX, activeWindowPosition[1] + nearY)
+      let idpWindow = this.windowService.newWindow(idpUrl, false, '', activeWindowPosition[0] + nearX, activeWindowPosition[1] + nearY)
       // This filter is used to listen to go to a specific callback url (or the generic one)
       const filter = {
         urls: [
@@ -67,11 +67,11 @@ export class AwsAuthenticationService implements IAwsAuthenticationService {
 
   async awsSignIn(idpUrl: string, needToAuthenticate: boolean): Promise<any> {
     // 1. Show or not browser window depending on needToAuthenticate
-    const activeWindowPosition = this.appService.getCurrentWindow().getPosition()
+    const activeWindowPosition = this.windowService.getCurrentWindow().getPosition()
     const nearX = 200
     const nearY = 50
     // 2. Prepare browser window
-    let idpWindow = this.appService.newWindow(idpUrl, needToAuthenticate, 'IDP - Login', activeWindowPosition[0] + nearX, activeWindowPosition[1] + nearY)
+    let idpWindow = this.windowService.newWindow(idpUrl, needToAuthenticate, 'IDP - Login', activeWindowPosition[0] + nearX, activeWindowPosition[1] + nearY)
     // 3. Prepare filters and configure callback
     const filter = {urls: ['https://signin.aws.amazon.com/saml']}
     // Catch filter url: extract SAML response

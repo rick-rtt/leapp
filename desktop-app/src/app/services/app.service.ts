@@ -1,8 +1,6 @@
 import { EventEmitter, Injectable } from '@angular/core'
-import { ConfirmationDialogComponent } from '../components/shared/confirmation-dialog/confirmation-dialog.component'
 import { FormControl, FormGroup } from '@angular/forms'
 import { environment } from '../../environments/environment'
-import { BsModalService } from 'ngx-bootstrap/modal'
 import { ElectronService } from './electron.service'
 import { ToastrService } from 'ngx-toastr'
 import { constants } from '@noovolari/leapp-core/models/constants'
@@ -13,15 +11,13 @@ import { LeappCoreService } from './leapp-core.service'
 /*
 * External enum to the toast level so we can use this to define the type of log
 */
+//TODO: What about a toasterService?
 export enum ToastLevel {
   info,
   warn,
   error,
   success
 }
-
-// FATAL CD TODO: AppService > LeappCoreService > AwsAuthenticationService > AppService
-// Solution: AppService carpaccio
 
 @Injectable({
   providedIn: 'root'
@@ -31,11 +27,10 @@ export class AppService {
   profileOpen: EventEmitter<boolean> = new EventEmitter<boolean>()
 
   /* This service is defined to provide different app wide methods as utilities */
-  private newWin: any
   private loggingService: LoggingService
   private awsCoreService: AwsCoreService
 
-  constructor(private modalService: BsModalService, private electronService: ElectronService,
+  constructor(private electronService: ElectronService,
               private toastr: ToastrService, leappCoreService: LeappCoreService) {
     this.awsCoreService = leappCoreService.awsCoreService
     this.loggingService = leappCoreService.loggingService
@@ -65,14 +60,6 @@ export class AppService {
     return this.electronService.menu
   }
 
-  getTray() {
-    return this.electronService.tray
-  }
-
-  getCurrentWindow() {
-    return this.electronService.currentWindow
-  }
-
   /**
    * Return the dialog native object
    */
@@ -80,9 +67,19 @@ export class AppService {
     return this.electronService.dialog
   }
 
+  isDarkMode() {
+    return this.electronService.nativeTheme.shouldUseDarkColors
+  }
+
+  //TODO: remove this wrapper, use electron service directly!
+  getTray() {
+    return this.electronService.tray
+  }
+
   /**
    * Return the native os object
    */
+  //TODO: remove this wrapper, use electron service directly!
   getOS() {
     return this.electronService.os
   }
@@ -90,6 +87,7 @@ export class AppService {
   /**
    * Return the fs native object
    */
+  //TODO: remove this wrapper, use electron service directly!
   getFs() {
     return this.electronService.fs
   }
@@ -97,6 +95,7 @@ export class AppService {
   /**
    * Return the app process
    */
+  //TODO: remove this wrapper, use electron service directly!
   getProcess() {
     return this.electronService.process
   }
@@ -104,25 +103,9 @@ export class AppService {
   /**
    * Return Electron ipcRenderer
    */
+  //TODO: remove this wrapper, use electron service directly!
   getIpcRenderer() {
     return this.electronService.ipcRenderer
-  }
-
-  getLog() {
-    return this.electronService.log
-  }
-
-  /**
-   * Get the current browser window
-   *
-   * @returns - {any} -
-   */
-  currentBrowserWindow() {
-    return this.electronService.currentWindow
-  }
-
-  isDarkMode() {
-    return this.electronService.nativeTheme.shouldUseDarkColors
   }
 
   /**
@@ -138,63 +121,6 @@ export class AppService {
   restart() {
     this.electronService.app.relaunch()
     this.electronService.app.exit(0)
-  }
-
-  /**
-   * Create a new browser window
-   *
-   * @param url - the url to point to launch the window with the protocol, it can also be a file://
-   * @param show - boolean to make the window visible or not
-   * @param title - the window title
-   * @param x - position x
-   * @param y - position y
-   * @param javascript - javascript to be run when the window starts
-   * @returns return a new browser window
-   */
-  newWindow(url: string, show: boolean, title?: string, x?: number, y?: number, javascript?: string) {
-    const opts = {
-      width: 514,
-      height: 550,
-      resizable: true,
-      show,
-      title,
-      titleBarStyle: 'hidden',
-      webPreferences: {
-        devTools: !environment.production,
-        worldSafeExecuteJavaScript: true,
-        partition: `persist:Leapp-${btoa(url)}`
-      }
-    }
-
-    if (x && y) {
-      Object.assign(opts, {
-        x: x + 50,
-        y: y + 50
-      })
-    }
-
-    if (this.newWin) {
-      try {
-        this.newWin.close()
-      } catch (e) {
-      }
-      this.newWin = null
-    }
-    this.newWin = new this.electronService.browserWindow(opts)
-    return this.newWin
-
-  }
-
-  /**
-   * Create a new invisible browser window
-   *
-   * @param url - the url to point to launch the window with the protocol, it can also be a file://
-   * @returns return a new browser window
-   */
-  newInvisibleWindow(url: string) {
-    const win = new this.electronService.browserWindow({width: 1, height: 1, show: false})
-    win.loadURL(url)
-    return win
   }
 
   /**
@@ -276,36 +202,6 @@ export class AppService {
   }
 
   /**
-   * Confirmation dialog popup!
-   *
-   * @param message - the message to show
-   * @param callback - the callback for the ok button to launch
-   */
-  confirmDialog(message: string, callback: any) {
-    for (let i = 1; i <= this.modalService.getModalsCount(); i++) {
-      this.modalService.hide(i)
-    }
-
-    this.getCurrentWindow().show()
-    this.modalService.show(ConfirmationDialogComponent, {
-      backdrop: 'static',
-      animated: false,
-      class: 'confirm-modal',
-      initialState: {message, callback}
-    })
-
-  }
-
-  /**
-   * With this one you can open an url in an external browser
-   *
-   * @param url - url to open
-   */
-  openExternalUrl(url) {
-    this.electronService.shell.openExternal(url)
-  }
-
-  /**
    * Useful to validate all form field at once if needed
    *
    * @param formGroup - the form formGroup
@@ -353,6 +249,7 @@ export class AppService {
    *
    * @returns - [{region: string}] - all the regions in array format
    */
+  //TODO: move this method under Core - AwsCoreService
   getRegions() {
     return [
       {region: 'af-south-1'},
@@ -388,6 +285,7 @@ export class AppService {
    *
    * @returns - {region: string}[] - all the regions in array format
    */
+  //TODO: move this method under Core - AzureCoreService (it doesn't exist atm, just create it!)
   getLocations() {
     return [
       {location: 'eastus'},
@@ -471,6 +369,7 @@ export class AppService {
   /**
    * Clean the credential file helper
    */
+  //TODO: move this method under Core - AwsCoreService
   cleanCredentialFile() {
     try {
       const awsCredentialsPath = this.awsCoreService.awsCredentialPath()
@@ -486,20 +385,8 @@ export class AppService {
    *
    * @param s - the session containing the account
    */
+  //TODO: move this method under Core - AzureCoreService (it doesn't exist atm, just create it!)
   isAzure(s) {
     return s.subscriptionId !== null && s.subscriptionId !== undefined
-  }
-
-  getUrl() {
-    return this.electronService.url
-  }
-
-  blockDevToolInProductionMode() {
-    this.currentBrowserWindow().webContents.on('devtools-opened', () => {
-      if (environment.production) {
-        this.electronService.log('Closing Web tools in production mode', LoggerLevel.info, this)
-        this.currentBrowserWindow().webContents.closeDevTools()
-      }
-    })
   }
 }

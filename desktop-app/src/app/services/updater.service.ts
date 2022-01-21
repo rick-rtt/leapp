@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core'
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal'
-import { AppService } from './app.service'
 import { environment } from '../../environments/environment'
 import { UpdateDialogComponent } from '../components/shared/update-dialog/update-dialog.component'
 import compareVersions from 'compare-versions'
@@ -11,6 +10,7 @@ import { constants } from '@noovolari/leapp-core/models/constants'
 import { Repository } from '@noovolari/leapp-core/services/repository'
 import { WorkspaceService } from '@noovolari/leapp-core/services/workspace.service'
 import { LeappCoreService } from './leapp-core.service'
+import { WindowService } from './window.service'
 
 @Injectable({
   providedIn: 'root'
@@ -25,8 +25,9 @@ export class UpdaterService {
   private repository: Repository
   private workspaceService: WorkspaceService
 
-  constructor(private appService: AppService, private bsModalService: BsModalService, private httpClient: HttpClient,
-              private electronService: ElectronService, leappCoreService: LeappCoreService) {
+  constructor(private bsModalService: BsModalService, private httpClient: HttpClient,
+              private electronService: ElectronService, private windowService: WindowService,
+              leappCoreService: LeappCoreService) {
     this.markdown = md()
     this.repository = leappCoreService.repository
     this.workspaceService = leappCoreService.workspaceService
@@ -72,12 +73,12 @@ export class UpdaterService {
           this.workspaceService.sessions = [...this.workspaceService.sessions]
           this.repository.updateSessions(this.workspaceService.sessions)
         } else if (event === constants.confirmCloseAndDownloadUpdate) {
-          this.appService.openExternalUrl(`${environment.latestUrl}`)
+          this.windowService.openExternalUrl(`${environment.latestUrl}`)
         }
         this.bsModalRef = undefined
       }
 
-      this.appService.getCurrentWindow().show()
+      this.windowService.getCurrentWindow().show()
       this.bsModalRef = this.bsModalService.show(UpdateDialogComponent, {
         backdrop: 'static',
         animated: false,
