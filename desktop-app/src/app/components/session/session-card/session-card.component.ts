@@ -63,15 +63,17 @@ export class SessionCardComponent implements OnInit {
   private loggingService: LoggingService
   private repository: Repository
   private sessionServiceFactory: SessionFactory
+  private awsIamUserService: AwsIamUserService
   private workspaceService: WorkspaceService
 
   constructor(private appService: AppService, private router: Router, private ssmService: SsmService,
-              private modalService: BsModalService, private awsIamUserService: AwsIamUserService,
-              private windowService: WindowService, leappCoreService: LeappCoreService) {
+              private modalService: BsModalService, private windowService: WindowService,
+              leappCoreService: LeappCoreService) {
     this.repository = leappCoreService.repository
     this.loggingService = leappCoreService.loggingService
     this.sessionServiceFactory = leappCoreService.sessionFactory
     this.workspaceService = leappCoreService.workspaceService
+    this.awsIamUserService = leappCoreService.awsIamUserService
   }
 
   ngOnInit() {
