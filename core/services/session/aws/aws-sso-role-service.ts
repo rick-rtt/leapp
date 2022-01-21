@@ -232,7 +232,7 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
   }
 
   private async login(region: string, portalUrl: string): Promise<LoginResponse> {
-    const redirectClient = this.nativeService.followRedirects.getFollowRedirects()[this.getProtocol(portalUrl)]
+    const redirectClient = this.nativeService.followRedirects[this.getProtocol(portalUrl)]
     portalUrl = await new Promise((resolve, _) => {
       const request = redirectClient.request(portalUrl, response => resolve(response.responseUrl))
       request.end()
