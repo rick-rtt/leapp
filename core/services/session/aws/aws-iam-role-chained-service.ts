@@ -45,7 +45,8 @@ export class AwsIamRoleChainedService extends AwsSessionService {
     const session = new AwsIamRoleChainedSession(sessionRequest.accountName, sessionRequest.region,
       sessionRequest.roleArn, profileId, sessionRequest.parentSessionId, sessionRequest.roleSessionName)
 
-    this.iSessionNotifier.addSession(session)
+    this.repository.addSession(session)
+    this.iSessionNotifier?.addSession(session)
   }
 
   async applyCredentials(sessionId: string, credentialsInfo: CredentialsInfo): Promise<void> {

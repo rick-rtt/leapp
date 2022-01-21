@@ -108,7 +108,8 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
   create(accountRequest: AwsSsoRoleSessionRequest, profileId: string): void {
     const session = new AwsSsoRoleSession(accountRequest.sessionName, accountRequest.region, accountRequest.roleArn,
       profileId, accountRequest.email)
-    this.iSessionNotifier.addSession(session)
+    this.repository.addSession(session)
+    this.iSessionNotifier?.addSession(session)
   }
 
   async applyCredentials(sessionId: string, credentialsInfo: CredentialsInfo): Promise<void> {

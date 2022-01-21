@@ -38,7 +38,7 @@ export class AzureService extends SessionService {
     const session = new AzureSession(sessionRequest.sessionName, sessionRequest.region,
       sessionRequest.subscriptionId, sessionRequest.tenantId)
     this.repository.addSession(session)
-    this.iSessionNotifier.addSession(session)
+    this.iSessionNotifier?.addSession(session)
   }
 
   async start(sessionId: string): Promise<void> {

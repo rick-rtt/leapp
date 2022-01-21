@@ -59,7 +59,9 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
       sessionRequest.idpArn,
       sessionRequest.roleArn,
       profileId)
-    this.iSessionNotifier.addSession(session)
+
+    this.repository.addSession(session)
+    this.iSessionNotifier?.addSession(session)
   }
 
   async applyCredentials(sessionId: string, credentialsInfo: CredentialsInfo): Promise<void> {

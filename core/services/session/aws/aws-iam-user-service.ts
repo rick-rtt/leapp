@@ -74,10 +74,7 @@ export class AwsIamUserService extends AwsSessionService {
       .catch((err: any) => console.error(err))
 
     this.repository.addSession(session)
-
-    if (this.iSessionNotifier) {
-      this.iSessionNotifier.addSession(session)
-    }
+    this.iSessionNotifier?.addSession(session)
   }
 
   async applyCredentials(sessionId: string, credentialsInfo: CredentialsInfo): Promise<void> {
