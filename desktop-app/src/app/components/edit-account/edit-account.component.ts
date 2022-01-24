@@ -10,6 +10,7 @@ import { KeychainService } from '@noovolari/leapp-core/services/keychain-service
 import { WorkspaceService } from '@noovolari/leapp-core/services/workspace.service'
 import { LeappCoreService } from '../../services/leapp-core.service'
 import { WindowService } from '../../services/window.service'
+import { AwsCoreService } from '@noovolari/leapp-core/services/aws-core-service'
 
 @Component({
   selector: 'app-edit-account',
@@ -40,12 +41,13 @@ export class EditAccountComponent implements OnInit {
 
   private keychainService: KeychainService
   private workspaceService: WorkspaceService
-
+  private awsCoreService: AwsCoreService
   /* Setup the first account for the application */
   constructor(private appService: AppService, private router: Router, private activatedRoute: ActivatedRoute,
               private windowService: WindowService, leappCoreService: LeappCoreService) {
     this.keychainService = leappCoreService.keyChainService
     this.workspaceService = leappCoreService.workspaceService
+    this.awsCoreService = leappCoreService.awsCoreService
   }
 
   ngOnInit() {
@@ -54,7 +56,7 @@ export class EditAccountComponent implements OnInit {
       this.selectedSession = this.workspaceService.sessions.find(session => session.sessionId === params.sessionId) as AwsIamUserSession
 
       // Get the region
-      this.regions = this.appService.getRegions()
+      this.regions = this.awsCoreService.getRegions()
       this.selectedRegion = this.regions.find(r => r.region === this.selectedSession.region).region
       this.form.controls['awsRegion'].setValue(this.selectedRegion)
 

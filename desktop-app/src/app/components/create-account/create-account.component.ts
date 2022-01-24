@@ -1,6 +1,6 @@
 import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core'
 import { FormControl, FormGroup, Validators } from '@angular/forms'
-import { AppService } from '../../services/app.service'
+
 import { ActivatedRoute, Router } from '@angular/router'
 import { environment } from '../../../environments/environment'
 import * as uuid from 'uuid'
@@ -25,6 +25,8 @@ import {
 import { AzureService, AzureSessionRequest } from '@noovolari/leapp-core/services/session/azure/azure.service'
 import { SessionFactory } from '@noovolari/leapp-core/services/session-factory'
 import { WindowService } from '../../services/window.service'
+import { AzureCoreService } from '@noovolari/leapp-core/services/azure-core.service'
+import { AwsCoreService } from '@noovolari/leapp-core/services/aws-core-service'
 
 @Component({
   selector: 'app-create-account',
@@ -89,13 +91,17 @@ export class CreateAccountComponent implements OnInit {
   private repository: Repository
   private loggingService: LoggingService
   private sessionFactory: SessionFactory
+  private azureCoreService: AzureCoreService
+  private awsCoreService: AwsCoreService
 
-  constructor(private appService: AppService, private router: Router, private activatedRoute: ActivatedRoute,
-              private windowService: WindowService, leappCoreService: LeappCoreService) {
+  constructor(private router: Router, private activatedRoute: ActivatedRoute, private windowService: WindowService,
+              leappCoreService: LeappCoreService) {
     this.repository = leappCoreService.repository
     this.loggingService = leappCoreService.loggingService
     this.workspaceService = leappCoreService.workspaceService
     this.sessionFactory = leappCoreService.sessionFactory
+    this.azureCoreService = leappCoreService.azureCoreService
+    this.awsCoreService = leappCoreService.awsCoreService
   }
 
   ngOnInit() {
@@ -134,8 +140,8 @@ export class CreateAccountComponent implements OnInit {
       }
 
       // Get all regions and locations from app service lists
-      this.regions = this.appService.getRegions()
-      this.locations = this.appService.getLocations()
+      this.regions = this.awsCoreService.getRegions()
+      this.locations = this.azureCoreService.getLocations()
 
       // Select default values
       this.selectedRegion = this.repository.getDefaultRegion() || environment.defaultRegion || this.regions[0].region
@@ -255,7 +261,7 @@ export class CreateAccountComponent implements OnInit {
         roleArn: this.form.value.roleArn.trim()
       }
       sessionService.create(awsFederatedAccountRequest, this.selectedProfile.value)
-    } else if (sessionService instanceof AwsIamUserService){
+    } else if (sessionService instanceof AwsIamUserService) {
       const awsIamUserSessionRequest: AwsIamUserSessionRequest = {
         accountName: this.form.value.name.trim(),
         region: this.selectedRegion,
@@ -264,7 +270,7 @@ export class CreateAccountComponent implements OnInit {
         mfaDevice: this.form.value.mfaDevice.trim()
       }
       sessionService.create(awsIamUserSessionRequest, this.selectedProfile.value)
-    }else if (sessionService instanceof AwsIamRoleChainedService) {
+    } else if (sessionService instanceof AwsIamRoleChainedService) {
       const awsIamRoleChainedAccountRequest: AwsIamRoleChainedSessionRequest = {
         accountName: this.form.value.name.trim(),
         region: this.selectedRegion,
@@ -273,7 +279,7 @@ export class CreateAccountComponent implements OnInit {
         parentSessionId: this.selectedSession.sessionId
       }
       sessionService.create(awsIamRoleChainedAccountRequest, this.selectedProfile.value)
-    }else if (sessionService instanceof AzureService) {
+    } else if (sessionService instanceof AzureService) {
       const azureSessionRequest: AzureSessionRequest = {
         region: this.selectedLocation,
         sessionName: this.form.value.name,

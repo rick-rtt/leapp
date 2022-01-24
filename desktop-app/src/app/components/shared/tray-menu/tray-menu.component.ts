@@ -14,6 +14,7 @@ import { LoggerLevel, LoggingService } from '@noovolari/leapp-core/services/logg
 import { LeappCoreService } from '../../../services/leapp-core.service'
 import { SessionFactory } from '@noovolari/leapp-core/services/session-factory'
 import { WindowService } from '../../../services/window.service'
+import { AwsCoreService } from '@noovolari/leapp-core/services/aws-core-service'
 
 @Component({
   selector: 'app-tray-menu',
@@ -29,6 +30,7 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
   private repository: Repository
   private sessionServiceFactory: SessionFactory
   private workspaceService: WorkspaceService
+  private awsCoreService: AwsCoreService
 
   constructor(private updaterService: UpdaterService, private appService: AppService,
               private windowService: WindowService, leappCoreService: LeappCoreService) {
@@ -36,6 +38,7 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
     this.loggingService = leappCoreService.loggingService
     this.sessionServiceFactory = leappCoreService.sessionFactory
     this.workspaceService = leappCoreService.workspaceService
+    this.awsCoreService = leappCoreService.awsCoreService
   }
 
   ngOnInit() {
@@ -194,7 +197,7 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
       })
 
       // Clean the config file
-      this.appService.cleanCredentialFile()
+      this.awsCoreService.cleanCredentialFile()
     } catch (err) {
       this.loggingService.logger('No sessions to stop, skipping...', LoggerLevel.error, this, err.stack)
     }

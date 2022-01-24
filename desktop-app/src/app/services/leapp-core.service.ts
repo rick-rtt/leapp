@@ -22,11 +22,13 @@ import { VerificationWindowService } from './verification-window.service'
 import { WorkspaceService } from '@noovolari/leapp-core/services/workspace.service'
 import { SessionFactory } from '@noovolari/leapp-core/services/session-factory'
 import { RotationService } from '@noovolari/leapp-core/services/rotation.service'
+import { AzureCoreService } from '@noovolari/leapp-core/services/azure-core.service'
 
 @Injectable({
   providedIn: 'root'
 })
 export class LeappCoreService {
+
   constructor(private mfaCodePrompter: MfaCodePromptService, private awsAuthenticationService: AwsAuthenticationService,
               private verificationWindowService: VerificationWindowService, private electronService: ElectronService) {
   }
@@ -220,5 +222,15 @@ export class LeappCoreService {
     }
 
     return this.retroCompatibilityServiceInstance
+  }
+
+  private azureCoreServiceInstance: AzureCoreService
+
+  get azureCoreService(): AzureCoreService {
+    if (!this.azureCoreServiceInstance) {
+      this.azureCoreServiceInstance = new AzureCoreService()
+    }
+
+    return this.azureCoreServiceInstance
   }
 }

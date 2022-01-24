@@ -14,6 +14,8 @@ import { SessionStatus } from '@noovolari/leapp-core/models/session-status'
 import { LeappCoreService } from '../../../services/leapp-core.service'
 import { SessionFactory } from '@noovolari/leapp-core/services/session-factory'
 import { WindowService } from '../../../services/window.service'
+import { AzureCoreService } from '@noovolari/leapp-core/services/azure-core.service'
+import { AwsCoreService } from '@noovolari/leapp-core/services/aws-core-service'
 
 @Component({
   selector: 'app-profile-page',
@@ -63,13 +65,16 @@ export class ProfilePageComponent implements OnInit {
   private workspaceService: WorkspaceService
   private loggingService: LoggingService
   private sessionServiceFactory: SessionFactory
-
+  private azureCoreService: AzureCoreService
+  private awsCoreService: AwsCoreService
   constructor(private appService: AppService, private router: Router, private windowService: WindowService,
               leappCoreService: LeappCoreService) {
     this.repository = leappCoreService.repository
     this.loggingService = leappCoreService.loggingService
     this.sessionServiceFactory = leappCoreService.sessionFactory
     this.workspaceService = leappCoreService.workspaceService
+    this.azureCoreService = leappCoreService.azureCoreService
+    this.awsCoreService = leappCoreService.awsCoreService
   }
 
   ngOnInit() {
@@ -95,8 +100,8 @@ export class ProfilePageComponent implements OnInit {
       this.showProxyAuthentication = true
     }
 
-    this.regions = this.appService.getRegions()
-    this.locations = this.appService.getLocations()
+    this.regions = this.awsCoreService.getRegions()
+    this.locations = this.azureCoreService.getLocations()
     this.selectedRegion = this.repository.getDefaultRegion() || environment.defaultRegion
     this.selectedLocation = this.repository.getDefaultLocation() || environment.defaultLocation
     this.selectedBrowserOpening = this.repository.getAwsSsoConfiguration().browserOpening || constants.inApp.toString()

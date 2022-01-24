@@ -1,10 +1,12 @@
-import {constants} from '../models/constants';
-import {Session} from '../models/session';
-import {INativeService} from "../interfaces/i-native-service";
+import { constants } from '../models/constants'
+import { Session } from '../models/session'
+import { INativeService } from '../interfaces/i-native-service'
+import { LoggerLevel } from './logging-service'
 
 export class AwsCoreService {
 
-  constructor(private nativeService: INativeService) {}
+  constructor(private nativeService: INativeService) {
+  }
 
   static stsEndpointsPerRegion: Map<string, string> = new Map([
     ['af-south-1', 'https://sts.af-south-1.amazonaws.com'],
@@ -32,32 +34,44 @@ export class AwsCoreService {
     ['us-gov-west-1', 'https://sts.us-gov-west-1.amazonaws.com'],
     ['us-west-1', 'https://sts.us-west-1.amazonaws.com'],
     ['us-west-2', 'https://sts.us-west-2.amazonaws.com']
-  ]);
+  ])
 
-  /**
-   * Return the aws credential path so we have only one point in the application where we need to adjust it!
-   *
-   * @returns the credential path string
-   */
   awsCredentialPath() {
-    return this.nativeService.path.join(this.nativeService.os.homedir(), '.aws', 'credentials');
+    return this.nativeService.path.join(this.nativeService.os.homedir(), '.aws', 'credentials')
   }
 
   // TODO: move environment in core
   stsOptions(session: Session) {
     let options: any = {
       maxRetries: 0,
-      httpOptions: { timeout: constants.timeout }
-    };
+      httpOptions: {timeout: constants.timeout}
+    }
 
     if (session.region) {
       options = {
         ...options,
         endpoint: AwsCoreService.stsEndpointsPerRegion.get(session.region),
         region: session.region
-      };
+      }
     }
 
-    return options;
+    return options
+  }
+
+  cleanCredentialFile() {
+    try {
+      const awsCredentialsPath = this.awsCredentialPath()
+      // Rewrite credential file
+      this.nativeService.fs.writeFileSync(awsCredentialsPath, '')
+    } catch (error) {
+      this.nativeService.log(`Can\'t delete aws credential file probably missing: ${error.toString()}`, LoggerLevel.warn, this, error.stack)
+    }
+  }
+
+  getRegions() {
+    const regionKeys = [...AwsCoreService.stsEndpointsPerRegion.keys()]
+    return regionKeys.map(key => {
+      return {region: key}
+    })
   }
 }

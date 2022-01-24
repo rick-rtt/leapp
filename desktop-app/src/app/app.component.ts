@@ -122,7 +122,7 @@ export class AppComponent implements OnInit {
     // We need the Try/Catch as we have a the possibility to call the method without sessions
     try {
       // Clean the config file
-      this.app.cleanCredentialFile()
+      this.awsCoreService.cleanCredentialFile()
     } catch (err) {
       this.loggingService.logger('No sessions to stop, skipping...', LoggerLevel.error, this, err.stack)
     }

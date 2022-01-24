@@ -19,6 +19,8 @@ import { AwsSessionService } from '@noovolari/leapp-core/services/session/aws/aw
 import { LeappCoreService } from '../../../services/leapp-core.service'
 import { SessionFactory } from '@noovolari/leapp-core/services/session-factory'
 import { WindowService } from '../../../services/window.service'
+import { AzureCoreService } from '@noovolari/leapp-core/services/azure-core.service'
+import { AwsCoreService } from '@noovolari/leapp-core/services/aws-core-service'
 
 @Component({
   selector: 'app-session-card',
@@ -65,6 +67,8 @@ export class SessionCardComponent implements OnInit {
   private sessionServiceFactory: SessionFactory
   private awsIamUserService: AwsIamUserService
   private workspaceService: WorkspaceService
+  private azureCoreService: AzureCoreService
+  private awsCoreService: AwsCoreService
 
   constructor(private appService: AppService, private router: Router, private ssmService: SsmService,
               private modalService: BsModalService, private windowService: WindowService,
@@ -74,6 +78,8 @@ export class SessionCardComponent implements OnInit {
     this.sessionServiceFactory = leappCoreService.sessionFactory
     this.workspaceService = leappCoreService.workspaceService
     this.awsIamUserService = leappCoreService.awsIamUserService
+    this.azureCoreService = leappCoreService.azureCoreService
+    this.awsCoreService = leappCoreService.awsCoreService
   }
 
   ngOnInit() {
@@ -81,8 +87,8 @@ export class SessionCardComponent implements OnInit {
     this.sessionService = this.sessionServiceFactory.getSessionService(this.session.type)
 
     // Set regions and locations
-    this.awsRegions = this.appService.getRegions()
-    const azureLocations = this.appService.getLocations()
+    this.awsRegions = this.awsCoreService.getRegions()
+    const azureLocations = this.azureCoreService.getLocations()
 
     // Get profiles
     this.profiles = this.repository.getProfiles()
