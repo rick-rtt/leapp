@@ -18,6 +18,7 @@ import { LeappCoreService } from './services/leapp-core.service'
 import { SessionFactory } from '@noovolari/leapp-core/services/session-factory'
 import { RotationService } from '@noovolari/leapp-core/services/rotation.service'
 import { WindowService } from './services/window.service'
+import { ElectronService } from './services/electron.service'
 
 @Component({
   selector: 'app-root',
@@ -36,8 +37,9 @@ export class AppComponent implements OnInit {
   private rotationService: RotationService
 
   /* Main app file: launches the Angular framework inside Electron app */
-  constructor(private app: AppService, private router: Router, private updaterService: UpdaterService,
-              private windowService: WindowService, leappCoreService: LeappCoreService) {
+  constructor(private appService: AppService, private router: Router, private updaterService: UpdaterService,
+              private windowService: WindowService, private electronService: ElectronService,
+              leappCoreService: LeappCoreService) {
     this.repository = leappCoreService.repository
     this.fileService = leappCoreService.fileService
     this.awsCoreService = leappCoreService.awsCoreService
@@ -51,8 +53,8 @@ export class AppComponent implements OnInit {
 
   async ngOnInit() {
     // We get the right moment to set an hook to app close
-    const ipc = this.app.getIpcRenderer()
-    ipc.on('app-close', () => {
+    const ipcRenderer = this.electronService.ipcRenderer
+    ipcRenderer.on('app-close', () => {
       this.loggingService.logger('Preparing for closing instruction...', LoggerLevel.info, this)
       this.beforeCloseInstructions()
     })
@@ -128,30 +130,30 @@ export class AppComponent implements OnInit {
     }
 
     // Finally quit
-    this.app.quit()
+    this.appService.quit()
   }
 
   /**
    * Show that we created a copy of original credential file if present in the system
    */
   private showCredentialBackupMessageIfNeeded() {
-    const oldAwsCredentialsPath = this.app.getOS().homedir() + '/' + environment.credentialsDestination
+    const oldAwsCredentialsPath = this.fileService.homeDir() + '/' + environment.credentialsDestination
     const newAwsCredentialsPath = oldAwsCredentialsPath + '.leapp.bkp'
     const check = this.workspaceService.sessions.length === 0 &&
-      this.app.getFs().existsSync(oldAwsCredentialsPath) &&
-      !this.app.getFs().existsSync(newAwsCredentialsPath)
+      this.fileService.existsSync(oldAwsCredentialsPath) &&
+      !this.fileService.existsSync(newAwsCredentialsPath)
 
     this.loggingService.logger(`Check existing credential file: ${check}`, LoggerLevel.info, this)
 
     if (check) {
-      this.app.getFs().renameSync(oldAwsCredentialsPath, newAwsCredentialsPath)
-      this.app.getFs().writeFileSync(oldAwsCredentialsPath, '')
-      this.app.getDialog().showMessageBox({
+      this.fileService.renameSync(oldAwsCredentialsPath, newAwsCredentialsPath)
+      this.fileService.writeFileSync(oldAwsCredentialsPath, '')
+      this.appService.getDialog().showMessageBox({
         type: 'info',
         icon: __dirname + '/assets/images/Leapp.png',
         message: 'You had a previous credential file. We made a backup of the old one in the same directory before starting.'
       })
-    } else if (!this.fileService.exists(this.awsCoreService.awsCredentialPath())) {
+    } else if (!this.fileService.existsSync(this.awsCoreService.awsCredentialPath())) {
       this.fileService.writeFileSync(this.awsCoreService.awsCredentialPath(), '')
     }
   }
@@ -179,9 +181,8 @@ export class AppComponent implements OnInit {
       this.updaterService.updateVersionJson(this.updaterService.getCurrentAppVersion())
     }
 
-    const ipc = this.app.getIpcRenderer()
-    ipc.on('UPDATE_AVAILABLE', async (_, info) => {
-
+    const ipcRenderer = this.electronService.ipcRenderer
+    ipcRenderer.on('UPDATE_AVAILABLE', async (_, info) => {
       const releaseNote = await this.updaterService.getReleaseNote()
       this.updaterService.setUpdateInfo(info.version, info.releaseName, info.releaseDate, releaseNote)
       if (this.updaterService.isUpdateNeeded()) {

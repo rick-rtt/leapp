@@ -46,6 +46,10 @@ export class AppService {
     return this.electronService.menu
   }
 
+  isDarkMode() {
+    return this.electronService.nativeTheme.shouldUseDarkColors
+  }
+
   /**
    * Return the dialog native object
    */
@@ -53,45 +57,17 @@ export class AppService {
     return this.electronService.dialog
   }
 
-  isDarkMode() {
-    return this.electronService.nativeTheme.shouldUseDarkColors
-  }
-
-  //TODO: remove this wrapper, use electron service directly!
-  getTray() {
-    return this.electronService.tray
-  }
-
   /**
-   * Return the native os object
+   * Return the type of OS in human readable form
    */
-  //TODO: remove this wrapper, use electron service directly!
-  getOS() {
-    return this.electronService.os
-  }
-
-  /**
-   * Return the fs native object
-   */
-  //TODO: remove this wrapper, use electron service directly!
-  getFs() {
-    return this.electronService.fs
-  }
-
-  /**
-   * Return the app process
-   */
-  //TODO: remove this wrapper, use electron service directly!
-  getProcess() {
-    return this.electronService.process
-  }
-
-  /**
-   * Return Electron ipcRenderer
-   */
-  //TODO: remove this wrapper, use electron service directly!
-  getIpcRenderer() {
-    return this.electronService.ipcRenderer
+  detectOs() {
+    const hrNames = {
+      linux: constants.linux,
+      darwin: constants.mac,
+      win32: constants.windows
+    }
+    const os = this.electronService.os.platform()
+    return hrNames[os]
   }
 
   /**
@@ -107,19 +83,6 @@ export class AppService {
   restart() {
     this.electronService.app.relaunch()
     this.electronService.app.exit(0)
-  }
-
-  /**
-   * Return the type of OS in human readable form
-   */
-  detectOs() {
-    const hrNames = {
-      linux: constants.linux,
-      darwin: constants.mac,
-      win32: constants.windows
-    }
-    const os = this.electronService.os.platform()
-    return hrNames[os]
   }
 
   public async logout() {
@@ -172,19 +135,6 @@ export class AppService {
     selBox.select()
     document.execCommand('copy')
     document.body.removeChild(selBox)
-  }
-
-  /**
-   * Standard parsing of a json JWT token without library
-   *
-   * @param token - a string token
-   * @returns the json object decoded
-   */
-  parseJwt(token) {
-    const base64Url = token.split('.')[1]
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
-    const jsonPayload = decodeURIComponent(atob(base64).split('').map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''))
-    return JSON.parse(jsonPayload)
   }
 
   /**

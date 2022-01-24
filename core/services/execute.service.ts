@@ -1,7 +1,13 @@
 import { INativeService } from '../interfaces/i-native-service'
 
 export class ExecuteService {
-  constructor(private nativeService: INativeService) {
+  public constructor(private nativeService: INativeService) {
+  }
+
+  public getQuote(): string{
+    return this.nativeService.process.platform === 'darwin'
+      ? '\''
+      : ''
   }
 
   /**

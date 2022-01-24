@@ -1,13 +1,14 @@
-import {Observable, Subscription} from 'rxjs';
-import {INativeService} from "../interfaces/i-native-service";
+import { Observable, Subscription } from 'rxjs'
+import { INativeService } from '../interfaces/i-native-service'
 //import * as CryptoJS from 'crypto-js';
-const CryptoJS = require('crypto-js');
+const CryptoJS = require('crypto-js')
 
 export class FileService {
 
-  private readSubscription: Subscription;
+  private readSubscription: Subscription
 
-  constructor(private nativeService: INativeService) {}
+  constructor(private nativeService: INativeService) {
+  }
 
   /* ====================================================
    * === Wrapper functions over the fs native library ===
@@ -19,7 +20,7 @@ export class FileService {
    * @returns - {string} - path of the home directory
    */
   homeDir(): string {
-    return this.nativeService.os.homedir();
+    return this.nativeService.os.homedir()
   }
 
   /**
@@ -28,8 +29,12 @@ export class FileService {
    * @returns - {boolean} - exists or not
    * @param path - the path of the directory
    */
-  exists(path: string): boolean {
-    return this.nativeService.fs.existsSync(path);
+  existsSync(path: string): boolean {
+    return this.nativeService.fs.existsSync(path)
+  }
+
+  renameSync(oldPath: string, newPath: string): void {
+    this.nativeService.fs.renameSync(oldPath, newPath)
   }
 
   /**
@@ -39,7 +44,7 @@ export class FileService {
    * @param path - the directory path
    */
   dirname(path: string): string {
-    return this.nativeService.path.dirname(path);
+    return this.nativeService.path.dirname(path)
   }
 
   /**
@@ -52,13 +57,13 @@ export class FileService {
     return new Observable(subscriber => {
       this.nativeService.fs.readFile(filePath, {encoding: 'utf-8'}, (err: any, data: any) => {
         if (err) {
-          subscriber.error(err);
+          subscriber.error(err)
         } else {
-          subscriber.next(data);
+          subscriber.next(data)
         }
-        subscriber.complete();
-      });
-    });
+        subscriber.complete()
+      })
+    })
   }
 
   /**
@@ -68,7 +73,7 @@ export class FileService {
    * @param target - target directory
    */
   copyDir(source: string, target: string) {
-    this.nativeService.copydir.sync(source, target, {mode: true});
+    this.nativeService.copydir.sync(source, target, {mode: true})
   }
 
   /**
@@ -78,7 +83,7 @@ export class FileService {
    * @param filePath - Path to read the file
    */
   readFileSync(filePath: string): string {
-    return this.nativeService.fs.readFileSync(filePath, {encoding: 'utf-8'});
+    return this.nativeService.fs.readFileSync(filePath, {encoding: 'utf-8'})
   }
 
   /**
@@ -90,7 +95,7 @@ export class FileService {
   getSubDirs(source: string) {
     return this.nativeService.fs.readdirSync(source, {withFileTypes: true})
       .filter((dirent: any) => dirent.isDirectory())
-      .map((dirent: any) => dirent.name);
+      .map((dirent: any) => dirent.name)
   }
 
   /**
@@ -100,7 +105,7 @@ export class FileService {
    * @param options - some options if needed - optional
    */
   newDir(path: string, options: { recursive: boolean }): void {
-    this.nativeService.fs.mkdirSync(path, options);
+    this.nativeService.fs.mkdirSync(path, options)
   }
 
   /**
@@ -114,13 +119,13 @@ export class FileService {
     return new Observable(subscriber => {
       this.nativeService.fs.writeFile(filePath, content, (err: any, data: any) => {
         if (err) {
-          subscriber.error(err);
+          subscriber.error(err)
         } else {
-          subscriber.next(data);
+          subscriber.next(data)
         }
-        subscriber.complete();
-      });
-    });
+        subscriber.complete()
+      })
+    })
   }
 
   /**
@@ -131,7 +136,7 @@ export class FileService {
    * @param content - the content to write
    */
   writeFileSync(filePath: string, content: string): any {
-    return this.nativeService.fs.writeFileSync(filePath, content);
+    return this.nativeService.fs.writeFileSync(filePath, content)
   }
 
   /**
@@ -145,11 +150,11 @@ export class FileService {
     Object.keys(content).forEach(key => {
       Object.keys(content[key]).forEach(subKey => {
         if (content[key][subKey] === null || content[key][subKey] === undefined || content[key][subKey] === 'null' || content[key][subKey] === '') {
-          delete content[key][subKey];
+          delete content[key][subKey]
         }
-      });
-    });
-    return this.writeFile(filePath, this.nativeService.ini.stringify(content));
+      })
+    })
+    return this.writeFile(filePath, this.nativeService.ini.stringify(content))
   }
 
   /**
@@ -163,25 +168,25 @@ export class FileService {
     Object.keys(content).forEach(key => {
       Object.keys(content[key]).forEach(subKey => {
         if (content[key][subKey] === null || content[key][subKey] === undefined || content[key][subKey] === 'null' || content[key][subKey] === '') {
-          delete content[key][subKey];
+          delete content[key][subKey]
         }
-      });
-    });
+      })
+    })
 
-    const old = this.iniParseSync(filePath);
-    const result = Object.assign(old, content);
-    return this.writeFileSync(filePath, this.nativeService.ini.stringify(result));
+    const old = this.iniParseSync(filePath)
+    const result = Object.assign(old, content)
+    return this.writeFileSync(filePath, this.nativeService.ini.stringify(result))
   }
 
   replaceWriteSync(filePath: string, content: any) {
     Object.keys(content).forEach(key => {
       Object.keys(content[key]).forEach(subKey => {
         if (content[key][subKey] === null || content[key][subKey] === undefined || content[key][subKey] === 'null' || content[key][subKey] === '') {
-          delete content[key][subKey];
+          delete content[key][subKey]
         }
-      });
-    });
-    return this.writeFileSync(filePath, this.nativeService.ini.stringify(content));
+      })
+    })
+    return this.writeFileSync(filePath, this.nativeService.ini.stringify(content))
   }
 
   /**
@@ -193,21 +198,21 @@ export class FileService {
   iniParse(filePath: string): Observable<any> {
     return new Observable(subscriber => {
       if (this.readSubscription) {
-        this.readSubscription.unsubscribe();
+        this.readSubscription.unsubscribe()
       }
       this.readSubscription = this.readFile(filePath).subscribe(file => {
         try {
-          subscriber.next(this.nativeService.ini.parse(file));
+          subscriber.next(this.nativeService.ini.parse(file))
         } catch (e) {
-          subscriber.error(e);
+          subscriber.error(e)
         } finally {
-          subscriber.complete();
+          subscriber.complete()
         }
       }, err => {
-        subscriber.error(err);
-        subscriber.complete();
-      });
-    });
+        subscriber.error(err)
+        subscriber.complete()
+      })
+    })
   }
 
   /**
@@ -217,7 +222,7 @@ export class FileService {
    * @param filePath - the filepath to read from
    */
   iniParseSync(filePath: string) {
-    return this.nativeService.ini.parse(this.readFileSync(filePath));
+    return this.nativeService.ini.parse(this.readFileSync(filePath))
   }
 
 
@@ -226,13 +231,13 @@ export class FileService {
    * Encrypt Text
    */
   encryptText(text: string): string {
-    return CryptoJS.AES.encrypt(text.trim(), this.nativeService.machineId).toString();
+    return CryptoJS.AES.encrypt(text.trim(), this.nativeService.machineId).toString()
   }
 
   /**
    * Decrypt Text
    */
   decryptText(text: string): string {
-    return CryptoJS.AES.decrypt(text.trim(), this.nativeService.machineId).toString(CryptoJS.enc.Utf8);
+    return CryptoJS.AES.decrypt(text.trim(), this.nativeService.machineId).toString(CryptoJS.enc.Utf8)
   }
 }

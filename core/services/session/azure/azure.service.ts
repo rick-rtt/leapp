@@ -143,6 +143,6 @@ export class AzureService extends SessionService {
   }
 
   private accessTokenFileExists(): boolean {
-    return this.fileService.exists(`${this.fileService.homeDir()}/${this.azureAccessTokens}`)
+    return this.fileService.existsSync(`${this.fileService.homeDir()}/${this.azureAccessTokens}`)
   }
 }

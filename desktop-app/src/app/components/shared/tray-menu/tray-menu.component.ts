@@ -15,6 +15,7 @@ import { LeappCoreService } from '../../../services/leapp-core.service'
 import { SessionFactory } from '@noovolari/leapp-core/services/session-factory'
 import { WindowService } from '../../../services/window.service'
 import { AwsCoreService } from '@noovolari/leapp-core/services/aws-core-service'
+import { ElectronService } from '../../../services/electron.service'
 
 @Component({
   selector: 'app-tray-menu',
@@ -33,7 +34,8 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
   private awsCoreService: AwsCoreService
 
   constructor(private updaterService: UpdaterService, private appService: AppService,
-              private windowService: WindowService, leappCoreService: LeappCoreService) {
+              private windowService: WindowService, private electronService: ElectronService,
+              leappCoreService: LeappCoreService) {
     this.repository = leappCoreService.repository
     this.loggingService = leappCoreService.loggingService
     this.sessionServiceFactory = leappCoreService.sessionFactory
@@ -164,7 +166,7 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
     }
 
     if (!this.currentTray) {
-      this.currentTray = new (this.appService.getTray())(__dirname + `/assets/images/${normalIcon}.png`)
+      this.currentTray = new (this.electronService.tray)(__dirname + `/assets/images/${normalIcon}.png`)
     }
 
     if (this.updaterService.getSavedVersionComparison() && this.updaterService.isReady()) {

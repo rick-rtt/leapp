@@ -83,7 +83,7 @@ export class RetroCompatibilityService {
   }
 
   isRetroPatchNecessary(): boolean {
-    if (this.fileService.exists(this.fileService.homeDir() + '/' + this.lockFileDestination)) {
+    if (this.fileService.existsSync(this.fileService.homeDir() + '/' + this.lockFileDestination)) {
       const workspaceParsed = this.parseWorkspaceFile()
       // use a never more used property to check if workspace has changed to new version
       return workspaceParsed.defaultWorkspace === 'default'
