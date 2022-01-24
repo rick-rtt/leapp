@@ -1,5 +1,5 @@
 import { Component, Input, OnInit, TemplateRef, ViewChild } from '@angular/core'
-import { AppService, ToastLevel } from '../../../services/app.service'
+import { AppService } from '../../../services/app.service'
 import { Router } from '@angular/router'
 import { SsmService } from '../../../services/ssm.service'
 import { environment } from '../../../../environments/environment'
@@ -21,6 +21,7 @@ import { SessionFactory } from '@noovolari/leapp-core/services/session-factory'
 import { WindowService } from '../../../services/window.service'
 import { AzureCoreService } from '@noovolari/leapp-core/services/azure-core.service'
 import { AwsCoreService } from '@noovolari/leapp-core/services/aws-core-service'
+import { MessageToasterService, ToastLevel } from '../../../services/message-toaster.service'
 
 @Component({
   selector: 'app-session-card',
@@ -72,7 +73,7 @@ export class SessionCardComponent implements OnInit {
 
   constructor(private appService: AppService, private router: Router, private ssmService: SsmService,
               private modalService: BsModalService, private windowService: WindowService,
-              leappCoreService: LeappCoreService) {
+              private messageToasterService: MessageToasterService, leappCoreService: LeappCoreService) {
     this.repository = leappCoreService.repository
     this.loggingService = leappCoreService.loggingService
     this.sessionServiceFactory = leappCoreService.sessionFactory
@@ -184,10 +185,10 @@ export class SessionCardComponent implements OnInit {
         }
 
         this.appService.copyToClipboard(text)
-        this.appService.toast('Your information have been successfully copied!', ToastLevel.success, 'Information copied!')
+        this.messageToasterService.toast('Your information have been successfully copied!', ToastLevel.success, 'Information copied!')
       }
     } catch (err) {
-      this.appService.toast(err, ToastLevel.warn)
+      this.messageToasterService.toast(err, ToastLevel.warn)
       this.loggingService.logger(err, LoggerLevel.error, this, err.stack)
     }
   }
@@ -265,7 +266,7 @@ export class SessionCardComponent implements OnInit {
         this.startSession()
       }
 
-      this.appService.toast('Default region has been changed!', ToastLevel.success, 'Region changed!')
+      this.messageToasterService.toast('Default region has been changed!', ToastLevel.success, 'Region changed!')
       this.modalRef.hide()
     }
   }
@@ -344,7 +345,7 @@ export class SessionCardComponent implements OnInit {
         this.startSession()
       }
 
-      this.appService.toast('Profile has been changed!', ToastLevel.success, 'Profile changed!')
+      this.messageToasterService.toast('Profile has been changed!', ToastLevel.success, 'Profile changed!')
       this.modalRef.hide()
     }
   }

@@ -2,21 +2,10 @@ import { EventEmitter, Injectable } from '@angular/core'
 import { FormControl, FormGroup } from '@angular/forms'
 import { environment } from '../../environments/environment'
 import { ElectronService } from './electron.service'
-import { ToastrService } from 'ngx-toastr'
 import { constants } from '@noovolari/leapp-core/models/constants'
 import { LoggerLevel, LoggingService } from '@noovolari/leapp-core/services/logging-service'
 import { LeappCoreService } from './leapp-core.service'
-
-/*
-* External enum to the toast level so we can use this to define the type of log
-*/
-//TODO: What about a toasterService?
-export enum ToastLevel {
-  info,
-  warn,
-  error,
-  success
-}
+import { MessageToasterService, ToastLevel } from './message-toaster.service'
 
 @Injectable({
   providedIn: 'root'
@@ -28,8 +17,8 @@ export class AppService {
   /* This service is defined to provide different app wide methods as utilities */
   private loggingService: LoggingService
 
-  constructor(private electronService: ElectronService,
-              private toastr: ToastrService, leappCoreService: LeappCoreService) {
+  constructor(private electronService: ElectronService, private messageToasterService: MessageToasterService,
+              leappCoreService: LeappCoreService) {
     this.loggingService = leappCoreService.loggingService
 
     // Global Configure logger
@@ -145,7 +134,7 @@ export class AppService {
       // Clean localStorage
       localStorage.clear()
 
-      this.toast('Cache and configuration file cleaned.', ToastLevel.success, 'Cleaning configuration file')
+      this.messageToasterService.toast('Cache and configuration file cleaned.', ToastLevel.success, 'Cleaning configuration file')
 
       // Restart
       setTimeout(() => {
@@ -153,7 +142,7 @@ export class AppService {
       }, 2000)
     } catch (err) {
       this.loggingService.logger(`Leapp has an error re-creating your configuration file and cache.`, LoggerLevel.error, this, err.stack)
-      this.toast(`Leapp has an error re-creating your configuration file and cache.`, ToastLevel.error, 'Cleaning configuration file')
+      this.messageToasterService.toast(`Leapp has an error re-creating your configuration file and cache.`, ToastLevel.error, 'Cleaning configuration file')
     }
   }
 
@@ -212,33 +201,6 @@ export class AppService {
         this.validateAllFormFields(control)
       }
     })
-  }
-
-  /**
-   * Show a toast message with different styles for different type of toast
-   *
-   * @param message - the message to show
-   * @param type - the type of message from Toast Level
-   * @param title - [optional]
-   */
-  toast(message: string, type: ToastLevel | LoggerLevel, title?: string): void {
-    switch (type) {
-      case ToastLevel.success:
-        this.toastr.success(message, title)
-        break
-      case ToastLevel.info || LoggerLevel.info:
-        this.toastr.info(message, title)
-        break
-      case ToastLevel.warn || LoggerLevel.warn:
-        this.toastr.warning(message, title)
-        break
-      case ToastLevel.error || LoggerLevel.error:
-        this.toastr.error(message, title ? title : 'Invalid Action!')
-        break
-      default:
-        this.toastr.error(message, title)
-        break
-    }
   }
 
   /**

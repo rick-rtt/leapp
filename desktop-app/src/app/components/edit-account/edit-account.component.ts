@@ -1,6 +1,5 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core'
 import { FormControl, FormGroup, Validators } from '@angular/forms'
-import { AppService, ToastLevel } from '../../services/app.service'
 import { ActivatedRoute, Router } from '@angular/router'
 import { environment } from '../../../environments/environment'
 import { SessionType } from '@noovolari/leapp-core/models/session-type'
@@ -11,6 +10,7 @@ import { WorkspaceService } from '@noovolari/leapp-core/services/workspace.servi
 import { LeappCoreService } from '../../services/leapp-core.service'
 import { WindowService } from '../../services/window.service'
 import { AwsCoreService } from '@noovolari/leapp-core/services/aws-core-service'
+import { MessageToasterService, ToastLevel } from '../../services/message-toaster.service'
 
 @Component({
   selector: 'app-edit-account',
@@ -42,9 +42,10 @@ export class EditAccountComponent implements OnInit {
   private keychainService: KeychainService
   private workspaceService: WorkspaceService
   private awsCoreService: AwsCoreService
+
   /* Setup the first account for the application */
-  constructor(private appService: AppService, private router: Router, private activatedRoute: ActivatedRoute,
-              private windowService: WindowService, leappCoreService: LeappCoreService) {
+  constructor(private router: Router, private activatedRoute: ActivatedRoute, private windowService: WindowService,
+              private messageToasterService: MessageToasterService, leappCoreService: LeappCoreService) {
     this.keychainService = leappCoreService.keyChainService
     this.workspaceService = leappCoreService.workspaceService
     this.awsCoreService = leappCoreService.awsCoreService
@@ -74,11 +75,13 @@ export class EditAccountComponent implements OnInit {
       this.selectedSession.sessionName = this.form.controls['name'].value
       this.selectedSession.region = this.selectedRegion
       this.selectedSession.mfaDevice = this.form.controls['mfaDevice'].value
-      this.keychainService.saveSecret(environment.appName, `${this.selectedSession.sessionId}-iam-user-aws-session-access-key-id`, this.form.controls['accessKey'].value).then(_ => {})
-      this.keychainService.saveSecret(environment.appName, `${this.selectedSession.sessionId}-iam-user-aws-session-secret-access-key`, this.form.controls['secretKey'].value).then(_ => {})
+      this.keychainService.saveSecret(environment.appName, `${this.selectedSession.sessionId}-iam-user-aws-session-access-key-id`, this.form.controls['accessKey'].value).then(_ => {
+      })
+      this.keychainService.saveSecret(environment.appName, `${this.selectedSession.sessionId}-iam-user-aws-session-secret-access-key`, this.form.controls['secretKey'].value).then(_ => {
+      })
 
       this.workspaceService.updateSession(this.selectedSession.sessionId, this.selectedSession)
-      this.appService.toast('Session updated correctly.', ToastLevel.success, 'Session Update')
+      this.messageToasterService.toast('Session updated correctly.', ToastLevel.success, 'Session Update')
 
       this.router.navigate(['/sessions', 'session-selected']).then(_ => {
       })

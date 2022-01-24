@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core'
 import { FormControl, FormGroup } from '@angular/forms'
-import { AppService, ToastLevel } from '../../../services/app.service'
+import { AppService } from '../../../services/app.service'
 import { Router } from '@angular/router'
 import { environment } from '../../../../environments/environment'
 import * as uuid from 'uuid'
@@ -16,6 +16,7 @@ import { SessionFactory } from '@noovolari/leapp-core/services/session-factory'
 import { WindowService } from '../../../services/window.service'
 import { AzureCoreService } from '@noovolari/leapp-core/services/azure-core.service'
 import { AwsCoreService } from '@noovolari/leapp-core/services/aws-core-service'
+import { MessageToasterService, ToastLevel } from '../../../services/message-toaster.service'
 
 @Component({
   selector: 'app-profile-page',
@@ -68,7 +69,7 @@ export class ProfilePageComponent implements OnInit {
   private azureCoreService: AzureCoreService
   private awsCoreService: AwsCoreService
   constructor(private appService: AppService, private router: Router, private windowService: WindowService,
-              leappCoreService: LeappCoreService) {
+              private messageToasterService: MessageToasterService, leappCoreService: LeappCoreService) {
     this.repository = leappCoreService.repository
     this.loggingService = leappCoreService.loggingService
     this.sessionServiceFactory = leappCoreService.sessionFactory
@@ -136,7 +137,7 @@ export class ProfilePageComponent implements OnInit {
         })
       } else {
         this.loggingService.logger('Option saved.', LoggerLevel.info, this, JSON.stringify(this.form.getRawValue(), null, 3))
-        this.appService.toast('Option saved.', ToastLevel.info, 'Options')
+        this.messageToasterService.toast('Option saved.', ToastLevel.info, 'Options')
         this.router.navigate(['/sessions', 'session-selected']).then(_ => {
         })
       }
