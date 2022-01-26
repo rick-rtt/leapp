@@ -9,15 +9,12 @@ module.exports = {
     const path = require('path')
     const shellJs = require('shelljs')
     const semver = require('semver')
-    const deleteFunction = require('./delete-func')
-    const compileFunction = require('./compile-func')
     const bumpVersionFunction = require('./bump-func')
 
     try {
-      console.log('Publishing leapp-core library... ')
+      await gushio.run(path.join(__dirname, './target-build.js'))
 
-      await deleteFunction(path, '../dist')
-      await compileFunction(shellJs)
+      console.log('Publishing leapp-core library... ')
       await bumpVersionFunction(path, semver)
 
       let result = shellJs.exec('cd dist')

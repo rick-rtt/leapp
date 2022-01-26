@@ -1,6 +1,6 @@
 {
   "name": "@noovolari/leapp-core",
-  "version": "0.1.70",
+  "version": "0.1.71",
   "author": "besharp <info@besharp.it>",
   "description": "Leapp's core module",
   "peerDependencies": {
@@ -50,7 +50,7 @@
   "devDependencies": {
     "@babel/preset-env": "^7.16.5",
     "@babel/preset-typescript": "^7.16.5",
-    "gushio": "0.4.1",
+    "gushio": "~0.5.0",
     "jest": "^27.4.5",
     "typescript": "4.3.5"
   },
