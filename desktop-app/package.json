@@ -19,21 +19,19 @@
     "build-prod": "gushio gushio/target-build.js 'configuration production'",
     "run-local": "electron --enable-accelerated-mjpeg-decode --enable-accelerated-video --ignore-gpu-blacklist --enable-native-gpu-memory-buffers --enable-gpu-rasterization --ignore-gpu-blacklist .",
     "build-and-run-dev": "gushio gushio/target-build-and-run.js aot",
-    "build-and-run-stag": "gushio gushio/target-build-and-run.js 'configuration staging'",
-    "build-and-run-prod": "gushio gushio/target-build-and-run.js 'configuration production'",
 
-    "dist-mac-dev": "rm -rf electron/dist && rm -rf release && rm -rf dist && tsc --p electron && ng build --aot --base-href ./ && mkdir -p electron/dist/electron/assets/images && cp -a electron/assets/images/* electron/dist/electron/assets/images/ && electron-builder build",
-    "dist-mac-stag": "rm -rf electron/dist && rm -rf release && rm -rf dist && tsc --p electron && ng build --aot --configuration staging --base-href ./ && mkdir -p electron/dist/electron/assets/images && cp -a electron/assets/images/* electron/dist/electron/assets/images/ && electron-builder build",
-    "dist-mac-prod": "rm -rf electron/dist && rm -rf release && rm -rf dist && tsc --p electron && ng build --aot --configuration production --base-href ./ && mkdir -p electron/dist/electron/assets/images && cp -a electron/assets/images/* electron/dist/electron/assets/images/ && electron-builder build",
-    "dist-deb-dev": "rm -rf electron/dist && rm -rf release && rm -rf dist && tsc --p electron && ng build --aot --base-href ./ && mkdir -p electron/dist/electron/assets/images && cp -a electron/assets/images/* electron/dist/electron/assets/images/ && electron-builder build --linux",
-    "dist-deb-stag": "rm -rf electron/dist && rm -rf release && rm -rf dist && tsc --p electron && ng build --aot --configuration staging --base-href ./ && mkdir -p electron/dist/electron/assets/images && cp -a electron/assets/images/* electron/dist/electron/assets/images/ && electron-builder build --linux",
-    "dist-deb-prod": "rm -rf electron/dist && rm -rf release && rm -rf dist && tsc --p electron && ng build --aot --configuration production --base-href ./ && mkdir -p electron/dist/electron/assets/images && cp -a electron/assets/images/* electron/dist/electron/assets/images/ && electron-builder build --linux",
-    "dist-win-dev": "rm -rf electron/dist && rm -rf release && rm -rf dist && tsc --p electron && ng build --aot --base-href ./ && mkdir -p electron/dist/electron/assets/images && cp -a electron/assets/images/* electron/dist/electron/assets/images/ && electron-builder build --win --x64",
-    "dist-win-stag": "rm -rf electron/dist && rm -rf release && rm -rf dist && tsc --p electron && ng build --aot --configuration staging --base-href ./ && mkdir -p electron/dist/electron/assets/images && cp -a electron/assets/images/* electron/dist/electron/assets/images/ && electron-builder build --win --x64",
-    "dist-win-prod": "rm -rf electron/dist && rm -rf release && rm -rf dist && tsc --p electron && ng build --aot --configuration production --base-href ./ && mkdir -p electron/dist/electron/assets/images && cp -a electron/assets/images/* electron/dist/electron/assets/images/ && electron-builder build --win --x64",
-    "dist-all-dev": "rm -rf electron/dist && rm -rf release && rm -rf dist && tsc --p electron && ng build --aot --base-href ./ && mkdir -p electron/dist/electron/assets/images && cp -a electron/assets/images/* electron/dist/electron/assets/images/ && electron-builder build --mac --win --linux",
-    "dist-all-stag": "rm -rf electron/dist && rm -rf release && rm -rf dist && tsc --p electron && ng build --aot --configuration staging --base-href ./ && mkdir -p electron/dist/electron/assets/images && cp -a electron/assets/images/* electron/dist/electron/assets/images/ && electron-builder build --mac --win --linux",
-    "dist-all-prod": "rm -rf electron/dist && rm -rf release && rm -rf dist && tsc --p electron && ng build --aot --configuration production --base-href ./ && mkdir -p electron/dist/electron/assets/images && cp -a electron/assets/images/* electron/dist/electron/assets/images/ && electron-builder build --mac --win --linux"
+    "release-mac-dev": "gushio gushio/target-release.js aot mac",
+    "release-mac-stag": "gushio gushio/target-release.js 'configuration staging' mac",
+    "release-mac-prod": "gushio gushio/target-release.js 'configuration production' mac",
+    "release-linux-dev": "gushio gushio/target-release.js aot linux",
+    "release-linux-stag": "gushio gushio/target-release.js 'configuration staging' linux",
+    "release-linux-prod": "gushio gushio/target-release.js 'configuration production' linux",
+    "release-win-dev": "gushio gushio/target-release.js aot win",
+    "release-win-stag": "gushio gushio/target-release.js 'configuration staging' win",
+    "release-win-prod": "gushio gushio/target-release.js 'configuration production' win",
+    "release-all-dev": "gushio gushio/target-release.js aot all",
+    "release-all-stag": "gushio gushio/target-release.js 'configuration staging' all",
+    "release-all-prod": "gushio gushio/target-release.js 'configuration production' all"
   },
   "build": {
     "publish": [

@@ -30,7 +30,8 @@
     "shx": "^0.3.3",
     "ts-node": "^10.2.1",
     "tslib": "^2.3.1",
-    "typescript": "^4.4.3"
+    "typescript": "^4.4.3",
+    "gushio": "~0.5.0"
   },
   "dirname": "oex",
   "engines": {
@@ -63,12 +64,11 @@
   },
   "repository": "noovolari/leapp",
   "scripts": {
-    "build": "rm -rf dist && tsc",
-    "lint": "eslint . --ext .ts --config .eslintrc",
-    "postpack": "shx rm -f oclif.manifest.json",
-    "posttest": "npm lint",
-    "prepack": "npm run build && oclif manifest && oclif readme",
+    "clean": "gushio gushio/target-clean.js",
+    "build": "gushio gushio/target-build.js",
     "test": "mocha --forbid-only \"test/**/*.test.ts\"",
+    "prepack": "npm run build && oclif manifest && oclif readme",
+    "postpack": "gushio gushio/target-post-pack.js",
     "version": "oclif readme && git add README.md"
   },
   "types": "dist/index.d.ts"
