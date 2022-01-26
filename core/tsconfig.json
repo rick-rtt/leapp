@@ -25,6 +25,7 @@
     "./package.json"
   ],
   "exclude": [
+    "./gushio/**",
     "/**/*.test.ts",
     "/**/*.spec.ts"
   ]

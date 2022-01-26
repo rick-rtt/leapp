@@ -9,11 +9,13 @@
   "main": "electron/dist/electron/main.js",
   "scripts": {
     "postinstall": "electron-builder install-app-deps",
-    "ng": "ng",
     "release": "standard-version",
     "rebuild-keytar": "electron-rebuild -f -w keytar",
-    "build": "rm -rf electron/dist && cp src/assets/icons/* dist/leapp-client/ && ng build --base-href ./",
+    "ng": "ng",
     "test": "ng test",
+    "clean": "gushio gushio/target-clean.js",
+    "build2": "gushio gushio/target-build.js",
+    "build": "rm -rf electron/dist && cp src/assets/icons/* dist/leapp-client/ && ng build --base-href ./",
     "electron-dev": "rm -rf electron/dist && rm -rf dist && mkdir -p dist/leapp-client && cp -a src/assets/icons/* dist/leapp-client/ && ng build --aot --base-href ./ && tsc --p electron && mkdir -p electron/dist/electron/assets/images && cp -a electron/assets/images/* electron/dist/electron/assets/images/ && electron --enable-accelerated-mjpeg-decode --enable-accelerated-video --ignore-gpu-blacklist --enable-native-gpu-memory-buffers --enable-gpu-rasterization --ignore-gpu-blacklist .",
     "electron-stag": "rm -rf electron/dist && rm -rf dist && mkdir -p dist/leapp-client && cp -a src/assets/icons/* dist/leapp-client/ && ng build --configuration staging --base-href ./ && tsc --p electron && mkdir -p electron/dist/electron/assets/images && cp -a electron/assets/images/* electron/dist/electron/assets/images/ && electron .",
     "electron-prod": "rm -rf electron/dist && rm -rf dist && mkdir -p dist/leapp-client && cp -a src/assets/icons/* dist/leapp-client/ && ng build --configuration production --base-href ./ && tsc --p electron && mkdir -p electron/dist/electron/assets/images && cp -a electron/assets/images/* electron/dist/electron/assets/images/ && electron .",
@@ -244,6 +246,7 @@
     "protractor": "^7.0.0",
     "ts-node": "^9.1.1",
     "typescript": "4.3.5",
-    "util": "^0.12.4"
+    "util": "^0.12.4",
+    "gushio": "0.4.1"
   }
 }

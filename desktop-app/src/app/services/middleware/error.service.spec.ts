@@ -16,7 +16,6 @@ describe('ErrorService', () => {
   let spyLoggingService
   let errorService
   let handler
-  let loggingService
 
   beforeEach(() => {
     spyLoggingService = jasmine.createSpyObj('LoggingService', ['logger'])
