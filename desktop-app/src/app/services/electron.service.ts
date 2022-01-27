@@ -18,7 +18,6 @@ export class ElectronService implements INativeService {
   copydir: any
   browserWindow: any
   sudo: any
-  md5File: any
   path: any
   currentWindow: any
   semver: any
@@ -41,7 +40,6 @@ export class ElectronService implements INativeService {
     this.rimraf = window.require('rimraf')
     this.os = window.require('os')
     this.ini = window.require('ini')
-    this.md5File = window.require('md5-file')
     this.path = window.require('path')
     this.exec = window.require('child_process').exec
     this.url = window.require('url')

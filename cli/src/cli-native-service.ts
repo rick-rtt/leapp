@@ -1,5 +1,6 @@
 import { INativeService } from '@noovolari/leapp-core/interfaces/i-native-service'
 
+
 export class CliNativeService implements INativeService {
 
   log: any
@@ -12,7 +13,6 @@ export class CliNativeService implements INativeService {
   unzip: any
   copydir: any
   sudo: any
-  md5File: any
   path: any
   semver: any
   machineId: any
@@ -27,10 +27,9 @@ export class CliNativeService implements INativeService {
     this.rimraf = require('rimraf')
     this.os = require('os')
     this.ini = require('ini')
-    this.md5File = require('md5-file')
     this.path = require('path')
     this.exec = require('child_process').exec
-    this.process = require('process')
+    this.process = global.process
     this.url = require('url')
     this.unzip = require('extract-zip')
     this.copydir = require('copy-dir')

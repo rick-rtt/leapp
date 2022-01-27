@@ -9,7 +9,6 @@ export interface INativeService {
   unzip: any;
   copydir: any;
   sudo: any;
-  md5File: any;
   path: any;
   semver: any;
   machineId: any;
