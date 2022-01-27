@@ -73,7 +73,7 @@ export class UpdaterService {
           this.workspaceService.sessions = [...this.workspaceService.sessions]
           this.repository.updateSessions(this.workspaceService.sessions)
         } else if (event === constants.confirmCloseAndDownloadUpdate) {
-          this.windowService.openExternalUrl(`${environment.latestUrl}`)
+          this.windowService.openExternalUrl(`${constants.latestUrl}`)
         }
         this.bsModalRef = undefined
       }

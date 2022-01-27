@@ -103,8 +103,8 @@ export class ProfilePageComponent implements OnInit {
 
     this.regions = this.awsCoreService.getRegions()
     this.locations = this.azureCoreService.getLocations()
-    this.selectedRegion = this.repository.getDefaultRegion() || environment.defaultRegion
-    this.selectedLocation = this.repository.getDefaultLocation() || environment.defaultLocation
+    this.selectedRegion = this.repository.getDefaultRegion() || constants.defaultRegion
+    this.selectedLocation = this.repository.getDefaultLocation() || constants.defaultLocation
     this.selectedBrowserOpening = this.repository.getAwsSsoConfiguration().browserOpening || constants.inApp.toString()
 
     this.appService.validateAllFormFields(this.form)

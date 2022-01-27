@@ -1,4 +1,3 @@
-import { Injectable } from '@angular/core'
 import { AwsIamUserService } from '@noovolari/leapp-core/services/session/aws/aws-iam-user-service'
 import { FileService } from '@noovolari/leapp-core/services/file-service'
 import { KeychainService } from '@noovolari/leapp-core/services/keychain-service'
@@ -7,30 +6,64 @@ import { LoggingService } from '@noovolari/leapp-core/services/logging-service'
 import { TimerService } from '@noovolari/leapp-core/services/timer-service'
 import { AwsIamRoleFederatedService } from '@noovolari/leapp-core/services/session/aws/aws-iam-role-federated-service'
 import { AzureService } from '@noovolari/leapp-core/services/session/azure/azure.service'
-import { ElectronService } from './electron.service'
-import { MfaCodePromptService } from './mfa-code-prompt.service'
 import { ExecuteService } from '@noovolari/leapp-core/services/execute.service'
 import { RetroCompatibilityService } from '@noovolari/leapp-core/services/retro-compatibility.service'
-import { AwsAuthenticationService } from './session/aws/aws-authentication.service'
 import { AwsParentSessionFactory } from '@noovolari/leapp-core/services/session/aws/aws-parent-session.factory'
 import { AwsIamRoleChainedService } from '@noovolari/leapp-core/services/session/aws/aws-iam-role-chained-service'
 import { Repository } from '@noovolari/leapp-core/services/repository'
 import { AwsSsoOidcService } from '@noovolari/leapp-core/services/session/aws/aws-sso-oidc.service'
 import { AwsSsoRoleService } from '@noovolari/leapp-core/services/session/aws/aws-sso-role-service'
-import { VerificationWindowService } from './verification-window.service'
 import { WorkspaceService } from '@noovolari/leapp-core/services/workspace.service'
 import { SessionFactory } from '@noovolari/leapp-core/services/session-factory'
 import { RotationService } from '@noovolari/leapp-core/services/rotation.service'
 import { AzureCoreService } from '@noovolari/leapp-core/services/azure-core.service'
+import { CliMfaCodePromptService } from './cli-mfa-code-prompt.service'
+import { CliAwsAuthenticationService } from './cli-aws-authentication.service'
+import { CliVerificationWindowService } from './cli-verification-window.service'
+import { CliNativeService } from './cli-native-service'
 import { constants } from '@noovolari/leapp-core/models/constants'
 
-@Injectable({
-  providedIn: 'root'
-})
-export class LeappCoreService {
 
-  constructor(private mfaCodePrompter: MfaCodePromptService, private awsAuthenticationService: AwsAuthenticationService,
-              private verificationWindowService: VerificationWindowService, private electronService: ElectronService) {
+export class LeappCLiService {
+
+  private cliNativeServiceInstance: CliNativeService
+
+  public get cliNativeService(): CliNativeService {
+    if (!this.cliNativeServiceInstance) {
+      this.cliNativeServiceInstance = new CliNativeService()
+    }
+
+    return this.cliNativeServiceInstance
+  }
+
+  private cliVerificationWindowServiceInstance: CliVerificationWindowService
+
+  public get cliVerificationWindowService(): CliVerificationWindowService {
+    if (!this.cliVerificationWindowServiceInstance) {
+      this.cliVerificationWindowServiceInstance = new CliVerificationWindowService()
+    }
+
+    return this.cliVerificationWindowServiceInstance
+  }
+
+  private cliAwsAuthenticationServiceInstance: CliAwsAuthenticationService
+
+  public get cliAwsAuthenticationService(): CliAwsAuthenticationService {
+    if (!this.cliAwsAuthenticationServiceInstance) {
+      this.cliAwsAuthenticationServiceInstance = new CliAwsAuthenticationService()
+    }
+
+    return this.cliAwsAuthenticationServiceInstance
+  }
+
+  private cliMfaCodePromptServiceInstance: CliMfaCodePromptService
+
+  public get cliMfaCodePromptService(): CliMfaCodePromptService {
+    if (!this.cliMfaCodePromptServiceInstance) {
+      this.cliMfaCodePromptServiceInstance = new CliMfaCodePromptService()
+    }
+
+    return this.cliMfaCodePromptServiceInstance
   }
 
   private workspaceServiceInstance: WorkspaceService
@@ -48,7 +81,7 @@ export class LeappCoreService {
   public get awsIamUserService(): AwsIamUserService {
     if (!this.awsIamUserServiceInstance) {
       this.awsIamUserServiceInstance = new AwsIamUserService(this.workspaceService, this.repository,
-        this.mfaCodePrompter, this.keyChainService, this.fileService, this.awsCoreService)
+        this.cliMfaCodePromptService, this.keyChainService, this.fileService, this.awsCoreService)
     }
 
     return this.awsIamUserServiceInstance
@@ -59,7 +92,7 @@ export class LeappCoreService {
   get awsIamRoleFederatedService(): AwsIamRoleFederatedService {
     if (!this.awsIamRoleFederatedServiceInstance) {
       this.awsIamRoleFederatedServiceInstance = new AwsIamRoleFederatedService(this.workspaceService, this.repository,
-        this.fileService, this.awsCoreService, this.awsAuthenticationService, constants.samlRoleSessionDuration)
+        this.fileService, this.awsCoreService, this.cliAwsAuthenticationService, constants.samlRoleSessionDuration)
     }
 
     return this.awsIamRoleFederatedServiceInstance
@@ -81,7 +114,7 @@ export class LeappCoreService {
   get awsSsoRoleService(): AwsSsoRoleService {
     if (!this.awsSsoRoleServiceInstance) {
       this.awsSsoRoleServiceInstance = new AwsSsoRoleService(this.workspaceService, this.repository, this.fileService,
-        this.keyChainService, this.awsCoreService, this.electronService, this.awsSsoOidcService, constants.appName,
+        this.keyChainService, this.awsCoreService, this.cliNativeService, this.awsSsoOidcService, constants.appName,
         constants.defaultRegion)
     }
 
@@ -92,7 +125,7 @@ export class LeappCoreService {
 
   get awsSsoOidcService(): AwsSsoOidcService {
     if (!this.awsSsoOidcServiceInstance) {
-      this.awsSsoOidcServiceInstance = new AwsSsoOidcService(this.verificationWindowService, this.repository)
+      this.awsSsoOidcServiceInstance = new AwsSsoOidcService(this.cliVerificationWindowService, this.repository)
     }
 
     return this.awsSsoOidcServiceInstance
@@ -102,7 +135,7 @@ export class LeappCoreService {
 
   get awsCoreService(): AwsCoreService {
     if (!this.awsCoreServiceInstance) {
-      this.awsCoreServiceInstance = new AwsCoreService(this.electronService)
+      this.awsCoreServiceInstance = new AwsCoreService(this.cliNativeService)
     }
 
     return this.awsCoreServiceInstance
@@ -147,7 +180,7 @@ export class LeappCoreService {
 
   get fileService(): FileService {
     if (!this.fileServiceInstance) {
-      this.fileServiceInstance = new FileService(this.electronService)
+      this.fileServiceInstance = new FileService(this.cliNativeService)
     }
 
     return this.fileServiceInstance
@@ -157,7 +190,7 @@ export class LeappCoreService {
 
   get repository(): Repository {
     if (!this.repositoryInstance) {
-      this.repositoryInstance = new Repository(this.electronService, this.fileService)
+      this.repositoryInstance = new Repository(this.cliNativeService, this.fileService)
     }
 
     return this.repositoryInstance
@@ -167,7 +200,7 @@ export class LeappCoreService {
 
   get keyChainService(): KeychainService {
     if (!this.keyChainServiceInstance) {
-      this.keyChainServiceInstance = new KeychainService(this.electronService)
+      this.keyChainServiceInstance = new KeychainService(this.cliNativeService)
     }
 
     return this.keyChainServiceInstance
@@ -177,7 +210,7 @@ export class LeappCoreService {
 
   get loggingService(): LoggingService {
     if (!this.loggingServiceInstance) {
-      this.loggingServiceInstance = new LoggingService(this.electronService)
+      this.loggingServiceInstance = new LoggingService(this.cliNativeService)
     }
 
     return this.loggingServiceInstance
@@ -197,7 +230,7 @@ export class LeappCoreService {
 
   get executeService(): ExecuteService {
     if (!this.executeServiceInstance) {
-      this.executeServiceInstance = new ExecuteService(this.electronService)
+      this.executeServiceInstance = new ExecuteService(this.cliNativeService)
     }
 
     return this.executeServiceInstance

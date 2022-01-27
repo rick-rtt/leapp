@@ -322,7 +322,7 @@ export class SessionCardComponent implements OnInit {
 
   getProfileName(profileId: string): string {
     const profileName = this.repository.getProfileName(profileId)
-    return profileName ? profileName : environment.defaultAwsProfileName
+    return profileName ? profileName : constants.defaultAwsProfileName
   }
 
   async changeProfile() {
@@ -360,7 +360,7 @@ export class SessionCardComponent implements OnInit {
   }
 
   getIcon(session: Session) {
-    const iconName = this.getProfileName(this.getProfileId(session)) === environment.defaultAwsProfileName ? 'home' : 'user'
+    const iconName = this.getProfileName(this.getProfileId(session)) === constants.defaultAwsProfileName ? 'home' : 'user'
     return session.status === SessionStatus.active ? `${iconName} orange` : iconName
   }
 

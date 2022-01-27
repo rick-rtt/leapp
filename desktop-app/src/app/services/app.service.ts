@@ -88,7 +88,7 @@ export class AppService {
   public async logout() {
     try {
       // Clear all extra data
-      const getAppPath = this.electronService.path.join(this.electronService.app.getPath('appData'), environment.appName)
+      const getAppPath = this.electronService.path.join(this.electronService.app.getPath('appData'), constants.appName)
       this.electronService.rimraf.sync(getAppPath + '/Partitions/leapp*')
 
       // Cleaning Library Electron Cache

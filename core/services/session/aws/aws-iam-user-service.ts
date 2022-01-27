@@ -15,6 +15,7 @@ import { ISessionNotifier } from '../../../interfaces/i-session-notifier'
 import { LeappNotFoundError } from '../../../errors/leapp-not-found-error'
 import { Credentials } from '../../../models/credentials'
 import { Repository } from '../../repository'
+import { IMfaCodePrompter } from '../../../interfaces/i-mfa-code-prompter'
 
 export interface AwsIamUserSessionRequest {
   accountName: string;
@@ -28,10 +29,6 @@ export interface GenerateSessionTokenCallingMfaParams {
   DurationSeconds: number;
   SerialNumber?: string;
   TokenCode?: string;
-}
-
-export interface IMfaCodePrompter {
-  promptForMFACode(sessionName: string, callback: any): void;
 }
 
 export class AwsIamUserService extends AwsSessionService {

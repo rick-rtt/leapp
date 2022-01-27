@@ -11,6 +11,7 @@ import { LeappCoreService } from '../../services/leapp-core.service'
 import { WindowService } from '../../services/window.service'
 import { AwsCoreService } from '@noovolari/leapp-core/services/aws-core-service'
 import { MessageToasterService, ToastLevel } from '../../services/message-toaster.service'
+import { constants } from '@noovolari/leapp-core/models/constants'
 
 @Component({
   selector: 'app-edit-account',
@@ -75,9 +76,9 @@ export class EditAccountComponent implements OnInit {
       this.selectedSession.sessionName = this.form.controls['name'].value
       this.selectedSession.region = this.selectedRegion
       this.selectedSession.mfaDevice = this.form.controls['mfaDevice'].value
-      this.keychainService.saveSecret(environment.appName, `${this.selectedSession.sessionId}-iam-user-aws-session-access-key-id`, this.form.controls['accessKey'].value).then(_ => {
+      this.keychainService.saveSecret(constants.appName, `${this.selectedSession.sessionId}-iam-user-aws-session-access-key-id`, this.form.controls['accessKey'].value).then(_ => {
       })
-      this.keychainService.saveSecret(environment.appName, `${this.selectedSession.sessionId}-iam-user-aws-session-secret-access-key`, this.form.controls['secretKey'].value).then(_ => {
+      this.keychainService.saveSecret(constants.appName, `${this.selectedSession.sessionId}-iam-user-aws-session-secret-access-key`, this.form.controls['secretKey'].value).then(_ => {
       })
 
       this.workspaceService.updateSession(this.selectedSession.sessionId, this.selectedSession)

@@ -27,6 +27,7 @@ import { SessionFactory } from '@noovolari/leapp-core/services/session-factory'
 import { WindowService } from '../../services/window.service'
 import { AzureCoreService } from '@noovolari/leapp-core/services/azure-core.service'
 import { AwsCoreService } from '@noovolari/leapp-core/services/aws-core-service'
+import { constants } from '@noovolari/leapp-core/models/constants'
 
 @Component({
   selector: 'app-create-account',
@@ -119,7 +120,7 @@ export class CreateAccountComponent implements OnInit {
       // We got all the applicable profiles
       // Note: we don't use azure profile so we remove default azure profile from the list
       this.repository.getProfiles().forEach(idp => {
-        if (idp !== null && idp.name !== environment.defaultAzureProfileName) {
+        if (idp !== null && idp.name !== constants.defaultAzureProfileName) {
           this.profiles.push({value: idp.id, label: idp.name})
         }
       })
@@ -144,8 +145,8 @@ export class CreateAccountComponent implements OnInit {
       this.locations = this.azureCoreService.getLocations()
 
       // Select default values
-      this.selectedRegion = this.repository.getDefaultRegion() || environment.defaultRegion || this.regions[0].region
-      this.selectedLocation = this.repository.getDefaultLocation() || environment.defaultLocation || this.locations[0].location
+      this.selectedRegion = this.repository.getDefaultRegion() || constants.defaultRegion || this.regions[0].region
+      this.selectedLocation = this.repository.getDefaultLocation() || constants.defaultLocation || this.locations[0].location
       this.selectedProfile = this.repository.getProfiles().filter(p => p.name === 'default').map(p => ({
         value: p.id,
         label: p.name

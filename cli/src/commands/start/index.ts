@@ -1,5 +1,5 @@
-import {Command, Flags} from '@oclif/core';
-import {awsIamUserService} from "../../bootstrap";
+import { Command, Flags } from '@oclif/core'
+import { LeappCLiService } from '../../service/leapp-cli.service'
 
 export default class Start extends Command {
   static description = 'Start Session'
@@ -15,12 +15,13 @@ export default class Start extends Command {
   //static args = [{name: '', description: '', required: true}]
 
   async run(): Promise<void> {
-    const parserOuput = await this.parse(Start)
+    const parserOutput = await this.parse(Start)
+    const leappCliService = new LeappCLiService()
 
     try {
-      await awsIamUserService.start(parserOuput.flags.sessionId);
+      await leappCliService.awsIamUserService.start(parserOutput.flags.sessionId)
     } catch (e: any) {
-      this.log(e);
+      this.log(e)
     }
   }
 }
