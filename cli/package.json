@@ -8,14 +8,13 @@
   },
   "bugs": "https://github.com/Noovolari/leapp/issues",
   "dependencies": {
-    "@noovolari/leapp-core": "file:../core/dist",
-    "@oclif/core": "^1",
-    "@oclif/plugin-help": "^5",
-    "@oclif/plugin-legacy": "^1.2.7",
-    "@oclif/plugin-plugins": "^2.0.1",
     "@babel/plugin-proposal-decorators": "^7.16.5",
     "@commitlint/cli": "^12.1.4",
     "@commitlint/config-conventional": "^12.1.4",
+    "@noovolari/leapp-core": "file:../core/dist",
+    "@oclif/core": "^1",
+    "@oclif/plugin-help": "^5",
+    "@oclif/plugin-plugins": "^2.0.1",
     "@types/jest": "~26.0.23",
     "@types/node": "^15.0.1",
     "@types/uuid": "^8.3.0",
@@ -66,12 +65,12 @@
     "eslint-config-oclif": "^4",
     "eslint-config-oclif-typescript": "^1.0.2",
     "globby": "^11",
+    "gushio": "~0.5.0",
     "mocha": "^9",
-    "oclif": "^2.0.0-main.10",
+    "oclif": "^2.4.0",
     "ts-node": "^10.2.1",
     "tslib": "^2.3.1",
-    "typescript": "^4.4.3",
-    "gushio": "~0.5.0"
+    "typescript": "^4.4.3"
   },
   "dirname": "oex",
   "engines": {
@@ -100,6 +99,9 @@
       "start": {
         "description": "Start Session"
       }
+    },
+    "macos": {
+      "identifier": "cloud.leapp"
     }
   },
   "repository": "noovolari/leapp",
