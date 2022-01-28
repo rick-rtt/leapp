@@ -15,6 +15,7 @@
     "@oclif/core": "^1",
     "@oclif/plugin-help": "^5",
     "@oclif/plugin-plugins": "^2.0.1",
+    "@types/inquirer": "^8.2.0",
     "@types/jest": "~26.0.23",
     "@types/node": "^15.0.1",
     "@types/uuid": "^8.3.0",
@@ -36,6 +37,7 @@
     "http-proxy-agent": "4.0.1",
     "https-proxy-agent": "5.0.0",
     "ini": "~2.0.0",
+    "inquirer": "^8.2.0",
     "is-url": "^1.2.4",
     "jwt-decode": "~3.1.2",
     "keytar": "7.7.0",
@@ -96,8 +98,8 @@
     ],
     "topicSeparator": " ",
     "topics": {
-      "start": {
-        "description": "Start Session"
+      "session": {
+        "description": "Permits to manage sessions"
       }
     },
     "macos": {
@@ -110,8 +112,12 @@
     "build": "gushio gushio/target-build.js",
     "test": "mocha --forbid-only \"test/**/*.test.ts\"",
     "prepack": "npm run build && oclif manifest && oclif readme",
+    "pack-mac": "oclif pack:macos",
+    "pack-linux": "oclif pack:deb",
+    "pack-win": "oclif pack:win",
     "postpack": "gushio gushio/target-post-pack.js",
-    "version": "oclif readme && git add README.md"
+    "version": "oclif readme && git add README.md",
+    "add-session": "./bin/dev session add"
   },
   "types": "dist/index.d.ts"
 }

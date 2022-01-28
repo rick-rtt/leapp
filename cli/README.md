@@ -20,7 +20,7 @@ $ npm install -g leapp
 $ leapp COMMAND
 running command...
 $ leapp (--version)
-leapp/0.1.0 darwin-x64 node-v16.13.2
+leapp/0.1.0 darwin-x64 node-v16.13.1
 $ leapp --help [COMMAND]
 USAGE
   $ leapp COMMAND
@@ -36,8 +36,9 @@ USAGE
 * [`leapp plugins:link PLUGIN`](#leapp-pluginslink-plugin)
 * [`leapp plugins:uninstall PLUGIN...`](#leapp-pluginsuninstall-plugin)
 * [`leapp plugins update`](#leapp-plugins-update)
-* [`leapp start`](#leapp-start)
-* [`leapp stop`](#leapp-stop)
+* [`leapp session add`](#leapp-session-add)
+* [`leapp session start`](#leapp-session-start)
+* [`leapp session stop`](#leapp-session-stop)
 
 ## `leapp help [COMMAND]`
 
@@ -205,43 +206,54 @@ DESCRIPTION
   Update installed plugins.
 ```
 
-## `leapp start`
+## `leapp session add`
 
-Start Session
+Add a new session
 
 ```
 USAGE
-  $ leapp start -i <value>
+  $ leapp session add
+
+DESCRIPTION
+  Add a new session
+
+EXAMPLES
+  $leapp add
+```
+
+## `leapp session start`
+
+Start a specific session
+
+```
+USAGE
+  $ leapp session start -i <value>
 
 FLAGS
   -i, --sessionId=<value>  (required) Session ID
 
 DESCRIPTION
-  Start Session
+  Start a specific session
 
 EXAMPLES
   $ oex start --sessionId 1234567890
 ```
 
-_See code: [dist/commands/start/index.ts](https://github.com/noovolari/leapp/blob/v0.1.0/dist/commands/start/index.ts)_
+## `leapp session stop`
 
-## `leapp stop`
-
-Stop Session
+Stop a specific session
 
 ```
 USAGE
-  $ leapp stop -i <value>
+  $ leapp session stop -i <value>
 
 FLAGS
   -i, --sessionId=<value>  (required) Session ID
 
 DESCRIPTION
-  Stop Session
+  Stop a specific session
 
 EXAMPLES
   $ oex stop --sessionId 1234567890
 ```
-
-_See code: [dist/commands/stop/index.ts](https://github.com/noovolari/leapp/blob/v0.1.0/dist/commands/stop/index.ts)_
 <!-- commandsstop -->

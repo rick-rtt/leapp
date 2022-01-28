@@ -1,3 +1,5 @@
+import { AccessMethod } from '../models/access-method'
+import { AccessMethodField } from '../models/access-method-field'
 import { SessionService } from './session/session.service'
 import { SessionType } from '../models/session-type'
 import { AwsIamRoleFederatedService } from './session/aws/aws-iam-role-federated-service'
@@ -27,6 +29,25 @@ export class SessionFactory {
         return this.awsSsoRoleService
       case SessionType.azure:
         return this.azureService
+    }
+  }
+
+  createSession(accessMethod: AccessMethod, sessionRequest: any): void {
+    const sessionService = this.getSessionService(accessMethod.sessionType)
+    sessionService
+
+    switch (accessMethod.sessionType) {
+      case SessionType.awsIamUser:
+        this.awsIamUserService.create(sessionRequest, '')
+        break
+      case SessionType.awsIamRoleFederated:
+        break
+      case SessionType.awsIamRoleChained:
+        break
+      case SessionType.awsSsoRole:
+        break
+      case SessionType.azure:
+        break
     }
   }
 }

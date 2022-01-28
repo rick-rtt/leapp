@@ -1,8 +1,9 @@
 import { Command, Flags } from '@oclif/core'
 import { LeappCLiService } from '../../service/leapp-cli.service'
 
+//TODO: this is not the real implementation, it's just a dummy version!
 export default class Start extends Command {
-  static description = 'Start Session'
+  static description = 'Start a specific session'
 
   static examples = [
     `$ oex start --sessionId 1234567890`,

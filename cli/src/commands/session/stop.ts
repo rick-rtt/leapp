@@ -1,8 +1,9 @@
 import { Command, Flags } from '@oclif/core'
 import { LeappCLiService } from '../../service/leapp-cli.service'
 
+//TODO: this is not the real implementation, it's just a dummy version!
 export default class Stop extends Command {
-  static description = 'Stop Session'
+  static description = 'Stop a specific session'
 
   static examples = [
     `$ oex stop --sessionId 1234567890`,

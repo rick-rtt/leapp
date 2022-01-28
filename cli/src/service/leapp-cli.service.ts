@@ -1,3 +1,4 @@
+import { CloudProviderService } from '@noovolari/leapp-core/services/cloud-provider.service'
 import { AwsIamUserService } from '@noovolari/leapp-core/services/session/aws/aws-iam-user-service'
 import { FileService } from '@noovolari/leapp-core/services/file-service'
 import { KeychainService } from '@noovolari/leapp-core/services/keychain-service'
@@ -131,17 +132,6 @@ export class LeappCLiService {
     return this.awsSsoOidcServiceInstance
   }
 
-  private awsCoreServiceInstance: AwsCoreService
-
-  get awsCoreService(): AwsCoreService {
-    if (!this.awsCoreServiceInstance) {
-      this.awsCoreServiceInstance = new AwsCoreService(this.cliNativeService)
-    }
-
-    return this.awsCoreServiceInstance
-  }
-
-
   private azureServiceInstance: AzureService
 
   get azureService(): AzureService {
@@ -255,6 +245,26 @@ export class LeappCLiService {
     }
 
     return this.retroCompatibilityServiceInstance
+  }
+
+  private cloudProviderServiceInstance: CloudProviderService
+
+  get cloudProviderService(): CloudProviderService {
+    if (!this.cloudProviderServiceInstance) {
+      this.cloudProviderServiceInstance = new CloudProviderService()
+    }
+
+    return this.cloudProviderServiceInstance
+  }
+
+  private awsCoreServiceInstance: AwsCoreService
+
+  get awsCoreService(): AwsCoreService {
+    if (!this.awsCoreServiceInstance) {
+      this.awsCoreServiceInstance = new AwsCoreService(this.cliNativeService)
+    }
+
+    return this.awsCoreServiceInstance
   }
 
   private azureCoreServiceInstance: AzureCoreService
