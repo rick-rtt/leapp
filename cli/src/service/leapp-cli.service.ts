@@ -251,7 +251,7 @@ export class LeappCLiService {
 
   get cloudProviderService(): CloudProviderService {
     if (!this.cloudProviderServiceInstance) {
-      this.cloudProviderServiceInstance = new CloudProviderService()
+      this.cloudProviderServiceInstance = new CloudProviderService(this.awsCoreService, this.repository)
     }
 
     return this.cloudProviderServiceInstance

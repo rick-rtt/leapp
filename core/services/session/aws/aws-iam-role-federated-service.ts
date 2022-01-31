@@ -1,23 +1,16 @@
-import { ISessionNotifier } from '../../../interfaces/i-session-notifier'
-import { CredentialsInfo } from '../../../models/credentials-info'
-import { Repository } from '../../repository'
-import { FileService } from '../../file-service'
-import { LeappSamlError } from '../../../errors/leapp-saml-error'
-import { LeappParseError } from '../../../errors/leapp-parse-error'
 import * as Aws from 'aws-sdk'
 import { LeappAwsStsError } from '../../../errors/leapp-aws-sts-error'
-import { AwsCoreService } from '../../aws-core-service'
-import { AwsSessionService } from './aws-session-service'
-import { AwsIamRoleFederatedSession } from '../../../models/aws-iam-role-federated-session'
+import { LeappParseError } from '../../../errors/leapp-parse-error'
+import { LeappSamlError } from '../../../errors/leapp-saml-error'
 import { IAwsAuthenticationService } from '../../../interfaces/i-aws-authentication.service'
-
-export interface AwsIamRoleFederatedSessionRequest {
-  accountName: string;
-  idpUrl: string;
-  idpArn: string;
-  roleArn: string;
-  region: string;
-}
+import { ISessionNotifier } from '../../../interfaces/i-session-notifier'
+import { AwsIamRoleFederatedSession } from '../../../models/aws-iam-role-federated-session'
+import { CredentialsInfo } from '../../../models/credentials-info'
+import { AwsCoreService } from '../../aws-core-service'
+import { FileService } from '../../file-service'
+import { Repository } from '../../repository'
+import { AwsIamRoleFederatedSessionRequest } from './aws-iam-role-federated-session-request'
+import { AwsSessionService } from './aws-session-service'
 
 export interface ResponseHookDetails {
   uploadData: { bytes: any[] }[];
@@ -51,14 +44,14 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
     }
   }
 
-  create(sessionRequest: AwsIamRoleFederatedSessionRequest, profileId: string): void {
+  async create(request: AwsIamRoleFederatedSessionRequest): Promise<void> {
     const session = new AwsIamRoleFederatedSession(
-      sessionRequest.accountName,
-      sessionRequest.region,
-      sessionRequest.idpUrl,
-      sessionRequest.idpArn,
-      sessionRequest.roleArn,
-      profileId)
+      request.sessionName,
+      request.region,
+      request.idpUrl,
+      request.idpArn,
+      request.roleArn,
+      request.profileId)
 
     this.repository.addSession(session)
     this.iSessionNotifier?.addSession(session)

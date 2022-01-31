@@ -1,29 +1,22 @@
-import { CredentialsInfo } from '../../../models/credentials-info'
-import { AwsIamUserSession } from '../../../models/aws-iam-user-session'
-import { KeychainService } from '../../keychain-service'
-import { Session } from '../../../models/session'
 import * as AWS from 'aws-sdk'
 import { GetSessionTokenResponse } from 'aws-sdk/clients/sts'
-import { constants } from '../../../models/constants'
 import { LeappAwsStsError } from '../../../errors/leapp-aws-sts-error'
-import { LeappParseError } from '../../../errors/leapp-parse-error'
 import { LeappMissingMfaTokenError } from '../../../errors/leapp-missing-mfa-token-error'
-import { FileService } from '../../file-service'
-import { AwsSessionService } from './aws-session-service'
-import { AwsCoreService } from '../../aws-core-service'
-import { ISessionNotifier } from '../../../interfaces/i-session-notifier'
 import { LeappNotFoundError } from '../../../errors/leapp-not-found-error'
-import { Credentials } from '../../../models/credentials'
-import { Repository } from '../../repository'
+import { LeappParseError } from '../../../errors/leapp-parse-error'
 import { IMfaCodePrompter } from '../../../interfaces/i-mfa-code-prompter'
-
-export interface AwsIamUserSessionRequest {
-  accountName: string;
-  accessKey: string;
-  secretKey: string;
-  region: string;
-  mfaDevice?: string;
-}
+import { ISessionNotifier } from '../../../interfaces/i-session-notifier'
+import { AwsIamUserSession } from '../../../models/aws-iam-user-session'
+import { constants } from '../../../models/constants'
+import { Credentials } from '../../../models/credentials'
+import { CredentialsInfo } from '../../../models/credentials-info'
+import { Session } from '../../../models/session'
+import { AwsCoreService } from '../../aws-core-service'
+import { FileService } from '../../file-service'
+import { KeychainService } from '../../keychain-service'
+import { Repository } from '../../repository'
+import { AwsIamUserSessionRequest } from './aws-iam-user-session-request'
+import { AwsSessionService } from './aws-session-service'
 
 export interface GenerateSessionTokenCallingMfaParams {
   DurationSeconds: number;
@@ -60,12 +53,12 @@ export class AwsIamUserService extends AwsSessionService {
     }
   }
 
-  create(accountRequest: AwsIamUserSessionRequest, profileId: string): void {
-    const session = new AwsIamUserSession(accountRequest.accountName, accountRequest.region, profileId, accountRequest.mfaDevice)
+  async create(request: AwsIamUserSessionRequest): Promise<void> {
+    const session = new AwsIamUserSession(request.sessionName, request.region, request.profileId, request.mfaDevice)
 
-    this.keychainService.saveSecret(constants.appName, `${session.sessionId}-iam-user-aws-session-access-key-id`, accountRequest.accessKey)
+    this.keychainService.saveSecret(constants.appName, `${session.sessionId}-iam-user-aws-session-access-key-id`, request.accessKey)
       .then((_: any) => {
-        this.keychainService.saveSecret(constants.appName, `${session.sessionId}-iam-user-aws-session-secret-access-key`, accountRequest.secretKey)
+        this.keychainService.saveSecret(constants.appName, `${session.sessionId}-iam-user-aws-session-secret-access-key`, request.secretKey)
           .catch((err: any) => console.error(err))
       })
       .catch((err: any) => console.error(err))

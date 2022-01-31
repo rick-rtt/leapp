@@ -2,27 +2,22 @@ import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core'
 import { FormControl, FormGroup, Validators } from '@angular/forms'
 
 import { ActivatedRoute, Router } from '@angular/router'
-import { environment } from '../../../environments/environment'
+import { AwsNamedProfile } from '@noovolari/leapp-core/models/aws-named-profile'
+import { AwsIamRoleChainedSessionRequest } from '@noovolari/leapp-core/services/session/aws/aws-iam-role-chained-session-request'
+import { AwsIamRoleFederatedSessionRequest } from '@noovolari/leapp-core/services/session/aws/aws-iam-role-federated-session-request'
+import { AwsIamUserSessionRequest } from '@noovolari/leapp-core/services/session/aws/aws-iam-user-session-request'
+import { AzureSessionRequest } from '@noovolari/leapp-core/services/session/azure/azure-session-request'
 import * as uuid from 'uuid'
 import { SessionType } from '@noovolari/leapp-core/models/session-type'
 import { Repository } from '@noovolari/leapp-core/services/repository'
 import { LoggerLevel, LoggingService } from '@noovolari/leapp-core/services/logging-service'
 import { WorkspaceService } from '@noovolari/leapp-core/services/workspace.service'
 import { LeappParseError } from '@noovolari/leapp-core/errors/leapp-parse-error'
-import {
-  AwsIamUserService,
-  AwsIamUserSessionRequest
-} from '@noovolari/leapp-core/services/session/aws/aws-iam-user-service'
-import {
-  AwsIamRoleFederatedService,
-  AwsIamRoleFederatedSessionRequest
-} from '@noovolari/leapp-core/services/session/aws/aws-iam-role-federated-service'
+import { AwsIamUserService } from '@noovolari/leapp-core/services/session/aws/aws-iam-user-service'
+import { AwsIamRoleFederatedService } from '@noovolari/leapp-core/services/session/aws/aws-iam-role-federated-service'
 import { LeappCoreService } from '../../services/leapp-core.service'
-import {
-  AwsIamRoleChainedService,
-  AwsIamRoleChainedSessionRequest
-} from '@noovolari/leapp-core/services/session/aws/aws-iam-role-chained-service'
-import { AzureService, AzureSessionRequest } from '@noovolari/leapp-core/services/session/azure/azure.service'
+import { AwsIamRoleChainedService } from '@noovolari/leapp-core/services/session/aws/aws-iam-role-chained-service'
+import { AzureService } from '@noovolari/leapp-core/services/session/azure/azure.service'
 import { SessionFactory } from '@noovolari/leapp-core/services/session-factory'
 import { WindowService } from '../../services/window.service'
 import { AzureCoreService } from '@noovolari/leapp-core/services/azure-core.service'
@@ -251,43 +246,46 @@ export class CreateAccountComponent implements OnInit {
    *
    * @private
    */
-  private createSession() {
+  private async createSession() {
     const sessionService = this.sessionFactory.getSessionService(this.sessionType)
     if (sessionService instanceof AwsIamRoleFederatedService) {
       const awsFederatedAccountRequest: AwsIamRoleFederatedSessionRequest = {
-        accountName: this.form.value.name.trim(),
+        sessionName: this.form.value.name.trim(),
         region: this.selectedRegion,
         idpUrl: this.selectedIdpUrl.value.trim(),
         idpArn: this.form.value.idpArn.trim(),
-        roleArn: this.form.value.roleArn.trim()
+        roleArn: this.form.value.roleArn.trim(),
+        profileId: this.selectedProfile.value
       }
-      sessionService.create(awsFederatedAccountRequest, this.selectedProfile.value)
+      await sessionService.create(awsFederatedAccountRequest)
     } else if (sessionService instanceof AwsIamUserService) {
       const awsIamUserSessionRequest: AwsIamUserSessionRequest = {
-        accountName: this.form.value.name.trim(),
+        sessionName: this.form.value.name.trim(),
         region: this.selectedRegion,
         accessKey: this.form.value.accessKey.trim(),
         secretKey: this.form.value.secretKey.trim(),
-        mfaDevice: this.form.value.mfaDevice.trim()
+        mfaDevice: this.form.value.mfaDevice.trim(),
+        profileId: this.selectedProfile.value
       }
-      sessionService.create(awsIamUserSessionRequest, this.selectedProfile.value)
+      await sessionService.create(awsIamUserSessionRequest)
     } else if (sessionService instanceof AwsIamRoleChainedService) {
       const awsIamRoleChainedAccountRequest: AwsIamRoleChainedSessionRequest = {
-        accountName: this.form.value.name.trim(),
+        sessionName: this.form.value.name.trim(),
         region: this.selectedRegion,
         roleArn: this.form.value.roleArn.trim(),
         roleSessionName: this.form.value.roleSessionName.trim(),
-        parentSessionId: this.selectedSession.sessionId
+        parentSessionId: this.selectedSession.sessionId,
+        profileId: this.selectedProfile.value
       }
-      sessionService.create(awsIamRoleChainedAccountRequest, this.selectedProfile.value)
+      await sessionService.create(awsIamRoleChainedAccountRequest)
     } else if (sessionService instanceof AzureService) {
       const azureSessionRequest: AzureSessionRequest = {
-        region: this.selectedLocation,
         sessionName: this.form.value.name,
+        region: this.selectedLocation,
         subscriptionId: this.form.value.subscriptionId,
         tenantId: this.form.value.tenantId
       }
-      sessionService.create(azureSessionRequest)
+      await sessionService.create(azureSessionRequest)
     }
   }
 
@@ -316,7 +314,7 @@ export class CreateAccountComponent implements OnInit {
    */
   private addProfileToWorkspace() {
     try {
-      const profile = {id: this.selectedProfile.value, name: this.selectedProfile.label}
+      const profile = new AwsNamedProfile(this.selectedProfile.value, this.selectedProfile.label)
       if (!this.repository.getProfileName(profile.id)) {
         this.repository.addProfile(profile)
       }

@@ -1,5 +1,5 @@
 import { AccessMethod } from '../models/access-method'
-import { AccessMethodField } from '../models/access-method-field'
+import { CreateSessionRequest } from './session/create-session-request'
 import { SessionService } from './session/session.service'
 import { SessionType } from '../models/session-type'
 import { AwsIamRoleFederatedService } from './session/aws/aws-iam-role-federated-service'
@@ -9,16 +9,15 @@ import { AwsIamRoleChainedService } from './session/aws/aws-iam-role-chained-ser
 import { AwsSsoRoleService } from './session/aws/aws-sso-role-service'
 
 export class SessionFactory {
-  constructor(
-    private readonly awsIamUserService: AwsIamUserService,
-    private readonly awsIamRoleFederatedService: AwsIamRoleFederatedService,
-    private readonly awsIamRoleChainedService: AwsIamRoleChainedService,
-    private readonly awsSsoRoleService: AwsSsoRoleService,
-    private readonly azureService: AzureService) {
+  public constructor(private readonly awsIamUserService: AwsIamUserService,
+              private readonly awsIamRoleFederatedService: AwsIamRoleFederatedService,
+              private readonly awsIamRoleChainedService: AwsIamRoleChainedService,
+              private readonly awsSsoRoleService: AwsSsoRoleService,
+              private readonly azureService: AzureService) {
   }
 
-  getSessionService(accountType: SessionType): SessionService {
-    switch (accountType) {
+  public getSessionService(sessionType: SessionType): SessionService {
+    switch (sessionType) {
       case SessionType.awsIamUser:
         return this.awsIamUserService
       case SessionType.awsIamRoleFederated:
@@ -32,22 +31,8 @@ export class SessionFactory {
     }
   }
 
-  createSession(accessMethod: AccessMethod, sessionRequest: any): void {
-    const sessionService = this.getSessionService(accessMethod.sessionType)
-    sessionService
-
-    switch (accessMethod.sessionType) {
-      case SessionType.awsIamUser:
-        this.awsIamUserService.create(sessionRequest, '')
-        break
-      case SessionType.awsIamRoleFederated:
-        break
-      case SessionType.awsIamRoleChained:
-        break
-      case SessionType.awsSsoRole:
-        break
-      case SessionType.azure:
-        break
-    }
+  public createSession(sessionType: SessionType, sessionRequest: CreateSessionRequest): void {
+    const sessionService = this.getSessionService(sessionType)
+    //sessionService.create(sessionRequest)
   }
 }

@@ -1,25 +1,18 @@
-import { AwsSessionService } from './aws-session-service'
 import * as AWS from 'aws-sdk'
-import { ISessionNotifier } from '../../../interfaces/i-session-notifier'
+import { AssumeRoleResponse } from 'aws-sdk/clients/sts'
 import { LeappAwsStsError } from '../../../errors/leapp-aws-sts-error'
 import { LeappNotFoundError } from '../../../errors/leapp-not-found-error'
-import { AssumeRoleResponse } from 'aws-sdk/clients/sts'
+import { ISessionNotifier } from '../../../interfaces/i-session-notifier'
 import { AwsIamRoleChainedSession } from '../../../models/aws-iam-role-chained-session'
 import { CredentialsInfo } from '../../../models/credentials-info'
-import { FileService } from '../../file-service'
 import { Session } from '../../../models/session'
-import { AwsIamUserService } from './aws-iam-user-service'
 import { AwsCoreService } from '../../aws-core-service'
-import { AwsParentSessionFactory } from './aws-parent-session.factory'
+import { FileService } from '../../file-service'
 import { Repository } from '../../repository'
-
-export interface AwsIamRoleChainedSessionRequest {
-  accountName: string;
-  region: string;
-  roleArn: string;
-  roleSessionName?: string;
-  parentSessionId: string;
-}
+import { AwsIamRoleChainedSessionRequest } from './aws-iam-role-chained-session-request'
+import { AwsIamUserService } from './aws-iam-user-service'
+import { AwsParentSessionFactory } from './aws-parent-session.factory'
+import { AwsSessionService } from './aws-session-service'
 
 export class AwsIamRoleChainedService extends AwsSessionService {
   public constructor(iSessionNotifier: ISessionNotifier, repository: Repository, private awsCoreService: AwsCoreService,
@@ -41,9 +34,9 @@ export class AwsIamRoleChainedService extends AwsSessionService {
     }
   }
 
-  create(sessionRequest: AwsIamRoleChainedSessionRequest, profileId: string): void {
-    const session = new AwsIamRoleChainedSession(sessionRequest.accountName, sessionRequest.region,
-      sessionRequest.roleArn, profileId, sessionRequest.parentSessionId, sessionRequest.roleSessionName)
+  async create(request: AwsIamRoleChainedSessionRequest): Promise<void> {
+    const session = new AwsIamRoleChainedSession(request.sessionName, request.region,
+      request.roleArn, request.profileId, request.parentSessionId, request.roleSessionName)
 
     this.repository.addSession(session)
     this.iSessionNotifier?.addSession(session)

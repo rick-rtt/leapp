@@ -70,11 +70,14 @@ export class AwsSsoComponent implements OnInit, BrowserWindowClosing {
       )
 
       try {
+        const defaultProfileId = this.repository.getDefaultProfileId()
         const ssoRoleSessions: SsoRoleSession[] = await this.awsSsoRoleService.sync()
-        ssoRoleSessions.forEach(ssoRoleSession => {
-          this.awsSsoRoleService.create(ssoRoleSession, this.repository.getDefaultProfileId())
-        })
-        this.router.navigate(['/sessions', 'session-selected'])
+        for (const ssoRoleSession of ssoRoleSessions) {
+          ssoRoleSession.profileId = defaultProfileId
+          await this.awsSsoRoleService.create(ssoRoleSession)
+        }
+
+        await this.router.navigate(['/sessions', 'session-selected'])
         this.loadingInBrowser = false
         this.loadingInApp = false
       } catch (err) {
@@ -95,10 +98,11 @@ export class AwsSsoComponent implements OnInit, BrowserWindowClosing {
   async forceSync() {
     try {
       const ssoRoleSessions: SsoRoleSession[] = await this.awsSsoRoleService.sync()
-      ssoRoleSessions.forEach(ssoRoleSession => {
-        this.awsSsoRoleService.create(ssoRoleSession, ssoRoleSession.profileId)
-      })
-      this.router.navigate(['/sessions', 'session-selected'])
+      for (const ssoRoleSession of ssoRoleSessions) {
+        await this.awsSsoRoleService.create(ssoRoleSession)
+      }
+
+      await this.router.navigate(['/sessions', 'session-selected'])
       this.loadingInBrowser = false
       this.loadingInApp = false
     } catch (err) {

@@ -7,26 +7,20 @@ import SSO, {
   LogoutRequest,
   RoleInfo
 } from 'aws-sdk/clients/sso'
-
-import { AwsSessionService } from './aws-session-service'
-import { AwsSsoOidcService } from './aws-sso-oidc.service'
+import { BrowserWindowClosing } from '../../../interfaces/i-browser-window-closing'
+import { INativeService } from '../../../interfaces/i-native-service'
 import { ISessionNotifier } from '../../../interfaces/i-session-notifier'
 import { AwsSsoRoleSession } from '../../../models/aws-sso-role-session'
 import { CredentialsInfo } from '../../../models/credentials-info'
-import { Repository } from '../../repository'
-import { FileService } from '../../file-service'
-import { AwsCoreService } from '../../aws-core-service'
-import { KeychainService } from '../../keychain-service'
 import { SessionType } from '../../../models/session-type'
-import { INativeService } from '../../../interfaces/i-native-service'
-import { BrowserWindowClosing } from '../../../interfaces/i-browser-window-closing'
+import { AwsCoreService } from '../../aws-core-service'
+import { FileService } from '../../file-service'
+import { KeychainService } from '../../keychain-service'
+import { Repository } from '../../repository'
 
-export interface AwsSsoRoleSessionRequest {
-  sessionName: string;
-  region: string;
-  email: string;
-  roleArn: string;
-}
+import { AwsSessionService } from './aws-session-service'
+import { AwsSsoOidcService } from './aws-sso-oidc.service'
+import { AwsSsoRoleSessionRequest } from './aws-sso-role-session-request'
 
 export interface GenerateSSOTokenResponse {
   accessToken: string;
@@ -105,9 +99,10 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
     }
   }
 
-  create(accountRequest: AwsSsoRoleSessionRequest, profileId: string): void {
-    const session = new AwsSsoRoleSession(accountRequest.sessionName, accountRequest.region, accountRequest.roleArn,
-      profileId, accountRequest.email)
+  async create(request: AwsSsoRoleSessionRequest): Promise<void> {
+    const session = new AwsSsoRoleSession(request.sessionName, request.region, request.roleArn, request.profileId,
+      request.email)
+
     this.repository.addSession(session)
     this.iSessionNotifier?.addSession(session)
   }

@@ -1,18 +1,12 @@
-import { SessionService } from '../session.service'
-import { ISessionNotifier } from '../../../interfaces/i-session-notifier'
-import { AzureSession } from '../../../models/azure-session'
-import { Repository } from '../../repository'
-import { ExecuteService } from '../../execute.service'
 import { LeappExecuteError } from '../../../errors/leapp-execute-error'
 import { LeappParseError } from '../../../errors/leapp-parse-error'
+import { ISessionNotifier } from '../../../interfaces/i-session-notifier'
+import { AzureSession } from '../../../models/azure-session'
+import { ExecuteService } from '../../execute.service'
 import { FileService } from '../../file-service'
-
-export interface AzureSessionRequest {
-  sessionName: string;
-  region: string;
-  subscriptionId: string;
-  tenantId: string;
-}
+import { Repository } from '../../repository'
+import { SessionService } from '../session.service'
+import { AzureSessionRequest } from './azure-session-request'
 
 export interface AzureSessionToken {
   tokenType: string;
@@ -34,7 +28,7 @@ export class AzureService extends SessionService {
     super(iSessionNotifier, repository)
   }
 
-  create(sessionRequest: AzureSessionRequest): void {
+  async create(sessionRequest: AzureSessionRequest): Promise<void> {
     const session = new AzureSession(sessionRequest.sessionName, sessionRequest.region,
       sessionRequest.subscriptionId, sessionRequest.tenantId)
     this.repository.addSession(session)
