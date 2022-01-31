@@ -11,16 +11,16 @@ import * as uuid from 'uuid'
 import { SessionType } from '@noovolari/leapp-core/models/session-type'
 import { Repository } from '@noovolari/leapp-core/services/repository'
 import { LoggerLevel, LoggingService } from '@noovolari/leapp-core/services/logging-service'
-import { WorkspaceService } from '@noovolari/leapp-core/services/workspace.service'
+import { WorkspaceService } from '@noovolari/leapp-core/services/workspace-service'
 import { LeappParseError } from '@noovolari/leapp-core/errors/leapp-parse-error'
 import { AwsIamUserService } from '@noovolari/leapp-core/services/session/aws/aws-iam-user-service'
 import { AwsIamRoleFederatedService } from '@noovolari/leapp-core/services/session/aws/aws-iam-role-federated-service'
 import { LeappCoreService } from '../../services/leapp-core.service'
 import { AwsIamRoleChainedService } from '@noovolari/leapp-core/services/session/aws/aws-iam-role-chained-service'
-import { AzureService } from '@noovolari/leapp-core/services/session/azure/azure.service'
+import { AzureService } from '@noovolari/leapp-core/services/session/azure/azure-service'
 import { SessionFactory } from '@noovolari/leapp-core/services/session-factory'
 import { WindowService } from '../../services/window.service'
-import { AzureCoreService } from '@noovolari/leapp-core/services/azure-core.service'
+import { AzureCoreService } from '@noovolari/leapp-core/services/azure-core-service'
 import { AwsCoreService } from '@noovolari/leapp-core/services/aws-core-service'
 import { constants } from '@noovolari/leapp-core/models/constants'
 
@@ -170,11 +170,11 @@ export class CreateAccountComponent implements OnInit {
   /**
    * Save the first account in the workspace
    */
-  saveSession() {
+  async saveSession() {
     this.loggingService.logger(`Saving account...`, LoggerLevel.info, this)
     this.addProfileToWorkspace()
     this.saveNewSsoRolesToWorkspace()
-    this.createSession()
+    await this.createSession()
     this.router.navigate(['/sessions', 'session-selected']).then(_ => {
     })
   }
@@ -315,7 +315,7 @@ export class CreateAccountComponent implements OnInit {
   private addProfileToWorkspace() {
     try {
       const profile = new AwsNamedProfile(this.selectedProfile.value, this.selectedProfile.label)
-      if (!this.repository.getProfileName(profile.id)) {
+      if (!this.repository.doesProfileExist(profile.id)) {
         this.repository.addProfile(profile)
       }
     } catch (err) {

@@ -1,4 +1,4 @@
-import { CloudProviderService } from '@noovolari/leapp-core/services/cloud-provider.service'
+import { CloudProviderService } from '@noovolari/leapp-core/services/cloud-provider-service'
 import { AwsIamUserService } from '@noovolari/leapp-core/services/session/aws/aws-iam-user-service'
 import { FileService } from '@noovolari/leapp-core/services/file-service'
 import { KeychainService } from '@noovolari/leapp-core/services/keychain-service'
@@ -6,26 +6,26 @@ import { AwsCoreService } from '@noovolari/leapp-core/services/aws-core-service'
 import { LoggingService } from '@noovolari/leapp-core/services/logging-service'
 import { TimerService } from '@noovolari/leapp-core/services/timer-service'
 import { AwsIamRoleFederatedService } from '@noovolari/leapp-core/services/session/aws/aws-iam-role-federated-service'
-import { AzureService } from '@noovolari/leapp-core/services/session/azure/azure.service'
-import { ExecuteService } from '@noovolari/leapp-core/services/execute.service'
-import { RetroCompatibilityService } from '@noovolari/leapp-core/services/retro-compatibility.service'
+import { AzureService } from '@noovolari/leapp-core/services/session/azure/azure-service'
+import { ExecuteService } from '@noovolari/leapp-core/services/execute-service'
+import { RetroCompatibilityService } from '@noovolari/leapp-core/services/retro-compatibility-service'
 import { AwsParentSessionFactory } from '@noovolari/leapp-core/services/session/aws/aws-parent-session.factory'
 import { AwsIamRoleChainedService } from '@noovolari/leapp-core/services/session/aws/aws-iam-role-chained-service'
 import { Repository } from '@noovolari/leapp-core/services/repository'
 import { AwsSsoOidcService } from '@noovolari/leapp-core/services/session/aws/aws-sso-oidc.service'
 import { AwsSsoRoleService } from '@noovolari/leapp-core/services/session/aws/aws-sso-role-service'
-import { WorkspaceService } from '@noovolari/leapp-core/services/workspace.service'
+import { WorkspaceService } from '@noovolari/leapp-core/services/workspace-service'
 import { SessionFactory } from '@noovolari/leapp-core/services/session-factory'
-import { RotationService } from '@noovolari/leapp-core/services/rotation.service'
-import { AzureCoreService } from '@noovolari/leapp-core/services/azure-core.service'
-import { CliMfaCodePromptService } from './cli-mfa-code-prompt.service'
-import { CliAwsAuthenticationService } from './cli-aws-authentication.service'
-import { CliVerificationWindowService } from './cli-verification-window.service'
+import { RotationService } from '@noovolari/leapp-core/services/rotation-service'
+import { AzureCoreService } from '@noovolari/leapp-core/services/azure-core-service'
+import { CliMfaCodePromptService } from './cli-mfa-code-prompt-service'
+import { CliAwsAuthenticationService } from './cli-aws-authentication-service'
+import { CliVerificationWindowService } from './cli-verification-window-service'
 import { CliNativeService } from './cli-native-service'
 import { constants } from '@noovolari/leapp-core/models/constants'
 
 
-export class LeappCLiService {
+export class LeappCliService {
 
   private cliNativeServiceInstance: CliNativeService
 

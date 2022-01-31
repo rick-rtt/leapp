@@ -3,7 +3,7 @@ import { AppService } from './app.service'
 import { CredentialsInfo } from '@noovolari/leapp-core/models/credentials-info'
 import { LeappBaseError } from '@noovolari/leapp-core/errors/leapp-base-error'
 import { LoggerLevel, LoggingService } from '@noovolari/leapp-core/services/logging-service'
-import { ExecuteService } from '@noovolari/leapp-core/services/execute.service'
+import { ExecuteService } from '@noovolari/leapp-core/services/execute-service'
 import { LeappCoreService } from './leapp-core.service'
 
 const AWS = require('aws-sdk')

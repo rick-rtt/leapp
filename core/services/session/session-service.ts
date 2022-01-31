@@ -2,6 +2,7 @@ import { Session } from '../../models/session'
 import { SessionStatus } from '../../models/session-status'
 import { Repository } from '../repository'
 import { ISessionNotifier } from '../../interfaces/i-session-notifier'
+import { CreateSessionRequest } from './create-session-request'
 
 export abstract class SessionService {
 
@@ -88,7 +89,7 @@ export abstract class SessionService {
     throw error
   }
 
-  abstract create(sessionRequest: any): Promise<void>
+  abstract create(sessionRequest: CreateSessionRequest): Promise<void>
 
   abstract start(sessionId: string): Promise<void>
 

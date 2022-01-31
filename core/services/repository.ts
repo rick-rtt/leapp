@@ -1,14 +1,14 @@
-import { AwsNamedProfile } from '../models/aws-named-profile'
-import { Workspace } from '../models/workspace'
-import { Session } from '../models/session'
 import { deserialize, serialize } from 'class-transformer'
-import { FileService } from './file-service'
-import { constants } from '../models/constants'
-import { SessionStatus } from '../models/session-status'
-import { SessionType } from '../models/session-type'
-import { AwsIamRoleChainedSession } from '../models/aws-iam-role-chained-session'
 import { LeappNotFoundError } from '../errors/leapp-not-found-error'
 import { INativeService } from '../interfaces/i-native-service'
+import { AwsIamRoleChainedSession } from '../models/aws-iam-role-chained-session'
+import { AwsNamedProfile } from '../models/aws-named-profile'
+import { constants } from '../models/constants'
+import { Session } from '../models/session'
+import { SessionStatus } from '../models/session-status'
+import { SessionType } from '../models/session-type'
+import { Workspace } from '../models/workspace'
+import { FileService } from './file-service'
 
 export class Repository {
   // Private singleton workspace
@@ -156,12 +156,15 @@ export class Repository {
   }
 
   getProfileName(profileId: string): string {
-    const workspace = this.getWorkspace()
-    const profileFiltered = workspace.profiles.find(profile => profile.id === profileId)
+    const profileFiltered = this.getWorkspace().profiles.find(profile => profile.id === profileId)
     if (profileFiltered === undefined) {
       throw new LeappNotFoundError(this, `named profile with id ${profileId} not found.`)
     }
     return profileFiltered.name
+  }
+
+  doesProfileExist(profileId: string): boolean{
+    return this.getWorkspace().profiles.find(profile => profile.id === profileId) !== undefined
   }
 
   getDefaultProfileId(): string {

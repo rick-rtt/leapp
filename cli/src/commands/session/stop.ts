@@ -1,5 +1,5 @@
 import { Command, Flags } from '@oclif/core'
-import { LeappCLiService } from '../../service/leapp-cli.service'
+import { LeappCliService } from '../../service/leapp-cli-service'
 
 //TODO: this is not the real implementation, it's just a dummy version!
 export default class Stop extends Command {
@@ -17,7 +17,7 @@ export default class Stop extends Command {
 
   async run(): Promise<void> {
     const parserOutput = await this.parse(Stop)
-    const leappCliService = new LeappCLiService()
+    const leappCliService = new LeappCliService()
 
     try {
       await leappCliService.awsIamUserService.stop(parserOutput.flags.sessionId)

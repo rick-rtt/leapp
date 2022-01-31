@@ -2,15 +2,14 @@ import { Component, Input, OnInit, TemplateRef, ViewChild } from '@angular/core'
 import { AppService } from '../../../services/app.service'
 import { Router } from '@angular/router'
 import { SsmService } from '../../../services/ssm.service'
-import { environment } from '../../../../environments/environment'
 import * as uuid from 'uuid'
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal'
-import { SessionService } from '@noovolari/leapp-core/services/session/session.service'
+import { SessionService } from '@noovolari/leapp-core/services/session/session-service'
 import { Session } from '@noovolari/leapp-core/models/session'
 import { SessionType } from '@noovolari/leapp-core/models/session-type'
 import { SessionStatus } from '@noovolari/leapp-core/models/session-status'
 import { Repository } from '@noovolari/leapp-core/services/repository'
-import { WorkspaceService } from '@noovolari/leapp-core/services/workspace.service'
+import { WorkspaceService } from '@noovolari/leapp-core/services/workspace-service'
 import { constants } from '@noovolari/leapp-core/models/constants'
 import { AwsIamRoleFederatedSession } from '@noovolari/leapp-core/models/aws-iam-role-federated-session'
 import { AwsIamUserService } from '@noovolari/leapp-core/services/session/aws/aws-iam-user-service'
@@ -19,7 +18,7 @@ import { AwsSessionService } from '@noovolari/leapp-core/services/session/aws/aw
 import { LeappCoreService } from '../../../services/leapp-core.service'
 import { SessionFactory } from '@noovolari/leapp-core/services/session-factory'
 import { WindowService } from '../../../services/window.service'
-import { AzureCoreService } from '@noovolari/leapp-core/services/azure-core.service'
+import { AzureCoreService } from '@noovolari/leapp-core/services/azure-core-service'
 import { AwsCoreService } from '@noovolari/leapp-core/services/aws-core-service'
 import { MessageToasterService, ToastLevel } from '../../../services/message-toaster.service'
 
@@ -329,7 +328,7 @@ export class SessionCardComponent implements OnInit {
     if (this.selectedProfile) {
       let wasActive = false
 
-      if (!this.repository.getProfileName(this.selectedProfile.id)) {
+      if (!this.repository.doesProfileExist(this.selectedProfile.id)) {
         this.repository.addProfile(this.selectedProfile)
       }
 

@@ -4,7 +4,7 @@ import { HttpClient } from '@angular/common/http'
 import { BsModalService } from 'ngx-bootstrap/modal'
 import { Workspace } from '@noovolari/leapp-core/models/Workspace'
 import { Repository } from '@noovolari/leapp-core/services/repository'
-import { WorkspaceService } from '@noovolari/leapp-core/services/workspace.service'
+import { WorkspaceService } from '@noovolari/leapp-core/services/workspace-service'
 import { LeappCoreService } from '../../../services/leapp-core.service'
 import { AwsCoreService } from '@noovolari/leapp-core/services/aws-core-service'
 

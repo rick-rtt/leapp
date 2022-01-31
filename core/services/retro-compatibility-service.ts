@@ -5,7 +5,7 @@ import { AwsIamRoleChainedSession } from '../models/aws-iam-role-chained-session
 import { AwsSsoRoleSession } from '../models/aws-sso-role-session'
 import { AzureSession } from '../models/azure-session'
 import { FileService } from './file-service'
-import { WorkspaceService } from './workspace.service'
+import { WorkspaceService } from './workspace-service'
 import { KeychainService } from './keychain-service'
 import { constants } from '../models/constants'
 import { AwsIamUserSession } from '../models/aws-iam-user-session'

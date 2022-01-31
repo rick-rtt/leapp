@@ -2,7 +2,7 @@ import { Component, OnInit, Renderer2 } from '@angular/core'
 import { AppService } from '../../../services/app.service'
 import { Router } from '@angular/router'
 import { LoggerLevel, LoggingService } from '@noovolari/leapp-core/services/logging-service'
-import { WorkspaceService } from '@noovolari/leapp-core/services/workspace.service'
+import { WorkspaceService } from '@noovolari/leapp-core/services/workspace-service'
 import { LeappCoreService } from '../../../services/leapp-core.service'
 
 @Component({

@@ -2,10 +2,10 @@ import { LeappExecuteError } from '../../../errors/leapp-execute-error'
 import { LeappParseError } from '../../../errors/leapp-parse-error'
 import { ISessionNotifier } from '../../../interfaces/i-session-notifier'
 import { AzureSession } from '../../../models/azure-session'
-import { ExecuteService } from '../../execute.service'
+import { ExecuteService } from '../../execute-service'
 import { FileService } from '../../file-service'
 import { Repository } from '../../repository'
-import { SessionService } from '../session.service'
+import { SessionService } from '../session-service'
 import { AzureSessionRequest } from './azure-session-request'
 
 export interface AzureSessionToken {

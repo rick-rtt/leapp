@@ -1,7 +1,7 @@
 import { AccessMethod } from '@noovolari/leapp-core/models/access-method'
 import { Command } from '@oclif/core'
 import inquirer from 'inquirer'
-import { LeappCLiService } from '../../service/leapp-cli.service'
+import { LeappCliService } from '../../service/leapp-cli-service'
 
 export default class AddSession extends Command {
   static description = 'Add a new session'
@@ -18,7 +18,7 @@ export default class AddSession extends Command {
   static args = [{name: '', description: '', required: true}]*/
 
   async run(): Promise<void> {
-    const leappCliService = new LeappCLiService()
+    const leappCliService = new LeappCliService()
 
     const availableCloudProviders = leappCliService.cloudProviderService.availableCloudProviders()
     const cloudProviderAnswer: any = await inquirer.prompt([{
