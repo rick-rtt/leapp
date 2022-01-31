@@ -11,7 +11,7 @@
     "experimentalDecorators": true,
     "lib": ["ES2019", "DOM"],
     "module": "ES2020",
-    "moduleResolution": "node",
+    "moduleResolution": "Node",
     "sourceMap": true,
     "target": "ES2019",
     "typeRoots": ["../node_modules/@types"],
@@ -28,6 +28,7 @@
     "src/**/*.ts"
   ],
   "exclude": [
+    "./gushio/**",
     "src/test.ts",
     "src/**/*.spec.ts",
     "src/base-injectables.ts",
