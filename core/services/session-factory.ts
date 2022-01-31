@@ -31,8 +31,8 @@ export class SessionFactory {
     }
   }
 
-  public createSession(sessionType: SessionType, sessionRequest: CreateSessionRequest): void {
+  public async createSession(sessionType: SessionType, sessionRequest: CreateSessionRequest): Promise<void> {
     const sessionService = this.getSessionService(sessionType)
-    //sessionService.create(sessionRequest)
+    await sessionService.create(sessionRequest)
   }
 }

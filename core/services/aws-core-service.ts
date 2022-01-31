@@ -68,7 +68,7 @@ export class AwsCoreService {
     }
   }
 
-  getRegions() {
+  getRegions(): { region: string }[] {
     const regionKeys = [...AwsCoreService.stsEndpointsPerRegion.keys()]
     return regionKeys.map(key => {
       return {region: key}

@@ -43,7 +43,7 @@ export default class AddSession extends Command {
         name: field.creationRequestField,
         message: field.message,
         type: field.type,
-        choices: field.choices
+        choices: field.choices?.map(choice => ({name: choice.fieldName, value: choice.fieldValue}))
       }])
       fieldValuesMap.set(field.creationRequestField, sessionNameAnswer[field.creationRequestField])
     }
