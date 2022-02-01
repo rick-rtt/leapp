@@ -23,7 +23,7 @@ export class CloudProviderService {
     return this.map.get(cloudProviderType)
   }
 
-  public get map(): Map<CloudProviderType, AccessMethod[]> {
+  private get map(): Map<CloudProviderType, AccessMethod[]> {
     const awsRegionChoices = this.getAwsRegionChoices()
     const awsNamedProfileChoices = this.getAwsNamedProfileChoices()
     const awsSessionChoices = this.getAwsSessionChoices()
@@ -54,13 +54,6 @@ export class CloudProviderService {
           new AccessMethodField('parentSessionId', 'Select Assumer Session', AccessMethodFieldType.list, awsSessionChoices),
           new AccessMethodField('roleSessionName', 'Role Session Name', AccessMethodFieldType.input),
           new AccessMethodField('profileId', 'Select the Named Profile', AccessMethodFieldType.list, awsNamedProfileChoices),
-        ]),
-        new AccessMethod(SessionType.awsSsoRole, 'Single Sign-On', [
-          new AccessMethodField('sessionName', 'Insert session alias', AccessMethodFieldType.input),
-          new AccessMethodField('region', 'Select region', AccessMethodFieldType.list, awsRegionChoices),
-          new AccessMethodField('roleArn', 'Insert Role ARN', AccessMethodFieldType.input),
-          new AccessMethodField('email', 'Insert E-mail', AccessMethodFieldType.input),
-          new AccessMethodField('profileId', 'Select the Named Profile', AccessMethodFieldType.list, awsNamedProfileChoices)
         ])
       ]],
       [CloudProviderType.AZURE, [

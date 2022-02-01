@@ -72,6 +72,7 @@ export class EditAccountComponent implements OnInit {
    */
   saveAccount() {
     if (this.form.valid) {
+      //TODO: move into session service
       this.selectedSession.sessionName = this.form.controls['name'].value
       this.selectedSession.region = this.selectedRegion
       this.selectedSession.mfaDevice = this.form.controls['mfaDevice'].value

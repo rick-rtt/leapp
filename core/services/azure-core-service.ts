@@ -1,12 +1,8 @@
 import { AzureLocation } from './azure-location'
 
-export class AzureCoreService{
+export class AzureCoreService {
 
   public constructor() {
-  }
-
-  public isAzure(session): boolean {
-    return session.subscriptionId !== null && session.subscriptionId !== undefined
   }
 
   public getLocations(): AzureLocation[] {
