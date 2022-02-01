@@ -77,4 +77,30 @@ describe('add session', () => {
     expect(leappCliService.sessionFactory.createSession).toHaveBeenCalledWith('sessionType', 'sessionCreationRequest')
     expect(command.log).toHaveBeenCalledWith('Session added')
   })
+
+  test('chooseCloudProvider', async () => {
+    const leappCliService: any = {
+      cloudProviderService: {
+        availableCloudProviders: () => {
+          return [CloudProviderType.AWS]
+        }
+      }
+    }
+
+    const inquirer: any = {
+      prompt: async (params: any) => {
+        expect(params).toEqual([{
+          'name': 'selectedProvider',
+          'message': 'select a provider',
+          'type': 'list',
+          'choices': [{'name': 'aws'}],
+        }])
+        return {selectedProvider: 'aws'}
+      }
+    }
+
+    const command = new AddSession([], {} as any, inquirer, leappCliService)
+    const selectedCloudProvider = await command.chooseCloudProvider()
+    expect(selectedCloudProvider).toBe('aws')
+  })
 })
