@@ -223,20 +223,17 @@ EXAMPLES
 
 ## `leapp session start`
 
-Start a specific session
+Start session
 
 ```
 USAGE
-  $ leapp session start -i <value>
-
-FLAGS
-  -i, --sessionId=<value>  (required) Session ID
+  $ leapp session start
 
 DESCRIPTION
-  Start a specific session
+  Start session
 
 EXAMPLES
-  $ oex start --sessionId 1234567890
+  $leapp session start
 ```
 
 ## `leapp session stop`

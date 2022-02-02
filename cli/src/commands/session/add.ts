@@ -2,18 +2,35 @@ import { AccessMethod } from '@noovolari/leapp-core/models/access-method'
 import { CloudProviderType } from '@noovolari/leapp-core/models/cloud-provider-type'
 import { Command } from '@oclif/core'
 import { Config } from '@oclif/core/lib/config/config'
-import inquirerDep from 'inquirer'
 import { LeappCliService } from '../../service/leapp-cli-service'
 
-export default class AddSession extends Command {
-  static description = 'Add a new session'
 
+async function callAction(command: Command, action: () => void) {
+  try {
+    await action()
+  } catch (error) {
+    command.error(error instanceof Error ? error.message : `Unknown error: ${error}`)
+  }
+}
+
+abstract class LeappCommand extends Command {
+
+  async callAction(action: () => void) {
+    try {
+      await action()
+    } catch (error) {
+      this.error(error instanceof Error ? error.message : `Unknown error: ${error}`)
+    }
+  }
+}
+
+export default class AddSession extends LeappCommand {
+  static description = 'Add a new session'
   static examples = [
     '$leapp session add',
   ]
 
   constructor(argv: string[], config: Config,
-              private inquirer: inquirerDep.Inquirer = inquirerDep,
               private leappCliService = new LeappCliService()) {
     super(argv, config)
   }
@@ -22,11 +39,14 @@ export default class AddSession extends Command {
     const selectedCloudProvider = await this.chooseCloudProvider()
     const selectedAccessMethod = await this.chooseAccessMethod(selectedCloudProvider)
     const selectedParams = await this.chooseAccessMethodParams(selectedAccessMethod)
-    try {
+
+    await callAction(this, async () => {
       await this.createSession(selectedAccessMethod, selectedParams)
-    } catch (error) {
-      this.error(error instanceof Error ? error.message : `Unknown error: ${error}`)
-    }
+    })
+    
+    await this.callAction(async () => {
+      await this.createSession(selectedAccessMethod, selectedParams)
+    })
   }
 
   public async createSession(accessMethod: AccessMethod, selectedParams: Map<string, string>): Promise<void> {
@@ -37,7 +57,7 @@ export default class AddSession extends Command {
 
   public async chooseCloudProvider(): Promise<CloudProviderType> {
     const availableCloudProviders = this.leappCliService.cloudProviderService.availableCloudProviders()
-    const cloudProviderAnswer: any = await this.inquirer.prompt([{
+    const cloudProviderAnswer: any = await this.leappCliService.inquirer.prompt([{
       name: 'selectedProvider',
       message: 'select a provider',
       type: 'list',
@@ -48,7 +68,7 @@ export default class AddSession extends Command {
 
   public async chooseAccessMethod(cloudProviderType: CloudProviderType): Promise<AccessMethod> {
     const accessMethods = this.leappCliService.cloudProviderService.availableAccessMethods(cloudProviderType)
-    const accessMethodAnswer: any = await this.inquirer.prompt([{
+    const accessMethodAnswer: any = await this.leappCliService.inquirer.prompt([{
       name: 'selectedMethod',
       message: 'select an access method',
       type: 'list',
@@ -60,7 +80,7 @@ export default class AddSession extends Command {
   public async chooseAccessMethodParams(selectedAccessMethod: AccessMethod): Promise<Map<string, string>> {
     const fieldValuesMap = new Map<string, string>()
     for (const field of selectedAccessMethod.accessMethodFields) {
-      const fieldAnswer: any = await this.inquirer.prompt([{
+      const fieldAnswer: any = await this.leappCliService.inquirer.prompt([{
         name: field.creationRequestField,
         message: field.message,
         type: field.type,

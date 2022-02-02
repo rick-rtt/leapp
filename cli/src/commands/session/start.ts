@@ -1,28 +1,34 @@
-import { Command, Flags } from '@oclif/core'
+import { Command } from '@oclif/core'
 import { LeappCliService } from '../../service/leapp-cli-service'
+import { Config } from '@oclif/core/lib/config/config'
+import { Session } from '@noovolari/leapp-core/models/session'
+import { SessionStatus } from '@noovolari/leapp-core/models/session-status'
 
-//TODO: this is not the real implementation, it's just a dummy version!
 export default class Start extends Command {
-  static description = 'Start a specific session'
+  static description = 'Start session'
 
   static examples = [
-    `$ oex start --sessionId 1234567890`,
+    `$leapp session start`,
   ]
 
-  static flags = {
-    sessionId: Flags.string({char: 'i', description: 'Session ID', required: true}),
+  constructor(argv: string[], config: Config,
+              private leappCliService = new LeappCliService()) {
+    super(argv, config)
   }
 
-  //static args = [{name: '', description: '', required: true}]
-
   async run(): Promise<void> {
-    const parserOutput = await this.parse(Start)
-    const leappCliService = new LeappCliService()
-
+    const selectedSession = await this.leappCliService.cliSessionSelectionService
+      .chooseSession(session => session.status === SessionStatus.inactive)
     try {
-      await leappCliService.awsIamUserService.start(parserOutput.flags.sessionId)
-    } catch (e: any) {
-      this.log(e)
+      await this.startSession(selectedSession)
+    } catch (error) {
+      this.error(error instanceof Error ? error.message : `Unknown error: ${error}`)
     }
+  }
+
+  public async startSession(session: Session): Promise<void> {
+    const sessionService = this.leappCliService.sessionFactory.getSessionService(session.type)
+    await sessionService.start(session.sessionId)
+    this.log('Session started')
   }
 }

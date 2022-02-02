@@ -92,7 +92,7 @@ export abstract class SessionService {
   abstract create(sessionRequest: CreateSessionRequest): Promise<void>
 
   abstract start(sessionId: string): Promise<void>
-ia
+
   abstract rotate(sessionId: string): Promise<void>
 
   abstract stop(sessionId: string): Promise<void>

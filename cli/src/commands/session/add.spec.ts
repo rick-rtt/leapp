@@ -9,22 +9,21 @@ describe('add session', () => {
         availableCloudProviders: () => {
           return [CloudProviderType.AWS]
         }
+      },
+      inquirer: {
+        prompt: async (params: any) => {
+          expect(params).toEqual([{
+            'name': 'selectedProvider',
+            'message': 'select a provider',
+            'type': 'list',
+            'choices': [{'name': 'aws'}],
+          }])
+          return {selectedProvider: 'aws'}
+        }
       }
     }
 
-    const inquirer: any = {
-      prompt: async (params: any) => {
-        expect(params).toEqual([{
-          'name': 'selectedProvider',
-          'message': 'select a provider',
-          'type': 'list',
-          'choices': [{'name': 'aws'}],
-        }])
-        return {selectedProvider: 'aws'}
-      }
-    }
-
-    const command = new AddSession([], {} as any, inquirer, leappCliService)
+    const command = new AddSession([], {} as any, leappCliService)
     const selectedCloudProvider = await command.chooseCloudProvider()
     expect(selectedCloudProvider).toBe('aws')
   })
@@ -35,22 +34,23 @@ describe('add session', () => {
         availableAccessMethods: () => {
           return [{label: 'IAmUser'}]
         }
+      },
+      inquirer: {
+        prompt: (param: any) => {
+          expect(param).toEqual([
+            {
+              'choices': [{'name': 'IAmUser', 'value': {'label': 'IAmUser'}}],
+              'message': 'select an access method',
+              'name': 'selectedMethod',
+              'type': 'list'
+            }
+          ])
+          return {selectedMethod: 'Method'}
+        }
       }
     }
-    const inquier: any = {
-      prompt: (param: any) => {
-        expect(param).toEqual([
-          {
-            'choices': [{'name': 'IAmUser', 'value': {'label': 'IAmUser'}}],
-            'message': 'select an access method',
-            'name': 'selectedMethod',
-            'type': 'list'
-          }
-        ])
-        return {selectedMethod: 'Method'}
-      }
-    }
-    const command = new AddSession([], {} as any, inquier, leappCliService)
+
+    const command = new AddSession([], {} as any, leappCliService)
     const accessMethod = await command.chooseAccessMethod(CloudProviderType.AWS)
     expect(accessMethod).toStrictEqual('Method')
   })
@@ -66,19 +66,21 @@ describe('add session', () => {
         }
       ]
     }
-    const inquier: any = {
-      prompt: (params: any) => {
-        expect(params).toStrictEqual([{
-          name: 'field',
-          message: 'message',
-          type: 'type',
-          choices: [{name: 'choice1', value: 'choice1value'}]
-        }])
-        return {field: {name: 'choice1', value: 'choice1value'}}
+    const leappCliService: any = {
+      inquirer: {
+        prompt: (params: any) => {
+          expect(params).toStrictEqual([{
+            name: 'field',
+            message: 'message',
+            type: 'type',
+            choices: [{name: 'choice1', value: 'choice1value'}]
+          }])
+          return {field: {name: 'choice1', value: 'choice1value'}}
+        }
       }
     }
 
-    const command = new AddSession([], {} as any, inquier, undefined)
+    const command = new AddSession([], {} as any, leappCliService)
     const map = await command.chooseAccessMethodParams(selectedAccessMethod)
     expect(map).toEqual(expectedMap)
   })
@@ -93,7 +95,7 @@ describe('add session', () => {
     }
 
     const leappCliService: any = {sessionFactory: {createSession: jest.fn()}}
-    const command = new AddSession([], {} as any, undefined, leappCliService)
+    const command = new AddSession([], {} as any, leappCliService)
     command.log = jest.fn()
 
     await command.createSession(accessMethod, selectedParams)
@@ -110,14 +112,14 @@ describe('add session', () => {
   })
 
   test('run - createSession throws undefined object', async () => {
-    await runCommand({hello:'randomObj'}, 'Unknown error: [object Object]')
+    await runCommand({hello: 'randomObj'}, 'Unknown error: [object Object]')
   })
 
-  async function runCommand(errorToThrow: any, expectedErrorMessage: string){
+  async function runCommand(errorToThrow: any, expectedErrorMessage: string) {
     const cloudProvider = 'cloudProvider'
     const accessMethod = 'accessMethod'
     const params = 'params'
-    const command = new AddSession([], {} as any, undefined, undefined)
+    const command = new AddSession([], {} as any, undefined)
     command.chooseCloudProvider = jest.fn(async (): Promise<any> => {
       return cloudProvider
     })
@@ -128,7 +130,7 @@ describe('add session', () => {
       return params
     })
     command.createSession = jest.fn(async (): Promise<void> => {
-      if(errorToThrow){
+      if (errorToThrow) {
         throw errorToThrow
       }
     })
@@ -136,8 +138,7 @@ describe('add session', () => {
     let occurredError
     try {
       await command.run()
-    }
-    catch (error){
+    } catch (error) {
       occurredError = error
     }
 
@@ -145,7 +146,7 @@ describe('add session', () => {
     expect(command.chooseAccessMethod).toHaveBeenCalledWith(cloudProvider)
     expect(command.chooseAccessMethodParams).toHaveBeenCalledWith(accessMethod)
     expect(command.createSession).toHaveBeenCalledWith(accessMethod, params)
-    if (errorToThrow){
+    if (errorToThrow) {
       expect(occurredError).toEqual(new Error(expectedErrorMessage))
     }
   }
