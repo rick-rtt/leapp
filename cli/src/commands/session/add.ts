@@ -68,6 +68,7 @@ export default class AddSession extends Command {
       }])
       fieldValuesMap.set(field.creationRequestField, fieldAnswer[field.creationRequestField])
     }
+
     return fieldValuesMap
   }
 }
