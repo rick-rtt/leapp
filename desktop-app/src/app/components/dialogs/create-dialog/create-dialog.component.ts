@@ -19,6 +19,13 @@ import {WindowService} from '../../../services/window.service';
 import {
   AwsIamRoleFederatedSessionRequest
 } from '@noovolari/leapp-core/services/session/aws/aws-iam-role-federated-session-request';
+import {AwsIamUserSessionRequest} from "@noovolari/leapp-core/services/session/aws/aws-iam-user-session-request";
+import {
+  AwsIamRoleChainedSessionRequest
+} from "@noovolari/leapp-core/services/session/aws/aws-iam-role-chained-session-request";
+import {AzureSessionRequest} from "@noovolari/leapp-core/services/session/azure/azure-session-request";
+import {MessageToasterService, ToastLevel} from "../../../services/message-toaster.service";
+import {LeappParseError} from "@noovolari/leapp-core/errors/leapp-parse-error";
 
 @Component({
   selector: 'app-create-dialog',
@@ -96,7 +103,8 @@ export class CreateDialogComponent implements OnInit {
     private loggingService: LoggingService,
     private bsModalService: BsModalService,
     private leappCoreService: LeappCoreService,
-    private windowService: WindowService
+    private windowService: WindowService,
+    private messageToasterService: MessageToasterService
   ) {}
 
   ngOnInit() {
@@ -308,33 +316,36 @@ export class CreateDialogComponent implements OnInit {
       switch (this.sessionType) {
         case (SessionType.awsIamRoleFederated):
           const awsFederatedAccountRequest: AwsIamRoleFederatedSessionRequest = {
-            accountName: this.form.value.name.trim(),
+            sessionName: this.form.value.name.trim(),
             region: this.selectedRegion,
             idpUrl: this.selectedIdpUrl.value.trim(),
             idpArn: this.form.value.idpArn.trim(),
-            roleArn: this.form.value.roleArn.trim()
+            roleArn: this.form.value.roleArn.trim(),
+            profileId: this.selectedProfile.value
           };
-          this.awsIamRoleFederatedService.create(awsFederatedAccountRequest, this.selectedProfile.value);
+          this.awsIamRoleFederatedService.create(awsFederatedAccountRequest);
           break;
         case (SessionType.awsIamUser):
           const awsIamUserSessionRequest: AwsIamUserSessionRequest = {
-            accountName: this.form.value.name.trim(),
+            sessionName: this.form.value.name.trim(),
             region: this.selectedRegion,
             accessKey: this.form.value.accessKey.trim(),
             secretKey: this.form.value.secretKey.trim(),
-            mfaDevice: this.form.value.mfaDevice.trim()
+            mfaDevice: this.form.value.mfaDevice.trim(),
+            profileId: this.selectedProfile.value
           };
-          this.awsIamUserService.create(awsIamUserSessionRequest, this.selectedProfile.value);
+          this.awsIamUserService.create(awsIamUserSessionRequest);
           break;
         case (SessionType.awsIamRoleChained):
           const awsIamRoleChainedAccountRequest: AwsIamRoleChainedSessionRequest = {
-            accountName: this.form.value.name.trim(),
+            sessionName: this.form.value.name.trim(),
             region: this.selectedRegion,
             roleArn: this.form.value.roleArn.trim(),
             roleSessionName: this.form.value.roleSessionName.trim(),
-            parentSessionId: this.selectedSession.sessionId
+            parentSessionId: this.selectedSession.sessionId,
+            profileId: this.selectedProfile.value
           };
-          this.awsIamRoleChainedService.create(awsIamRoleChainedAccountRequest, this.selectedProfile.value);
+          this.awsIamRoleChainedService.create(awsIamRoleChainedAccountRequest);
           break;
         case (SessionType.azure):
           const azureSessionRequest: AzureSessionRequest = {
@@ -347,10 +358,10 @@ export class CreateDialogComponent implements OnInit {
           break;
       }
 
-      this.appService.toast(`Session: ${this.form.value.name}, created.`, ToastLevel.success, '');
+      this.messageToasterService.toast(`Session: ${this.form.value.name}, created.`, ToastLevel.success, '');
       this.closeModal();
     } else {
-      this.appService.toast(`Session is missing some required properties, please fill them.`, ToastLevel.warn, '');
+      this.messageToasterService.toast(`Session is missing some required properties, please fill them.`, ToastLevel.warn, '');
     }
   }
 
@@ -363,8 +374,8 @@ export class CreateDialogComponent implements OnInit {
     if(this.sessionType === SessionType.awsIamRoleFederated) {
       try {
         const ipdUrl = { id: this.selectedIdpUrl.value, url: this.selectedIdpUrl.label };
-        if(!this.workspaceService.getIdpUrl(ipdUrl.id)) {
-          this.workspaceService.addIdpUrl(ipdUrl);
+        if(!this.leappCoreService.repository.getIdpUrl(ipdUrl.id)) {
+          this.leappCoreService.repository.addIdpUrl(ipdUrl);
         }
       } catch(err) {
         throw new LeappParseError(this, err.message);
@@ -380,14 +391,12 @@ export class CreateDialogComponent implements OnInit {
   private addProfileToWorkspace() {
     try {
       const profile = { id: this.selectedProfile.value, name: this.selectedProfile.label };
-      if(!this.workspaceService.getProfileName(profile.id)) {
-        this.workspaceService.addProfile(profile);
+      if(!this.leappCoreService.repository.getProfileName(profile.id)) {
+        this.leappCoreService.repository.addProfile(profile);
       }
     } catch(err) {
       throw new LeappParseError(this, err.message);
     }
   }
-
-
 }
 
