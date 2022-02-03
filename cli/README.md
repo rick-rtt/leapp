@@ -78,7 +78,7 @@ EXAMPLES
   $ leapp plugins
 ```
 
-_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v2.0.12/src/commands/plugins/index.ts)_
+_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v2.1.0/src/commands/plugins/index.ts)_
 
 ## `leapp plugins:inspect PLUGIN...`
 
@@ -218,25 +218,22 @@ DESCRIPTION
   Add a new session
 
 EXAMPLES
-  $leapp add
+  $leapp session add
 ```
 
 ## `leapp session start`
 
-Start a specific session
+Start session
 
 ```
 USAGE
-  $ leapp session start -i <value>
-
-FLAGS
-  -i, --sessionId=<value>  (required) Session ID
+  $ leapp session start
 
 DESCRIPTION
-  Start a specific session
+  Start session
 
 EXAMPLES
-  $ oex start --sessionId 1234567890
+  $leapp session start
 ```
 
 ## `leapp session stop`

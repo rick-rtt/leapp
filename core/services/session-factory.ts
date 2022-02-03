@@ -1,4 +1,3 @@
-import { AccessMethod } from '../models/access-method'
 import { CreateSessionRequest } from './session/create-session-request'
 import { SessionService } from './session/session-service'
 import { SessionType } from '../models/session-type'

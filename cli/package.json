@@ -16,7 +16,6 @@
     "@oclif/plugin-help": "^5",
     "@oclif/plugin-plugins": "^2.0.1",
     "@types/inquirer": "^8.2.0",
-    "@types/jest": "~26.0.23",
     "@types/node": "^15.0.1",
     "@types/uuid": "^8.3.0",
     "assert": "2.0.0",
@@ -57,18 +56,16 @@
     "zlib": "~1.0.5"
   },
   "devDependencies": {
-    "@oclif/test": "^2",
-    "@types/chai": "^4",
-    "@types/crypto-js": "^4.0.2",
-    "@types/mocha": "^9.0.0",
+    "@babel/preset-env": "^7.16.5",
+    "@babel/preset-typescript": "^7.16.5",
+    "@types/jest": "^27.4.0",
     "@types/node": "^16.9.4",
-    "chai": "^4",
     "eslint": "^7.32.0",
     "eslint-config-oclif": "^4",
     "eslint-config-oclif-typescript": "^1.0.2",
     "globby": "^11",
     "gushio": "~0.5.0",
-    "mocha": "^9",
+    "jest": "^27.4.5",
     "oclif": "^2.4.0",
     "ts-node": "^10.2.1",
     "tslib": "^2.3.1",
@@ -110,14 +107,14 @@
   "scripts": {
     "clean": "gushio gushio/target-clean.js",
     "build": "gushio gushio/target-build.js",
-    "test": "mocha --forbid-only \"test/**/*.test.ts\"",
+    "test": "jest",
     "prepack": "npm run build && oclif manifest && oclif readme",
     "pack-mac": "oclif pack:macos",
     "pack-linux": "oclif pack:deb",
     "pack-win": "oclif pack:win",
     "postpack": "gushio gushio/target-post-pack.js",
     "version": "oclif readme && git add README.md",
-    "add-session": "./bin/dev session add"
+    "start-session": "./bin/dev session start"
   },
   "types": "dist/index.d.ts"
 }

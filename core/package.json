@@ -7,7 +7,7 @@
     "@babel/plugin-proposal-decorators": "^7.16.5",
     "@commitlint/cli": "^12.1.4",
     "@commitlint/config-conventional": "^12.1.4",
-    "@types/jest": "~26.0.23",
+    "@types/jest": "^27.4.0",
     "@types/node": "^15.0.1",
     "@types/uuid": "^8.3.0",
     "assert": "2.0.0",

@@ -1,28 +1,34 @@
-import { Command, Flags } from '@oclif/core'
+import { Command } from '@oclif/core'
 import { LeappCliService } from '../../service/leapp-cli-service'
+import { Config } from '@oclif/core/lib/config/config'
+import { Session } from '@noovolari/leapp-core/models/session'
+import { SessionStatus } from '@noovolari/leapp-core/models/session-status'
 
-//TODO: this is not the real implementation, it's just a dummy version!
 export default class Stop extends Command {
-  static description = 'Stop a specific session'
+  static description = 'Stop session'
 
   static examples = [
-    `$ oex stop --sessionId 1234567890`,
+    `$leapp session stop`,
   ]
 
-  static flags = {
-    sessionId: Flags.string({char: 'i', description: 'Session ID', required: true}),
+  constructor(argv: string[], config: Config,
+              private leappCliService = new LeappCliService()) {
+    super(argv, config)
   }
 
-  //static args = [{name: '', description: '', required: true}]
-
   async run(): Promise<void> {
-    const parserOutput = await this.parse(Stop)
-    const leappCliService = new LeappCliService()
-
+    const selectedSession = await this.leappCliService.cliSessionSelectionService
+      .chooseSession(session => session.status === SessionStatus.active ||  session.status === SessionStatus.pending)
     try {
-      await leappCliService.awsIamUserService.stop(parserOutput.flags.sessionId)
-    } catch (e: any) {
-      this.log(e)
+      await this.stopSession(selectedSession)
+    } catch (error) {
+      this.error(error instanceof Error ? error.message : `Unknown error: ${error}`)
     }
+  }
+
+  public async stopSession(session: Session): Promise<void> {
+    const sessionService = this.leappCliService.sessionFactory.getSessionService(session.type)
+    await sessionService.stop(session.sessionId)
+    this.log('Session stopped')
   }
 }

@@ -174,6 +174,7 @@ export class AwsIamUserService extends AwsSessionService {
     return new Promise((resolve, reject) => {
       // TODO: think about timeout management
       // TODO: handle condition in which mfaCodePrompter is null
+      // TODO: convert promptForMFACode into an async function (without callback...)!
       this.mfaCodePrompter.promptForMFACode(session.sessionName, (value: string) => {
         if (value !== constants.confirmClosed) {
           params.SerialNumber = (session as AwsIamUserSession).mfaDevice

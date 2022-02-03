@@ -14,8 +14,6 @@ export abstract class AwsSessionService extends SessionService {
   }
 
   async start(sessionId: string): Promise<void> {
-    console.log(`${JSON.stringify(this.repository.getSessions())}`);
-
     try {
       if (this.isThereAnotherPendingSessionWithSameNamedProfile(sessionId)) {
         throw new LeappBaseError('Pending session with same named profile', this, LoggerLevel.info, 'Pending session with same named profile');

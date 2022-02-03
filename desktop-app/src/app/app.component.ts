@@ -1,18 +1,24 @@
-import {Component, OnInit} from '@angular/core';
-import {environment} from '../environments/environment';
-import {AppService} from './services/app.service';
-import {Router} from '@angular/router';
-import {UpdaterService} from './services/updater.service';
+import { Component, OnInit } from '@angular/core';
+import { environment } from '../environments/environment';
+import { AppService } from './services/app.service';
+import { Router } from '@angular/router';
+import { setTheme } from 'ngx-bootstrap/utils';
+import { UpdaterService } from './services/updater.service';
 import compareVersions from 'compare-versions';
-import {ElectronService} from './services/electron.service';
-import {LeappCoreService} from './services/leapp-core.service';
-import {LoggerLevel} from '@noovolari/leapp-core/services/logging-service';
-import {Workspace} from '@noovolari/leapp-core/models/workspace';
-import {constants} from '@noovolari/leapp-core/models/constants';
-import {LeappParseError} from '@noovolari/leapp-core/errors/leapp-parse-error';
-import {WindowService} from './services/window.service';
-import {setTheme} from 'ngx-bootstrap/utils';
-import {RetroCompatibilityService} from '@noovolari/leapp-core/services/retro-compatibility-service';
+import { LoggerLevel, LoggingService } from '@noovolari/leapp-core/services/logging-service';
+import { Repository } from '@noovolari/leapp-core/services/repository';
+import { WorkspaceService } from '@noovolari/leapp-core/services/workspace-service';
+import { LeappParseError } from '@noovolari/leapp-core/errors/leapp-parse-error';
+import { TimerService } from '@noovolari/leapp-core/services/timer-service';
+import { constants } from '@noovolari/leapp-core/models/constants';
+import { FileService } from '@noovolari/leapp-core/services/file-service';
+import { AwsCoreService } from '@noovolari/leapp-core/services/aws-core-service';
+import { RetroCompatibilityService } from '@noovolari/leapp-core/services/retro-compatibility-service';
+import { LeappCoreService } from './services/leapp-core.service';
+import { SessionFactory } from '@noovolari/leapp-core/services/session-factory';
+import { RotationService } from '@noovolari/leapp-core/services/rotation-service';
+import { WindowService } from './services/window.service';
+import { ElectronService } from './services/electron.service';
 
 @Component({
   selector: 'app-root',
@@ -20,22 +26,37 @@ import {RetroCompatibilityService} from '@noovolari/leapp-core/services/retro-co
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
+
+  private fileService: FileService;
+  private repository: Repository;
+  private awsCoreService: AwsCoreService;
+  private loggingService: LoggingService;
+  private timerService: TimerService;
+  private sessionServiceFactory: SessionFactory;
+  private workspaceService: WorkspaceService;
+  private retroCompatibilityService: RetroCompatibilityService;
+  private rotationService: RotationService;
+
   /* Main app file: launches the Angular framework inside Electron app */
-  constructor(
-    public app: AppService,
-    private router: Router,
-    private updaterService: UpdaterService,
-    private electronService: ElectronService,
-    private leappCoreService: LeappCoreService,
-    private windowService: WindowService,
-    private retrocompatibilityService: RetroCompatibilityService
-  ) {}
+  constructor(private appService: AppService, private router: Router, private updaterService: UpdaterService,
+              private windowService: WindowService, private electronService: ElectronService,
+              leappCoreService: LeappCoreService) {
+    this.repository = leappCoreService.repository;
+    this.fileService = leappCoreService.fileService;
+    this.awsCoreService = leappCoreService.awsCoreService;
+    this.loggingService = leappCoreService.loggingService;
+    this.timerService = leappCoreService.timerService;
+    this.sessionServiceFactory = leappCoreService.sessionFactory;
+    this.workspaceService = leappCoreService.workspaceService;
+    this.retroCompatibilityService = leappCoreService.retroCompatibilityService;
+    this.rotationService = leappCoreService.rotationService;
+  }
 
   async ngOnInit() {
     // We get the right moment to set an hook to app close
-    const ipc = this.electronService.ipcRenderer;
-    ipc.on('app-close', () => {
-      this.leappCoreService.loggingService.logger('Preparing for closing instruction...', LoggerLevel.info, this);
+    const ipcRenderer = this.electronService.ipcRenderer;
+    ipcRenderer.on('app-close', () => {
+      this.loggingService.logger('Preparing for closing instruction...', LoggerLevel.info, this);
       this.beforeCloseInstructions();
     });
 
@@ -57,34 +78,34 @@ export class AppComponent implements OnInit {
 
     // Before retrieving an actual copy of the workspace we
     // check and in case apply, our retro compatibility service
-    if (this.retrocompatibilityService.isRetroPatchNecessary()) {
-      await this.retrocompatibilityService.adaptOldWorkspaceFile();
+    if (this.retroCompatibilityService.isRetroPatchNecessary()) {
+      await this.retroCompatibilityService.adaptOldWorkspaceFile();
     }
 
-    if (this.retrocompatibilityService.isIntegrationPatchNecessary()) {
-      await this.retrocompatibilityService.adaptIntegrationPatch();
+    if (this.retroCompatibilityService.isIntegrationPatchNecessary()) {
+      await this.retroCompatibilityService.adaptIntegrationPatch();
     }
 
     let workspace;
     try {
-      workspace = this.leappCoreService.repository.getWorkspace();
+      workspace = this.repository.getWorkspace();
     } catch {
       throw new LeappParseError(this, 'We had trouble parsing your Leapp-lock.json file. It is either corrupt, obsolete, or with an error.');
     }
 
     // Check the existence of a pre-Leapp credential file and make a backup
-    this.showCredentialBackupMessageIfNeeded(workspace);
+    this.showCredentialBackupMessageIfNeeded();
 
     // All sessions start stopped when app is launched
-    if (workspace.sessions.length > 0) {
-      workspace.sessions.forEach((sess) => {
-        const concreteSessionService = this.leappCoreService.sessionFactory.getSessionService(sess.type);
+    if (this.workspaceService.sessions.length > 0) {
+      this.workspaceService.sessions.forEach((sess) => {
+        const concreteSessionService = this.sessionServiceFactory.getSessionService(sess.type);
         concreteSessionService.stop(sess.sessionId);
       });
     }
 
-    // Start Global Timer (1s)
-    this.leappCoreService.timerService.start(this.leappCoreService.rotationService.rotate.bind(this.leappCoreService.rotationService));
+    // Start Global Timer
+    this.timerService.start(this.rotationService.rotate.bind(this.rotationService));
 
     // Launch Auto Updater Routines
     this.manageAutoUpdate();
@@ -96,7 +117,7 @@ export class AppComponent implements OnInit {
   }
 
   closeAllRightClickMenus() {
-    this.app.closeAllMenuTriggers();
+    this.appService.closeAllMenuTriggers();
   }
 
   /**
@@ -104,42 +125,43 @@ export class AppComponent implements OnInit {
    */
   private beforeCloseInstructions() {
     // Check if we are here
-    this.leappCoreService.loggingService.logger('Closing app with cleaning process...', LoggerLevel.info, this);
+    this.loggingService.logger('Closing app with cleaning process...', LoggerLevel.info, this);
 
     // We need the Try/Catch as we have a the possibility to call the method without sessions
     try {
       // Clean the config file
-      this.leappCoreService.awsCoreService.cleanCredentialFile();
+      this.awsCoreService.cleanCredentialFile();
     } catch (err) {
-      this.leappCoreService.loggingService.logger('No sessions to stop, skipping...', LoggerLevel.error, this, err.stack);
+      this.loggingService.logger('No sessions to stop, skipping...', LoggerLevel.error, this, err.stack);
     }
 
     // Finally quit
-    this.app.quit();
+    this.appService.quit();
   }
 
   /**
    * Show that we created a copy of original credential file if present in the system
    */
-  private showCredentialBackupMessageIfNeeded(workspace: Workspace) {
-    const oldAwsCredentialsPath = this.electronService.os.homedir() + '/' + constants.credentialsDestination;
+  private showCredentialBackupMessageIfNeeded() {
+    //TODO: move this logic inside a service
+    const oldAwsCredentialsPath = this.fileService.homeDir() + '/' + constants.credentialsDestination;
     const newAwsCredentialsPath = oldAwsCredentialsPath + '.leapp.bkp';
-    const check = workspace.sessions.length === 0 &&
-      this.electronService.fs.existsSync(oldAwsCredentialsPath) &&
-      !this.electronService.fs.existsSync(newAwsCredentialsPath);
+    const check = this.workspaceService.sessions.length === 0 &&
+      this.fileService.existsSync(oldAwsCredentialsPath) &&
+      !this.fileService.existsSync(newAwsCredentialsPath);
 
-    this.leappCoreService.loggingService.logger(`Check existing credential file: ${check}`, LoggerLevel.info, this);
+    this.loggingService.logger(`Check existing credential file: ${check}`, LoggerLevel.info, this);
 
     if (check) {
-      this.electronService.fs.renameSync(oldAwsCredentialsPath, newAwsCredentialsPath);
-      this.electronService.fs.writeFileSync(oldAwsCredentialsPath,'');
-      this.app.getDialog().showMessageBox({
+      this.fileService.renameSync(oldAwsCredentialsPath, newAwsCredentialsPath);
+      this.fileService.writeFileSync(oldAwsCredentialsPath, '');
+      this.appService.getDialog().showMessageBox({
         type: 'info',
         icon: __dirname + '/assets/images/Leapp.png',
         message: 'You had a previous credential file. We made a backup of the old one in the same directory before starting.'
       });
-    } else if(!this.leappCoreService.fileService.existsSync(this.leappCoreService.awsCoreService.awsCredentialPath())) {
-      this.leappCoreService.fileService.writeFileSync(this.leappCoreService.awsCoreService.awsCredentialPath(), '');
+    } else if (!this.fileService.existsSync(this.awsCoreService.awsCredentialPath())) {
+      this.fileService.writeFileSync(this.awsCoreService.awsCredentialPath(), '');
     }
   }
 
@@ -168,12 +190,12 @@ export class AppComponent implements OnInit {
 
     const ipc = this.electronService.ipcRenderer;
     ipc.on('UPDATE_AVAILABLE', async (_, info) => {
-
       const releaseNote = await this.updaterService.getReleaseNote();
       this.updaterService.setUpdateInfo(info.version, info.releaseName, info.releaseDate, releaseNote);
       if (this.updaterService.isUpdateNeeded()) {
         this.updaterService.updateDialog();
-        this.leappCoreService.workspaceService.sessions = [...this.leappCoreService.workspaceService.sessions];
+        this.workspaceService.sessions = [...this.workspaceService.sessions];
+        this.repository.updateSessions(this.workspaceService.sessions);
       }
     });
   }
