@@ -35,6 +35,7 @@
           {
             "accessibility": "explicit",
             "overrides": {
+              "constructors": "no-public",
               "properties": "off"
             }
           }
