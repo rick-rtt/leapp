@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core'
 import { BsModalService } from 'ngx-bootstrap/modal'
-import { InputDialogComponent } from '../components/shared/input-dialog/input-dialog.component'
+import { InputDialogComponent } from '../components/dialogs/input-dialog/input-dialog.component'
 import { ElectronService } from './electron.service'
 import { IMfaCodePrompter } from '@noovolari/leapp-core/interfaces/i-mfa-code-prompter'
 

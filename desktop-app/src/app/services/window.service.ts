@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core'
 import { ElectronService } from './electron.service'
 import { environment } from '../../environments/environment'
-import { ConfirmationDialogComponent } from '../components/shared/confirmation-dialog/confirmation-dialog.component'
+import { ConfirmationDialogComponent } from '../components/dialogs/confirmation-dialog/confirmation-dialog.component'
 import { BsModalService } from 'ngx-bootstrap/modal'
 import { LoggerLevel } from '@noovolari/leapp-core/services/logging-service'
 

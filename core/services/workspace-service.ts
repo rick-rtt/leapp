@@ -1,6 +1,8 @@
 import { BehaviorSubject, Observable } from 'rxjs'
 import { Repository } from './repository'
 import { Session } from '../models/session'
+import Folder from '../models/folder'
+import Segment from '../models/Segment'
 import { SessionStatus } from '../models/session-status'
 import { SessionType } from '../models/session-type'
 import { AwsIamRoleChainedSession } from '../models/aws-iam-role-chained-session'
@@ -99,5 +101,60 @@ export class WorkspaceService implements ISessionNotifier {
 
   listAssumable(): Session[] {
     return (this.sessions.length > 0) ? this.sessions.filter((session) => session.type !== SessionType.azure) : []
+  }
+
+
+
+  getFolders() {
+    const workspace = this.repository.getWorkspace();
+    return workspace.folders;
+  }
+
+  setFolders(folders: Folder[]) {
+    const workspace = this.repository.getWorkspace();
+    workspace.folders = folders;
+    this.repository.persistWorkspace(workspace);
+  }
+
+  getSegments() {
+    const workspace = this.repository.getWorkspace();
+    return workspace.segments;
+  }
+
+  setSegments(segments: Segment[]) {
+    const workspace = this.repository.getWorkspace();
+    workspace.segments = segments;
+    this.repository.persistWorkspace(workspace);
+  }
+
+  getSegment(segmentName: string) {
+    const workspace = this.repository.getWorkspace();
+    return workspace.segments.find(s => s.name === segmentName);
+  }
+
+  removeSegment(segment: Segment) {
+    const workspace = this.repository.getWorkspace();
+    const index = workspace.segments.findIndex(s => s.name === segment.name);
+    if(index > -1) {
+      workspace.segments.splice(index, 1);
+      this.repository.persistWorkspace(workspace);
+    }
+  }
+
+  pinSession(session: Session) {
+    const workspace = this.repository.getWorkspace();
+    if(workspace.pinned.indexOf(session.sessionId) === -1) {
+      workspace.pinned.push(session.sessionId);
+      this.repository.persistWorkspace(workspace);
+    }
+  }
+
+  unpinSession(session: Session) {
+    const workspace = this.repository.getWorkspace();
+    const index = workspace.pinned.indexOf(session.sessionId);
+    if(index > -1) {
+      workspace.pinned.splice(index, 1);
+      this.repository.persistWorkspace(workspace);
+    }
   }
 }

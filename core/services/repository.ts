@@ -9,6 +9,8 @@ import { SessionStatus } from '../models/session-status'
 import { SessionType } from '../models/session-type'
 import { Workspace } from '../models/workspace'
 import { FileService } from './file-service'
+import * as uuid from 'uuid'
+import {AwsSsoIntegration} from "../models/aws-sso-integration";
 
 export class Repository {
   // Private singleton workspace
@@ -199,43 +201,61 @@ export class Repository {
     this.persistWorkspace(workspace)
   }
 
-  // AWS SSO CONFIGURATION
-
-  getAwsSsoConfiguration(): { region?: string; portalUrl?: string; browserOpening: string; expirationTime?: string } {
-    return this.getWorkspace().awsSsoConfiguration
+  // AWS SSO INTEGRATION
+  listAwsSsoConfigurations() {
+    const workspace = this.getWorkspace();
+    return workspace.awsSsoIntegrations;
   }
 
-  configureAwsSso(region: string, portalUrl: string, expirationTime: string): void {
-    const workspace = this.getWorkspace()
-    workspace.awsSsoConfiguration.region = region
-    workspace.awsSsoConfiguration.portalUrl = portalUrl
-    workspace.awsSsoConfiguration.expirationTime = expirationTime
-    this.persistWorkspace(workspace)
+  getAwsSsoConfiguration(id: string | number): AwsSsoIntegration {
+    return this.getWorkspace().awsSsoIntegrations.filter(ssoConfig => ssoConfig.id === id)[0];
   }
 
-  setAwsSsoConfiguration(region: string, portalUrl: string, browserOpening: string, expirationTime?: string) {
-    const workspace = this.getWorkspace()
-    workspace.awsSsoConfiguration = {region, portalUrl, browserOpening, expirationTime}
-    this.persistWorkspace(workspace)
+  getAwsSsoIntegrationSessions(id: string | number): Session[] {
+    return this.workspace.sessions.filter((sess) => {
+      return (sess as any).awsSsoConfigurationId === id;
+    });
   }
 
-  setBrowserOpening(browserOpening: string) {
-    const workspace = this.getWorkspace()
-    workspace.awsSsoConfiguration.browserOpening = browserOpening
-    this.persistWorkspace(workspace)
+  addAwsSsoIntegration(portalUrl: string, alias: string, region: string, browserOpening: string) {
+    const workspace = this.getWorkspace();
+    workspace.awsSsoIntegrations.push({ id: uuid.v4(), alias, portalUrl, region, accessTokenExpiration: undefined, browserOpening });
+    this.persistWorkspace(workspace);
   }
 
-  updateBrowserOpening(browserOpening: string) {
-    const workspace = this.getWorkspace()
-    workspace.awsSsoConfiguration.browserOpening = browserOpening
-    this.persistWorkspace(workspace)
+  updateAwsSsoIntegration(id: string, alias: string, region: string, portalUrl: string, browserOpening: string, expirationTime?: string): void {
+    const workspace = this.getWorkspace();
+    const index = workspace.awsSsoIntegrations.findIndex(sso => sso.id === id);
+    if(index > -1) {
+      workspace.awsSsoIntegrations[index].alias = alias;
+      workspace.awsSsoIntegrations[index].region = region;
+      workspace.awsSsoIntegrations[index].portalUrl = portalUrl;
+      workspace.awsSsoIntegrations[index].browserOpening = browserOpening;
+      if(expirationTime) {
+        workspace.awsSsoIntegrations[index].accessTokenExpiration = expirationTime;
+      }
+      this.persistWorkspace(workspace);
+    }
   }
 
-  removeExpirationTimeFromAwsSsoConfiguration(): void {
-    const workspace = this.getWorkspace()
-    workspace.awsSsoConfiguration.expirationTime = undefined
-    this.persistWorkspace(workspace)
+  unsetAwsSsoIntegrationExpiration(id: string): void {
+    const workspace = this.getWorkspace();
+    const index = workspace.awsSsoIntegrations.findIndex(sso => sso.id === id);
+    if(index > -1) {
+      workspace.awsSsoIntegrations[index].accessTokenExpiration = undefined;
+      this.persistWorkspace(workspace);
+    }
   }
+
+  deleteAwsSsoIntegration(id: string): void {
+    const workspace = this.getWorkspace();
+    const index = workspace.awsSsoIntegrations.findIndex(awsSsoIntegration => awsSsoIntegration.id === id);
+    if(index > -1) {
+      workspace.awsSsoIntegrations.splice(index, 1);
+      this.persistWorkspace(workspace);
+    }
+  }
+
 
   // PROXY CONFIGURATION
   getProxyConfiguration() {

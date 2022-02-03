@@ -4,6 +4,9 @@ import * as uuid from 'uuid'
 import 'reflect-metadata'
 import { Type } from 'class-transformer'
 import { constants } from './constants'
+import { AwsSsoIntegration } from './aws-sso-integration'
+import Folder from "./folder";
+import Segment from "./Segment";
 
 //TODO: Check required and optional keys for every object
 
@@ -15,12 +18,11 @@ export class Workspace {
   private _idpUrls: { id: string; url: string }[]
   private _profiles: AwsNamedProfile[]
 
-  private _awsSsoConfiguration: {
-    region?: string;
-    portalUrl?: string;
-    expirationTime?: string;
-    browserOpening: string;
-  }
+  private _awsSsoIntegrations: AwsSsoIntegration[];
+
+  private _pinned: string[];
+  private _folders: Folder[];
+  private _segments: Segment[];
 
   private _proxyConfiguration: {
     proxyProtocol: string;
@@ -31,18 +33,18 @@ export class Workspace {
   }
 
   constructor() {
-    this._sessions = []
-    this._defaultRegion = constants.defaultRegion
-    this._defaultLocation = constants.defaultLocation
-    this._profiles = [new AwsNamedProfile(uuid.v4(), constants.defaultAwsProfileName)]
-    this._idpUrls = []
+    this._pinned = [];
+    this._sessions = [];
+    this._folders = [];
+    this._segments = [];
+    this._defaultRegion = constants.defaultRegion;
+    this._defaultLocation = constants.defaultLocation;
+    this._idpUrls = [];
+    this._profiles = [
+      { id: uuid.v4(), name: constants.defaultAwsProfileName }
+    ];
 
-    this._awsSsoConfiguration = {
-      region: undefined,
-      portalUrl: undefined,
-      expirationTime: undefined,
-      browserOpening: constants.inApp.toString()
-    }
+    this._awsSsoIntegrations = [];
 
     this._proxyConfiguration = {
       proxyProtocol: 'https',
@@ -101,11 +103,35 @@ export class Workspace {
     this._defaultLocation = value
   }
 
-  get awsSsoConfiguration(): { region?: string; portalUrl?: string; browserOpening: string; expirationTime?: string } {
-    return this._awsSsoConfiguration
+  get awsSsoIntegrations(): AwsSsoIntegration[] {
+    return this._awsSsoIntegrations;
   }
 
-  set awsSsoConfiguration(value: { region?: string; portalUrl?: string; browserOpening: string; expirationTime?: string }) {
-    this._awsSsoConfiguration = value
+  set awsSsoIntegrations(value: AwsSsoIntegration[]) {
+    this._awsSsoIntegrations = value;
+  }
+
+  get pinned() {
+    return this._pinned;
+  }
+
+  set pinned(pinned: string[] ) {
+    this._pinned = pinned;
+  }
+
+  get folders() {
+    return this._folders;
+  }
+
+  set folders(folders: Folder[] ) {
+    this._folders = folders;
+  }
+
+  get segments() {
+    return this._segments;
+  }
+
+  set segments(segments: Segment[] ) {
+    this._segments = segments;
   }
 }

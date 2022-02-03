@@ -44,7 +44,7 @@ export class AwsSsoOidcService {
     this.listeners.push(listener)
   }
 
-  public async login(region: string, portalUrl: string): Promise<GenerateSSOTokenResponse> {
+  public async login(configurationId: string | number, region: string, portalUrl: string): Promise<GenerateSSOTokenResponse> {
     if (!this.loginMutex && this.setIntervalQueue.length === 0) {
       this.loginMutex = true
 
@@ -56,11 +56,11 @@ export class AwsSsoOidcService {
 
       const registerClientResponse = await this.registerSsoOidcClient()
       const startDeviceAuthorizationResponse = await this.startDeviceAuthorization(registerClientResponse, portalUrl)
-      const windowModality = this.repository.getAwsSsoConfiguration().browserOpening
+      const windowModality = this.repository.getAwsSsoConfiguration(configurationId).browserOpening
       const verificationResponse = await this.verificationWindowService.openVerificationWindow(registerClientResponse,
         startDeviceAuthorizationResponse, windowModality, () => this.closeVerificationWindow())
       try {
-        this.generateSSOTokenResponse = await this.createToken(verificationResponse)
+        this.generateSSOTokenResponse = await this.createToken(configurationId, verificationResponse)
       } catch (err) {
         this.loginMutex = false
         throw(err)
@@ -137,7 +137,7 @@ export class AwsSsoOidcService {
     return await this.getAwsSsoOidcClient().startDeviceAuthorization(startDeviceAuthorizationRequest).promise()
   }
 
-  private async createToken(verificationResponse: VerificationResponse): Promise<GenerateSSOTokenResponse> {
+  private async createToken(configurationId: string | number, verificationResponse: VerificationResponse): Promise<GenerateSSOTokenResponse> {
     const createTokenRequest: CreateTokenRequest = {
       clientId: verificationResponse.clientId,
       clientSecret: verificationResponse.clientSecret,
@@ -146,7 +146,7 @@ export class AwsSsoOidcService {
     }
 
     let createTokenResponse
-    if (this.repository.getAwsSsoConfiguration().browserOpening === constants.inApp) {
+    if (this.repository.getAwsSsoConfiguration(configurationId).browserOpening === constants.inApp) {
       createTokenResponse = await this.getAwsSsoOidcClient().createToken(createTokenRequest).promise()
     } else {
       createTokenResponse = await this.waitForToken(createTokenRequest)

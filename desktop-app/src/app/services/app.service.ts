@@ -6,6 +6,8 @@ import { constants } from '@noovolari/leapp-core/models/constants'
 import { LoggerLevel, LoggingService } from '@noovolari/leapp-core/services/logging-service'
 import { LeappCoreService } from './leapp-core.service'
 import { MessageToasterService, ToastLevel } from './message-toaster.service'
+import { MatMenuTrigger } from '@angular/material/menu'
+import {WindowService} from "./window.service";
 
 @Injectable({
   providedIn: 'root'
@@ -14,12 +16,20 @@ export class AppService {
 
   profileOpen: EventEmitter<boolean> = new EventEmitter<boolean>()
 
-  /* This service is defined to provide different app wide methods as utilities */
-  private loggingService: LoggingService
+  /* Is used to detect if application is in compact or full mode */
+  private _compactMode: boolean;
+  private triggers: MatMenuTrigger[];
 
-  constructor(private electronService: ElectronService, private messageToasterService: MessageToasterService,
+  /* This service is defined to provide different app wide methods as utilities */
+  private loggingService: LoggingService;
+
+  constructor(private electronService: ElectronService,
+              private messageToasterService: MessageToasterService,
+              private windowService: WindowService,
               leappCoreService: LeappCoreService) {
-    this.loggingService = leappCoreService.loggingService
+    this.triggers = [];
+
+    this.loggingService = leappCoreService.loggingService;
 
     // Global Configure logger
     if (this.electronService.log) {
@@ -35,6 +45,7 @@ export class AppService {
     }
   }
 
+  // TODO: get directly from electronService
   /**
    * Return the app object from node
    */
@@ -42,6 +53,7 @@ export class AppService {
     return this.electronService.app
   }
 
+  // TODO: get directly from electronService
   getMenu() {
     return this.electronService.menu
   }
@@ -164,5 +176,56 @@ export class AppService {
       details.requestHeaders['Origin'] = 'http://localhost:4200'
       callback({cancel: false, requestHeaders: details.requestHeaders})
     })
+  }
+
+  /**
+   * Create a new invisible browser window
+   *
+   * @param url - the url to point to launch the window with the protocol, it can also be a file://
+   * @returns return a new browser window
+   */
+  newInvisibleWindow(url: string) {
+    const win = new this.electronService.browserWindow({ width: 1, height: 1, show: false });
+    win.loadURL(url);
+    return win;
+  }
+
+  /**
+   * Standard parsing of a json JWT token without library
+   *
+   * @param token - a string token
+   * @returns the json object decoded
+   */
+  parseJwt(token) {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(atob(base64).split('').map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+    return JSON.parse(jsonPayload);
+  }
+
+  closeModal() {
+    // @ts-ignore: Accessing private variable as workaround for missing feature
+    this.modalService.loaders.forEach(loader => loader.instance.hide());
+  }
+
+  about() {
+    const version = this.getApp().getVersion();
+    this.windowService.getCurrentWindow().show();
+    this.getDialog().showMessageBox({
+      icon: __dirname + `/assets/images/Leapp.png`,
+      message: `Leapp\n` + `Version ${version} (${version})\n` + '© 2022 Noovolari',
+      buttons: ['Ok']
+    });
+  }
+
+  setMenuTrigger(trigger) {
+    this.triggers.push(trigger);
+  }
+
+  closeAllMenuTriggers() {
+    this.triggers.forEach(t => {
+      t.closeMenu();
+    });
+    this.triggers = [];
   }
 }
