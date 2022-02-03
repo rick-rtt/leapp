@@ -24,7 +24,6 @@ import { CliVerificationWindowService } from './cli-verification-window-service'
 import { CliNativeService } from './cli-native-service'
 import { constants } from '@noovolari/leapp-core/models/constants'
 import CliInquirer from 'inquirer'
-import { CliSessionSelectionService } from './cli-session-selection-service'
 
 
 export class LeappCliService {
@@ -278,16 +277,6 @@ export class LeappCliService {
     }
 
     return this.azureCoreServiceInstance
-  }
-
-  private cliSessionSelectionServiceInstance: CliSessionSelectionService
-
-  get cliSessionSelectionService(): CliSessionSelectionService {
-    if (!this.cliSessionSelectionServiceInstance) {
-      this.cliSessionSelectionServiceInstance = new CliSessionSelectionService(this.inquirer,this.repository)
-    }
-
-    return this.cliSessionSelectionServiceInstance
   }
 
   get inquirer(): CliInquirer.Inquirer {

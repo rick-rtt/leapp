@@ -4,27 +4,7 @@ import { Command } from '@oclif/core'
 import { Config } from '@oclif/core/lib/config/config'
 import { LeappCliService } from '../../service/leapp-cli-service'
 
-
-async function callAction(command: Command, action: () => void) {
-  try {
-    await action()
-  } catch (error) {
-    command.error(error instanceof Error ? error.message : `Unknown error: ${error}`)
-  }
-}
-
-abstract class LeappCommand extends Command {
-
-  async callAction(action: () => void) {
-    try {
-      await action()
-    } catch (error) {
-      this.error(error instanceof Error ? error.message : `Unknown error: ${error}`)
-    }
-  }
-}
-
-export default class AddSession extends LeappCommand {
+export default class AddSession extends Command {
   static description = 'Add a new session'
   static examples = [
     '$leapp session add',
@@ -40,13 +20,11 @@ export default class AddSession extends LeappCommand {
     const selectedAccessMethod = await this.chooseAccessMethod(selectedCloudProvider)
     const selectedParams = await this.chooseAccessMethodParams(selectedAccessMethod)
 
-    await callAction(this, async () => {
+    try {
       await this.createSession(selectedAccessMethod, selectedParams)
-    })
-    
-    await this.callAction(async () => {
-      await this.createSession(selectedAccessMethod, selectedParams)
-    })
+    } catch (error) {
+      this.error(error instanceof Error ? error.message : `Unknown error: ${error}`)
+    }
   }
 
   public async createSession(accessMethod: AccessMethod, selectedParams: Map<string, string>): Promise<void> {

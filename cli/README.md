@@ -238,19 +238,16 @@ EXAMPLES
 
 ## `leapp session stop`
 
-Stop a specific session
+Stop session
 
 ```
 USAGE
-  $ leapp session stop -i <value>
-
-FLAGS
-  -i, --sessionId=<value>  (required) Session ID
+  $ leapp session stop
 
 DESCRIPTION
-  Stop a specific session
+  Stop session
 
 EXAMPLES
-  $ oex stop --sessionId 1234567890
+  $leapp session stop
 ```
 <!-- commandsstop -->

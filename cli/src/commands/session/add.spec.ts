@@ -2,7 +2,7 @@ import { jest, describe, test, expect } from '@jest/globals'
 import { CloudProviderType } from '@noovolari/leapp-core/models/cloud-provider-type'
 import AddSession from './add'
 
-describe('add session', () => {
+describe('AddSession', () => {
   test('chooseCloudProvider', async () => {
     const leappCliService: any = {
       cloudProviderService: {
@@ -119,7 +119,7 @@ describe('add session', () => {
     const cloudProvider = 'cloudProvider'
     const accessMethod = 'accessMethod'
     const params = 'params'
-    const command = new AddSession([], {} as any, undefined)
+    const command = new AddSession([], {} as any, {} as any)
     command.chooseCloudProvider = jest.fn(async (): Promise<any> => {
       return cloudProvider
     })

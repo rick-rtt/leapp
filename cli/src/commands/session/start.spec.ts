@@ -1,4 +1,4 @@
-import { jest, describe, test, expect } from '@jest/globals'
+import { describe } from '@jest/globals'
 
-describe('start session', () => {}
+describe('StartSession', () => {}
 )
