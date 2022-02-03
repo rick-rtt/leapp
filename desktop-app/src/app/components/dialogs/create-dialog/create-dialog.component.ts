@@ -5,7 +5,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import * as uuid from 'uuid';
 import {BsModalService} from 'ngx-bootstrap/modal';
 import {openIntegrationEvent} from '../../integration-bar/integration-bar.component';
-import { SessionType } from '../../../../../../core/dist/models/session-type';
+import { SessionType } from '@noovolari/leapp-core/models/session-type';
 import {WorkspaceService} from '@noovolari/leapp-core/services/workspace-service';
 import {AwsIamRoleFederatedService} from '@noovolari/leapp-core/services/session/aws/aws-iam-role-federated-service';
 import {AwsIamUserService} from '@noovolari/leapp-core/services/session/aws/aws-iam-user-service';
@@ -19,13 +19,13 @@ import {WindowService} from '../../../services/window.service';
 import {
   AwsIamRoleFederatedSessionRequest
 } from '@noovolari/leapp-core/services/session/aws/aws-iam-role-federated-session-request';
-import {AwsIamUserSessionRequest} from "@noovolari/leapp-core/services/session/aws/aws-iam-user-session-request";
+import {AwsIamUserSessionRequest} from '@noovolari/leapp-core/services/session/aws/aws-iam-user-session-request';
 import {
   AwsIamRoleChainedSessionRequest
-} from "@noovolari/leapp-core/services/session/aws/aws-iam-role-chained-session-request";
-import {AzureSessionRequest} from "@noovolari/leapp-core/services/session/azure/azure-session-request";
-import {MessageToasterService, ToastLevel} from "../../../services/message-toaster.service";
-import {LeappParseError} from "@noovolari/leapp-core/errors/leapp-parse-error";
+} from '@noovolari/leapp-core/services/session/aws/aws-iam-role-chained-session-request';
+import {AzureSessionRequest} from '@noovolari/leapp-core/services/session/azure/azure-session-request';
+import {MessageToasterService, ToastLevel} from '../../../services/message-toaster.service';
+import {LeappParseError} from '@noovolari/leapp-core/errors/leapp-parse-error';
 
 @Component({
   selector: 'app-create-dialog',
