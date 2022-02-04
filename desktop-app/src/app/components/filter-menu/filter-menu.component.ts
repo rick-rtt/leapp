@@ -41,19 +41,19 @@ export class FilterMenuComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.data = this.data.map(o => {
+    this.data = this.data.map((o) => {
       o.show = true;
       return o;
     });
   }
 
   updateValue(event: any, data: { id?: string; category?: string; name: string; value: boolean; show?: boolean }[], form: FormGroup) {
-    data = data.map(o => ({ id: o.id, name: o.name, value: o.value, category: o.category }));
+    data = data.map((o) => ({ id: o.id, name: o.name, value: o.value, category: o.category }));
     form.get(this.control).setValue(data);
   }
 
   searchContent(event: any) {
-    this.data = this.data.map(o => {
+    this.data = this.data.map((o) => {
       o.show = (o.name.toLowerCase().indexOf(event.target.value) > -1);
       return o;
     });
@@ -66,11 +66,11 @@ export class FilterMenuComponent implements OnInit {
   }
 
   dataActive() {
-    return this.data.filter(d => d.value).length > 0;
+    return this.data.filter((d) => d.value).length > 0;
   }
 
   dataLabel() {
-    const result = this.data.filter(d => d.value).map(d => d.name);
+    const result = this.data.filter((d) => d.value).map((d) => d.name);
     return result.length > 0 ? (result.length > 2 ? `${this.name} · ${result.length}`: result.join(', ')) : this.name;
   }
 
@@ -78,7 +78,7 @@ export class FilterMenuComponent implements OnInit {
     event.preventDefault();
     event.stopPropagation();
 
-    this.data = this.data.map(d => {
+    this.data = this.data.map((d) => {
       d.value = false;
       return d;
     });
