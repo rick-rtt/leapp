@@ -103,8 +103,6 @@ export class WorkspaceService implements ISessionNotifier {
     return (this.sessions.length > 0) ? this.sessions.filter((session) => session.type !== SessionType.azure) : []
   }
 
-
-
   getFolders() {
     const workspace = this.repository.getWorkspace();
     return workspace.folders;

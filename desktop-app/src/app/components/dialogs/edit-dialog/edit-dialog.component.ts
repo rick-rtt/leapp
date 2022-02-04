@@ -1,14 +1,16 @@
 import {Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
-import {AppService, ToastLevel} from '../../../services/app.service';
+import {AppService} from '../../../services/app.service';
 import {ActivatedRoute, Router} from '@angular/router';
-import {Workspace} from '../../../models/workspace';
-import {SessionType} from '../../../models/session-type';
-import {AwsIamUserSession} from '../../../models/aws-iam-user-session';
-import {WorkspaceService} from '../../../services/workspace.service';
-import {KeychainService} from '../../../services/keychain.service';
-import {environment} from '../../../../environments/environment';
-import {SessionService} from '../../../services/session.service';
+import {SessionType} from '@noovolari/leapp-core/models/session-type';
+import {AwsIamUserSession} from '@noovolari/leapp-core/models/aws-iam-user-session';
+import {Workspace} from '@noovolari/leapp-core/models/workspace';
+import {WorkspaceService} from '@noovolari/leapp-core/services/workspace-service';
+import {KeychainService} from '@noovolari/leapp-core/services/keychain-service';
+import {constants} from '@noovolari/leapp-core/models/constants';
+import {LeappCoreService} from '../../../services/leapp-core.service';
+import {MessageToasterService, ToastLevel} from '../../../services/message-toaster.service';
+import {WindowService} from "../../../services/window.service";
 
 @Component({
   selector: 'app-edit-dialog',
@@ -24,12 +26,10 @@ export class EditDialogComponent implements OnInit {
   accountType = SessionType.awsIamUser;
   provider = SessionType.awsIamRoleFederated;
   selectedSession: AwsIamUserSession;
-
   selectedAccountNumber = '';
   selectedRole = '';
   selectedRegion;
   regions = [];
-
   workspace: Workspace;
 
   public form = new FormGroup({
@@ -42,31 +42,34 @@ export class EditDialogComponent implements OnInit {
 
   /* Setup the first account for the application */
   constructor(
-    private appService: AppService,
-    private router: Router,
     private activatedRoute: ActivatedRoute,
-    private workspaceService: WorkspaceService,
+    private appService: AppService,
     private keychainService: KeychainService,
-    private sessionService: SessionService
-  ) {}
+    private messageToasterService: MessageToasterService,
+    private router: Router,
+    private windowService: WindowService,
+    private workspaceService: WorkspaceService,
+    private leappCoreService: LeappCoreService
+  ) {
+  }
 
   ngOnInit() {
     // Get the workspace and the account you need
-    this.selectedSession = this.workspaceService.sessions.find(session => session.sessionId === this.selectedSessionId) as AwsIamUserSession;
+    this.selectedSession = this.workspaceService.sessions.find((session) => session.sessionId === this.selectedSessionId) as AwsIamUserSession;
 
     // Get the region
-    this.regions = this.appService.getRegions();
-    this.selectedRegion = this.regions.find(r => r.region === this.selectedSession.region).region;
+    this.regions = this.leappCoreService.awsCoreService.getRegions();
+    this.selectedRegion = this.regions.find((r) => r.region === this.selectedSession.region).region;
     this.form.controls['awsRegion'].setValue(this.selectedRegion);
 
     // Get other readonly properties
     this.form.controls['name'].setValue(this.selectedSession.sessionName);
     this.form.controls['mfaDevice'].setValue(this.selectedSession.mfaDevice);
 
-    this.keychainService.getSecret(environment.appName, `${this.selectedSession.sessionId}-iam-user-aws-session-access-key-id`).then(value => {
+    this.keychainService.getSecret(constants.appName, `${this.selectedSession.sessionId}-iam-user-aws-session-access-key-id`).then((value) => {
       this.form.controls['accessKey'].setValue(value);
     });
-    this.keychainService.getSecret(environment.appName, `${this.selectedSession.sessionId}-iam-user-aws-session-secret-access-key`).then(value => {
+    this.keychainService.getSecret(constants.appName, `${this.selectedSession.sessionId}-iam-user-aws-session-secret-access-key`).then((value) => {
       this.form.controls['secretKey'].setValue(value);
     });
   }
@@ -78,15 +81,15 @@ export class EditDialogComponent implements OnInit {
       this.selectedSession.sessionName =  this.form.controls['name'].value;
       this.selectedSession.region      =  this.selectedRegion;
       this.selectedSession.mfaDevice   =  this.form.controls['mfaDevice'].value;
-      this.keychainService.saveSecret(environment.appName, `${this.selectedSession.sessionId}-iam-user-aws-session-access-key-id`, this.form.controls['accessKey'].value).then(_ => {});
-      this.keychainService.saveSecret(environment.appName, `${this.selectedSession.sessionId}-iam-user-aws-session-secret-access-key`, this.form.controls['secretKey'].value).then(_ => {});
+      this.keychainService.saveSecret(constants.appName, `${this.selectedSession.sessionId}-iam-user-aws-session-access-key-id`, this.form.controls['accessKey'].value).then((_) => {});
+      this.keychainService.saveSecret(constants.appName, `${this.selectedSession.sessionId}-iam-user-aws-session-secret-access-key`, this.form.controls['secretKey'].value).then((_) => {});
 
-      this.sessionService.update(this.selectedSession.sessionId, this.selectedSession);
+      this.workspaceService.updateSession(this.selectedSession.sessionId, this.selectedSession);
 
-      this.appService.toast(`Session: ${this.form.value.name}, edited.`, ToastLevel.success, '');
+      this.messageToasterService.toast(`Session: ${this.form.value.name}, edited.`, ToastLevel.success, '');
       this.closeModal();
     } else {
-      this.appService.toast(`One or more parameters are invalid, check your choices.`, ToastLevel.warn, '');
+      this.messageToasterService.toast(`One or more parameters are invalid, check your choices.`, ToastLevel.warn, '');
     }
   }
 
@@ -125,7 +128,7 @@ export class EditDialogComponent implements OnInit {
   }
 
   openAccessStrategyDocumentation() {
-    this.appService.openExternalUrl('https://github.com/Noovolari/leapp/blob/master/README.md');
+    this.windowService.openExternalUrl('https://github.com/Noovolari/leapp/blob/master/README.md');
   }
 }
 
