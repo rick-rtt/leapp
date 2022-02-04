@@ -1,10 +1,9 @@
 import {Pipe, PipeTransform} from '@angular/core';
-import {Session} from '../../../models/session';
-import {AwsIamRoleFederatedSession} from '../../../models/aws-iam-role-federated-session';
-import {AzureSession} from '../../../models/azure-session';
-import {Workspace} from '../../../models/workspace';
-import {AwsSsoRoleSession} from '../../../models/aws-sso-role-session';
-
+import { Session } from '@noovolari/leapp-core/models/session';
+import { Workspace } from '@noovolari/leapp-core/models/workspace';
+import { AwsIamRoleFederatedSession } from '@noovolari/leapp-core/models/aws-iam-role-federated-session';
+import { AzureSession } from '@noovolari/leapp-core/models/azure-session';
+import { AwsSsoRoleSession } from '@noovolari/leapp-core/models/aws-sso-role-session';
 
 @Pipe({
   name: 'querying'
@@ -12,9 +11,9 @@ import {AwsSsoRoleSession} from '../../../models/aws-sso-role-session';
 export class QueryingPipe implements PipeTransform {
   transform(sessions: Session[], query: string, workspace: Workspace): Session[] {
     if (query !== '') {
-      return sessions.filter(s => {
-        const idpID = workspace.idpUrls.filter(idp => idp && idp.url.toLowerCase().indexOf(query.toLowerCase()) > -1).map(m => m.id);
-        const integrationID = workspace.awsSsoIntegrations.filter(integration => integration.alias.toLowerCase().indexOf(query.toLowerCase()) > -1).map(m => m.id);
+      return sessions.filter((s) => {
+        const idpID = workspace.idpUrls.filter((idp) => idp && idp.url.toLowerCase().indexOf(query.toLowerCase()) > -1).map((m) => m.id);
+        const integrationID = workspace.awsSsoIntegrations.filter((integration) => integration.alias.toLowerCase().indexOf(query.toLowerCase()) > -1).map((m) => m.id);
 
         return s.sessionName.toLowerCase().indexOf(query.toLowerCase()) > -1 ||
           ((s as AwsIamRoleFederatedSession).roleArn && (s as AwsIamRoleFederatedSession).roleArn.toLowerCase().indexOf(query.toLowerCase()) > -1) ||

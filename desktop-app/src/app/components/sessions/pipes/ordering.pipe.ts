@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import {Session} from '../../../models/session';
+import { Session } from '@noovolari/leapp-core/models/session';
 
 @Pipe({
   name: 'ordering'
