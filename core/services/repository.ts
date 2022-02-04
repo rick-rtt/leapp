@@ -257,7 +257,6 @@ export class Repository {
     }
   }
 
-
   // PROXY CONFIGURATION
   getProxyConfiguration() {
     return this.getWorkspace().proxyConfiguration

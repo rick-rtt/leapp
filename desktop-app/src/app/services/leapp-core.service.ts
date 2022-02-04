@@ -108,7 +108,6 @@ export class LeappCoreService {
     return this.awsCoreServiceInstance
   }
 
-
   private azureServiceInstance: AzureService
 
   get azureService(): AzureService {
@@ -233,4 +232,6 @@ export class LeappCoreService {
 
     return this.azureCoreServiceInstance
   }
+
+  private session
 }
