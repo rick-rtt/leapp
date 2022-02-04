@@ -11,6 +11,7 @@ import { Workspace } from '../models/workspace'
 import { FileService } from './file-service'
 import * as uuid from 'uuid'
 import {AwsSsoIntegration} from "../models/aws-sso-integration";
+import Segment from "../models/Segment";
 
 export class Repository {
   // Private singleton workspace
@@ -291,4 +292,35 @@ export class Repository {
     }
     return childSession
   }
+
+  getSegments() {
+    const workspace = this.getWorkspace();
+    return workspace.segments;
+  }
+
+  getSegment(segmentName: string) {
+    const workspace = this.getWorkspace();
+    return workspace.segments.find(s => s.name === segmentName);
+  }
+
+  setSegments(segments: Segment[]) {
+    const workspace = this.getWorkspace();
+    workspace.segments = segments;
+    this.persistWorkspace(workspace);
+  }
+
+  removeSegment(segment: Segment) {
+    const workspace = this.getWorkspace();
+    const index = workspace.segments.findIndex(s => s.name === segment.name);
+    if(index > -1) {
+      workspace.segments.splice(index, 1);
+      this.persistWorkspace(workspace);
+    }
+  }
+
+  listAwsSsoIntegrations() {
+    const workspace = this.getWorkspace();
+    return workspace.awsSsoIntegrations;
+  }
+
 }
