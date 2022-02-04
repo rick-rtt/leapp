@@ -19,7 +19,6 @@
     "build-prod": "gushio gushio/target-build.js 'configuration production'",
     "run-local": "electron --enable-accelerated-mjpeg-decode --enable-accelerated-video --ignore-gpu-blacklist --enable-native-gpu-memory-buffers --enable-gpu-rasterization --ignore-gpu-blacklist .",
     "build-and-run-dev": "gushio gushio/target-build-and-run.js aot",
-
     "release-mac-dev": "gushio gushio/target-release.js aot mac",
     "release-mac-stag": "gushio gushio/target-release.js 'configuration staging' mac",
     "release-mac-prod": "gushio gushio/target-release.js 'configuration production' mac",

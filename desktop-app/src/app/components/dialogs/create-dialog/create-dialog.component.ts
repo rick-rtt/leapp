@@ -107,7 +107,7 @@ export class CreateDialogComponent implements OnInit {
     private messageToasterService: MessageToasterService
   ) {}
 
-  ngOnInit() {
+  public ngOnInit(): void {
 
     this.activatedRoute.queryParams.subscribe((params) => {
 
@@ -153,7 +153,8 @@ export class CreateDialogComponent implements OnInit {
       // Select default values
       this.selectedRegion = workspace.defaultRegion || constants.defaultRegion || this.regions[0].region;
       this.selectedLocation = workspace.defaultLocation || constants.defaultLocation || this.locations[0].location;
-      this.selectedProfile = workspace.profiles.filter((p) => p.name === 'default').map((p) => ({ value: p.id, label: p.name }))[0];
+      this.selectedProfile = workspace.profiles.filter((p) => p.name === 'default')
+                                               .map((p) => ({ value: p.id, label: p.name }))[0];
     });
   }
 
@@ -161,25 +162,25 @@ export class CreateDialogComponent implements OnInit {
   /**
    * Add a new UUID
    */
-  addNewUUID(): string {
+  public addNewUUID(): string {
     return uuid.v4();
   }
 
   /**
    * Save the first account in the workspace
    */
-  saveSession() {
+  public saveSession(): void {
     this.loggingService.logger(`Saving account...`, LoggerLevel.info, this);
     this.addProfileToWorkspace();
     this.saveNewSsoRolesToWorkspace();
     this.createSession();
-    this.router.navigate(['/dashboard']).then((_) => {});
+    this.router.navigate(['/dashboard']).then(() => {});
   }
 
   /**
    * Form validation mechanic
    */
-  formValid() {
+  public formValid(): boolean {
     let result = false;
     switch (this.sessionType) {
       case SessionType.awsIamRoleFederated:
@@ -221,7 +222,7 @@ export class CreateDialogComponent implements OnInit {
    *
    * @param name
    */
-  setProvider(name) {
+  public setProvider(name: SessionType): void {
     this.provider = name;
     this.providerSelected = true;
     this.sessionType = name;
@@ -233,9 +234,7 @@ export class CreateDialogComponent implements OnInit {
    *
    * @param strategy
    */
-  setAccessStrategy(strategy) {
-    console.log(strategy);
-
+  public setAccessStrategy(strategy: SessionType): void {
     this.sessionType = strategy;
     this.provider = strategy;
     this.typeSelection = false;
@@ -249,7 +248,7 @@ export class CreateDialogComponent implements OnInit {
    * Open the Leapp documentation in the default browser
    *
    */
-  openAccessStrategyDocumentation() {
+  public openAccessStrategyDocumentation(): void {
     let url = 'https://docs.leapp.cloud/configuring-session/configure-aws-iam-role-federated/';
     if(this.provider === SessionType.awsIamRoleChained) {
       url = 'https://docs.leapp.cloud/configuring-session/configure-aws-iam-role-chained/';
@@ -263,7 +262,7 @@ export class CreateDialogComponent implements OnInit {
    * Go to the Single Sing-On integration page
    *
    */
-  goToAwsSso() {
+  public goToAwsSso(): void {
     this.appService.closeModal();
     openIntegrationEvent.next(true);
   }
@@ -271,11 +270,11 @@ export class CreateDialogComponent implements OnInit {
   /**
    * Go to Session Selection screen by closing the modal
    */
-  goBack() {
+  public goBack(): void {
     this.appService.closeModal();
   }
 
-  getNameForProvider(provider: SessionType) {
+  public getNameForProvider(provider: SessionType): string {
     switch (provider) {
       case SessionType.azure: return 'Microsoft Azure session';
       case SessionType.google: return 'Google Cloud session';
@@ -284,7 +283,7 @@ export class CreateDialogComponent implements OnInit {
     }
   }
 
-  getIconForProvider(provider: SessionType) {
+  public getIconForProvider(provider: SessionType): string {
     switch (provider) {
       case SessionType.azure: return 'azure-logo.svg';
       case SessionType.google: return 'google.png';
@@ -293,14 +292,13 @@ export class CreateDialogComponent implements OnInit {
     }
   }
 
-  closeModal() {
+  public closeModal(): void {
     this.appService.closeModal();
   }
 
-  selectedIdpUrlEvent($event: { items: any[]; item: any }) {
+  public selectedIdpUrlEvent($event: { items: any[]; item: any }): void {
     this.idpUrls = $event.items;
     this.selectedIdpUrl = $event.item;
-    console.log($event);
   }
 
   /**
@@ -334,7 +332,7 @@ export class CreateDialogComponent implements OnInit {
             mfaDevice: this.form.value.mfaDevice.trim(),
             profileId: this.selectedProfile.value
           };
-          this.awsIamUserService.create(awsIamUserSessionRequest);
+          this.awsIamUserService.create(awsIamUserSessionRequest).then(() => {});
           break;
         case (SessionType.awsIamRoleChained):
           const awsIamRoleChainedAccountRequest: AwsIamRoleChainedSessionRequest = {
@@ -361,6 +359,7 @@ export class CreateDialogComponent implements OnInit {
       this.messageToasterService.toast(`Session: ${this.form.value.name}, created.`, ToastLevel.success, '');
       this.closeModal();
     } else {
+      // eslint-disable-next-line max-len
       this.messageToasterService.toast(`Session is missing some required properties, please fill them.`, ToastLevel.warn, '');
     }
   }

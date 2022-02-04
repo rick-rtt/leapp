@@ -35,9 +35,9 @@
       </div>
 
       <div class="window-buttons">
-        <span class="minimize" (click)="appService.getCurrentWindow().minimize()"><img src="assets/images/windows_minimize.png" alt="" title=""></span>
-        <span class="maximize" (click)="appService.getCurrentWindow().maximize()"><img src="assets/images/windows_maximize.png" alt="" title=""></span>
-        <span class="quit" (click)="appService.getCurrentWindow().hide()"><img src="assets/images/windows_close.png" alt="" title=""></span>
+        <span class="minimize" (click)="electronService.currentWindow.minimize()"><img src="assets/images/windows_minimize.png" alt="" title=""></span>
+        <span class="maximize" (click)="electronService.currentWindow.maximize()"><img src="assets/images/windows_maximize.png" alt="" title=""></span>
+        <span class="quit" (click)="electronService.currentWindow.hide()"><img src="assets/images/windows_close.png" alt="" title=""></span>
       </div>
     </div>
 

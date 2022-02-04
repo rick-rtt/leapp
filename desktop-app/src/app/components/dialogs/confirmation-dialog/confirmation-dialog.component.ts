@@ -1,6 +1,6 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {BsModalRef} from 'ngx-bootstrap/modal';
-import {constants} from "@noovolari/leapp-core/models/constants";
+import {constants} from '@noovolari/leapp-core/models/constants';
 
 @Component({
   selector: 'app-confirmation-dialog',
@@ -23,20 +23,20 @@ export class ConfirmationDialogComponent implements OnInit {
   /* Just a restyled modal to show a confirmation for delete actions */
   constructor(private bsModalRef: BsModalRef) { }
 
-  ngOnInit() {
+  public ngOnInit(): void {
   }
 
   /**
    * Launch a callback on yes (which is the actual action), then close
    */
-  confirm() {
+  public confirm(): void {
     if (this.callback) {
       this.callback(constants.confirmed);
       this.close();
     }
   }
 
-  close() {
+  public close(): void {
     this.bsModalRef.hide();
     this.callback(constants.confirmClosed);
   }

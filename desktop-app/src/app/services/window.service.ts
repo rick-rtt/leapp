@@ -59,8 +59,8 @@ export class WindowService {
     return this.currentWindow
   }
 
-  public getCurrentWindow() {
-    return this.electronService.currentWindow
+  public getCurrentWindow(): any {
+    return this.electronService.currentWindow;
   }
 
   /**
@@ -68,19 +68,19 @@ export class WindowService {
    *
    * @param message - the message to show
    * @param callback - the callback for the ok button to launch
+   * @param confirmText
+   * @param cancelText
    */
-  public confirmDialog(message: string, callback: any) {
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+  public confirmDialog(message: string, callback: any, confirmText?: string, cancelText?: string) {
     for (let i = 1; i <= this.modalService.getModalsCount(); i++) {
-      this.modalService.hide(i)
+      this.modalService.hide(i);
     }
 
-    this.getCurrentWindow().show()
-    this.modalService.show(ConfirmationDialogComponent, {
-      backdrop: 'static',
-      animated: false,
-      class: 'confirm-modal',
-      initialState: {message, callback}
-    })
+    this.getCurrentWindow().show();
+    return this.modalService.show(ConfirmationDialogComponent, {
+      animated: false, class: 'confirm-modal', initialState: { message, callback, confirmText, cancelText }
+    });
   }
 
   /**
@@ -88,16 +88,16 @@ export class WindowService {
    *
    * @param url - url to open
    */
-  public openExternalUrl(url) {
-    this.electronService.shell.openExternal(url)
+  public openExternalUrl(url: string): void {
+    this.electronService.shell.openExternal(url);
   }
 
-  public blockDevToolInProductionMode() {
+  public blockDevToolInProductionMode(): void {
     this.getCurrentWindow().webContents.on('devtools-opened', () => {
       if (environment.production) {
-        this.electronService.log('Closing Web tools in production mode', LoggerLevel.info, this)
-        this.getCurrentWindow().webContents.closeDevTools()
+        this.electronService.log('Closing Web tools in production mode', LoggerLevel.info, this);
+        this.getCurrentWindow().webContents.closeDevTools();
       }
-    })
+    });
   }
 }
