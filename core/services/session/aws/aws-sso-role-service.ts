@@ -63,6 +63,7 @@ export interface SsoRoleSession {
   email: string;
   region: string;
   profileId: string;
+  awsSsoConfigurationId: string;
 }
 
 export class AwsSsoRoleService extends AwsSessionService implements BrowserWindowClosing {
@@ -159,7 +160,7 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
     const accessToken = await this.getAccessToken(configurationId, region, portalUrl);
 
     // Get AWS SSO Role sessions
-    const sessions = await this.getSessions(accessToken, region)
+    const sessions = await this.getSessions(configurationId, accessToken, region)
 
     // Remove all old AWS SSO Role sessions from workspace
     await this.removeSsoSessionsFromWorkspace()
@@ -259,13 +260,13 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
     return protocol
   }
 
-  private async getSessions(accessToken: string, region: string): Promise<SsoRoleSession[]> {
+  private async getSessions(configurationId: string, accessToken: string, region: string): Promise<SsoRoleSession[]> {
     const accounts: AccountInfo[] = await this.listAccounts(accessToken, region)
 
     const promiseArray: Promise<SsoRoleSession[]>[] = []
 
     accounts.forEach((account) => {
-      promiseArray.push(this.getSessionsFromAccount(account, accessToken, region))
+      promiseArray.push(this.getSessionsFromAccount(configurationId, account, accessToken, region))
     })
 
     return new Promise((resolve, _) => {
@@ -275,7 +276,7 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
     })
   }
 
-  private async getSessionsFromAccount(accountInfo: AccountInfo, accessToken: string, region: string): Promise<SsoRoleSession[]> {
+  private async getSessionsFromAccount(configurationId: string, accountInfo: AccountInfo, accessToken: string, region: string): Promise<SsoRoleSession[]> {
     this.getSsoPortalClient(region)
 
     const listAccountRolesRequest: ListAccountRolesRequest = {
@@ -300,7 +301,8 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
         region: oldSession?.region || this.repository.getDefaultRegion() || this.defaultRegion,
         roleArn: `arn:aws:iam::${accountInfo.accountId}/${accountRole.roleName}`,
         sessionName: accountInfo.accountName,
-        profileId: oldSession?.profileId || this.repository.getDefaultProfileId()
+        profileId: oldSession?.profileId || this.repository.getDefaultProfileId(),
+        awsSsoConfigurationId: configurationId
       }
 
       awsSsoSessions.push(awsSsoSession)

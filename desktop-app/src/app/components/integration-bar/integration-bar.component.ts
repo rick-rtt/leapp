@@ -10,8 +10,11 @@ import {MatMenuTrigger} from '@angular/material/menu';
 import {AwsSsoIntegration} from '@noovolari/leapp-core/models/aws-sso-integration';
 import {constants} from '@noovolari/leapp-core/models/constants';
 import {LeappCoreService} from '../../services/leapp-core.service';
-import {ToastLevel} from '../../services/message-toaster.service';
+import {MessageToasterService, ToastLevel} from '../../services/message-toaster.service';
 import {WindowService} from '../../services/window.service';
+import {AwsSsoRoleSession} from '@noovolari/leapp-core/models/aws-sso-role-session';
+import {SsoRoleSession} from '@noovolari/leapp-core/services/session/aws/aws-sso-role-service';
+import {LoggerLevel} from '@noovolari/leapp-core/services/logging-service';
 
 
 export interface SelectedIntegration {
@@ -65,6 +68,7 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
               private bsModalService: BsModalService,
               private router: Router,
               private windowService: WindowService,
+              private toasterService: MessageToasterService,
               private leappCoreService: LeappCoreService) { }
 
   public ngOnInit(): void {
@@ -82,33 +86,34 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
 
     this.subscription3 = syncAllEvent.subscribe(async (value) => {
       if(value) {
-        for(let i = 0; i < this.awsSsoConfigurations.length; i++) {
+        // eslint-disable-next-line @typescript-eslint/prefer-for-of
+        for (let i = 0; i < this.awsSsoConfigurations.length; i++) {
           const integration = this.awsSsoConfigurations[i];
           if(this.isOnline(integration)) {
              await this.forceSync(integration.id);
           }
         }
-        this.windowService.toast('Integrations synchronized.', ToastLevel.info, '');
+        this.toasterService.toast('Integrations synchronized.', ToastLevel.info, '');
       }
     });
 
-    this.awsSsoOidcService.listeners.push(this);
+    this.leappCoreService.awsSsoOidcService.getListeners().push(this);
     this.loadingInBrowser = false;
     this.loadingInApp = false;
   }
 
-  ngOnDestroy() {
+  public ngOnDestroy(): void {
     this.subscription.unsubscribe();
     this.subscription2.unsubscribe();
     this.subscription3.unsubscribe();
   }
 
-  selectedSsoConfigurationCheck(awsSsoConfiguration: AwsSsoIntegration) {
+  public selectedSsoConfigurationCheck(awsSsoConfiguration: AwsSsoIntegration): string {
     const index = this.selectedIntegrations.findIndex((s) => s.id === awsSsoConfiguration.id);
     return this.selectedIntegrations[index].selected ? 'selected-integration' : '';
   }
 
-  applyContextMenu(index: number, awsSsoConfiguration: AwsSsoIntegration, event) {
+  public applyContextMenu(index: number, awsSsoConfiguration: AwsSsoIntegration, event: MouseEvent): void {
     event.preventDefault();
     event.stopPropagation();
 
@@ -120,15 +125,15 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
     this.selectedIntegrations[selectedIndex].selected = true;
 
     setTimeout(() => {
-      this.menuY = event.layerY - 10;
-      this.menuX = event.layerX - 10;
+      this.menuY = (event as any).layerY - 10;
+      this.menuX = (event as any).layerX - 10;
 
       this.triggers.get(index).openMenu();
       this.appService.setMenuTrigger(this.triggers.get(index));
     }, 100);
   }
 
-  applySegmentFilter(awsSsoConfiguration: AwsSsoIntegration, event: MouseEvent) {
+  public applySegmentFilter(awsSsoConfiguration: AwsSsoIntegration, event: MouseEvent): void {
     event.preventDefault();
     event.stopPropagation();
 
@@ -137,12 +142,16 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
     const selectedIndex = this.selectedIntegrations.findIndex((s) => s.id === awsSsoConfiguration.id);
     this.selectedIntegrations[selectedIndex].selected = true;
 
-    globalFilteredSessions.next(this.workspaceService.sessions.filter((s) => (s as AwsSsoRoleSession).awsSsoConfigurationId === awsSsoConfiguration.id));
+    globalFilteredSessions.next(
+      this.leappCoreService.repository.getSessions().filter(
+        (s) => (s as AwsSsoRoleSession).awsSsoConfigurationId === awsSsoConfiguration.id
+      )
+    );
   }
 
-  async logout(configurationId: string) {
+  public async logout(configurationId: string): Promise<void> {
     this.logoutLoadings[configurationId] = true;
-    this.selectedAwsSsoConfiguration = this.workspaceService.getAwsSsoIntegration(configurationId);
+    this.selectedAwsSsoConfiguration = this.leappCoreService.repository.getAwsSsoConfiguration(configurationId);
     await AwsSsoIntegrationService.getInstance().logout(this.selectedAwsSsoConfiguration.id);
 
     this.loadingInBrowser = false;
@@ -150,12 +159,12 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
     this.setValues();
   }
 
-  async forceSync(configurationId: string) {
-    this.selectedAwsSsoConfiguration = this.workspaceService.getAwsSsoIntegration(configurationId);
+  public async forceSync(configurationId: string): Promise<void> {
+    this.selectedAwsSsoConfiguration = this.leappCoreService.repository.getAwsSsoConfiguration(configurationId);
 
     if (this.selectedAwsSsoConfiguration && !this.loadingInApp) {
-      this.loadingInBrowser = (this.selectedAwsSsoConfiguration.browserOpening === Constants.inBrowser.toString());
-      this.loadingInApp = (this.selectedAwsSsoConfiguration.browserOpening === Constants.inApp.toString());
+      this.loadingInBrowser = (this.selectedAwsSsoConfiguration.browserOpening === constants.inBrowser.toString());
+      this.loadingInApp = (this.selectedAwsSsoConfiguration.browserOpening === constants.inApp.toString());
 
       if(this.loadingInBrowser && !this.isOnline(this.selectedAwsSsoConfiguration)) {
         this.modalRef = this.bsModalService.show(this.ssoModalTemplate, { class: 'sso-modal'});
@@ -165,7 +174,7 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
         const ssoRoleSessions: SsoRoleSession[] = await AwsSsoIntegrationService.getInstance().provisionSessions(this.selectedAwsSsoConfiguration.id);
         ssoRoleSessions.forEach((ssoRoleSession) => {
           ssoRoleSession.awsSsoConfigurationId = configurationId;
-          this.awsSsoRoleService.create(ssoRoleSession, ssoRoleSession.profileId);
+          this.leappCoreService.awsSsoRoleService.create(ssoRoleSession);
         });
 
         if(this.modalRef) {
@@ -181,16 +190,16 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
     }
   }
 
-  async gotoWebForm(integrationId: string) {
+  public async gotoWebForm(integrationId: string): Promise<void> {
     // TODO: check if we need to put this method in IntegrationService singleton - sync method
-    this.awsSsoRoleService.interrupt();
+    this.leappCoreService.awsSsoOidcService.interrupt();
     await this.forceSync(integrationId);
   }
 
-  setValues() {
+  public setValues(): void {
     this.modifying = 0;
-    this.regions = this.appService.getRegions();
-    this.awsSsoConfigurations = this.workspaceService.listAwsSsoIntegrations();
+    this.regions = this.leappCoreService.awsCoreService.getRegions();
+    this.awsSsoConfigurations = this.leappCoreService.repository.listAwsSsoIntegrations();
     this.logoutLoadings = {};
     this.awsSsoConfigurations.forEach((sc) => {
       this.logoutLoadings[sc.id] = false;
@@ -201,26 +210,26 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
       alias: '',
       region: this.regions[0].region,
       portalUrl: '',
-      browserOpening: Constants.inApp,
+      browserOpening: constants.inApp,
       accessTokenExpiration: undefined
     };
   }
 
-  closeLoadingScreen() {
+  public closeLoadingScreen(): void {
     // TODO: call aws sso oidc service directly
-    this.awsSsoRoleService.interrupt();
+    this.leappCoreService.awsSsoOidcService.interrupt();
     this.loadingInBrowser = false;
     this.loadingInApp = false;
     this.modalRef.hide();
   }
 
-  catchClosingBrowserWindow(): void {
+  public catchClosingBrowserWindow(): void {
     this.loadingInBrowser = false;
     this.loadingInApp = false;
     this.modalRef.hide();
   }
 
-  gotoForm(modifying, currentAwsSsoConfiguration) {
+  public gotoForm(modifying: number, currentAwsSsoConfiguration: AwsSsoIntegration): void {
     // Change graphical values to show the form
     this.chooseIntegration = false;
     this.modifying = modifying;
@@ -232,7 +241,7 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
         alias: '',
         region: this.regions[0].region,
         portalUrl: '',
-        browserOpening: Constants.inApp,
+        browserOpening: constants.inApp,
         accessTokenExpiration: undefined
       };
     }
@@ -245,7 +254,7 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
     this.modalRef = this.bsModalService.show(this.ssoModalTemplate, { class: 'sso-modal'});
   }
 
-  save() {
+  public save(): void {
     if(this.form.valid) {
       const alias = this.form.get('alias').value;
       const portalUrl = this.form.get('portalUrl').value;
@@ -254,7 +263,7 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
 
       if(this.modifying === 1) {
         // Save
-        this.workspaceService.addAwsSsoIntegration(
+        this.leappCoreService.repository.addAwsSsoIntegration(
           portalUrl,
           alias,
           region,
@@ -262,7 +271,7 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
         );
       } else if(this.modifying === 2 && this.selectedAwsSsoConfiguration.portalUrl !== '') {
         // Edit
-        this.workspaceService.updateAwsSsoIntegration(
+        this.leappCoreService.repository.updateAwsSsoIntegration(
           this.selectedAwsSsoConfiguration.id,
           alias,
           region,
@@ -270,33 +279,35 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
           browserOpening
         );
       }
-      integrationsFilter.next(this.workspaceService.listAwsSsoIntegrations());
+      integrationsFilter.next(this.leappCoreService.repository.listAwsSsoIntegrations());
       this.modalRef.hide();
     } else {
-      this.appService.toast('Form is not valid', ToastLevel.warn, 'Form validation');
+      this.toasterService.toast('Form is not valid', ToastLevel.warn, 'Form validation');
     }
   }
 
-  delete(awsSsoConfiguration: AwsSsoIntegration) {
+  public delete(awsSsoConfiguration: AwsSsoIntegration): void {
     // Ask for deletion
-    this.appService.confirmDialog(`Deleting this configuration will also logout from its sessions: do you wannt to proceed?`, async (res) => {
-      if (res !== Constants.confirmClosed) {
-        this.loggingService.logger(`Removing sessions with attached aws sso config id: ${awsSsoConfiguration.id}`, LoggerLevel.info, this);
-        this.logout(awsSsoConfiguration.id);
-        this.workspaceService.deleteAwsSsoIntegration(awsSsoConfiguration.id);
+    // eslint-disable-next-line max-len
+    this.windowService.confirmDialog(`Deleting this configuration will also logout from its sessions: do you wannt to proceed?`, async (res) => {
+      if (res !== constants.confirmClosed) {
+        // eslint-disable-next-line max-len
+        this.leappCoreService.loggingService.logger(`Removing sessions with attached aws sso config id: ${awsSsoConfiguration.id}`, LoggerLevel.info, this);
+        await this.logout(awsSsoConfiguration.id);
+        this.leappCoreService.repository.deleteAwsSsoIntegration(awsSsoConfiguration.id);
         this.modifying = 0;
       }
     }, 'Delete Configuration', 'Cancel');
   }
 
-  isOnline(awsSsoConfiguration: AwsSsoIntegration) {
+  public isOnline(awsSsoConfiguration: AwsSsoIntegration): boolean {
     return (awsSsoConfiguration.accessTokenExpiration !== null &&
         awsSsoConfiguration.accessTokenExpiration !== undefined &&
         awsSsoConfiguration.accessTokenExpiration !== '') &&
       !isPast(new Date(awsSsoConfiguration.accessTokenExpiration));
   }
 
-  remainingHours(awsSsoConfiguration: AwsSsoIntegration) {
+  public remainingHours(awsSsoConfiguration: AwsSsoIntegration): string {
     return formatDistance(
       new Date(awsSsoConfiguration.accessTokenExpiration),
       new Date(),
