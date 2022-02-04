@@ -10,14 +10,14 @@ import {optionBarIds} from '../../components/sessions/sessions.component';
 })
 export class MainLayoutComponent implements OnInit, OnDestroy {
 
-  _compactMode: boolean;
+  compactMode: boolean;
 
   private subscription;
 
   constructor(private electronService: ElectronService) {
-    this.subscription = compactMode.subscribe(value => {
-      this._compactMode = value;
-      this.electronService.ipcRenderer.send('resize-window', { compactMode: this._compactMode });
+    this.subscription = compactMode.subscribe((value) => {
+      this.compactMode = value;
+      this.electronService.ipcRenderer.send('resize-window', { compactMode: this.compactMode });
     });
   }
 

@@ -5,14 +5,14 @@ import {CreateDialogComponent} from '../dialogs/create-dialog/create-dialog.comp
 import {SegmentDialogComponent} from '../dialogs/segment-dialog/segment-dialog.component';
 import {FormControl, FormGroup} from '@angular/forms';
 import {BehaviorSubject} from 'rxjs';
-import {AppService} from '../../services/app.service';
 import {globalOrderingFilter} from '../sessions/sessions.component';
 import { Session } from '@noovolari/leapp-core/models/session';
 import Segment, {GlobalFilters} from '@noovolari/leapp-core/models/Segment';
 import {SessionType} from '@noovolari/leapp-core/models/session-type';
 import {WorkspaceService} from '@noovolari/leapp-core/services/workspace-service';
 import {syncAllEvent} from '../integration-bar/integration-bar.component';
-import {LeappCoreService} from "../../services/leapp-core.service";
+import {LeappCoreService} from '../../services/leapp-core.service';
+import {ElectronService} from '../../services/electron.service';
 
 export const compactMode = new BehaviorSubject<boolean>(false);
 export const globalFilteredSessions = new BehaviorSubject<Session[]>([]);
@@ -70,7 +70,7 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
   constructor(private bsModalService: BsModalService,
               private leappCoreService: LeappCoreService,
               private workspaceService: WorkspaceService,
-              public appService: AppService) {
+              public electronService: ElectronService) {
     this.filterExtended = false;
     this.compactMode = false;
 

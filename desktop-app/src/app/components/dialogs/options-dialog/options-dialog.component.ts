@@ -1,20 +1,18 @@
 import {AfterViewInit, Component, Input, OnInit, ViewChild, ViewEncapsulation} from '@angular/core';
-import {Workspace} from '../../../models/workspace';
 import {FormControl, FormGroup} from '@angular/forms';
-import {AppService, LoggerLevel, ToastLevel} from '../../../services/app.service';
-import {FileService} from '../../../services/file.service';
+import {AppService} from '../../../services/app.service';
 import {Router} from '@angular/router';
-import {Constants} from '../../../models/constants';
-import {environment} from '../../../../environments/environment';
 import * as uuid from 'uuid';
-import {AwsIamRoleFederatedSession} from '../../../models/aws-iam-role-federated-session';
-import {WorkspaceService} from '../../../services/workspace.service';
-import {SessionStatus} from '../../../models/session-status';
-import {SessionFactoryService} from '../../../services/session-factory.service';
-import {SessionType} from '../../../models/session-type';
-import {AwsSessionService} from '../../../services/session/aws/aws-session.service';
-import {LoggingService} from '../../../services/logging.service';
 import {MatTabGroup} from '@angular/material/tabs';
+import {Workspace} from '@noovolari/leapp-core/models/workspace';
+import {LeappCoreService} from '../../../services/leapp-core.service';
+import {constants} from '@noovolari/leapp-core/models/constants';
+import {LoggerLevel} from '@noovolari/leapp-core/services/logging-service';
+import {MessageToasterService, ToastLevel} from '../../../services/message-toaster.service';
+import {WindowService} from '../../../services/window.service';
+import {SessionType} from '@noovolari/leapp-core/models/session-type';
+import {AwsIamRoleFederatedSession} from '@noovolari/leapp-core/models/aws-iam-role-federated-session';
+import {SessionStatus} from '@noovolari/leapp-core/models/session-status';
 
 @Component({
   selector: 'app-options-dialog',
@@ -30,7 +28,7 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
   @ViewChild('tabs', { static: false })
   tabGroup: MatTabGroup;
 
-  eConstants = Constants;
+  eConstants = constants;
 
   awsProfileValue: { id: string; name: string };
   idpUrlValue;
@@ -50,7 +48,7 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
   regions: { region: string }[];
   selectedLocation: string;
   selectedRegion: string;
-  selectedBrowserOpening = Constants.inApp.toString();
+  selectedBrowserOpening = constants.inApp.toString();
 
   form = new FormGroup({
     idpUrl: new FormControl(''),
@@ -71,16 +69,14 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
 
   constructor(
     private appService: AppService,
-    private loggingService: LoggingService,
-    private fileService: FileService,
-    private sessionProviderService: SessionFactoryService,
-    private awsSessionService: AwsSessionService,
-    private workspaceService: WorkspaceService,
+    private leappCoreService: LeappCoreService,
+    private windowService: WindowService,
+    private toasterService: MessageToasterService,
     private router: Router
   ) {}
 
-  ngOnInit() {
-    this.workspace = this.workspaceService.getWorkspace();
+  public ngOnInit(): void {
+    this.workspace = this.leappCoreService.repository.getWorkspace();
     this.idpUrlValue = '';
     this.proxyProtocol = this.workspace.proxyConfiguration.proxyProtocol;
     this.proxyUrl = this.workspace.proxyConfiguration.proxyUrl;
@@ -95,24 +91,25 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
     this.form.controls['proxyUsername'].setValue(this.proxyUsername);
     this.form.controls['proxyPassword'].setValue(this.proxyPassword);
 
-    const isProxyUrl = this.workspace.proxyConfiguration.proxyUrl && this.workspace.proxyConfiguration.proxyUrl !== 'undefined';
+    const isProxyUrl = this.workspace.proxyConfiguration.proxyUrl &&
+                       this.workspace.proxyConfiguration.proxyUrl !== 'undefined';
     this.proxyUrl = isProxyUrl ? this.workspace.proxyConfiguration.proxyUrl : '';
 
     if (this.proxyUsername || this.proxyPassword) {
       this.showProxyAuthentication = true;
     }
 
-    this.regions = this.appService.getRegions();
-    this.locations = this.appService.getLocations();
-    this.selectedRegion   = this.workspace.defaultRegion || environment.defaultRegion;
-    this.selectedLocation = this.workspace.defaultLocation || environment.defaultLocation;
+    this.regions = this.leappCoreService.awsCoreService.getRegions();
+    this.locations = this.leappCoreService.azureCoreService.getLocations();
+    this.selectedRegion   = this.workspace.defaultRegion || constants.defaultRegion;
+    this.selectedLocation = this.workspace.defaultLocation || constants.defaultLocation;
 
     this.appService.validateAllFormFields(this.form);
 
 
   }
 
-  ngAfterViewInit() {
+  public ngAfterViewInit(): void {
     if(this.selectedIndex) {
       this.tabGroup.selectedIndex = this.selectedIndex;
     }
@@ -121,32 +118,32 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
   /**
    * Save the idp-url again
    */
-  saveOptions() {
+  public saveOptions(): void {
     if (this.form.valid) {
       this.workspace.proxyConfiguration.proxyUrl = this.form.controls['proxyUrl'].value;
       this.workspace.proxyConfiguration.proxyProtocol = this.form.controls['proxyProtocol'].value;
       this.workspace.proxyConfiguration.proxyPort = this.form.controls['proxyPort'].value;
       this.workspace.proxyConfiguration.username = this.form.controls['proxyUsername'].value;
       this.workspace.proxyConfiguration.password = this.form.controls['proxyPassword'].value;
-      this.workspaceService.updateProxyConfiguration(this.workspace.proxyConfiguration);
+      this.leappCoreService.repository.updateProxyConfiguration(this.workspace.proxyConfiguration);
 
       this.workspace.defaultRegion = this.selectedRegion;
-      this.workspaceService.updateDefaultRegion(this.workspace.defaultRegion);
+      this.leappCoreService.repository.updateDefaultRegion(this.workspace.defaultRegion);
 
       this.workspace.defaultLocation = this.selectedLocation;
-      this.workspaceService.updateDefaultLocation(this.workspace.defaultLocation);
+      this.leappCoreService.repository.updateDefaultLocation(this.workspace.defaultLocation);
 
       if (this.checkIfNeedDialogBox()) {
-        this.appService.confirmDialog('You\'ve set a proxy url: the app must be restarted to update the configuration.', (res) => {
-          if (res !== Constants.confirmClosed) {
-            this.loggingService.logger('User have set a proxy url: the app must be restarted to update the configuration.', LoggerLevel.info, this);
+        this.windowService.confirmDialog('You\'ve set a proxy url: the app must be restarted to update the configuration.', (res) => {
+          if (res !== constants.confirmClosed) {
+            this.leappCoreService.loggingService.logger('User have set a proxy url: the app must be restarted to update the configuration.', LoggerLevel.info, this);
             this.appService.restart();
           }
         }, 'Restart', 'Cancel');
       } else {
         this.appService.closeModal();
-        this.loggingService.logger('Option saved.', LoggerLevel.info, this, JSON.stringify(this.form.getRawValue(), null, 3));
-        this.loggingService.toast('Option saved.', ToastLevel.info, 'Options');
+        this.leappCoreService.loggingService.logger('Option saved.', LoggerLevel.info, this, JSON.stringify(this.form.getRawValue(), null, 3));
+        this.toasterService.toast('Option saved.', ToastLevel.info, 'Options');
       }
     }
   }
@@ -154,7 +151,7 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
   /**
    * Check if we need a dialog box to request restarting the application
    */
-  checkIfNeedDialogBox() {
+  public checkIfNeedDialogBox(): boolean {
     return this.form.controls['proxyUrl'].value !== undefined &&
       this.form.controls['proxyUrl'].value !== null &&
       (this.form.controls['proxyUrl'].dirty ||
@@ -167,77 +164,88 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
   /**
    * Return to home screen
    */
-  goBack() {
-    this.router.navigate(['/dashboard']).then(_ => {});
+  public goBack(): void {
+    this.router.navigate(['/dashboard']).then(() => {});
   }
 
-  manageIdpUrl(id) {
-    const idpUrl = this.workspaceService.getIdpUrl(id);
+  public manageIdpUrl(id: string): void {
+    const idpUrl = this.leappCoreService.repository.getIdpUrl(id);
     if (this.form.get('idpUrl').value !== '') {
       if (!idpUrl) {
-        this.workspaceService.addIdpUrl({ id: uuid.v4(), url: this.form.get('idpUrl').value });
+        this.leappCoreService.repository.addIdpUrl({ id: uuid.v4(), url: this.form.get('idpUrl').value });
       } else {
-        this.workspaceService.updateIdpUrl(id, this.form.get('idpUrl').value);
+        this.leappCoreService.repository.updateIdpUrl(id, this.form.get('idpUrl').value);
       }
     }
     this.editingIdpUrl = false;
     this.idpUrlValue = undefined;
     this.form.get('idpUrl').setValue('');
-    this.workspace = this.workspaceService.getWorkspace();
+    this.workspace = this.leappCoreService.repository.getWorkspace();
   }
 
-  editIdpUrl(id) {
-    const idpUrl = this.workspace.idpUrls.filter(u => u.id === id)[0];
+  public editIdpUrl(id: string): void {
+    const idpUrl = this.workspace.idpUrls.filter((u) => u.id === id)[0];
     this.idpUrlValue = idpUrl;
     this.form.get('idpUrl').setValue(idpUrl.url);
     this.editingIdpUrl = true;
   }
 
-  deleteIdpUrl(id) {
+  public deleteIdpUrl(id: string): void {
     // Assumable sessions with this id
-    this.sessionService = this.sessionProviderService.getService(SessionType.awsIamRoleFederated);
-    let sessions = this.sessionService.list().filter(s => (s as AwsIamRoleFederatedSession).idpUrlId === id);
+    this.sessionService = this.leappCoreService.sessionFactory.getSessionService(SessionType.awsIamRoleFederated);
+    let sessions = this.sessionService.list().filter((s) => (s as AwsIamRoleFederatedSession).idpUrlId === id);
 
     // Add iam Role Chained from iam role iam_federated_role
-    sessions.forEach(parent => {
+    sessions.forEach((parent) => {
       const childs = this.sessionService.listIamRoleChained(parent);
       sessions = sessions.concat(childs);
     });
 
     // Get only names for display
-    let sessionsNames = sessions.map(s => `<li><div class="removed-sessions"><b>${s.sessionName}</b> - <small>${(s as AwsIamRoleFederatedSession).roleArn.split('/')[1]}</small></div></li>`);
+    let sessionsNames = sessions.map((s) =>
+      `<li>
+            <div class="removed-sessions">
+            <b>${s.sessionName}</b> - <small>${(s as AwsIamRoleFederatedSession).roleArn.split('/')[1]}</small>
+            </div>
+      </li>`);
+
     if (sessionsNames.length === 0) {
       sessionsNames = ['<li><b>no sessions</b></li>'];
     }
 
     // Ask for deletion
-    this.appService.confirmDialog(`Deleting this IdP URL will also remove these sessions: <br><ul>${sessionsNames.join('')}</ul>Do you want to proceed?`, (res) => {
-      if (res !== Constants.confirmClosed) {
-        this.loggingService.logger(`Removing idp url with id: ${id}`, LoggerLevel.info, this);
+    // eslint-disable-next-line max-len
+    this.windowService.confirmDialog(`Deleting this IdP URL will also remove these sessions: <br><ul>${sessionsNames.join('')}</ul>Do you want to proceed?`, (res) => {
+      if (res !== constants.confirmClosed) {
+        this.leappCoreService.loggingService.logger(`Removing idp url with id: ${id}`, LoggerLevel.info, this);
 
-        this.workspaceService.removeIdpUrl(id);
+        this.leappCoreService.repository.removeIdpUrl(id);
 
-        sessions.forEach(session => {
+        sessions.forEach((session) => {
           this.sessionService.delete(session.sessionId);
         });
 
-        this.workspace = this.workspaceService.getWorkspace();
+        this.workspace = this.leappCoreService.repository.getWorkspace();
       }
     }, 'Delete IdP URL', 'Cancel');
   }
 
-  async manageAwsProfile(id: string | number) {
+  public async manageAwsProfile(id: string | number): Promise<void> {
 
-    const profileIndex = this.workspaceService.getWorkspace().profiles.findIndex(p => p.id === id.toString());
+    const profileIndex = this.leappCoreService.repository.getWorkspace()
+      .profiles
+      .findIndex((p) => p.id === id.toString());
+
     if (this.form.get('awsProfile').value !== '') {
       if (profileIndex === -1) {
-        this.workspaceService.addProfile({ id: uuid.v4(), name: this.form.get('awsProfile').value });
+        this.leappCoreService.repository.addProfile({ id: uuid.v4(), name: this.form.get('awsProfile').value });
       } else {
-        this.workspaceService.updateProfile(id.toString(), this.form.get('awsProfile').value);
+        this.leappCoreService.repository.updateProfile(id.toString(), this.form.get('awsProfile').value);
 
-        for(let i = 0; i < this.workspaceService.sessions.length; i++) {
-          const sess = this.workspaceService.sessions[i];
-          this.sessionService = this.sessionProviderService.getService(sess.type);
+        // eslint-disable-next-line @typescript-eslint/prefer-for-of
+        for (let i = 0; i < this.leappCoreService.workspaceService.sessions.length; i++) {
+          const sess = this.leappCoreService.workspaceService.sessions[i];
+          this.sessionService = this.leappCoreService.sessionFactory.getSessionService(sess.type);
 
           if( (sess as any).profileId === id.toString()) {
             if ((sess as any).status === SessionStatus.active) {
@@ -248,38 +256,42 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
         }
       }
     }
+
     this.editingAwsProfile = false;
     this.awsProfileValue = undefined;
     this.form.get('awsProfile').setValue('');
-    this.workspace = this.workspaceService.getWorkspace();
+    this.workspace = this.leappCoreService.repository.getWorkspace();
   }
 
-  editAwsProfile(id: string) {
-    const profile = this.workspace.profiles.filter(u => u.id === id)[0];
+  public editAwsProfile(id: string): void {
+    const profile = this.workspace.profiles.filter((u) => u.id === id)[0];
     this.awsProfileValue = profile;
     this.form.get('awsProfile').setValue(profile.name);
     this.editingAwsProfile = true;
   }
 
-  deleteAwsProfile(id: string) {
+  public deleteAwsProfile(id: string): void {
     // With profile
-    const sessions = this.awsSessionService.list().filter(sess => (sess as any).profileId === id);
+    // TODO: add aws filtering list implementation in core
+    const sessions = this.leappCoreService.repository.getSessions().filter((sess) => (sess as any).profileId === id);
 
     // Get only names for display
-    let sessionsNames = sessions.map(s => `<li><div class="removed-sessions"><b>${s.sessionName}</b> - <small>${(s as AwsIamRoleFederatedSession).roleArn ? (s as AwsIamRoleFederatedSession).roleArn.split('/')[1] : ''}</small></div></li>`);
+    let sessionsNames = sessions.map((s) => `<li><div class="removed-sessions"><b>${s.sessionName}</b> - <small>${(s as AwsIamRoleFederatedSession).roleArn ? (s as AwsIamRoleFederatedSession).roleArn.split('/')[1] : ''}</small></div></li>`);
     if (sessionsNames.length === 0) {
       sessionsNames = ['<li><b>no sessions</b></li>'];
     }
 
     // Ask for deletion
-    this.appService.confirmDialog(`Deleting this profile will set default to these sessions: <br><ul>${sessionsNames.join('')}</ul>Do you want to proceed?`, async (res) => {
-      if (res !== Constants.confirmClosed) {
-        this.loggingService.logger(`Reverting to default profile with id: ${id}`, LoggerLevel.info, this);
-        this.workspaceService.removeProfile(id);
+    // eslint-disable-next-line max-len
+    this.windowService.confirmDialog(`Deleting this profile will set default to these sessions: <br><ul>${sessionsNames.join('')}</ul>Do you want to proceed?`, async (res) => {
+      if (res !== constants.confirmClosed) {
+        this.leappCoreService.loggingService.logger(`Reverting to default profile with id: ${id}`, LoggerLevel.info, this);
+        this.leappCoreService.repository.removeProfile(id);
         // Reverting all sessions to default profile
+        // eslint-disable-next-line @typescript-eslint/prefer-for-of
         for(let i = 0; i < sessions.length; i++) {
           const sess = sessions[i];
-          this.sessionService = this.sessionProviderService.getService(sess.type);
+          this.sessionService = this.leappCoreService.sessionFactory.getSessionService(sess.type);
 
           let wasActive = false;
           if ((sess as any).status === SessionStatus.active) {
@@ -287,7 +299,7 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
             await this.sessionService.stop(sess.sessionId);
           }
 
-          (sess as any).profileId = this.workspaceService.getDefaultProfileId();
+          (sess as any).profileId = this.leappCoreService.repository.getDefaultProfileId();
           this.sessionService.update(sess.sessionId, sess);
 
           if(wasActive) {
@@ -295,7 +307,7 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
           }
         }
 
-        this.workspace = this.workspaceService.getWorkspace();
+        this.workspace = this.leappCoreService.repository.getWorkspace();
       }
     }, 'Delete Profile', 'Cancel');
   }

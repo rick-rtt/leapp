@@ -23,6 +23,7 @@ desktop-app/bazel-out
 *.launch
 .settings/
 *.sublime-workspace
+release/
 
 # IDE - VSCode
 .vscode/*
@@ -74,3 +75,4 @@ cli/tmp
 cli/yarn.lock
 cli/node_modules
 cli/oclif.manifest.json
+/release/

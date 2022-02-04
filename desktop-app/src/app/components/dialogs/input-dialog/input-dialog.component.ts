@@ -1,7 +1,7 @@
 import {AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {BsModalRef} from 'ngx-bootstrap/modal';
-import {Constants} from '../../../models/constants';
+import {constants} from '@noovolari/leapp-core/models/constants';
 
 @Component({
   selector: 'app-input-dialog',
@@ -32,28 +32,28 @@ export class InputDialogComponent implements OnInit, AfterViewInit {
   /* Just a restyled modal to show a confirmation for delete actions */
   constructor(private bsModalRef: BsModalRef) { }
 
-  ngOnInit() {}
+  public ngOnInit(): void {}
 
-  ngAfterViewInit() {
+  public ngAfterViewInit(): void {
     this.inputField.nativeElement.focus();
   }
 
   /**
    * Launch a callback on yes (which is the actual action), then close
    */
-  confirm() {
+  public confirm(): void {
     if (this.callback && this.form.valid) {
       this.callback(this.form.value.value);
       this.bsModalRef.hide();
     }
   }
 
-  close() {
-    this.callback(Constants.confirmClosed);
+  public close(): void {
+    this.callback(constants.confirmClosed);
     this.bsModalRef.hide();
   }
 
-  checkAndConfirm(event: Event) {
+  public checkAndConfirm(_: Event): void {
     this.confirm();
   }
 }
