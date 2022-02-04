@@ -171,7 +171,7 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
       }
 
       try {
-        const ssoRoleSessions: SsoRoleSession[] = await this.leappCoreService.awsSsoRoleService.sync(this.selectedAwsSsoConfiguration.id);
+        const ssoRoleSessions: SsoRoleSession[] = await this.leappCoreService.awsSsoIntegrationService.provisionSessions(this.selectedAwsSsoConfiguration.id);
         ssoRoleSessions.forEach((ssoRoleSession) => {
           ssoRoleSession.awsSsoConfigurationId = configurationId;
           this.leappCoreService.awsSsoRoleService.create(ssoRoleSession);

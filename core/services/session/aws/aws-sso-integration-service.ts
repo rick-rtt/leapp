@@ -5,7 +5,6 @@ import SSO, {
   LogoutRequest,
   RoleInfo
 } from 'aws-sdk/clients/sso'
-import { INativeService } from '../../../interfaces/i-native-service'
 import { AwsSsoRoleSession } from '../../../models/aws-sso-role-session'
 import { SessionType } from '../../../models/session-type'
 import { AwsCoreService } from '../../aws-core-service'
@@ -18,6 +17,7 @@ import {AwsSsoIntegration} from "../../../models/aws-sso-integration";
 import {AwsSsoRoleService} from "./aws-sso-role-service";
 import {constants} from "../../../models/constants";
 import {AwsSsoIntegrationTokenInfo} from "../../../models/aws-sso-integration-token-info";
+import {WorkspaceService} from "../../workspace-service";
 
 export interface LoginResponse {
   accessToken: string;
@@ -51,10 +51,10 @@ export interface SsoRoleSession {
 export class AwsSsoIntegrationService {
   private _ssoPortal: SSO;
 
-  public constructor(repository: Repository, private fileService: FileService,
+  public constructor(private repository: Repository, private fileService: FileService,
                      private keyChainService: KeychainService, private awsCoreService: AwsCoreService,
-                     private awsSsoRoleService: AwsSsoRoleService, private nativeService: INativeService,
-                     private awsSsoOidcService: AwsSsoOidcService, private workspaceService) {}
+                     private awsSsoRoleService: AwsSsoRoleService, private awsSsoOidcService: AwsSsoOidcService,
+                     private workspaceService: WorkspaceService) {}
 
   get ssoPortal(): SSO {
     return this._ssoPortal;
@@ -65,10 +65,10 @@ export class AwsSsoIntegrationService {
 
   async login(awsSsoIntegrationId: string): Promise<void> {
     if (await this.isAwsSsoAccessTokenExpired(awsSsoIntegrationId)) {
-      const awsSsoIntegration = this.workspaceService.getAwsSsoIntegration(awsSsoIntegrationId);
+      const awsSsoIntegration = this.repository.getAwsSsoConfiguration(awsSsoIntegrationId);
       const generateSsoTokenResponse = await this.awsSsoOidcService.login(awsSsoIntegrationId, awsSsoIntegration.region, awsSsoIntegration.portalUrl);
 
-      this.workspaceService.updateAwsSsoIntegration(
+      this.repository.updateAwsSsoIntegration(
         awsSsoIntegration.id,
         awsSsoIntegration.alias,
         awsSsoIntegration.region,
@@ -86,7 +86,7 @@ export class AwsSsoIntegrationService {
   }
 
   async logout(awsSsoIntegrationId: string): Promise<void> {
-    const awsSsoIntegration = this.workspaceService.getAwsSsoIntegration(awsSsoIntegrationId);
+    const awsSsoIntegration = this.repository.getAwsSsoConfiguration(awsSsoIntegrationId);
 
     const region = awsSsoIntegration.region;
     const awsSsoIntegrationAccessTokenInfo = await this.getAwsSsoIntegrationTokenInfo(awsSsoIntegration.id);
@@ -103,9 +103,9 @@ export class AwsSsoIntegrationService {
         await this.keyChainService.deletePassword(constants.appName, `aws-sso-integration-access-token-${awsSsoIntegrationId}`);
       } catch(err) {}
 
-      this.workspaceService.unsetAwsSsoIntegrationExpiration(awsSsoIntegration.id);
+      this.repository.unsetAwsSsoIntegrationExpiration(awsSsoIntegration.id);
 
-      const sessions = this.workspaceService.getAwsSsoIntegrationSessions(awsSsoIntegration.id);
+      const sessions = this.repository.getAwsSsoIntegrationSessions(awsSsoIntegration.id);
 
       for (let i = 0; i < sessions.length; i++) {
         const sess = sessions[i];
@@ -118,7 +118,7 @@ export class AwsSsoIntegrationService {
 
         await this.awsSsoRoleService.stop(sess.sessionId);
 
-        this.workspaceService.removeSession(sess.sessionId);
+        this.repository.deleteSession(sess.sessionId);
       }
     });
   }
@@ -126,7 +126,7 @@ export class AwsSsoIntegrationService {
   async provisionSessions(awsSsoIntegrationId: string) {
     await this.login(awsSsoIntegrationId);
 
-    const awsSsoIntegration: AwsSsoIntegration = this.workspaceService.getAwsSsoIntegration(awsSsoIntegrationId);
+    const awsSsoIntegration: AwsSsoIntegration = this.repository.getAwsSsoConfiguration(awsSsoIntegrationId);
     const region = awsSsoIntegration.region;
 
     const awsSsoIntegrationTokenInfo = await this.getAwsSsoIntegrationTokenInfo(awsSsoIntegrationId);
@@ -142,7 +142,7 @@ export class AwsSsoIntegrationService {
     const sessionsNotFlattened = await Promise.all(promiseArray);
     const sessions = sessionsNotFlattened.flat();
 
-    const persistedSessions = this.workspaceService.getAwsSsoIntegrationSessions(awsSsoIntegration.id);
+    const persistedSessions = this.repository.getAwsSsoIntegrationSessions(awsSsoIntegration.id);
     const sessionsToBeDeleted: SsoRoleSession[] = [];
 
     for (let i = 0; i < persistedSessions.length; i++) {
@@ -162,7 +162,7 @@ export class AwsSsoIntegrationService {
         }
 
         await this.awsSsoRoleService.stop(persistedSession.sessionId);
-        this.workspaceService.removeSession(persistedSession.sessionId);
+        this.repository.deleteSession(persistedSession.sessionId);
       }
     }
 
@@ -190,7 +190,7 @@ export class AwsSsoIntegrationService {
 
   async getAwsSsoIntegrationTokenInfo(awsSsoIntegrationId: string): Promise<AwsSsoIntegrationTokenInfo> {
     const accessToken = await this.keyChainService.getSecret(constants.appName, `aws-sso-integration-access-token-${awsSsoIntegrationId}`);
-    const expiration = this.workspaceService.getAwsSsoIntegration(awsSsoIntegrationId) ? new Date(this.workspaceService.getAwsSsoIntegration(awsSsoIntegrationId).accessTokenExpiration).getTime() : undefined;
+    const expiration = this.repository.getAwsSsoConfiguration(awsSsoIntegrationId) ? new Date(this.repository.getAwsSsoConfiguration(awsSsoIntegrationId).accessTokenExpiration).getTime() : undefined;
     return { accessToken, expiration };
   }
 
@@ -252,10 +252,10 @@ export class AwsSsoIntegrationService {
 
       const awsSsoSession = {
         email: accountInfo.emailAddress,
-        region: oldSession?.region || this.workspaceService.getWorkspace().defaultRegion || constants.defaultRegion,
+        region: oldSession?.region || this.repository.getWorkspace().defaultRegion || constants.defaultRegion,
         roleArn: `arn:aws:iam::${accountInfo.accountId}/${accountRole.roleName}`,
         sessionName: accountInfo.accountName,
-        profileId: oldSession?.profileId || this.workspaceService.getDefaultProfileId(),
+        profileId: oldSession?.profileId || this.repository.getDefaultProfileId(),
         awsSsoConfigurationId: configurationId
       };
 
