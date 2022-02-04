@@ -159,13 +159,52 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
 
     const accessToken = await this.getAccessToken(configurationId, region, portalUrl);
 
-    // Get AWS SSO Role sessions
     const sessions = await this.getSessions(configurationId, accessToken, region)
 
-    // Remove all old AWS SSO Role sessions from workspace
-    await this.removeSsoSessionsFromWorkspace()
+    const persistedSessions = this.repository.getAwsSsoIntegrationSessions(configurationId);
+    const sessionsToBeDeleted: SsoRoleSession[] = [];
 
-    return sessions
+    for (let i = 0; i < persistedSessions.length; i++) {
+      const persistedSession = persistedSessions[i];
+      const shouldBeDeleted = sessions.filter(s =>
+        (persistedSession as unknown as SsoRoleSession).sessionName === s.sessionName &&
+        (persistedSession as unknown as SsoRoleSession).roleArn === s.roleArn &&
+        (persistedSession as unknown as SsoRoleSession).email === s.email).length === 0;
+
+      if (shouldBeDeleted) {
+        sessionsToBeDeleted.push(persistedSession as unknown as SsoRoleSession);
+
+        const iamRoleChainedSessions = this.repository.listIamRoleChained(persistedSession);
+
+        for (let j = 0; j < iamRoleChainedSessions.length; j++) {
+          await this.delete(iamRoleChainedSessions[j].sessionId);
+        }
+
+        await this.stop(persistedSession.sessionId);
+        this.repository.deleteSession(persistedSession.sessionId);
+      }
+    }
+
+    const finalSessions = [];
+
+    for (let j = 0; j < sessions.length; j++) {
+      const session = sessions[j];
+      let found = false;
+      for (let i = 0; i < persistedSessions.length; i++) {
+        const persistedSession = persistedSessions[i];
+        if((persistedSession as unknown as SsoRoleSession).sessionName === session.sessionName &&
+          (persistedSession as unknown as SsoRoleSession).roleArn === session.roleArn &&
+          (persistedSession as unknown as SsoRoleSession).email === session.email) {
+          found = true;
+          break;
+        }
+      }
+      if(!found) {
+        finalSessions.push(session);
+      }
+    }
+
+    return finalSessions;
   }
 
   async logout(configurationId: string | number): Promise<void> {

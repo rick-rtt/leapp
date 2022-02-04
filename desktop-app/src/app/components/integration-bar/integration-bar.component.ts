@@ -7,15 +7,14 @@ import {formatDistance, isPast} from 'date-fns';
 import {BsModalRef, BsModalService} from 'ngx-bootstrap/modal';
 import {BehaviorSubject} from 'rxjs';
 import {MatMenuTrigger} from '@angular/material/menu';
-import {AwsSsoIntegration} from '@noovolari/leapp-core/models/aws-sso-integration';
-import {constants} from '@noovolari/leapp-core/models/constants';
 import {LeappCoreService} from '../../services/leapp-core.service';
 import {MessageToasterService, ToastLevel} from '../../services/message-toaster.service';
 import {WindowService} from '../../services/window.service';
+import {AwsSsoIntegration} from '@noovolari/leapp-core/models/aws-sso-integration';
+import {constants} from '@noovolari/leapp-core/models/constants';
 import {AwsSsoRoleSession} from '@noovolari/leapp-core/models/aws-sso-role-session';
 import {SsoRoleSession} from '@noovolari/leapp-core/services/session/aws/aws-sso-role-service';
 import {LoggerLevel} from '@noovolari/leapp-core/services/logging-service';
-
 
 export interface SelectedIntegration {
   id: string;
@@ -76,7 +75,7 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
       this.setValues();
       this.selectedIntegrations = this.awsSsoConfigurations.map((awsIntegration) => ({ id: awsIntegration.id, selected: false }));
     });
-    integrationsFilter.next(this.leappCoreService.repository.listAwsSsoIntegrations());
+    integrationsFilter.next(this.leappCoreService.repository.listAwsSsoConfigurations());
 
     this.subscription2 = openIntegrationEvent.subscribe((value) => {
       if(value) {
@@ -152,7 +151,7 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
   public async logout(configurationId: string): Promise<void> {
     this.logoutLoadings[configurationId] = true;
     this.selectedAwsSsoConfiguration = this.leappCoreService.repository.getAwsSsoConfiguration(configurationId);
-    await AwsSsoIntegrationService.getInstance().logout(this.selectedAwsSsoConfiguration.id);
+    await this.leappCoreService.awsSsoRoleService.logout(this.selectedAwsSsoConfiguration.id);
 
     this.loadingInBrowser = false;
     this.loadingInApp = false;
@@ -171,8 +170,8 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
       }
 
       try {
-        const ssoRoleSessions: SsoRoleSession[] = await AwsSsoIntegrationService.getInstance().provisionSessions(this.selectedAwsSsoConfiguration.id);
-        ssoRoleSessions.forEach((ssoRoleSession) => {
+        const ssoRoleSessions: SsoRoleSession[] = await this.leappCoreService.awsSsoRoleService.sync(configurationId);
+        ssoRoleSessions.forEach((ssoRoleSession: SsoRoleSession) => {
           ssoRoleSession.awsSsoConfigurationId = configurationId;
           this.leappCoreService.awsSsoRoleService.create(ssoRoleSession);
         });
@@ -199,7 +198,7 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
   public setValues(): void {
     this.modifying = 0;
     this.regions = this.leappCoreService.awsCoreService.getRegions();
-    this.awsSsoConfigurations = this.leappCoreService.repository.listAwsSsoIntegrations();
+    this.awsSsoConfigurations = this.leappCoreService.repository.listAwsSsoConfigurations();
     this.logoutLoadings = {};
     this.awsSsoConfigurations.forEach((sc) => {
       this.logoutLoadings[sc.id] = false;
@@ -279,7 +278,7 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
           browserOpening
         );
       }
-      integrationsFilter.next(this.leappCoreService.repository.listAwsSsoIntegrations());
+      integrationsFilter.next(this.leappCoreService.repository.listAwsSsoConfigurations());
       this.modalRef.hide();
     } else {
       this.toasterService.toast('Form is not valid', ToastLevel.warn, 'Form validation');
