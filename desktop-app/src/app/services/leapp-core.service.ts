@@ -7,7 +7,6 @@ import { LoggingService } from '@noovolari/leapp-core/services/logging-service';
 import { TimerService } from '@noovolari/leapp-core/services/timer-service';
 import { AwsIamRoleFederatedService } from '@noovolari/leapp-core/services/session/aws/aws-iam-role-federated-service';
 import { AzureService } from '@noovolari/leapp-core/services/session/azure/azure-service';
-import { AwsSsoIntegrationService } from '@noovolari/leapp-core/services/session/aws/aws-sso-integration-service';
 import { ElectronService } from './electron.service';
 import { MfaCodePromptService } from './mfa-code-prompt.service';
 import { ExecuteService } from '@noovolari/leapp-core/services/execute-service';
@@ -49,7 +48,6 @@ export class LeappCoreService {
   private rotationServiceInstance: RotationService;
   private retroCompatibilityServiceInstance: RetroCompatibilityService;
   private azureCoreServiceInstance: AzureCoreService;
-  private awsSsoIntegrationServiceInstance: AwsSsoIntegrationService;
 
   constructor(private mfaCodePrompter: MfaCodePromptService, private awsAuthenticationService: AwsAuthenticationService,
               private verificationWindowService: VerificationWindowService, private electronService: ElectronService) {
@@ -197,15 +195,5 @@ export class LeappCoreService {
       this.azureCoreServiceInstance = new AzureCoreService();
     }
     return this.azureCoreServiceInstance;
-  }
-
-  public get awsSsoIntegrationService(): AwsSsoIntegrationService {
-    if (!this.awsSsoIntegrationServiceInstance) {
-      this.awsSsoIntegrationServiceInstance = new AwsSsoIntegrationService(
-        this.repositoryInstance, this.fileServiceInstance, this.keyChainServiceInstance,
-        this.awsCoreServiceInstance, this.awsSsoRoleServiceInstance, this.awsSsoOidcServiceInstance,
-        this.workspaceServiceInstance);
-    }
-    return this.awsSsoIntegrationServiceInstance;
   }
 }
