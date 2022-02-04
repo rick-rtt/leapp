@@ -85,6 +85,34 @@ describe('AddSession', () => {
     expect(map).toEqual(expectedMap)
   })
 
+  test('chooseAccessMethodParams - choice not present', async () => {
+    const expectedMap: any = new Map<string, {}>([['field', 'input']])
+    const selectedAccessMethod: any = {
+      accessMethodFields: [
+        {
+          creationRequestField: 'field', message: 'message', type: 'type', choices: undefined
+        }
+      ]
+    }
+    const leappCliService: any = {
+      inquirer: {
+        prompt: (params: any) => {
+          expect(params).toStrictEqual([{
+            name: 'field',
+            message: 'message',
+            type: 'type',
+            choices: undefined
+          }])
+          return {field: 'input'}
+        }
+      }
+    }
+
+    const command = new AddSession([], {} as any, leappCliService)
+    const map = await command.chooseAccessMethodParams(selectedAccessMethod)
+    expect(map).toEqual(expectedMap)
+  })
+
   test('createSession', async () => {
     const selectedParams = new Map<string, string>([['name', 'prova']])
     const accessMethod: any = {
@@ -119,7 +147,7 @@ describe('AddSession', () => {
     const cloudProvider = 'cloudProvider'
     const accessMethod = 'accessMethod'
     const params = 'params'
-    const command = new AddSession([], {} as any, {} as any)
+    const command = new AddSession([], {} as any)
     command.chooseCloudProvider = jest.fn(async (): Promise<any> => {
       return cloudProvider
     })

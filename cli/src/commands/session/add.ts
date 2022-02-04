@@ -10,8 +10,7 @@ export default class AddSession extends Command {
     '$leapp session add',
   ]
 
-  constructor(argv: string[], config: Config,
-              private leappCliService = new LeappCliService()) {
+  constructor(argv: string[], config: Config, private leappCliService = new LeappCliService()) {
     super(argv, config)
   }
 

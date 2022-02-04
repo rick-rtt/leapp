@@ -9,7 +9,7 @@ describe('CloudProviderService', () => {
     expect(service.availableCloudProviders()).toEqual(['aws', 'azure'])
   })
 
-  it('availableAccessMethods AWS cloud provider', function () {
+  it('availableAccessMethods - AWS', function () {
     const awsCoreService: any = {
       getRegions: () => [{region: 'region1'}, {region: 'region2'}]
     }
@@ -180,8 +180,7 @@ describe('CloudProviderService', () => {
     ])
   })
 
-
-  it('availableAccessMethods Azure cloud provider', function () {
+  it('availableAccessMethods - Azure', function () {
     const awsCoreService: any = {getRegions: () => []}
     const azureCoreService: any = {
       getLocations: () => [{location: 'location1'}, {location: 'location2'}]

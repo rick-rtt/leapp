@@ -11,8 +11,7 @@ export default class StartSession extends Command {
     `$leapp session start`,
   ]
 
-  constructor(argv: string[], config: Config,
-              private leappCliService = new LeappCliService()) {
+  constructor(argv: string[], config: Config, private leappCliService = new LeappCliService()) {
     super(argv, config)
   }
 
