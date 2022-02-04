@@ -6,4 +6,5 @@ export interface AwsSsoRoleSessionRequest extends CreateSessionRequest{
     email: string
     roleArn: string
     profileId: string
+    awsSsoConfigurationId: string
 }
