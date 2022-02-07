@@ -94,6 +94,8 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
       needToAuthenticate = await this.awsAuthenticationService.needAuthentication(idpUrl)
     } catch (err) {
       throw new LeappSamlError(this, err.message)
+    } finally {
+      await this.awsAuthenticationService.authenticationPhaseEnded()
     }
 
     // AwsSignIn: retrieve the response hook
@@ -102,6 +104,8 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
       responseHookDetails = await this.awsAuthenticationService.awsSignIn(idpUrl, needToAuthenticate)
     } catch (err) {
       throw new LeappParseError(this, err.message)
+    } finally {
+      await this.awsAuthenticationService.authenticationPhaseEnded()
     }
 
     // Extract SAML response from responseHookDetails

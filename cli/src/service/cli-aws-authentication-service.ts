@@ -1,32 +1,76 @@
 import { IAwsAuthenticationService } from '@noovolari/leapp-core/interfaces/i-aws-authentication.service'
-import puppeteer from 'puppeteer'
+import { BrowserHandler, DEFAULT_INTERCEPT_RESOLUTION_PRIORITY } from './browser-handler'
 
 export class CliAwsAuthenticationService implements IAwsAuthenticationService {
+  private browserHandler: BrowserHandler
+
   async needAuthentication(idpUrl: string): Promise<boolean> {
-    const browser = await puppeteer.launch({headless: false})
-    const page = await browser.newPage()
-    await page.setRequestInterception(true)
-    page.on('request', async (request) => {
+    return new Promise(async (resolve, reject) => {
 
-      if ((request.url.toString().indexOf('https://accounts.google.com/ServiceLogin') !== -1) &&
-        (request.url.toString().indexOf('.onelogin.com/login') !== -1) &&
-        (request.url.toString().indexOf('.okta.com/discovery/iframe.html') !== -1)  &&
-        (request.url.toString().indexOf('https://login.microsoftonline.com') !== -1) &&
-        (request.url.toString().indexOf('/oauth2/authorize') !== -1)){
-      }
-      else
-      {
-        console.log(request)
-        await browser.close()
-      }
+      this.browserHandler = new BrowserHandler(true)
+      const page = await (await this.browserHandler.getBrowser()).newPage()
+      await page.setDefaultNavigationTimeout(0)
+      await page.setRequestInterception(true)
+      page.on('request', request => {
+        const requestUrl = request.url().toString()
+        if (request.isInterceptResolutionHandled()) {
+          reject('request unexpectedly already handled')
+        }
 
+        if (this.isRequestToIntercept(requestUrl)) {
+          resolve(requestUrl.indexOf('https://signin.aws.amazon.com/saml') === -1)
+        } else {
+          request.continue(undefined, DEFAULT_INTERCEPT_RESOLUTION_PRIORITY)
+        }
+      })
+
+      await page.goto(idpUrl)
     })
-    await page.goto(idpUrl)
-    return true
   }
 
+  public async awsSignIn(idpUrl: string, needToAuthenticate: boolean): Promise<any> {
+    return new Promise(async (resolve, reject) => {
 
-  async awsSignIn(idpUrl: string, needToAuthenticate: boolean): Promise<any> {
-    return idpUrl === '' && needToAuthenticate
+      this.browserHandler = new BrowserHandler(!needToAuthenticate)
+      const page = await (await this.browserHandler.getBrowser()).newPage()
+      await page.setDefaultNavigationTimeout(0)
+      await page.setRequestInterception(true)
+      page.on('request', request => {
+        const requestUrl = request.url().toString()
+        if (request.isInterceptResolutionHandled()) {
+          reject('request unexpectedly already handled')
+        }
+
+        if (requestUrl.indexOf('https://signin.aws.amazon.com/saml') !== -1) {
+          resolve({uploadData: [{bytes: {toString: () => request.postData()}}]})
+        } else {
+          request.continue(undefined, DEFAULT_INTERCEPT_RESOLUTION_PRIORITY)
+        }
+      })
+
+      await page.goto(idpUrl)
+    })
+  }
+
+  async authenticationPhaseEnded(): Promise<void> {
+    if (this.browserHandler){
+      await this.browserHandler.killBrowser()
+    }
+  }
+
+  private isRequestToIntercept(requestUrl: string): boolean {
+    if (requestUrl.indexOf('https://login.microsoftonline.com') !== -1 &&
+      requestUrl.indexOf('/oauth2/authorize') !== -1) {
+      return true
+    }
+
+    const otherFilters = [
+      '.onelogin.com/login',
+      '.okta.com/discovery/iframe.html',
+      'https://accounts.google.com/ServiceLogin',
+      'https://signin.aws.amazon.com/saml'
+    ]
+
+    return otherFilters.some(filter => requestUrl.indexOf(filter) !== -1)
   }
 }
