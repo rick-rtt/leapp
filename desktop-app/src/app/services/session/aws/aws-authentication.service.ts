@@ -7,6 +7,8 @@ export class AwsAuthenticationService implements IAwsAuthenticationService {
   public constructor(private windowService: WindowService) {
   }
 
+  authenticationPhaseEnded(): void {}
+
   async needAuthentication(idpUrl: string): Promise<boolean> {
     return new Promise((resolve, _) => {
       // Get active window position for extracting new windows coordinate

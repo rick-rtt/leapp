@@ -15,5 +15,5 @@ describe('BrowserHandler', () => {
     await browserHandler2.killBrowser()
 
     expect(browser).not.toEqual(browser2)
-  })
+  }, 10000)
 })

@@ -26,6 +26,7 @@ export class CloudProviderService {
   private get map(): Map<CloudProviderType, AccessMethod[]> {
     const awsRegionChoices = this.getAwsRegionChoices()
     const awsNamedProfileChoices = this.getAwsNamedProfileChoices()
+    const idpUrlChoices = this.getIdpUrls()
     const awsSessionChoices = this.getAwsSessionChoices()
     const azureLocationChoices = this.getAzureLocationChoices()
 
@@ -43,7 +44,7 @@ export class CloudProviderService {
           new AccessMethodField('sessionName', 'Insert session alias', AccessMethodFieldType.input),
           new AccessMethodField('region', 'Select region', AccessMethodFieldType.list, awsRegionChoices),
           new AccessMethodField('roleArn', 'Insert Role ARN', AccessMethodFieldType.input),
-          new AccessMethodField('idpUrl', 'Insert the SAML 2.0 Url', AccessMethodFieldType.input),
+          new AccessMethodField('idpUrl', 'Insert the SAML 2.0 Url', AccessMethodFieldType.list, idpUrlChoices),
           new AccessMethodField('idpArn', 'Insert the AWS Identity Provider ARN', AccessMethodFieldType.input),
           new AccessMethodField('profileId', 'Select the Named Profile', AccessMethodFieldType.list, awsNamedProfileChoices)
         ]),
@@ -67,6 +68,10 @@ export class CloudProviderService {
     ])
   }
 
+  private getAzureLocationChoices(): FieldChoice[] {
+    return this.azureCoreService.getLocations().map(location => new FieldChoice(location.location, location.location))
+  }
+
   private getAwsRegionChoices(): FieldChoice[] {
     return this.awsCoreService.getRegions().map(value => new FieldChoice(value.region, value.region))
   }
@@ -81,7 +86,8 @@ export class CloudProviderService {
       .map(session => new FieldChoice(session.sessionName, session.sessionId))
   }
 
-  private getAzureLocationChoices(): FieldChoice[] {
-    return this.azureCoreService.getLocations().map(location => new FieldChoice(location.location, location.location))
+  private getIdpUrls(): FieldChoice[] {
+    return this.repository.getIdpUrls()
+      .map(idpUrl => new FieldChoice(idpUrl.url, idpUrl.id))
   }
 }

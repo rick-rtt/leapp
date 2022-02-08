@@ -52,9 +52,9 @@ export class CliAwsAuthenticationService implements IAwsAuthenticationService {
     })
   }
 
-  async authenticationPhaseEnded(): Promise<void> {
+  public authenticationPhaseEnded(): void {
     if (this.browserHandler){
-      await this.browserHandler.killBrowser()
+      this.browserHandler.killBrowser()
     }
   }
 

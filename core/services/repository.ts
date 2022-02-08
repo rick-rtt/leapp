@@ -9,6 +9,7 @@ import { SessionStatus } from '../models/session-status'
 import { SessionType } from '../models/session-type'
 import { Workspace } from '../models/workspace'
 import { FileService } from './file-service'
+import { IdpUrl } from '../models/IdpUrl'
 
 export class Repository {
   // Private singleton workspace
@@ -116,20 +117,19 @@ export class Repository {
   }
 
   // IDP URLS
-
   getIdpUrl(idpUrlId: string): string | null {
     const workspace = this.getWorkspace()
     const idpUrlFiltered = workspace.idpUrls.find(url => url.id === idpUrlId)
     return idpUrlFiltered ? idpUrlFiltered.url : null
   }
 
-  getIdpUrls() {
+  getIdpUrls(): IdpUrl[] {
     return this.getWorkspace().idpUrls
   }
 
-  addIdpUrl(idpUrl: { id: string; url: string }): void {
+  addIdpUrl(idpUrl: IdpUrl): void {
     const workspace = this.getWorkspace()
-    workspace.idpUrls.push(idpUrl)
+    workspace.addIpUrl(idpUrl)
     this.persistWorkspace(workspace)
   }
 

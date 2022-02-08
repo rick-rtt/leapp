@@ -22,7 +22,8 @@ describe('CloudProviderService', () => {
         {type: SessionType.awsSsoRole, sessionName: 'session4', sessionId: 's4'},
         {type: SessionType.azure, sessionName: 'session5', sessionId: 's5'},
       ],
-      getProfiles: () => [{name: 'profileName', id: 'p1'}]
+      getProfiles: () => [{name: 'profileName', id: 'p1'}],
+      getIdpUrls: () => [{url: 'idpUrl1', id: 'id1'}],
     }
     const service = new CloudProviderService(awsCoreService, azureCoreService, repository)
 
@@ -41,6 +42,13 @@ describe('CloudProviderService', () => {
       {
         'fieldName': 'profileName',
         'fieldValue': 'p1'
+      }
+    ]
+
+    const expectedIdpUrlChoices = [
+      {
+        'fieldName': 'idpUrl1',
+        'fieldValue': 'id1'
       }
     ]
 
@@ -102,9 +110,10 @@ describe('CloudProviderService', () => {
             'type': 'input'
           },
           {
+            'choices': expectedIdpUrlChoices,
             'creationRequestField': 'idpUrl',
             'message': 'Insert the SAML 2.0 Url',
-            'type': 'input'
+            'type': 'list'
           },
           {
             'creationRequestField': 'idpArn',
@@ -185,7 +194,7 @@ describe('CloudProviderService', () => {
     const azureCoreService: any = {
       getLocations: () => [{location: 'location1'}, {location: 'location2'}]
     }
-    const repository: any = {getSessions: () => [], getProfiles: () => []}
+    const repository: any = {getSessions: () => [], getProfiles: () => [], getIdpUrls: () => []}
     const service = new CloudProviderService(awsCoreService, azureCoreService, repository)
 
     expect(service.availableAccessMethods(CloudProviderType.AZURE)).toEqual([
