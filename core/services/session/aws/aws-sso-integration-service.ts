@@ -110,7 +110,7 @@ export class AwsSsoIntegrationService {
       for (let i = 0; i < sessions.length; i++) {
         const sess = sessions[i];
 
-        const iamRoleChainedSessions = this.awsSsoRoleService.listIamRoleChained(sess);
+        const iamRoleChainedSessions = this.repository.listIamRoleChained(sess);
 
         for (let j = 0; j < iamRoleChainedSessions.length; j++) {
           await this.awsSsoRoleService.delete(iamRoleChainedSessions[j].sessionId);
@@ -155,7 +155,7 @@ export class AwsSsoIntegrationService {
       if (shouldBeDeleted) {
         sessionsToBeDeleted.push(persistedSession as unknown as SsoRoleSession);
 
-        const iamRoleChainedSessions = this.awsSsoRoleService.listIamRoleChained(persistedSession);
+        const iamRoleChainedSessions = this.repository.listIamRoleChained(persistedSession);
 
         for (let j = 0; j < iamRoleChainedSessions.length; j++) {
           await this.awsSsoRoleService.delete(iamRoleChainedSessions[j].sessionId);

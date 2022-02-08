@@ -89,12 +89,13 @@ export class CreateDialogComponent implements OnInit {
     selectAccessStrategy: new FormControl(SessionType.awsIamRoleFederated, [Validators.required])
   });
 
+  private workspaceService: WorkspaceService;
+
   /* Setup the first account for the application */
   constructor(
     private appService: AppService,
     private router: Router,
     private activatedRoute: ActivatedRoute,
-    private workspaceService: WorkspaceService,
     private awsIamRoleFederatedService: AwsIamRoleFederatedService,
     private awsIamUserService: AwsIamUserService,
     private awsIamRoleChainedService: AwsIamRoleChainedService,
@@ -105,7 +106,9 @@ export class CreateDialogComponent implements OnInit {
     private leappCoreService: LeappCoreService,
     private windowService: WindowService,
     private messageToasterService: MessageToasterService
-  ) {}
+  ) {
+    this.workspaceService = leappCoreService.workspaceService;
+  }
 
   public ngOnInit(): void {
 

@@ -28,6 +28,8 @@
         "no-trailing-spaces": "error",
         "no-underscore-dangle": "error",
         "no-case-declarations": "off",
+        "no-dupe-else-if": "warn",
+        "@typescript-eslint/prefer-for-of": "off",
         "@typescript-eslint/consistent-type-definitions": "error",
         "@typescript-eslint/dot-notation": "off",
         "@typescript-eslint/explicit-member-accessibility": [

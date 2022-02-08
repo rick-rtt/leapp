@@ -1,17 +1,20 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {WorkspaceService} from '../../services/workspace.service';
-import Folder from '../../models/folder';
-import Segment from '../../models/Segment';
 import {
   globalFilteredSessions,
   globalHasFilter,
-  globalResetFilter, globalSegmentFilter
+  globalResetFilter,
+  globalSegmentFilter
 } from '../command-bar/command-bar.component';
-import {Session} from '../../models/session';
-import {BehaviorSubject, Observable} from 'rxjs';
+import {BehaviorSubject} from 'rxjs';
 import {BsModalRef, BsModalService} from 'ngx-bootstrap/modal';
 import {ConfirmationDialogComponent} from '../dialogs/confirmation-dialog/confirmation-dialog.component';
-import {Constants} from '../../models/constants';
+import Segment from '@noovolari/leapp-core/models/Segment';
+import Folder from '@noovolari/leapp-core/models/folder';
+import {WorkspaceService} from '@noovolari/leapp-core/services/workspace-service';
+import {Session} from '@noovolari/leapp-core/models/session';
+import {Repository} from '@noovolari/leapp-core/services/repository';
+import {LeappCoreService} from '../../services/leapp-core.service';
+import {constants} from '@noovolari/leapp-core/models/constants';
 
 export interface SelectedSegment {
   name: string;
@@ -35,17 +38,24 @@ export class SideBarComponent implements OnInit, OnDestroy {
   showPinned: boolean;
   modalRef: BsModalRef;
 
-  constructor(private workspaceService: WorkspaceService, private bsModalService: BsModalService) {
+  private repository: Repository;
+  private workspaceService: WorkspaceService;
+
+  constructor(private bsModalService: BsModalService,
+              private leappCoreService: LeappCoreService,
+  ) {
+    this.repository = leappCoreService.repository;
+    this.workspaceService = leappCoreService.workspaceService;
     this.showAll = true;
     this.showPinned = false;
   }
 
   ngOnInit(): void {
-    this.subscription = segmentFilter.subscribe(segments => {
+    this.subscription = segmentFilter.subscribe((segments) => {
       this.segments = segments;
-      this.selectedS = this.segments.map(segment => ({ name: segment.name, selected: false }));
+      this.selectedS = this.segments.map((segment) => ({ name: segment.name, selected: false }));
     });
-    segmentFilter.next(this.workspaceService.getSegments());
+    segmentFilter.next(this.repository.getSegments());
   }
 
   ngOnDestroy(): void {
@@ -55,7 +65,7 @@ export class SideBarComponent implements OnInit, OnDestroy {
   resetFilters() {
     this.showAll = true;
     this.showPinned = false;
-    this.selectedS.forEach(s => s.selected = false);
+    this.selectedS.forEach((s) => s.selected = false);
     globalFilteredSessions.next(this.workspaceService.sessions);
     globalHasFilter.next(false);
     globalResetFilter.next(true);
@@ -64,8 +74,8 @@ export class SideBarComponent implements OnInit, OnDestroy {
   showOnlyPinned() {
     this.showAll = false;
     this.showPinned = true;
-    this.selectedS.forEach(s => s.selected = false);
-    globalFilteredSessions.next(this.workspaceService.sessions.filter((s: Session) => this.workspaceService.getWorkspace().pinned.indexOf(s.sessionId) !== -1));
+    this.selectedS.forEach((s) => s.selected = false);
+    globalFilteredSessions.next(this.workspaceService.sessions.filter((s: Session) => this.repository.getWorkspace().pinned.indexOf(s.sessionId) !== -1));
   }
 
   applySegmentFilter(segment: Segment, event) {
@@ -74,9 +84,9 @@ export class SideBarComponent implements OnInit, OnDestroy {
 
     this.showAll = false;
     this.showPinned = false;
-    this.selectedS.forEach(s => s.selected = false);
+    this.selectedS.forEach((s) => s.selected = false);
 
-    const selectedIndex = this.selectedS.findIndex(s => s.name === segment.name);
+    const selectedIndex = this.selectedS.findIndex((s) => s.name === segment.name);
     this.selectedS[selectedIndex].selected = true;
 
     globalSegmentFilter.next(JSON.parse(JSON.stringify(segment)));
@@ -86,12 +96,12 @@ export class SideBarComponent implements OnInit, OnDestroy {
     event.preventDefault();
     event.stopPropagation();
     console.log(segment);
-    this.workspaceService.removeSegment(segment);
-    this.segments = JSON.parse(JSON.stringify(this.workspaceService.getSegments()));
+    this.repository.removeSegment(segment);
+    this.segments = JSON.parse(JSON.stringify(this.repository.getSegments()));
   }
 
   selectedSegmentCheck(segment: Segment) {
-    const index = this.selectedS.findIndex(s => s.name === segment.name);
+    const index = this.selectedS.findIndex((s) => s.name === segment.name);
     return this.selectedS[index].selected ? 'selected-segment' : '';
   }
 
@@ -99,7 +109,7 @@ export class SideBarComponent implements OnInit, OnDestroy {
     const message = `Are you sure you want to delete the segment "${segment.name}"?`;
     const confirmText = 'Delete';
     const callback = (answerString: string) => {
-      if(answerString === Constants.confirmed.toString()) {
+      if(answerString === constants.confirmed.toString()) {
         this.deleteSegment(segment, event);
       }
     };

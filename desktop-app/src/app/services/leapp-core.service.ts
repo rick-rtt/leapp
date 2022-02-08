@@ -177,7 +177,7 @@ export class LeappCoreService {
 
   public get rotationService(): RotationService {
     if (!this.rotationServiceInstance) {
-      this.rotationServiceInstance = new RotationService(this.sessionFactory, this.workspaceService);
+      this.rotationServiceInstance = new RotationService(this.sessionFactory);
     }
     return this.rotationServiceInstance;
   }

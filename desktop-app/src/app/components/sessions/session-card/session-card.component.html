@@ -3,7 +3,7 @@
     <img src="assets/images/{{getSessionTypeIcon(session.type)}}.png" alt="" title="" />
     &nbsp;
     <span class="{{session.status === eSessionStatus.active ? 'strong' : ''}}">{{session.sessionName}}</span>
-    <i class="moon-Pin" *ngIf="workspaceService.getWorkspace().pinned.indexOf(session.sessionId) !== -1"></i>
+    <i class="moon-Pin" *ngIf="this.repository.getWorkspace().pinned.indexOf(session.sessionId) !== -1"></i>
   </div>
 </td>
 <td (dblclick)="switchCredentials()" (click)="openOptionBar(session);" (contextmenu)="openContextMenu($event, session)" class="{{eOptionIds[session.sessionId] ? 'selected' : (session.status !== eSessionStatus.inactive ? 'active' : '')}} table-column-2" *ngIf="globalColumns.role">
@@ -68,14 +68,14 @@
     <span>Edit Session</span>
   </button>
 
-  <ng-container *ngIf="workspaceService.getWorkspace().pinned.indexOf(session.sessionId) === -1">
+  <ng-container *ngIf="this.repository.getWorkspace().pinned.indexOf(session.sessionId) === -1">
   <button mat-menu-item (click)="pinSession(session, $event);">
       <i class="moon-Pin"></i>&nbsp;
       <span>Pin Session</span>
   </button>
   </ng-container>
 
-  <ng-container *ngIf="workspaceService.getWorkspace().pinned.indexOf(session.sessionId) !== -1">
+  <ng-container *ngIf="this.repository.getWorkspace().pinned.indexOf(session.sessionId) !== -1">
   <button mat-menu-item (click)="unpinSession(session, $event);">
       <i class="moon-Pin"></i>&nbsp;
       <span>Unpin Session</span>
@@ -127,8 +127,8 @@
       <span class="separator"></span>
 
       <div class="opt-bar-middle-right-buttons">
-        <a class="icon-button" (click)="pinSession(session, $event);" *ngIf="this.workspaceService.getWorkspace().pinned.indexOf(session.sessionId) === -1" tooltip="Pin Session"><i class="moon-Pin"></i></a>
-        <a class="icon-button" (click)="unpinSession(session, $event);" *ngIf="this.workspaceService.getWorkspace().pinned.indexOf(session.sessionId) !== -1" tooltip="Unpin Session"><i class="moon-Pin-filled"></i></a>
+        <a class="icon-button" (click)="pinSession(session, $event);" *ngIf="this.repository.getWorkspace().pinned.indexOf(session.sessionId) === -1" tooltip="Pin Session"><i class="moon-Pin"></i></a>
+        <a class="icon-button" (click)="unpinSession(session, $event);" *ngIf="this.repository.getWorkspace().pinned.indexOf(session.sessionId) !== -1" tooltip="Unpin Session"><i class="moon-Pin-filled"></i></a>
         <a class="icon-button" (click)="deleteSession(session, $event);" tooltip="Delete Session"><i class="moon-Delete"></i></a>
       </div>
     </div>

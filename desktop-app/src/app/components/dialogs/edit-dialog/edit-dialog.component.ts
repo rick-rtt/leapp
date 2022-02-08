@@ -40,6 +40,8 @@ export class EditDialogComponent implements OnInit {
     mfaDevice: new FormControl('')
   });
 
+  private workspaceService: WorkspaceService;
+
   /* Setup the first account for the application */
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -48,9 +50,9 @@ export class EditDialogComponent implements OnInit {
     private messageToasterService: MessageToasterService,
     private router: Router,
     private windowService: WindowService,
-    private workspaceService: WorkspaceService,
     private leappCoreService: LeappCoreService
   ) {
+    this.workspaceService = leappCoreService.workspaceService;
   }
 
   ngOnInit() {

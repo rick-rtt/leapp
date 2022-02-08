@@ -1,5 +1,4 @@
 import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {WorkspaceService} from '../../services/workspace.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {AppService} from '../../services/app.service';
 import {HttpClient} from '@angular/common/http';
@@ -8,17 +7,22 @@ import {
   compactMode, globalColumns,
   globalFilteredSessions,
   globalFilterGroup,
-  GlobalFilters, globalHasFilter, IGlobalColumns
+  globalHasFilter,
+  IGlobalColumns
 } from '../command-bar/command-bar.component';
-import {Session} from '../../models/session';
 import {ColumnDialogComponent} from '../dialogs/column-dialog/column-dialog.component';
 import {BehaviorSubject} from 'rxjs';
-import {SessionType} from '../../models/session-type';
-import {AwsIamRoleFederatedSession} from '../../models/aws-iam-role-federated-session';
-import {AzureSession} from '../../models/azure-session';
-import {AwsSsoRoleSession} from '../../models/aws-sso-role-session';
-import {AwsIamRoleChainedSession} from '../../models/aws-iam-role-chained-session';
 import {SessionCardComponent} from './session-card/session-card.component';
+import {Session} from '@noovolari/leapp-core/models/session';
+import {GlobalFilters} from '@noovolari/leapp-core/models/Segment';
+import {WorkspaceService} from '@noovolari/leapp-core/services/workspace-service';
+import {LeappCoreService} from '../../services/leapp-core.service';
+import {AwsCoreService} from '@noovolari/leapp-core/services/aws-core-service';
+import {SessionType} from '@noovolari/leapp-core/models/session-type';
+import {AwsIamRoleFederatedSession} from '@noovolari/leapp-core/models/aws-iam-role-federated-session';
+import {AzureSession} from '@noovolari/leapp-core/models/azure-session';
+import {AwsSsoRoleSession} from '@noovolari/leapp-core/models/aws-sso-role-session';
+import {AwsIamRoleChainedSession} from '@noovolari/leapp-core/models/aws-iam-role-chained-session';
 
 export const optionBarIds = {};
 export const globalOrderingFilter = new BehaviorSubject<Session[]>([]);
@@ -58,30 +62,35 @@ export class SessionsComponent implements OnInit, OnDestroy {
   columnSettings: ArrowSettings[];
 
   private subscriptions = [];
+  private awsCoreService: AwsCoreService;
+
+  private workspaceService: WorkspaceService;
 
   constructor(
     private router: Router,
     private route: ActivatedRoute,
-    public workspaceService: WorkspaceService,
     private httpClient: HttpClient,
     private modalService: BsModalService,
-    private appService: AppService
+    private appService: AppService,
+    private leappCoreService: LeappCoreService
   ) {
+    this.workspaceService = leappCoreService.workspaceService;
+    this.awsCoreService = this.leappCoreService.awsCoreService;
 
     this.columnSettings = Array.from(Array(5)).map((): ArrowSettings => ({ activeArrow: false, orderStyle: false }));
-    const subscription = globalHasFilter.subscribe(value => {
+    const subscription = globalHasFilter.subscribe((value) => {
       this.eGlobalFilterExtended = value;
     });
-    const subscription2 = globalFilteredSessions.subscribe(value => {
+    const subscription2 = globalFilteredSessions.subscribe((value) => {
       this.eGlobalFilteredSessions = value;
     });
-    const subscription3 = compactMode.subscribe(value => {
+    const subscription3 = compactMode.subscribe((value) => {
       this.eCompactMode = value;
     });
-    const subscription4 = globalFilterGroup.subscribe(value => {
+    const subscription4 = globalFilterGroup.subscribe((value) => {
       this.eGlobalFilterGroup = value;
     });
-    const subscription5 = globalColumns.subscribe(value => {
+    const subscription5 = globalColumns.subscribe((value) => {
       this.eGlobalColumns = value;
     });
 
@@ -96,11 +105,11 @@ export class SessionsComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     // Set regions for ssm
-    this.ssmRegions = this.appService.getRegions();
+    this.ssmRegions = this.awsCoreService.getRegions();
   }
 
   ngOnDestroy(): void {
-    this.subscriptions.forEach(subscription => {
+    this.subscriptions.forEach((subscription) => {
       subscription.unsubscribe();
     });
   }
@@ -110,7 +119,7 @@ export class SessionsComponent implements OnInit, OnDestroy {
    */
   createAccount() {
     // Go!
-    this.router.navigate(['/managing', 'create-account']).then(_ => {});
+    this.router.navigate(['/managing', 'create-account']).then((_) => {});
   }
 
   openFilterColumn() {

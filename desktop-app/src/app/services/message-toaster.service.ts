@@ -1,6 +1,6 @@
-import { Injectable } from '@angular/core'
-import { LoggerLevel } from '@noovolari/leapp-core/services/logging-service'
-import { ToastrService } from 'ngx-toastr'
+import { Injectable } from '@angular/core';
+import { LoggerLevel } from '@noovolari/leapp-core/services/logging-service';
+import { ToastrService } from 'ngx-toastr';
 
 export enum ToastLevel {
   info,
@@ -12,8 +12,7 @@ export enum ToastLevel {
 @Injectable({providedIn: 'root'})
 export class MessageToasterService {
 
-  constructor(private toastr: ToastrService) {
-  }
+  constructor(private toastr: ToastrService) {}
 
   /**
    * Show a toast message with different styles for different type of toast
@@ -25,20 +24,20 @@ export class MessageToasterService {
   toast(message: string, type: ToastLevel | LoggerLevel, title?: string): void {
     switch (type) {
       case ToastLevel.success:
-        this.toastr.success(message, title)
-        break
+        this.toastr.success(message, title);
+        break;
       case ToastLevel.info || LoggerLevel.info:
-        this.toastr.info(message, title)
-        break
+        this.toastr.info(message, title);
+        break;
       case ToastLevel.warn || LoggerLevel.warn:
-        this.toastr.warning(message, title)
-        break
+        this.toastr.warning(message, title);
+        break;
       case ToastLevel.error || LoggerLevel.error:
-        this.toastr.error(message, title ? title : 'Invalid Action!')
-        break
+        this.toastr.error(message, title ? title : 'Invalid Action!');
+        break;
       default:
-        this.toastr.error(message, title)
-        break
+        this.toastr.error(message, title);
+        break;
     }
   }
 }

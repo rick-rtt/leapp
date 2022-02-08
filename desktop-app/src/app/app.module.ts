@@ -16,7 +16,7 @@ import {ErrorService} from './services/middleware/error.service';
 
 import {MatSnackBarModule} from '@angular/material/snack-bar';
 import {ComponentsModule} from './components/components.module';
-
+import {ToastrModule} from 'ngx-toastr';
 
 @NgModule({
   declarations: [
@@ -35,10 +35,13 @@ import {ComponentsModule} from './components/components.module';
     NgSelectModule,
     LayoutModule,
     TooltipModule.forRoot(),
-    ModalModule.forRoot()
+    ModalModule.forRoot(),
+    ToastrModule.forRoot()
   ],
   entryComponents: [ConfirmationDialogComponent, InputDialogComponent],
-  providers: [{ provide: ErrorHandler, useClass: ErrorService}],
+  providers: [
+    { provide: ErrorHandler, useClass: ErrorService}
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

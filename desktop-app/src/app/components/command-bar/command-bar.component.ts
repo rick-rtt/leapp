@@ -13,6 +13,7 @@ import {WorkspaceService} from '@noovolari/leapp-core/services/workspace-service
 import {syncAllEvent} from '../integration-bar/integration-bar.component';
 import {LeappCoreService} from '../../services/leapp-core.service';
 import {ElectronService} from '../../services/electron.service';
+import {AppService} from '../../services/app.service';
 
 export const compactMode = new BehaviorSubject<boolean>(false);
 export const globalFilteredSessions = new BehaviorSubject<Session[]>([]);
@@ -67,14 +68,18 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
 
   private currentSegment: Segment;
 
+  private workspaceService: WorkspaceService;
+
   constructor(private bsModalService: BsModalService,
               private leappCoreService: LeappCoreService,
-              private workspaceService: WorkspaceService,
+              public appService: AppService,
               public electronService: ElectronService) {
+    this.workspaceService = leappCoreService.workspaceService;
+
     this.filterExtended = false;
     this.compactMode = false;
 
-    globalFilteredSessions.next(this.workspaceService.sessions);
+    globalFilteredSessions.next(this.leappCoreService.workspaceService.sessions);
 
     globalColumns.next({
       role: true,
@@ -91,7 +96,6 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
   }
 
   ngOnInit(): void {
-
     this.subscription = this.filterForm.valueChanges.subscribe((values: GlobalFilters) => {
       globalFilterGroup.next(values);
       this.applyFiltersToSessions(values, this.workspaceService.sessions);
@@ -180,8 +184,6 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
     // this.saveTemporarySegmentAndApply();
     CommandBarComponent.changeSessionsTableHeight();
   }
-
-
 
   toggleDateFilter() {
     this.filterForm.get('dateFilter').setValue(!this.filterForm.get('dateFilter').value);

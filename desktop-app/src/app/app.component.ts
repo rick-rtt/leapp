@@ -38,9 +38,13 @@ export class AppComponent implements OnInit {
   private rotationService: RotationService;
 
   /* Main app file: launches the Angular framework inside Electron app */
-  constructor(private appService: AppService, private router: Router, private updaterService: UpdaterService,
-              private windowService: WindowService, private electronService: ElectronService,
-              leappCoreService: LeappCoreService) {
+  constructor(public appService: AppService,
+              private router: Router,
+              private updaterService: UpdaterService,
+              private windowService: WindowService,
+              private electronService: ElectronService,
+              leappCoreService: LeappCoreService
+  ) {
     this.repository = leappCoreService.repository;
     this.fileService = leappCoreService.fileService;
     this.awsCoreService = leappCoreService.awsCoreService;
