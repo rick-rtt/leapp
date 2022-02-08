@@ -1,14 +1,14 @@
 import { IAwsAuthenticationService } from '@noovolari/leapp-core/interfaces/i-aws-authentication.service'
-import { BrowserHandler, DEFAULT_INTERCEPT_RESOLUTION_PRIORITY } from './browser-handler'
+import puppeteer from 'puppeteer'
 
 export class CliAwsAuthenticationService implements IAwsAuthenticationService {
-  private browserHandler: BrowserHandler
+  private browser: puppeteer.Browser
 
   async needAuthentication(idpUrl: string): Promise<boolean> {
     return new Promise(async (resolve, reject) => {
 
-      this.browserHandler = new BrowserHandler(true)
-      const page = await (await this.browserHandler.getBrowser()).newPage()
+      this.browser = await puppeteer.launch({headless: true, devtools: false})
+      const page = await this.browser.newPage()
       await page.setDefaultNavigationTimeout(0)
       await page.setRequestInterception(true)
       page.on('request', request => {
@@ -18,21 +18,23 @@ export class CliAwsAuthenticationService implements IAwsAuthenticationService {
         }
 
         if (this.isRequestToIntercept(requestUrl)) {
+          request.abort()
           resolve(requestUrl.indexOf('https://signin.aws.amazon.com/saml') === -1)
         } else {
-          request.continue(undefined, DEFAULT_INTERCEPT_RESOLUTION_PRIORITY)
+          request.continue()
         }
       })
 
-      await page.goto(idpUrl)
+      try {await page.goto(idpUrl)}catch (e) {
+      }
     })
   }
 
   public async awsSignIn(idpUrl: string, needToAuthenticate: boolean): Promise<any> {
     return new Promise(async (resolve, reject) => {
 
-      this.browserHandler = new BrowserHandler(!needToAuthenticate)
-      const page = await (await this.browserHandler.getBrowser()).newPage()
+      this.browser = await puppeteer.launch({headless: !needToAuthenticate, devtools: false})
+      const page = await this.browser.newPage()
       await page.setDefaultNavigationTimeout(0)
       await page.setRequestInterception(true)
       page.on('request', request => {
@@ -42,19 +44,23 @@ export class CliAwsAuthenticationService implements IAwsAuthenticationService {
         }
 
         if (requestUrl.indexOf('https://signin.aws.amazon.com/saml') !== -1) {
+          request.abort()
           resolve({uploadData: [{bytes: {toString: () => request.postData()}}]})
         } else {
-          request.continue(undefined, DEFAULT_INTERCEPT_RESOLUTION_PRIORITY)
+          request.continue()
         }
       })
 
-      await page.goto(idpUrl)
+      try {await page.goto(idpUrl)}catch (e) {
+      }
     })
   }
 
-  public authenticationPhaseEnded(): void {
-    if (this.browserHandler){
-      this.browserHandler.killBrowser()
+  public async closeAuthenticationWindow(): Promise<void> {
+    if (this.browser) {
+      this.browser.removeAllListeners()
+      this.browser.disconnect()
+      await this.browser.close()
     }
   }
 

@@ -95,7 +95,7 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
     } catch (err) {
       throw new LeappSamlError(this, err.message)
     } finally {
-      await this.awsAuthenticationService.authenticationPhaseEnded()
+      await this.awsAuthenticationService.closeAuthenticationWindow()
     }
 
     // AwsSignIn: retrieve the response hook
@@ -105,7 +105,7 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
     } catch (err) {
       throw new LeappParseError(this, err.message)
     } finally {
-      await this.awsAuthenticationService.authenticationPhaseEnded()
+      await this.awsAuthenticationService.closeAuthenticationWindow()
     }
 
     // Extract SAML response from responseHookDetails
