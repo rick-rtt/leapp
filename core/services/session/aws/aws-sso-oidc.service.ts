@@ -10,8 +10,11 @@ import {
 } from './aws-sso-role-service'
 import { IVerificationWindowService } from '../../../interfaces/i-verification-window.service'
 import { BrowserWindowClosing } from '../../../interfaces/i-browser-window-closing'
-import {SSOOIDC} from "aws-sdk";
-import {CreateTokenRequest, RegisterClientRequest, StartDeviceAuthorizationRequest} from "aws-sdk/clients/ssooidc";
+import SSOOIDC, {
+  CreateTokenRequest,
+  RegisterClientRequest,
+  StartDeviceAuthorizationRequest
+} from 'aws-sdk/clients/ssooidc';
 
 export class AwsSsoOidcService {
   private readonly listeners: BrowserWindowClosing[]
