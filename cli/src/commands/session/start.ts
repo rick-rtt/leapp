@@ -5,7 +5,7 @@ import { Session } from '@noovolari/leapp-core/models/session'
 import { SessionStatus } from '@noovolari/leapp-core/models/session-status'
 
 export default class StartSession extends Command {
-  static description = 'Start session'
+  static description = 'Start a session'
 
   static examples = [
     `$leapp session start`,

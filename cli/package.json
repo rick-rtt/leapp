@@ -12,7 +12,7 @@
     "@commitlint/cli": "^12.1.4",
     "@commitlint/config-conventional": "^12.1.4",
     "@noovolari/leapp-core": "file:../core/dist",
-    "@oclif/core": "^1",
+    "@oclif/core": "1.3.2",
     "@oclif/plugin-help": "^5",
     "@oclif/plugin-plugins": "^2.0.1",
     "@types/inquirer": "^8.2.0",
@@ -115,7 +115,7 @@
     "pack-win": "oclif pack:win",
     "postpack": "gushio gushio/target-post-pack.js",
     "version": "oclif readme && git add README.md",
-    "start-session": "./bin/dev session start"
+    "list-session": "./bin/dev session list"
   },
   "types": "dist/index.d.ts"
 }

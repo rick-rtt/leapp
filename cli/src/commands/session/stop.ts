@@ -5,7 +5,7 @@ import { Session } from '@noovolari/leapp-core/models/session'
 import { SessionStatus } from '@noovolari/leapp-core/models/session-status'
 
 export default class StopSession extends Command {
-  static description = 'Stop session'
+  static description = 'Stop a session'
 
   static examples = [
     `$leapp session stop`,
