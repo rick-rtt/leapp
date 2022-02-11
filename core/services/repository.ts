@@ -3,13 +3,16 @@ import { LeappNotFoundError } from '../errors/leapp-not-found-error'
 import { INativeService } from '../interfaces/i-native-service'
 import { AwsIamRoleChainedSession } from '../models/aws-iam-role-chained-session'
 import { AwsNamedProfile } from '../models/aws-named-profile'
+import { AwsSsoIntegration } from '../models/aws-sso-integration'
 import { constants } from '../models/constants'
+import Segment from '../models/Segment'
 import { Session } from '../models/session'
 import { SessionStatus } from '../models/session-status'
 import { SessionType } from '../models/session-type'
 import { Workspace } from '../models/workspace'
 import { FileService } from './file-service'
 import { IdpUrl } from '../models/IdpUrl'
+import * as uuid from 'uuid'
 
 export class Repository {
   // Private singleton workspace

@@ -231,7 +231,7 @@ export class LeappCliService {
 
   get rotationService(): RotationService {
     if (!this.rotationServiceInstance) {
-      this.rotationServiceInstance = new RotationService(this.sessionFactory, this.workspaceService)
+      this.rotationServiceInstance = new RotationService(this.sessionFactory)
     }
 
     return this.rotationServiceInstance
@@ -242,7 +242,7 @@ export class LeappCliService {
   get retroCompatibilityService(): RetroCompatibilityService {
     if (!this.retroCompatibilityServiceInstance) {
       this.retroCompatibilityServiceInstance = new RetroCompatibilityService(this.fileService, this.keyChainService,
-        this.workspaceService, constants.appName, constants.lockFileDestination)
+        this.repository, this.workspaceService, constants.appName, constants.lockFileDestination)
     }
 
     return this.retroCompatibilityServiceInstance
