@@ -16,6 +16,7 @@ export default class StartSession extends Command {
   }
 
   async run(): Promise<void> {
+
     const selectedSession = await this.selectSession()
     try {
       await this.startSession(selectedSession)

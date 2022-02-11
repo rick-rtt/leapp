@@ -10,7 +10,6 @@ import { FieldChoice } from './field-choice'
 import { Repository } from './repository'
 
 export class CloudProviderService {
-
   public constructor(private awsCoreService: AwsCoreService, private azureCoreService: AzureCoreService,
                      private repository: Repository) {
   }
@@ -21,6 +20,11 @@ export class CloudProviderService {
 
   public availableAccessMethods(cloudProviderType: CloudProviderType): AccessMethod[] {
     return this.map.get(cloudProviderType)
+  }
+
+  public getSessionTypeMap(): Map<SessionType,string> {
+    const accessMethods = [].concat(...Array.from(this.map.values()))
+    return  new Map (accessMethods.map(accessMethod => [accessMethod.sessionType, accessMethod.label] as [SessionType, string]))
   }
 
   private get map(): Map<CloudProviderType, AccessMethod[]> {

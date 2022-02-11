@@ -1,41 +1,64 @@
 import ListSessions from './list'
+import { CliUx } from '@oclif/core'
 import { describe, expect, jest, test } from '@jest/globals'
-import { SessionStatus } from '@noovolari/leapp-core/models/session-status'
+import { AwsIamUserSession } from '@noovolari/leapp-core/models/aws-iam-user-session'
+import { SessionType } from '@noovolari/leapp-core/models/session-type'
 
-
-describe('ShowSessions', () => {
-
-  test('run', () => {
-
-    const command = new ListSessions([], {} as any, {} as any)
+describe('ListSessions', () => {
+  test('run', async () => {
+    const command = new ListSessions([], {} as any)
     command.showSessions = jest.fn()
-    command.run()
-    expect(command.showSessions).toHaveBeenCalled()
+   await command.run()
 
+    expect(command.showSessions).toHaveBeenCalled()
   })
 
-  test('showSessions', () => {
+  test('run - showSessions throw an error', async ()=>{
+    const command = new ListSessions([], {} as any, {} as any)
+    command.showSessions = jest.fn(async ()=>{ throw Error('error')})
+    try {
+      await command.run()
+    }catch (error) {
+      expect(error).toEqual(new Error('error'))
+    }
+  })
 
-    const sessions = [
-      {sessionName: 'sessionName1', status: SessionStatus.active},
-      {sessionName: 'sessionName2', status: SessionStatus.pending},
-      {sessionName: 'sessionName3', status: SessionStatus.inactive}]
-    const leappCliService: any = {
+  test('run - showSessions throw an object', async()=>{
+    const command = new ListSessions([], {} as any, {} as any)
+    command.showSessions = jest.fn(async()=>{throw 'string'})
+    try {
+     await command.run()
+    }catch (error) {
+      expect(error).toEqual(new Error('Unknown error: string'))
+    }
+  })
+
+  test('showSessions', async () => {
+    const sessions = [new AwsIamUserSession('sessionName', 'region', 'profileId',)]
+    const namedProfileMap = new Map([['profileId', {id: 'profileId', name: 'profileName'}]])
+    const sessionTypeMap = new Map([[SessionType.awsIamUser, 'sessionTypeLabel']])
+    const leapCliService: any = {
       repository: {
-        getSessions: jest.fn(() => {
+        getSessions: () => {
           return sessions
-        })
+        },
+        getProfilesMap: () => {
+          return namedProfileMap
+        }
+      },
+      cloudProviderService: {
+        getSessionTypeMap: () => {
+          return sessionTypeMap
+        }
       }
     }
-    const command = new ListSessions([], {} as any, leappCliService)
-    command.log = jest.fn()
-    command.showSessions()
 
-    expect(leappCliService.repository.getSessions).toHaveBeenCalled()
-    expect(command.log).toBeCalledTimes(4)
+    const command = new ListSessions([], {} as any, leapCliService)
+    command.log = jest.fn()
+    const tableSpy = jest.spyOn(CliUx.ux, 'table')
+
+    await command.showSessions()
     expect(command.log).toHaveBeenCalledWith('sessions list:')
-    expect(command.log).toHaveBeenCalledWith('- sessionName1')
-    expect(command.log).toHaveBeenCalledWith('- sessionName2')
-    expect(command.log).toHaveBeenCalledWith('- sessionName3')
+    expect(tableSpy.mock.calls[0][0]).toEqual(sessions)
   })
 })

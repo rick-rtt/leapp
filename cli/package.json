@@ -115,6 +115,7 @@
     "pack-win": "oclif pack:win",
     "postpack": "gushio gushio/target-post-pack.js",
     "version": "oclif readme && git add README.md",
+    "list-session": "./bin/dev session list",
     "start-session": "./bin/dev session start"
   },
   "types": "dist/index.d.ts"

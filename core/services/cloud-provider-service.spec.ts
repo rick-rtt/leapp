@@ -1,3 +1,4 @@
+import { AccessMethod } from '../models/access-method'
 import { CloudProviderType } from '../models/cloud-provider-type'
 import { SessionType } from '../models/session-type'
 import { CloudProviderService } from './cloud-provider-service'
@@ -7,6 +8,20 @@ describe('CloudProviderService', () => {
     const service = new CloudProviderService(null, null, null)
 
     expect(service.availableCloudProviders()).toEqual(['aws', 'azure'])
+  })
+
+  it('getSessionTypeMap',()=>{
+    const map = new Map([[CloudProviderType.AWS, [new AccessMethod(SessionType.awsIamUser, 'IAM User', [])]]])
+    const service = new CloudProviderService(null, null, null)
+    const spy = jest.spyOn(CloudProviderService.prototype as any,'map','get').mockReturnValue(map)
+
+    let expectedMap = new Map<SessionType, string>([
+      [SessionType.awsIamUser, "IAM User"]
+    ]);
+    const sessionTypeLabelMap = service.getSessionTypeMap()
+    expect(sessionTypeLabelMap).toEqual(expectedMap)
+
+    spy.mockRestore()
   })
 
   it('availableAccessMethods - AWS', function () {

@@ -155,6 +155,10 @@ export class Repository {
     return this.getWorkspace().profiles
   }
 
+  getProfilesMap(): Map<string, AwsNamedProfile>{
+    return  new Map(this.getProfiles().map(profile => [profile.id, profile] as [string, AwsNamedProfile]))
+  }
+
   getProfileName(profileId: string): string {
     const profileFiltered = this.getWorkspace().profiles.find(profile => profile.id === profileId)
     if (profileFiltered === undefined) {
