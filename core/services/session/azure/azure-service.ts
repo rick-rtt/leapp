@@ -104,6 +104,7 @@ export class AzureService extends SessionService {
 
   async delete(sessionId: string): Promise<void> {
     try {
+      //TODO: check if session is currently active before trying to stop it?
       await this.stop(sessionId)
       this.repository.deleteSession(sessionId)
       this.iSessionNotifier.deleteSession(sessionId)

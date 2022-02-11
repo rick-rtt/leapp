@@ -1,4 +1,5 @@
 import { AwsNamedProfile } from './aws-named-profile'
+import { IdpUrl } from './IdpUrl'
 import { Session } from './session'
 import * as uuid from 'uuid'
 import 'reflect-metadata'
@@ -15,7 +16,7 @@ export class Workspace {
   private _sessions: Session[]
   private _defaultRegion: string
   private _defaultLocation: string
-  private _idpUrls: { id: string; url: string }[]
+  private _idpUrls: IdpUrl[]
   private _profiles: AwsNamedProfile[]
 
   private _awsSsoIntegrations: AwsSsoIntegration[];
@@ -55,11 +56,15 @@ export class Workspace {
     }
   }
 
-  get idpUrls(): { id: string; url: string }[] {
+  addIpUrl(idpUrl: IdpUrl): void{
+    this._idpUrls.push(idpUrl)
+  }
+
+  get idpUrls(): IdpUrl[] {
     return this._idpUrls
   }
 
-  set idpUrls(value: { id: string; url: string }[]) {
+  set idpUrls(value: IdpUrl[]) {
     this._idpUrls = value
   }
 

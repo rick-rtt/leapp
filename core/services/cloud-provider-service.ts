@@ -10,7 +10,6 @@ import { FieldChoice } from './field-choice'
 import { Repository } from './repository'
 
 export class CloudProviderService {
-
   public constructor(private awsCoreService: AwsCoreService, private azureCoreService: AzureCoreService,
                      private repository: Repository) {
   }
@@ -23,9 +22,15 @@ export class CloudProviderService {
     return this.map.get(cloudProviderType)
   }
 
+  public getSessionTypeMap(): Map<SessionType,string> {
+    const accessMethods = [].concat(...Array.from(this.map.values()))
+    return  new Map (accessMethods.map(accessMethod => [accessMethod.sessionType, accessMethod.label] as [SessionType, string]))
+  }
+
   private get map(): Map<CloudProviderType, AccessMethod[]> {
     const awsRegionChoices = this.getAwsRegionChoices()
     const awsNamedProfileChoices = this.getAwsNamedProfileChoices()
+    const idpUrlChoices = this.getIdpUrls()
     const awsSessionChoices = this.getAwsSessionChoices()
     const azureLocationChoices = this.getAzureLocationChoices()
 
@@ -43,7 +48,7 @@ export class CloudProviderService {
           new AccessMethodField('sessionName', 'Insert session alias', AccessMethodFieldType.input),
           new AccessMethodField('region', 'Select region', AccessMethodFieldType.list, awsRegionChoices),
           new AccessMethodField('roleArn', 'Insert Role ARN', AccessMethodFieldType.input),
-          new AccessMethodField('idpUrl', 'Insert the SAML 2.0 Url', AccessMethodFieldType.input),
+          new AccessMethodField('idpUrl', 'Insert the SAML 2.0 Url', AccessMethodFieldType.list, idpUrlChoices),
           new AccessMethodField('idpArn', 'Insert the AWS Identity Provider ARN', AccessMethodFieldType.input),
           new AccessMethodField('profileId', 'Select the Named Profile', AccessMethodFieldType.list, awsNamedProfileChoices)
         ]),
@@ -67,6 +72,10 @@ export class CloudProviderService {
     ])
   }
 
+  private getAzureLocationChoices(): FieldChoice[] {
+    return this.azureCoreService.getLocations().map(location => new FieldChoice(location.location, location.location))
+  }
+
   private getAwsRegionChoices(): FieldChoice[] {
     return this.awsCoreService.getRegions().map(value => new FieldChoice(value.region, value.region))
   }
@@ -81,7 +90,8 @@ export class CloudProviderService {
       .map(session => new FieldChoice(session.sessionName, session.sessionId))
   }
 
-  private getAzureLocationChoices(): FieldChoice[] {
-    return this.azureCoreService.getLocations().map(location => new FieldChoice(location.location, location.location))
+  private getIdpUrls(): FieldChoice[] {
+    return this.repository.getIdpUrls()
+      .map(idpUrl => new FieldChoice(idpUrl.url, idpUrl.id))
   }
 }

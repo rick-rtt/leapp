@@ -1,13 +1,11 @@
 import { describe, expect, jest, test } from '@jest/globals'
-import StartSession from './start'
+import DeleteSession from './delete'
 import { SessionStatus } from '@noovolari/leapp-core/models/session-status'
 
-describe('StartSession', () => {
-
-  test('startSession', async () => {
-
+describe('DeleteSession', () => {
+  test('deleteSession', async () => {
     const sessionService: any = {
-      start: jest.fn(async () => {
+      delete: jest.fn(async () => {
       })
     }
     const sessionFactory: any = {
@@ -21,17 +19,16 @@ describe('StartSession', () => {
     }
 
     const session: any = {sessionId: 'sessionId', type: 'sessionType'}
-    const command = new StartSession([], {} as any, leappCliService)
+    const command = new DeleteSession([], {} as any, leappCliService)
     command.log = jest.fn()
-    await command.startSession(session)
+    await command.deleteSession(session)
 
     expect(sessionFactory.getSessionService).toHaveBeenCalledWith('sessionType')
-    expect(sessionService.start).toHaveBeenCalledWith('sessionId')
-    expect(command.log).toHaveBeenCalledWith('Session started')
+    expect(sessionService.delete).toHaveBeenCalledWith('sessionId')
+    expect(command.log).toHaveBeenCalledWith('Session deleted')
   })
 
   test('selectSession', async () => {
-
     const leappCliService: any = {
       repository: {
         getSessions: jest.fn(() => {
@@ -44,42 +41,61 @@ describe('StartSession', () => {
       },
       inquirer: {
         prompt: jest.fn(() => {
-          return {selectedSession: {name: 'sessionInactive', value: 'InactiveSession'}}
+          return {selectedSession: {name: 'sessionName', value: 'sessionValue'}}
         })
       }
     }
 
-    const command = new StartSession([], {} as any, leappCliService)
+    const command = new DeleteSession([], {} as any, leappCliService)
     const selectedSession = await command.selectSession()
     expect(leappCliService.inquirer.prompt).toHaveBeenCalledWith([{
-      'choices': [{
-        'name': 'sessionInactive',
-        'value': {'sessionName': 'sessionInactive', 'status': SessionStatus.inactive}
-      }], 'message': 'select a session', 'name': 'selectedSession', 'type': 'list'
+      'choices': [
+        {
+          'name': 'sessionActive',
+          'value': {
+            'sessionName': 'sessionActive',
+            'status': SessionStatus.active,
+          },
+        },
+        {
+          'name': 'sessionPending',
+          'value': {
+            'sessionName': 'sessionPending',
+            'status': SessionStatus.pending,
+          },
+        },
+        {
+          'name': 'sessionInactive',
+          'value': {
+            'sessionName': 'sessionInactive',
+            'status': SessionStatus.inactive,
+          },
+        },
+      ], 'message': 'select a session', 'name': 'selectedSession', 'type': 'list'
     }])
-    expect(selectedSession).toEqual({name: 'sessionInactive', value: 'InactiveSession'})
+    expect(selectedSession).toEqual({name: 'sessionName', value: 'sessionValue'})
   })
 
   test('run - all ok', async () => {
     await runCommand(undefined, '')
   })
 
-  test('run - createSession throws exception', async () => {
+  test('run - deleteSession throws exception', async () => {
     await runCommand(new Error('errorMessage'), 'errorMessage')
   })
 
-  test('run - createSession throws undefined object', async () => {
+  test('run - deleteSession throws undefined object', async () => {
     await runCommand({hello: 'randomObj'}, 'Unknown error: [object Object]')
   })
 
   async function runCommand(errorToThrow: any, expectedErrorMessage: string) {
-    const command = new StartSession([], {} as any)
+    const command = new DeleteSession([], {} as any)
 
     command.selectSession = jest.fn(async (): Promise<any> => {
       return 'session'
     })
 
-    command.startSession = jest.fn(async (): Promise<any> => {
+    command.deleteSession = jest.fn(async (): Promise<any> => {
       if (errorToThrow) {
         throw errorToThrow
       }
@@ -90,6 +106,6 @@ describe('StartSession', () => {
     } catch (error) {
       expect(error).toEqual(new Error(expectedErrorMessage))
     }
-    expect(command.startSession).toHaveBeenCalledWith('session')
+    expect(command.deleteSession).toHaveBeenCalledWith('session')
   }
 })

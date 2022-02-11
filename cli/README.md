@@ -37,6 +37,8 @@ USAGE
 * [`leapp plugins:uninstall PLUGIN...`](#leapp-pluginsuninstall-plugin)
 * [`leapp plugins update`](#leapp-plugins-update)
 * [`leapp session add`](#leapp-session-add)
+* [`leapp session delete`](#leapp-session-delete)
+* [`leapp session list`](#leapp-session-list)
 * [`leapp session start`](#leapp-session-start)
 * [`leapp session stop`](#leapp-session-stop)
 
@@ -221,16 +223,58 @@ EXAMPLES
   $leapp session add
 ```
 
+## `leapp session delete`
+
+Delete a session
+
+```
+USAGE
+  $ leapp session delete
+
+DESCRIPTION
+  Delete a session
+
+EXAMPLES
+  $leapp session delete
+```
+
+## `leapp session list`
+
+Show sessions list
+
+```
+USAGE
+  $ leapp session list [--columns <value> | -x] [--sort <value>] [--filter <value>] [--output csv|json|yaml |  |
+    [--csv | --no-truncate]] [--no-header | ]
+
+FLAGS
+  -x, --extended     show extra columns
+  --columns=<value>  only show provided columns (comma-separated)
+  --csv              output is csv format [alias: --output=csv]
+  --filter=<value>   filter property by partial string matching, ex: name=foo
+  --no-header        hide table header from output
+  --no-truncate      do not truncate output to fit screen
+  --output=<option>  output in a more machine friendly format
+                     <options: csv|json|yaml>
+  --sort=<value>     property to sort by (prepend '-' for descending)
+
+DESCRIPTION
+  Show sessions list
+
+EXAMPLES
+  $leapp session list
+```
+
 ## `leapp session start`
 
-Start session
+Start a session
 
 ```
 USAGE
   $ leapp session start
 
 DESCRIPTION
-  Start session
+  Start a session
 
 EXAMPLES
   $leapp session start
@@ -238,19 +282,16 @@ EXAMPLES
 
 ## `leapp session stop`
 
-Stop a specific session
+Stop a session
 
 ```
 USAGE
-  $ leapp session stop -i <value>
-
-FLAGS
-  -i, --sessionId=<value>  (required) Session ID
+  $ leapp session stop
 
 DESCRIPTION
-  Stop a specific session
+  Stop a session
 
 EXAMPLES
-  $ oex stop --sessionId 1234567890
+  $leapp session stop
 ```
 <!-- commandsstop -->

@@ -1,3 +1,4 @@
+import { AccessMethod } from '../models/access-method'
 import { CloudProviderType } from '../models/cloud-provider-type'
 import { SessionType } from '../models/session-type'
 import { CloudProviderService } from './cloud-provider-service'
@@ -9,7 +10,21 @@ describe('CloudProviderService', () => {
     expect(service.availableCloudProviders()).toEqual(['aws', 'azure'])
   })
 
-  it('availableAccessMethods AWS cloud provider', function () {
+  it('getSessionTypeMap',()=>{
+    const map = new Map([[CloudProviderType.AWS, [new AccessMethod(SessionType.awsIamUser, 'IAM User', [])]]])
+    const service = new CloudProviderService(null, null, null)
+    const spy = jest.spyOn(CloudProviderService.prototype as any,'map','get').mockReturnValue(map)
+
+    let expectedMap = new Map<SessionType, string>([
+      [SessionType.awsIamUser, "IAM User"]
+    ]);
+    const sessionTypeLabelMap = service.getSessionTypeMap()
+    expect(sessionTypeLabelMap).toEqual(expectedMap)
+
+    spy.mockRestore()
+  })
+
+  it('availableAccessMethods - AWS', function () {
     const awsCoreService: any = {
       getRegions: () => [{region: 'region1'}, {region: 'region2'}]
     }
@@ -22,7 +37,8 @@ describe('CloudProviderService', () => {
         {type: SessionType.awsSsoRole, sessionName: 'session4', sessionId: 's4'},
         {type: SessionType.azure, sessionName: 'session5', sessionId: 's5'},
       ],
-      getProfiles: () => [{name: 'profileName', id: 'p1'}]
+      getProfiles: () => [{name: 'profileName', id: 'p1'}],
+      getIdpUrls: () => [{url: 'idpUrl1', id: 'id1'}],
     }
     const service = new CloudProviderService(awsCoreService, azureCoreService, repository)
 
@@ -41,6 +57,13 @@ describe('CloudProviderService', () => {
       {
         'fieldName': 'profileName',
         'fieldValue': 'p1'
+      }
+    ]
+
+    const expectedIdpUrlChoices = [
+      {
+        'fieldName': 'idpUrl1',
+        'fieldValue': 'id1'
       }
     ]
 
@@ -102,9 +125,10 @@ describe('CloudProviderService', () => {
             'type': 'input'
           },
           {
+            'choices': expectedIdpUrlChoices,
             'creationRequestField': 'idpUrl',
             'message': 'Insert the SAML 2.0 Url',
-            'type': 'input'
+            'type': 'list'
           },
           {
             'creationRequestField': 'idpArn',
@@ -180,13 +204,12 @@ describe('CloudProviderService', () => {
     ])
   })
 
-
-  it('availableAccessMethods Azure cloud provider', function () {
+  it('availableAccessMethods - Azure', function () {
     const awsCoreService: any = {getRegions: () => []}
     const azureCoreService: any = {
       getLocations: () => [{location: 'location1'}, {location: 'location2'}]
     }
-    const repository: any = {getSessions: () => [], getProfiles: () => []}
+    const repository: any = {getSessions: () => [], getProfiles: () => [], getIdpUrls: () => []}
     const service = new CloudProviderService(awsCoreService, azureCoreService, repository)
 
     expect(service.availableAccessMethods(CloudProviderType.AZURE)).toEqual([

@@ -2,13 +2,12 @@ import { Command } from '@oclif/core'
 import { LeappCliService } from '../../service/leapp-cli-service'
 import { Config } from '@oclif/core/lib/config/config'
 import { Session } from '@noovolari/leapp-core/models/session'
-import { SessionStatus } from '@noovolari/leapp-core/models/session-status'
 
-export default class StopSession extends Command {
-  static description = 'Stop a session'
+export default class DeleteSession extends Command {
+  static description = 'Delete a session'
 
   static examples = [
-    `$leapp session stop`,
+    `$leapp session delete`,
   ]
 
   constructor(argv: string[], config: Config, private leappCliService = new LeappCliService()) {
@@ -18,24 +17,15 @@ export default class StopSession extends Command {
   async run(): Promise<void> {
     const selectedSession = await this.selectSession()
     try {
-      await this.stopSession(selectedSession)
+      await this.deleteSession(selectedSession)
     } catch (error) {
       this.error(error instanceof Error ? error.message : `Unknown error: ${error}`)
     }
   }
 
-  public async stopSession(session: Session): Promise<void> {
-    const sessionService = this.leappCliService.sessionFactory.getSessionService(session.type)
-    await sessionService.stop(session.sessionId)
-    this.log('Session stopped')
-  }
-
   public async selectSession(): Promise<Session> {
     const availableSessions = this.leappCliService.repository
       .getSessions()
-      .filter((session: Session) => session.status === SessionStatus.active ||
-        session.status === SessionStatus.pending)
-
     const answer: any = await this.leappCliService.inquirer.prompt([{
       name: 'selectedSession',
       message: 'select a session',
@@ -43,5 +33,11 @@ export default class StopSession extends Command {
       choices: availableSessions.map(session => ({name: session.sessionName, value: session})),
     }])
     return answer.selectedSession
+  }
+
+  public async deleteSession(session: Session): Promise<void> {
+    const sessionService = this.leappCliService.sessionFactory.getSessionService(session.type)
+    await sessionService.delete(session.sessionId)
+    this.log('Session deleted')
   }
 }

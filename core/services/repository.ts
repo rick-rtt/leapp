@@ -9,9 +9,7 @@ import { SessionStatus } from '../models/session-status'
 import { SessionType } from '../models/session-type'
 import { Workspace } from '../models/workspace'
 import { FileService } from './file-service'
-import * as uuid from 'uuid'
-import {AwsSsoIntegration} from "../models/aws-sso-integration";
-import Segment from "../models/Segment";
+import { IdpUrl } from '../models/IdpUrl'
 
 export class Repository {
   // Private singleton workspace
@@ -119,20 +117,19 @@ export class Repository {
   }
 
   // IDP URLS
-
   getIdpUrl(idpUrlId: string): string | null {
     const workspace = this.getWorkspace()
     const idpUrlFiltered = workspace.idpUrls.find(url => url.id === idpUrlId)
     return idpUrlFiltered ? idpUrlFiltered.url : null
   }
 
-  getIdpUrls() {
+  getIdpUrls(): IdpUrl[] {
     return this.getWorkspace().idpUrls
   }
 
-  addIdpUrl(idpUrl: { id: string; url: string }): void {
+  addIdpUrl(idpUrl: IdpUrl): void {
     const workspace = this.getWorkspace()
-    workspace.idpUrls.push(idpUrl)
+    workspace.addIpUrl(idpUrl)
     this.persistWorkspace(workspace)
   }
 
@@ -156,6 +153,10 @@ export class Repository {
 
   getProfiles(): AwsNamedProfile[] {
     return this.getWorkspace().profiles
+  }
+
+  getProfilesMap(): Map<string, AwsNamedProfile>{
+    return  new Map(this.getProfiles().map(profile => [profile.id, profile] as [string, AwsNamedProfile]))
   }
 
   getProfileName(profileId: string): string {
