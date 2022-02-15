@@ -20,7 +20,7 @@ $ npm install -g leapp
 $ leapp COMMAND
 running command...
 $ leapp (--version)
-leapp/0.1.0 darwin-x64 node-v16.13.1
+leapp/0.1.0 darwin-x64 node-v16.13.2
 $ leapp --help [COMMAND]
 USAGE
   $ leapp COMMAND
@@ -37,6 +37,7 @@ USAGE
 * [`leapp plugins:uninstall PLUGIN...`](#leapp-pluginsuninstall-plugin)
 * [`leapp plugins update`](#leapp-plugins-update)
 * [`leapp session add`](#leapp-session-add)
+* [`leapp session change-region`](#leapp-session-change-region)
 * [`leapp session delete`](#leapp-session-delete)
 * [`leapp session list`](#leapp-session-list)
 * [`leapp session start`](#leapp-session-start)
@@ -80,7 +81,7 @@ EXAMPLES
   $ leapp plugins
 ```
 
-_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v2.1.0/src/commands/plugins/index.ts)_
+_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v2.0.12/src/commands/plugins/index.ts)_
 
 ## `leapp plugins:inspect PLUGIN...`
 
@@ -221,6 +222,21 @@ DESCRIPTION
 
 EXAMPLES
   $leapp session add
+```
+
+## `leapp session change-region`
+
+Change a session region
+
+```
+USAGE
+  $ leapp session change-region
+
+DESCRIPTION
+  Change a session region
+
+EXAMPLES
+  $leapp session change-region
 ```
 
 ## `leapp session delete`

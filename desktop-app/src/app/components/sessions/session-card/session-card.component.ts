@@ -88,7 +88,7 @@ export class SessionCardComponent implements OnInit {
 
   repository: Repository;
   private loggingService: LoggingService;
-  private sessionProviderService: SessionFactory;
+  private sessionFactory: SessionFactory;
   private fileService: FileService;
   private keychainService: KeychainService;
   private workspaceService: WorkspaceService;
@@ -106,7 +106,7 @@ export class SessionCardComponent implements OnInit {
               private leappCoreService: LeappCoreService
   ) {
     this.loggingService = leappCoreService.loggingService;
-    this.sessionProviderService = leappCoreService.sessionFactory;
+    this.sessionFactory = leappCoreService.sessionFactory;
     this.fileService = leappCoreService.fileService;
     this.keychainService = leappCoreService.keyChainService;
     this.workspaceService = leappCoreService.workspaceService;
@@ -116,8 +116,8 @@ export class SessionCardComponent implements OnInit {
   }
 
   ngOnInit() {
-    // Generate a singleton service for the concrete implementation of SessionService
-    this.sessionService = this.sessionProviderService.getSessionService(this.session.type);
+    // Retrieve the singleton service for the concrete implementation of SessionService
+    this.sessionService = this.sessionFactory.getSessionService(this.session.type);
 
     // Set regions and locations
     this.awsRegions = this.awsCoreService.getRegions();
@@ -310,7 +310,7 @@ export class SessionCardComponent implements OnInit {
   /**
    * Set the region for the sessions
    */
-  async changeRegion() {
+  async changeRegion() { // TODO: Use the brand new RegionService
     if (this.selectedDefaultRegion) {
       let wasActive = false;
 
@@ -323,7 +323,7 @@ export class SessionCardComponent implements OnInit {
       const sessions: Session[] = this.repository.getSessions();
       for(let i = 0; i < sessions.length; i++) {
         if (sessions[i].sessionId === this.session.sessionId) {
-          (sessions[i] as any).region = this.selectedDefaultRegion;
+          sessions[i].region = this.selectedDefaultRegion;
         }
       }
       this.repository.updateSessions(sessions);

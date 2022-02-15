@@ -40,7 +40,6 @@ export class AwsCoreService {
     return this.nativeService.path.join(this.nativeService.os.homedir(), '.aws', 'credentials')
   }
 
-  // TODO: move environment in core
   stsOptions(session: Session) {
     let options: any = {
       maxRetries: 0,

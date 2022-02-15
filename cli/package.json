@@ -116,7 +116,8 @@
     "postpack": "gushio gushio/target-post-pack.js",
     "version": "oclif readme && git add README.md",
     "list-session": "./bin/dev session list",
-    "start-session": "./bin/dev session start"
+    "start-session": "./bin/dev session start",
+    "change-region": "./bin/dev session change-region"
   },
   "types": "dist/index.d.ts"
 }
