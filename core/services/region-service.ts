@@ -27,4 +27,12 @@ export class RegionService {
             await sessionService.start(session.sessionId)
         }
     }
+
+    public getDefaultAwsRegion(): string {
+        return this.repository.getDefaultRegion()
+    }
+
+    public changeDefaultAwsRegion(newDefaultRegion: string) {
+        this.repository.updateDefaultRegion(newDefaultRegion)
+    }
 }

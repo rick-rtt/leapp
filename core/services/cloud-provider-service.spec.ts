@@ -256,6 +256,7 @@ describe('CloudProviderService', () => {
 
         const awsChoices = [{fieldName: 'region1', fieldValue: 'region1'},
             {fieldName: 'region2', fieldValue: 'region2'}]
+        expect(service.availableRegions(SessionType.aws)).toEqual(awsChoices)
         expect(service.availableRegions(SessionType.awsIamUser)).toEqual(awsChoices)
         expect(service.availableRegions(SessionType.awsIamRoleChained)).toEqual(awsChoices)
         expect(service.availableRegions(SessionType.awsIamRoleFederated)).toEqual(awsChoices)

@@ -58,4 +58,25 @@ describe('RegionService', () => {
         expect(workspaceService.updateSession).toHaveBeenCalledWith(session.sessionId, session)
         expect(sessionService.start).toHaveBeenCalledWith(session.sessionId)
     })
+
+    test('getDefaultAwsRegion', () => {
+        const defaultRegion = 'defaultRegion'
+        const repository = {
+            getDefaultRegion: () => defaultRegion
+        }
+        const regionService = new RegionService(null, repository as any, null)
+
+        expect(regionService.getDefaultAwsRegion()).toBe(defaultRegion)
+    })
+
+    test('changeDefaultAwsRegion', () => {
+        const repository = {
+            updateDefaultRegion: jest.fn()
+        }
+        const regionService = new RegionService(null, repository as any, null)
+
+        const newRegion = 'newDefaultRegion'
+        regionService.changeDefaultAwsRegion(newRegion)
+        expect(repository.updateDefaultRegion).toHaveBeenCalledWith(newRegion)
+    })
 })

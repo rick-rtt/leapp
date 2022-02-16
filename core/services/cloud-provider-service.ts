@@ -82,6 +82,7 @@ export class CloudProviderService {
         const azureLocationChoices = this.getAzureLocationChoices()
 
         return new Map([
+                [SessionType.aws, awsRegionChoices],
                 [SessionType.awsIamUser, awsRegionChoices],
                 [SessionType.awsSsoRole, awsRegionChoices],
                 [SessionType.awsIamRoleFederated, awsRegionChoices],

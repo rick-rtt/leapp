@@ -36,6 +36,8 @@ USAGE
 * [`leapp plugins:link PLUGIN`](#leapp-pluginslink-plugin)
 * [`leapp plugins:uninstall PLUGIN...`](#leapp-pluginsuninstall-plugin)
 * [`leapp plugins update`](#leapp-plugins-update)
+* [`leapp region get-default`](#leapp-region-get-default)
+* [`leapp region set-default`](#leapp-region-set-default)
 * [`leapp session add`](#leapp-session-add)
 * [`leapp session change-region`](#leapp-session-change-region)
 * [`leapp session delete`](#leapp-session-delete)
@@ -207,6 +209,36 @@ FLAGS
 
 DESCRIPTION
   Update installed plugins.
+```
+
+## `leapp region get-default`
+
+Change the default regions
+
+```
+USAGE
+  $ leapp region get-default
+
+DESCRIPTION
+  Change the default regions
+
+EXAMPLES
+  $leapp region get-default
+```
+
+## `leapp region set-default`
+
+Change the default regions
+
+```
+USAGE
+  $ leapp region set-default
+
+DESCRIPTION
+  Change the default regions
+
+EXAMPLES
+  $leapp region set-default
 ```
 
 ## `leapp session add`
