@@ -12,7 +12,7 @@ describe('RegionService', () => {
         const repositorySessions = [{sessionId: 'sid0'}, {sessionId: 'sid1'}]
         const repository = {
             getSessions: () => repositorySessions,
-            updateSessions: jest.fn()
+            updateSession: jest.fn()
         }
 
         const workspaceService = {
@@ -24,15 +24,17 @@ describe('RegionService', () => {
 
         expect(session.region).toBe('newRegion')
         expect(sessionFactory.getSessionService).toHaveBeenCalledWith(session.type)
-        expect(repository.updateSessions).toHaveBeenCalledWith([repositorySessions[0], session])
+        expect(repository.updateSession).toHaveBeenCalledWith(session.sessionId, session)
         expect(workspaceService.updateSession).toHaveBeenCalledWith(session.sessionId, session)
     })
 
     test('changeRegion, session active', async () => {
         const session = {sessionId: 'sid1', type: 'sessionType', status: SessionStatus.active, region: 'oldRegion'}
+
+        let isSessionActive = false
         const sessionService = {
-            stop: jest.fn(),
-            start: jest.fn()
+            stop: jest.fn(() => isSessionActive = false),
+            start: jest.fn(() => isSessionActive = true)
         }
         const sessionFactory = {
             getSessionService: jest.fn(() => sessionService)
@@ -41,20 +43,26 @@ describe('RegionService', () => {
         const repositorySessions = [{sessionId: 'sid0'}, {sessionId: 'sid1'}]
         const repository = {
             getSessions: () => repositorySessions,
-            updateSessions: jest.fn()
+            updateSession: jest.fn((sessionId, session) => {
+                expect(session.region).toBe('newRegion')
+                expect(isSessionActive).toBe(false)
+            })
         }
 
         const workspaceService = {
-            updateSession: jest.fn()
+            updateSession: jest.fn((sessionId, session) => {
+                expect(session.region).toBe('newRegion')
+                expect(isSessionActive).toBe(false)
+            })
         }
 
         const regionService = new RegionService(sessionFactory as any, repository as any, workspaceService as any)
         await regionService.changeRegion(session as any, 'newRegion')
 
-        expect(session.region).toBe('newRegion')
+        expect(isSessionActive).toBe(true)
         expect(sessionFactory.getSessionService).toHaveBeenCalledWith(session.type)
         expect(sessionService.stop).toHaveBeenCalledWith(session.sessionId)
-        expect(repository.updateSessions).toHaveBeenCalledWith([repositorySessions[0], session])
+        expect(repository.updateSession).toHaveBeenCalledWith(session.sessionId, session)
         expect(workspaceService.updateSession).toHaveBeenCalledWith(session.sessionId, session)
         expect(sessionService.start).toHaveBeenCalledWith(session.sessionId)
     })

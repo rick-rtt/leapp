@@ -88,6 +88,13 @@ export class Repository {
     this.persistWorkspace(workspace)
   }
 
+  updateSession(sessionId: string, sessionToUpdate: Session) {
+    const workspace = this.getWorkspace()
+    workspace.sessions = workspace.sessions
+        .map(session => session.sessionId === sessionId ? sessionToUpdate : session)
+    this.persistWorkspace(workspace)
+  }
+
   deleteSession(sessionId: string) {
     const workspace = this.getWorkspace()
     const index = workspace.sessions.findIndex(sess => sess.sessionId === sessionId)
@@ -156,10 +163,6 @@ export class Repository {
 
   getProfiles(): AwsNamedProfile[] {
     return this.getWorkspace().profiles
-  }
-
-  getProfilesMap(): Map<string, AwsNamedProfile>{
-    return  new Map(this.getProfiles().map(profile => [profile.id, profile] as [string, AwsNamedProfile]))
   }
 
   getProfileName(profileId: string): string {

@@ -15,11 +15,10 @@ export default class AddSession extends Command {
   }
 
   async run(): Promise<void> {
-    const selectedCloudProvider = await this.chooseCloudProvider()
-    const selectedAccessMethod = await this.chooseAccessMethod(selectedCloudProvider)
-    const selectedParams = await this.chooseAccessMethodParams(selectedAccessMethod)
-
     try {
+      const selectedCloudProvider = await this.chooseCloudProvider()
+      const selectedAccessMethod = await this.chooseAccessMethod(selectedCloudProvider)
+      const selectedParams = await this.chooseAccessMethodParams(selectedAccessMethod)
       await this.createSession(selectedAccessMethod, selectedParams)
     } catch (error) {
       this.error(error instanceof Error ? error.message : `Unknown error: ${error}`)

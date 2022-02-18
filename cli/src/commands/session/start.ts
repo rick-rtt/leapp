@@ -16,9 +16,8 @@ export default class StartSession extends Command {
   }
 
   async run(): Promise<void> {
-
-    const selectedSession = await this.selectSession()
     try {
+    const selectedSession = await this.selectSession()
       await this.startSession(selectedSession)
     } catch (error) {
       this.error(error instanceof Error ? error.message : `Unknown error: ${error}`)

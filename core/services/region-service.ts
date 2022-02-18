@@ -18,9 +18,7 @@ export class RegionService {
         }
 
         session.region = newRegion
-        const updatedSessions = this.repository.getSessions()
-            .map(repoSession => repoSession.sessionId === session.sessionId ? session : repoSession)
-        this.repository.updateSessions(updatedSessions)
+        this.repository.updateSession(session.sessionId, session)
         this.workspaceService.updateSession(session.sessionId, session)
 
         if (wasActive) {

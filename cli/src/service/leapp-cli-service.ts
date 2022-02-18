@@ -24,8 +24,8 @@ import {CliAwsAuthenticationService} from './cli-aws-authentication-service'
 import {CliVerificationWindowService} from './cli-verification-window-service'
 import {CliNativeService} from './cli-native-service'
 import {constants} from '@noovolari/leapp-core/models/constants'
+import {NamedProfilesService} from '@noovolari/leapp-core/services/named-profiles-service'
 import CliInquirer from 'inquirer'
-
 
 export class LeappCliService {
 
@@ -194,6 +194,15 @@ export class LeappCliService {
             this.regionServiceInstance = new RegionService(this.sessionFactory, this.repository, this.workspaceService)
         }
         return this.regionServiceInstance
+    }
+
+    private namedProfilesServiceInstance: NamedProfilesService
+
+    get namedProfilesService(): NamedProfilesService {
+        if (!this.namedProfilesServiceInstance) {
+            this.namedProfilesServiceInstance = new NamedProfilesService(this.sessionFactory, this.repository, this.workspaceService)
+        }
+        return this.namedProfilesServiceInstance
     }
 
     private keyChainServiceInstance: KeychainService

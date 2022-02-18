@@ -36,6 +36,9 @@ USAGE
 * [`leapp plugins:link PLUGIN`](#leapp-pluginslink-plugin)
 * [`leapp plugins:uninstall PLUGIN...`](#leapp-pluginsuninstall-plugin)
 * [`leapp plugins update`](#leapp-plugins-update)
+* [`leapp profile create`](#leapp-profile-create)
+* [`leapp profile delete`](#leapp-profile-delete)
+* [`leapp profile edit`](#leapp-profile-edit)
 * [`leapp region get-default`](#leapp-region-get-default)
 * [`leapp region set-default`](#leapp-region-set-default)
 * [`leapp session add`](#leapp-session-add)
@@ -211,16 +214,61 @@ DESCRIPTION
   Update installed plugins.
 ```
 
+## `leapp profile create`
+
+Create a new AWS named profile
+
+```
+USAGE
+  $ leapp profile create
+
+DESCRIPTION
+  Create a new AWS named profile
+
+EXAMPLES
+  $leapp profile create
+```
+
+## `leapp profile delete`
+
+Delete an AWS named profile
+
+```
+USAGE
+  $ leapp profile delete
+
+DESCRIPTION
+  Delete an AWS named profile
+
+EXAMPLES
+  $leapp profile delete
+```
+
+## `leapp profile edit`
+
+Rename an AWS named profile
+
+```
+USAGE
+  $ leapp profile edit
+
+DESCRIPTION
+  Rename an AWS named profile
+
+EXAMPLES
+  $leapp profile edit
+```
+
 ## `leapp region get-default`
 
-Change the default regions
+Displays the default region
 
 ```
 USAGE
   $ leapp region get-default
 
 DESCRIPTION
-  Change the default regions
+  Displays the default region
 
 EXAMPLES
   $leapp region get-default
@@ -228,14 +276,14 @@ EXAMPLES
 
 ## `leapp region set-default`
 
-Change the default regions
+Change the default region
 
 ```
 USAGE
   $ leapp region set-default
 
 DESCRIPTION
-  Change the default regions
+  Change the default region
 
 EXAMPLES
   $leapp region set-default

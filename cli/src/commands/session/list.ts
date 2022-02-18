@@ -26,9 +26,8 @@ export default class ListSessions extends Command {
   public async showSessions(): Promise<void> {
     const {flags} = await this.parse(ListSessions)
     const data = this.leappCliService.repository.getSessions() as unknown as Record<string, unknown> []
-    const namedProfilesMap = this.leappCliService.repository.getProfilesMap()
+    const namedProfilesMap = this.leappCliService.namedProfilesService.getNamedProfilesMap()
     const sessionTypeLabelMap = this.leappCliService.cloudProviderService.getSessionTypeMap()
-    this.log('sessions list:')
 
     const columns = {
       sessionName: {header: 'Session Name'},

@@ -15,10 +15,9 @@ export default class ChangeSessionRegion extends Command {
     }
 
     async run(): Promise<void> {
-        const selectedSession = await this.selectSession()
-        const selectedRegion = await this.selectRegion(selectedSession)
-
         try {
+            const selectedSession = await this.selectSession()
+            const selectedRegion = await this.selectRegion(selectedSession)
             await this.changeSessionRegion(selectedSession, selectedRegion)
         } catch (error) {
             this.error(error instanceof Error ? error.message : `Unknown error: ${error}`)

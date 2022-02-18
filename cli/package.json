@@ -117,7 +117,9 @@
     "version": "oclif readme && git add README.md",
     "list-session": "./bin/dev session list",
     "start-session": "./bin/dev session start",
-    "change-region": "./bin/dev session change-region"
+    "change-region": "./bin/dev session change-region",
+    "profile-create": "./bin/dev profile create",
+    "profile-edit": "./bin/dev profile edit"
   },
   "types": "dist/index.d.ts"
 }
