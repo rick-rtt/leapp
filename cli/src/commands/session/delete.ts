@@ -26,6 +26,9 @@ export default class DeleteSession extends Command {
     public async selectSession(): Promise<Session> {
         const availableSessions = this.leappCliService.repository
             .getSessions()
+        if (availableSessions.length === 0) {
+            throw new Error('No sessions available')
+        }
         const answer: any = await this.leappCliService.inquirer.prompt([{
             name: 'selectedSession',
             message: 'select a session',
