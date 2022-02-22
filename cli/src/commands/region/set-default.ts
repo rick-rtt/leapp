@@ -38,6 +38,6 @@ export default class ChangeDefaultRegion extends Command {
 
     public async changeDefaultRegion(newDefaultRegion: string): Promise<void> {
         this.leappCliService.regionService.changeDefaultAwsRegion(newDefaultRegion)
-        this.log('Default region changed')
+        this.log('default region changed')
     }
 }

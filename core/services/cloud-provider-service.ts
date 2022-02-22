@@ -4,13 +4,16 @@ import {AccessMethodFieldType} from '../models/access-method-field-type'
 import {CloudProviderType} from '../models/cloud-provider-type'
 import {SessionType} from '../models/session-type'
 import {AwsCoreService} from './aws-core-service'
-import {AwsSessionTypes} from './aws-session-types'
+import {AwsAssumableSessionTypes} from './aws-assumable-session-types'
 import {AzureCoreService} from './azure-core-service'
 import {FieldChoice} from './field-choice'
+import {NamedProfilesService} from './named-profiles-service'
+import {IdpUrlsService} from './idp-urls-service'
 import {Repository} from './repository'
 
 export class CloudProviderService {
     public constructor(private awsCoreService: AwsCoreService, private azureCoreService: AzureCoreService,
+                       private namedProfilesService: NamedProfilesService, private idpUrlService: IdpUrlsService,
                        private repository: Repository) {
     }
 
@@ -36,7 +39,7 @@ export class CloudProviderService {
         const awsRegionChoices = this.getAwsRegionChoices()
         const awsNamedProfileChoices = this.getAwsNamedProfileChoices()
         const idpUrlChoices = this.getIdpUrls()
-        const awsSessionChoices = this.getAwsSessionChoices()
+        const awsAssumerSessionChoices = this.getAwsAssumerSessionChoices()
         const azureLocationChoices = this.getAzureLocationChoices()
 
         return new Map([
@@ -61,7 +64,7 @@ export class CloudProviderService {
                     new AccessMethodField('sessionName', 'Insert session alias', AccessMethodFieldType.input),
                     new AccessMethodField('region', 'Select region', AccessMethodFieldType.list, awsRegionChoices),
                     new AccessMethodField('roleArn', 'Insert Role ARN', AccessMethodFieldType.input),
-                    new AccessMethodField('parentSessionId', 'Select Assumer Session', AccessMethodFieldType.list, awsSessionChoices),
+                    new AccessMethodField('parentSessionId', 'Select Assumer Session', AccessMethodFieldType.list, awsAssumerSessionChoices),
                     new AccessMethodField('roleSessionName', 'Role Session Name', AccessMethodFieldType.input),
                     new AccessMethodField('profileId', 'Select the Named Profile', AccessMethodFieldType.list, awsNamedProfileChoices)
                 ])
@@ -100,18 +103,18 @@ export class CloudProviderService {
         return this.awsCoreService.getRegions().map(value => new FieldChoice(value.region, value.region))
     }
 
-    private getAwsNamedProfileChoices(): FieldChoice[] {
-        return this.repository.getProfiles().map(profile => new FieldChoice(profile.name, profile.id))
-    }
-
-    private getAwsSessionChoices(): FieldChoice[] {
+    private getAwsAssumerSessionChoices(): FieldChoice[] {
         return this.repository.getSessions()
-            .filter(session => AwsSessionTypes.includes(session.type))
+            .filter(session => AwsAssumableSessionTypes.includes(session.type))
             .map(session => new FieldChoice(session.sessionName, session.sessionId))
     }
 
+    private getAwsNamedProfileChoices(): FieldChoice[] {
+        return this.namedProfilesService.getNamedProfiles().map(profile => new FieldChoice(profile.name, profile.id))
+    }
+
     private getIdpUrls(): FieldChoice[] {
-        return this.repository.getIdpUrls()
+        return this.idpUrlService.getIdpUrls()
             .map(idpUrl => new FieldChoice(idpUrl.url, idpUrl.id))
     }
 }

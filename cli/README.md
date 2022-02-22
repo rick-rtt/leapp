@@ -30,12 +30,9 @@ USAGE
 # Commands
 <!-- commands -->
 * [`leapp help [COMMAND]`](#leapp-help-command)
-* [`leapp plugins`](#leapp-plugins)
-* [`leapp plugins:inspect PLUGIN...`](#leapp-pluginsinspect-plugin)
-* [`leapp plugins:install PLUGIN...`](#leapp-pluginsinstall-plugin)
-* [`leapp plugins:link PLUGIN`](#leapp-pluginslink-plugin)
-* [`leapp plugins:uninstall PLUGIN...`](#leapp-pluginsuninstall-plugin)
-* [`leapp plugins update`](#leapp-plugins-update)
+* [`leapp idp-url create`](#leapp-idp-url-create)
+* [`leapp idp-url delete`](#leapp-idp-url-delete)
+* [`leapp idp-url edit`](#leapp-idp-url-edit)
 * [`leapp profile create`](#leapp-profile-create)
 * [`leapp profile delete`](#leapp-profile-delete)
 * [`leapp profile edit`](#leapp-profile-edit)
@@ -68,150 +65,49 @@ DESCRIPTION
 
 _See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v5.1.10/src/commands/help.ts)_
 
-## `leapp plugins`
+## `leapp idp-url create`
 
-List installed plugins.
+Create a new identity provider URL
 
 ```
 USAGE
-  $ leapp plugins [--core]
-
-FLAGS
-  --core  Show core plugins.
+  $ leapp idp-url create
 
 DESCRIPTION
-  List installed plugins.
+  Create a new identity provider URL
 
 EXAMPLES
-  $ leapp plugins
+  $leapp idp-url create
 ```
 
-_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v2.0.12/src/commands/plugins/index.ts)_
+## `leapp idp-url delete`
 
-## `leapp plugins:inspect PLUGIN...`
-
-Displays installation properties of a plugin.
+Delete an identity provider URL
 
 ```
 USAGE
-  $ leapp plugins:inspect PLUGIN...
-
-ARGUMENTS
-  PLUGIN  [default: .] Plugin to inspect.
-
-FLAGS
-  -h, --help     Show CLI help.
-  -v, --verbose
+  $ leapp idp-url delete
 
 DESCRIPTION
-  Displays installation properties of a plugin.
+  Delete an identity provider URL
 
 EXAMPLES
-  $ leapp plugins:inspect myplugin
+  $leapp idp-url delete
 ```
 
-## `leapp plugins:install PLUGIN...`
+## `leapp idp-url edit`
 
-Installs a plugin into the CLI.
+Edit an identity provider URL
 
 ```
 USAGE
-  $ leapp plugins:install PLUGIN...
-
-ARGUMENTS
-  PLUGIN  Plugin to install.
-
-FLAGS
-  -f, --force    Run yarn install with force flag.
-  -h, --help     Show CLI help.
-  -v, --verbose
+  $ leapp idp-url edit
 
 DESCRIPTION
-  Installs a plugin into the CLI.
-
-  Can be installed from npm or a git url.
-
-  Installation of a user-installed plugin will override a core plugin.
-
-  e.g. If you have a core plugin that has a 'hello' command, installing a user-installed plugin with a 'hello' command
-  will override the core plugin implementation. This is useful if a user needs to update core plugin functionality in
-  the CLI without the need to patch and update the whole CLI.
-
-ALIASES
-  $ leapp plugins add
+  Edit an identity provider URL
 
 EXAMPLES
-  $ leapp plugins:install myplugin 
-
-  $ leapp plugins:install https://github.com/someuser/someplugin
-
-  $ leapp plugins:install someuser/someplugin
-```
-
-## `leapp plugins:link PLUGIN`
-
-Links a plugin into the CLI for development.
-
-```
-USAGE
-  $ leapp plugins:link PLUGIN
-
-ARGUMENTS
-  PATH  [default: .] path to plugin
-
-FLAGS
-  -h, --help     Show CLI help.
-  -v, --verbose
-
-DESCRIPTION
-  Links a plugin into the CLI for development.
-
-  Installation of a linked plugin will override a user-installed or core plugin.
-
-  e.g. If you have a user-installed or core plugin that has a 'hello' command, installing a linked plugin with a 'hello'
-  command will override the user-installed or core plugin implementation. This is useful for development work.
-
-EXAMPLES
-  $ leapp plugins:link myplugin
-```
-
-## `leapp plugins:uninstall PLUGIN...`
-
-Removes a plugin from the CLI.
-
-```
-USAGE
-  $ leapp plugins:uninstall PLUGIN...
-
-ARGUMENTS
-  PLUGIN  plugin to uninstall
-
-FLAGS
-  -h, --help     Show CLI help.
-  -v, --verbose
-
-DESCRIPTION
-  Removes a plugin from the CLI.
-
-ALIASES
-  $ leapp plugins unlink
-  $ leapp plugins remove
-```
-
-## `leapp plugins update`
-
-Update installed plugins.
-
-```
-USAGE
-  $ leapp plugins update [-h] [-v]
-
-FLAGS
-  -h, --help     Show CLI help.
-  -v, --verbose
-
-DESCRIPTION
-  Update installed plugins.
+  $leapp idp-url edit
 ```
 
 ## `leapp profile create`

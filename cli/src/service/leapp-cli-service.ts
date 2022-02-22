@@ -25,6 +25,7 @@ import {CliVerificationWindowService} from './cli-verification-window-service'
 import {CliNativeService} from './cli-native-service'
 import {constants} from '@noovolari/leapp-core/models/constants'
 import {NamedProfilesService} from '@noovolari/leapp-core/services/named-profiles-service'
+import {IdpUrlsService} from '@noovolari/leapp-core/services/idp-urls-service'
 import CliInquirer from 'inquirer'
 
 export class LeappCliService {
@@ -200,9 +201,19 @@ export class LeappCliService {
 
     get namedProfilesService(): NamedProfilesService {
         if (!this.namedProfilesServiceInstance) {
-            this.namedProfilesServiceInstance = new NamedProfilesService(this.sessionFactory, this.repository, this.workspaceService)
+            this.namedProfilesServiceInstance = new NamedProfilesService(this.sessionFactory, this.repository,
+                this.workspaceService)
         }
         return this.namedProfilesServiceInstance
+    }
+
+    private idpUrlsServiceInstance: IdpUrlsService
+
+    get idpUrlsService(): IdpUrlsService {
+        if (!this.idpUrlsServiceInstance) {
+            this.idpUrlsServiceInstance = new IdpUrlsService(this.sessionFactory, this.repository)
+        }
+        return this.idpUrlsServiceInstance
     }
 
     private keyChainServiceInstance: KeychainService
@@ -271,7 +282,7 @@ export class LeappCliService {
     get cloudProviderService(): CloudProviderService {
         if (!this.cloudProviderServiceInstance) {
             this.cloudProviderServiceInstance = new CloudProviderService(this.awsCoreService, this.azureCoreService,
-                this.repository)
+                this.namedProfilesService, this.idpUrlsService, this.repository)
         }
 
         return this.cloudProviderServiceInstance

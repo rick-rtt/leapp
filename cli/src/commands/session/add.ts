@@ -28,7 +28,7 @@ export default class AddSession extends Command {
   public async createSession(accessMethod: AccessMethod, selectedParams: Map<string, string>): Promise<void> {
     const creationRequest = accessMethod.getSessionCreationRequest(selectedParams)
     await this.leappCliService.sessionFactory.createSession(accessMethod.sessionType, creationRequest)
-    this.log('Session added')
+    this.log('session added')
   }
 
   public async chooseCloudProvider(): Promise<CloudProviderType> {

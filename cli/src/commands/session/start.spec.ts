@@ -27,7 +27,7 @@ describe('StartSession', () => {
 
         expect(sessionFactory.getSessionService).toHaveBeenCalledWith('sessionType')
         expect(sessionService.start).toHaveBeenCalledWith('sessionId')
-        expect(command.log).toHaveBeenCalledWith('Session started')
+        expect(command.log).toHaveBeenCalledWith('session started')
     })
 
     test('selectSession', async () => {
@@ -69,7 +69,7 @@ describe('StartSession', () => {
         }
 
         const command = new StartSession([], {} as any, leappCliService)
-        await expect(command.selectSession()).rejects.toThrow(new Error('No sessions available'))
+        await expect(command.selectSession()).rejects.toThrow(new Error('no sessions available'))
     })
 
     test('run - all ok', async () => {

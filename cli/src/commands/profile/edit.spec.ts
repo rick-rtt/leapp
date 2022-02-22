@@ -37,7 +37,7 @@ describe('EditNamedProfile', () => {
         }
 
         const command = new EditNamedProfile([], {} as any, leappCliService)
-        await expect(command.selectNamedProfile()).rejects.toThrow(new Error('No profiles available'))
+        await expect(command.selectNamedProfile()).rejects.toThrow(new Error('no profiles available'))
     })
 
     test('getProfileName', async () => {
@@ -71,7 +71,7 @@ describe('EditNamedProfile', () => {
         await command.editNamedProfile('profileId', 'profileName')
 
         expect(leappCliService.namedProfilesService.editNamedProfile).toHaveBeenCalledWith('profileId', 'profileName')
-        expect(command.log).toHaveBeenCalledWith('Profile edited')
+        expect(command.log).toHaveBeenCalledWith('profile edited')
     })
 
     test('run', async () => {

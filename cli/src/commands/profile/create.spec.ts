@@ -34,7 +34,7 @@ describe('CreateNamedProfile', () => {
         command.createNamedProfile('profileName')
 
         expect(leappCliService.namedProfilesService.createNamedProfile).toHaveBeenCalledWith('profileName')
-        expect(command.log).toHaveBeenCalledWith('Profile created')
+        expect(command.log).toHaveBeenCalledWith('profile created')
     })
 
     test('run', async () => {

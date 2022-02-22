@@ -45,7 +45,7 @@ describe('ChangeDefaultRegion', () => {
 
         await command.changeDefaultRegion(newRegion)
         expect(leappCliService.regionService.changeDefaultAwsRegion).toHaveBeenCalledWith(newRegion)
-        expect(command.log).toHaveBeenCalledWith('Default region changed')
+        expect(command.log).toHaveBeenCalledWith('default region changed')
     })
 
     test('run', async () => {

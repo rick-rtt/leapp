@@ -27,7 +27,7 @@ export default class DeleteSession extends Command {
         const availableSessions = this.leappCliService.repository
             .getSessions()
         if (availableSessions.length === 0) {
-            throw new Error('No sessions available')
+            throw new Error('no sessions available')
         }
         const answer: any = await this.leappCliService.inquirer.prompt([{
             name: 'selectedSession',
@@ -41,6 +41,6 @@ export default class DeleteSession extends Command {
     public async deleteSession(session: Session): Promise<void> {
         const sessionService = this.leappCliService.sessionFactory.getSessionService(session.type)
         await sessionService.delete(session.sessionId)
-        this.log('Session deleted')
+        this.log('session deleted')
     }
 }

@@ -74,7 +74,7 @@ describe('ChangeRegion', () => {
 
         await command.changeSessionRegion(session, newRegion)
         expect(leappCliService.regionService.changeRegion).toHaveBeenCalledWith(session, newRegion)
-        expect(command.log).toHaveBeenCalledWith('Session region changed')
+        expect(command.log).toHaveBeenCalledWith('session region changed')
     })
 
     test('run', async () => {

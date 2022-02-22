@@ -30,7 +30,7 @@ export default class DeleteNamedProfile extends Command {
     public async selectNamedProfile(): Promise<AwsNamedProfile> {
         const namedProfiles = this.leappCliService.namedProfilesService.getNamedProfiles(true)
         if (namedProfiles.length === 0) {
-            throw new Error('No profiles available')
+            throw new Error('no profiles available')
         }
         const answer: any = await this.leappCliService.inquirer.prompt([{
             name: 'selectedNamedProfile',
@@ -60,6 +60,6 @@ export default class DeleteNamedProfile extends Command {
 
     public async deleteNamedProfile(id: string) {
         await this.leappCliService.namedProfilesService.deleteNamedProfile(id)
-        this.log('Profile deleted')
+        this.log('profile deleted')
     }
 }

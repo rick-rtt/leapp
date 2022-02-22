@@ -27,7 +27,7 @@ export default class StopSession extends Command {
     public async stopSession(session: Session): Promise<void> {
         const sessionService = this.leappCliService.sessionFactory.getSessionService(session.type)
         await sessionService.stop(session.sessionId)
-        this.log('Session stopped')
+        this.log('session stopped')
     }
 
     public async selectSession(): Promise<Session> {
@@ -36,7 +36,7 @@ export default class StopSession extends Command {
             .filter((session: Session) => session.status === SessionStatus.active ||
                 session.status === SessionStatus.pending)
         if (availableSessions.length === 0) {
-            throw new Error('No active sessions available')
+            throw new Error('no active sessions available')
         }
         const answer: any = await this.leappCliService.inquirer.prompt([{
             name: 'selectedSession',

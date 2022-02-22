@@ -128,7 +128,7 @@ describe('AddSession', () => {
 
     await command.createSession(accessMethod, selectedParams)
     expect(leappCliService.sessionFactory.createSession).toHaveBeenCalledWith('sessionType', 'creationRequest')
-    expect(command.log).toHaveBeenCalledWith('Session added')
+    expect(command.log).toHaveBeenCalledWith('session added')
   })
 
   test('run', async () => {

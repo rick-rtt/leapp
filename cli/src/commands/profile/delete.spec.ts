@@ -37,7 +37,7 @@ describe('DeleteNamedProfile', () => {
         }
         const command = new DeleteNamedProfile([], {} as any, leappCliService)
 
-        await expect(command.selectNamedProfile()).rejects.toThrow(new Error('No profiles available'))
+        await expect(command.selectNamedProfile()).rejects.toThrow(new Error('no profiles available'))
     })
 
     test('getAffectedSessions', async () => {
@@ -96,7 +96,7 @@ describe('DeleteNamedProfile', () => {
         await command.deleteNamedProfile('profileId')
 
         expect(leappCliService.namedProfilesService.deleteNamedProfile).toHaveBeenCalledWith('profileId')
-        expect(command.log).toHaveBeenCalledWith('Profile deleted')
+        expect(command.log).toHaveBeenCalledWith('profile deleted')
     })
 
     test('run', async () => {

@@ -2,11 +2,11 @@ import {Command} from '@oclif/core'
 import {LeappCliService} from '../../service/leapp-cli-service'
 import {Config} from '@oclif/core/lib/config/config'
 
-export default class CreateNamedProfile extends Command {
-    static description = 'Create a new AWS named profile'
+export default class CreateIdpUrl extends Command {
+    static description = 'Create a new identity provider URL'
 
     static examples = [
-        `$leapp profile create`
+        `$leapp idp-url create`
     ]
 
     constructor(argv: string[], config: Config, private leappCliService = new LeappCliService()) {
@@ -15,24 +15,24 @@ export default class CreateNamedProfile extends Command {
 
     async run(): Promise<void> {
         try {
-            const profileName = await this.getProfileName()
-            this.createNamedProfile(profileName)
+            const idpUrl = await this.getIdpUrl()
+            this.createIdpUrl(idpUrl)
         } catch (error) {
             this.error(error instanceof Error ? error.message : `Unknown error: ${error}`)
         }
     }
 
-    public async getProfileName(): Promise<string> {
+    public async getIdpUrl(): Promise<string> {
         const answer: any = await this.leappCliService.inquirer.prompt([{
-            name: 'namedProfileName',
-            message: `choose a name for the profile`,
+            name: 'idpUrl',
+            message: `enter the identity provider URL`,
             type: 'input'
         }])
-        return answer.namedProfileName
+        return answer.idpUrl
     }
 
-    public createNamedProfile(profileName: string) {
-        this.leappCliService.namedProfilesService.createNamedProfile(profileName)
-        this.log('profile created')
+    public createIdpUrl(idpUrl: string) {
+        this.leappCliService.idpUrlsService.createIdpUrl(idpUrl)
+        this.log('identity provider URL created')
     }
 }

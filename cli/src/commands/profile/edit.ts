@@ -27,7 +27,7 @@ export default class EditNamedProfile extends Command {
     public async selectNamedProfile(): Promise<AwsNamedProfile> {
         const namedProfiles = this.leappCliService.namedProfilesService.getNamedProfiles(true)
         if (namedProfiles.length === 0) {
-            throw new Error('No profiles available')
+            throw new Error('no profiles available')
         }
         const answer: any = await this.leappCliService.inquirer.prompt([{
             name: 'selectedNamedProfile',
@@ -49,6 +49,6 @@ export default class EditNamedProfile extends Command {
 
     public async editNamedProfile(id: string, newName: string) {
         await this.leappCliService.namedProfilesService.editNamedProfile(id, newName)
-        this.log('Profile edited')
+        this.log('profile edited')
     }
 }

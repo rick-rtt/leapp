@@ -25,7 +25,7 @@ describe('DeleteSession', () => {
 
         expect(sessionFactory.getSessionService).toHaveBeenCalledWith('sessionType')
         expect(sessionService.delete).toHaveBeenCalledWith('sessionId')
-        expect(command.log).toHaveBeenCalledWith('Session deleted')
+        expect(command.log).toHaveBeenCalledWith('session deleted')
     })
 
     test('selectSession', async () => {
@@ -86,7 +86,7 @@ describe('DeleteSession', () => {
         }
 
         const command = new DeleteSession([], {} as any, leappCliService)
-        await expect(command.selectSession()).rejects.toThrow(new Error('No sessions available'))
+        await expect(command.selectSession()).rejects.toThrow(new Error('no sessions available'))
     })
 
     test('run - all ok', async () => {

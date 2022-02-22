@@ -6,14 +6,14 @@ import {CloudProviderService} from './cloud-provider-service'
 describe('CloudProviderService', () => {
 
     test('availableCloudProviders', () => {
-        const service = new CloudProviderService(null, null, null)
+        const service = new CloudProviderService(null, null, null, null, null)
 
         expect(service.availableCloudProviders()).toEqual(['aws', 'azure'])
     })
 
     test('getSessionTypeMap', () => {
         const map = new Map([[CloudProviderType.AWS, [new AccessMethod(SessionType.awsIamUser, 'IAM User', [])]]])
-        const service = new CloudProviderService(null, null, null)
+        const service = new CloudProviderService(null, null, null, null, null)
         const spy = jest.spyOn(CloudProviderService.prototype as any, 'accessMethodMap', 'get').mockReturnValue(map)
 
         let expectedMap = new Map<SessionType, string>([
@@ -35,11 +35,16 @@ describe('CloudProviderService', () => {
                 {type: SessionType.awsIamRoleChained, sessionName: 'session3', sessionId: 's3'},
                 {type: SessionType.awsSsoRole, sessionName: 'session4', sessionId: 's4'},
                 {type: SessionType.azure, sessionName: 'session5', sessionId: 's5'}
-            ],
-            getProfiles: () => [{name: 'profileName', id: 'p1'}],
+            ]
+        }
+        const namedProfileService: any = {
+            getNamedProfiles: () => [{name: 'profileName', id: 'p1'}]
+        }
+        const idpUrlProfileService: any = {
             getIdpUrls: () => [{url: 'idpUrl1', id: 'id1'}]
         }
-        const service = new CloudProviderService(awsCoreService, azureCoreService, repository)
+        const service = new CloudProviderService(awsCoreService, azureCoreService, namedProfileService,
+            idpUrlProfileService, repository)
 
         const expectedRegionChoices = [
             {
@@ -173,10 +178,6 @@ describe('CloudProviderService', () => {
                                 'fieldValue': 's2'
                             },
                             {
-                                'fieldName': 'session3',
-                                'fieldValue': 's3'
-                            },
-                            {
                                 'fieldName': 'session4',
                                 'fieldValue': 's4'
                             }
@@ -206,8 +207,11 @@ describe('CloudProviderService', () => {
     test('availableAccessMethods - Azure', () => {
         const awsCoreService: any = {getRegions: () => []}
         const azureCoreService: any = {getLocations: () => [{location: 'location1'}, {location: 'location2'}]}
-        const repository: any = {getSessions: () => [], getProfiles: () => [], getIdpUrls: () => []}
-        const service = new CloudProviderService(awsCoreService, azureCoreService, repository)
+        const repository: any = {getSessions: () => []}
+        const namedProfileService: any = {getNamedProfiles: () => []}
+        const idpUrlProfileService: any = {getIdpUrls: () => []}
+        const service = new CloudProviderService(awsCoreService, azureCoreService, namedProfileService,
+            idpUrlProfileService, repository)
 
         expect(service.availableAccessMethods(CloudProviderType.AZURE)).toEqual([
             {
@@ -252,7 +256,7 @@ describe('CloudProviderService', () => {
     test('availableRegions', () => {
         const awsCoreService: any = {getRegions: () => [{region: 'region1'}, {region: 'region2'}]}
         const azureCoreService: any = {getLocations: () => [{location: 'location1'}, {location: 'location2'}]}
-        const service = new CloudProviderService(awsCoreService, azureCoreService, null)
+        const service = new CloudProviderService(awsCoreService, azureCoreService, null, null, null)
 
         const awsChoices = [{fieldName: 'region1', fieldValue: 'region1'},
             {fieldName: 'region2', fieldValue: 'region2'}]

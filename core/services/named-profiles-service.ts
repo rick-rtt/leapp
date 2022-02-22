@@ -1,11 +1,11 @@
-import {SessionFactory} from './session-factory'
-import {Repository} from './repository'
-import {AwsNamedProfile} from '../models/aws-named-profile'
 import * as uuid from 'uuid'
-import {WorkspaceService} from './workspace-service'
-import {SessionStatus} from '../models/session-status'
 import {constants} from '../models/constants'
+import {AwsNamedProfile} from '../models/aws-named-profile'
+import {Repository} from './repository'
 import {Session} from '../models/session'
+import {SessionFactory} from './session-factory'
+import {SessionStatus} from '../models/session-status'
+import {WorkspaceService} from './workspace-service'
 
 export class NamedProfilesService {
 
@@ -28,7 +28,7 @@ export class NamedProfilesService {
 
     createNamedProfile(name: string) {
         const validName = this.validateNewProfileName(name)
-        this.repository.addProfile({id: this.getNewId(), name: validName})
+        this.repository.addProfile(new AwsNamedProfile(this.getNewId(), validName))
     }
 
     async editNamedProfile(id: string, newName: string) {

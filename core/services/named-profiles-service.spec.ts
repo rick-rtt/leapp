@@ -6,8 +6,9 @@ import {
 } from './named-profiles-service'
 import {SessionStatus} from '../models/session-status'
 import {constants} from '../models/constants'
+import {AwsNamedProfile} from '../models/aws-named-profile'
 
-describe('NamedProfileService', () => {
+describe('NamedProfilesService', () => {
 
     test('getNamedProfiles', () => {
         const repository = {
@@ -62,7 +63,7 @@ describe('NamedProfileService', () => {
         namedProfileService.createNamedProfile('newName')
 
         expect(namedProfileService.validateNewProfileName).toHaveBeenCalledWith('newName')
-        expect(repository.addProfile).toHaveBeenCalledWith({id: 'newId', name: 'validName'})
+        expect(repository.addProfile).toHaveBeenCalledWith(new AwsNamedProfile('newId', 'validName'))
     })
 
     test('editNamedProfile', async () => {
