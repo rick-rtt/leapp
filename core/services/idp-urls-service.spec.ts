@@ -21,10 +21,11 @@ describe('IdpUrlsService', () => {
         idpUrlsService.validateNewIdpUrl = jest.fn(() => 'validUrl')
         idpUrlsService.getNewId = () => 'newId'
 
-        idpUrlsService.createIdpUrl('newUrl')
+        const newIdpUrl = idpUrlsService.createIdpUrl('newUrl')
 
         expect(idpUrlsService.validateNewIdpUrl).toHaveBeenCalledWith('newUrl')
         expect(repository.addIdpUrl).toHaveBeenCalledWith(new IdpUrl('newId', 'validUrl'))
+        expect(newIdpUrl).toEqual(new IdpUrl('newId', 'validUrl'))
     })
 
     test('editIdpUrl', () => {

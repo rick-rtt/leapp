@@ -10,6 +10,9 @@ import {FieldChoice} from './field-choice'
 import {NamedProfilesService} from './named-profiles-service'
 import {IdpUrlsService} from './idp-urls-service'
 import {Repository} from './repository'
+import {IdpUrlAccessMethodField} from '../models/idp-url-access-method-field'
+
+export const CreateNewIdpUrlFieldChoice = "CreateNewIdpUrlFieldChoice"
 
 export class CloudProviderService {
     public constructor(private awsCoreService: AwsCoreService, private azureCoreService: AzureCoreService,
@@ -56,7 +59,7 @@ export class CloudProviderService {
                     new AccessMethodField('sessionName', 'Insert session alias', AccessMethodFieldType.input),
                     new AccessMethodField('region', 'Select region', AccessMethodFieldType.list, awsRegionChoices),
                     new AccessMethodField('roleArn', 'Insert Role ARN', AccessMethodFieldType.input),
-                    new AccessMethodField('idpUrl', 'Insert the SAML 2.0 Url', AccessMethodFieldType.list, idpUrlChoices),
+                    new IdpUrlAccessMethodField('idpUrl', 'Select the SAML 2.0 Url', AccessMethodFieldType.list, idpUrlChoices),
                     new AccessMethodField('idpArn', 'Insert the AWS Identity Provider ARN', AccessMethodFieldType.input),
                     new AccessMethodField('profileId', 'Select the Named Profile', AccessMethodFieldType.list, awsNamedProfileChoices)
                 ]),
@@ -114,7 +117,7 @@ export class CloudProviderService {
     }
 
     private getIdpUrls(): FieldChoice[] {
-        return this.idpUrlService.getIdpUrls()
-            .map(idpUrl => new FieldChoice(idpUrl.url, idpUrl.id))
+        const idpUrlsFieldChoices = this.idpUrlService.getIdpUrls().map(idpUrl => new FieldChoice(idpUrl.url, idpUrl.id))
+        return idpUrlsFieldChoices.concat(new FieldChoice("Create new", CreateNewIdpUrlFieldChoice))
     }
 }

@@ -95,7 +95,16 @@
     "topicSeparator": " ",
     "topics": {
       "session": {
-        "description": "Permits to manage sessions"
+        "description": "Sessions management"
+      },
+      "profile": {
+        "description": "AWS named profiles management"
+      },
+      "idp-url": {
+        "description": "Identity providers URL management"
+      },
+      "region": {
+        "description": "AWS regions management"
       }
     },
     "macos": {
@@ -113,11 +122,7 @@
     "pack-win": "oclif pack:win",
     "postpack": "gushio gushio/target-post-pack.js",
     "version": "oclif readme && git add README.md",
-    "list-session": "./bin/dev session list",
-    "start-session": "./bin/dev session start",
-    "change-region": "./bin/dev session change-region",
-    "profile-create": "./bin/dev profile create",
-    "profile-edit": "./bin/dev profile edit"
+    "add-session": "./bin/dev session add"
   },
   "types": "dist/index.d.ts"
 }

@@ -2,6 +2,7 @@ import {AccessMethod} from '../models/access-method'
 import {CloudProviderType} from '../models/cloud-provider-type'
 import {SessionType} from '../models/session-type'
 import {CloudProviderService} from './cloud-provider-service'
+import {IdpUrlAccessMethodField} from '../models/idp-url-access-method-field'
 
 describe('CloudProviderService', () => {
 
@@ -68,10 +69,15 @@ describe('CloudProviderService', () => {
             {
                 'fieldName': 'idpUrl1',
                 'fieldValue': 'id1'
+            },
+            {
+                'fieldName': 'Create new',
+                'fieldValue': 'CreateNewIdpUrlFieldChoice'
             }
         ]
 
-        expect(service.availableAccessMethods(CloudProviderType.AWS)).toEqual([
+        const accessMethods = service.availableAccessMethods(CloudProviderType.AWS)
+        expect(accessMethods).toEqual([
             {
                 'accessMethodFields': [
                     {
@@ -131,7 +137,7 @@ describe('CloudProviderService', () => {
                     {
                         'choices': expectedIdpUrlChoices,
                         'creationRequestField': 'idpUrl',
-                        'message': 'Insert the SAML 2.0 Url',
+                        'message': 'Select the SAML 2.0 Url',
                         'type': 'list'
                     },
                     {
@@ -202,6 +208,12 @@ describe('CloudProviderService', () => {
                 'sessionType': 'awsIamRoleChained'
             }
         ])
+
+        const awsFederatedAccessMethod = accessMethods
+            .filter(accessMethod => accessMethod.sessionType === SessionType.awsIamRoleFederated)[0]
+        const idpUrlAccessMethodField = awsFederatedAccessMethod.accessMethodFields
+            .filter(accessMethodField => accessMethodField.creationRequestField === 'idpUrl')[0]
+        expect(idpUrlAccessMethodField).toBeInstanceOf(IdpUrlAccessMethodField)
     })
 
     test('availableAccessMethods - Azure', () => {
