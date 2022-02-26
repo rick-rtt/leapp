@@ -1,14 +1,14 @@
-import { Command, CliUx } from '@oclif/core'
-import { LeappCliService } from '../../service/leapp-cli-service'
-import { Config } from '@oclif/core/lib/config/config'
-import { SessionStatus } from '@noovolari/leapp-core/models/session-status'
+import {Command, CliUx} from '@oclif/core'
+import {LeappCliService} from '../../service/leapp-cli-service'
+import {Config} from '@oclif/core/lib/config/config'
+import {SessionStatus} from '@noovolari/leapp-core/models/session-status'
 
 export default class ListSessions extends Command {
   static description = 'Show sessions list'
   static examples = [`$leapp session list`]
 
   static flags = {
-    ...CliUx.ux.table.flags()
+    ...CliUx.ux.table.flags(),
   }
 
   constructor(argv: string[], config: Config, private leappCliService = new LeappCliService()) {
@@ -25,23 +25,24 @@ export default class ListSessions extends Command {
 
   public async showSessions(): Promise<void> {
     const {flags} = await this.parse(ListSessions)
-    const data = this.leappCliService.repository.getSessions() as unknown as Record<string, unknown> []
-    const namedProfilesMap = this.leappCliService.namedProfilesService.getNamedProfilesMap()
     const sessionTypeLabelMap = this.leappCliService.cloudProviderService.getSessionTypeMap()
+    const namedProfilesMap = this.leappCliService.namedProfilesService.getNamedProfilesMap()
+    const data = this.leappCliService.repository.getSessions().map(session => {
+      return {
+        sessionName: session.sessionName,
+        type: sessionTypeLabelMap.get(session.type),
+        profileId: 'profileId' in session ? namedProfilesMap.get((session as any).profileId)?.name : '-',
+        region: session.region,
+        status: SessionStatus[session.status],
+      }
+    }) as any as Record<string, unknown> []
 
     const columns = {
       sessionName: {header: 'Session Name'},
-      type: {
-        get: (row: any) => sessionTypeLabelMap.get(row.type)
-      },
-      profileId: {
-        header: 'Named Profile',
-        get: (row: any) => 'profileId' in row
-          ? namedProfilesMap.get(row.profileId)?.name
-          : '-'
-      },
+      type: {header: 'Type'},
+      profileId: {header: 'Named Profile'},
       region: {header: 'Region/Location'},
-      status: {get: (row: any) => SessionStatus[row.status]},
+      status: {header: 'Status'},
     }
 
     CliUx.ux.table(data, columns, {...flags})

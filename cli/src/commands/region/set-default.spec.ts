@@ -6,7 +6,7 @@ describe('ChangeDefaultRegion', () => {
 
     test('selectDefaultRegion', async () => {
         const leappCliService: any = {
-            regionService: {
+            regionsService: {
                 getDefaultAwsRegion: () => 'region1'
             },
             cloudProviderService: {
@@ -35,7 +35,7 @@ describe('ChangeDefaultRegion', () => {
     test('changeDefaultRegion', async () => {
         const newRegion = 'newRegion'
         const leappCliService: any = {
-            regionService: {
+            regionsService: {
                 changeDefaultAwsRegion: jest.fn()
             }
         }
@@ -44,7 +44,7 @@ describe('ChangeDefaultRegion', () => {
         command.log = jest.fn()
 
         await command.changeDefaultRegion(newRegion)
-        expect(leappCliService.regionService.changeDefaultAwsRegion).toHaveBeenCalledWith(newRegion)
+        expect(leappCliService.regionsService.changeDefaultAwsRegion).toHaveBeenCalledWith(newRegion)
         expect(command.log).toHaveBeenCalledWith('default region changed')
     })
 

@@ -26,7 +26,8 @@ export class AwsSsoOidcService {
   private timeoutOccurred: boolean
   private interruptOccurred: boolean
 
-  public constructor(private verificationWindowService: IVerificationWindowService, private repository: Repository) {
+  public constructor(private verificationWindowService: IVerificationWindowService, private repository: Repository,
+                     private disableInAppBrowser: Boolean = false) {
     this.listeners = []
     this.ssoOidc = null
     this.generateSSOTokenResponse = null
@@ -146,7 +147,7 @@ export class AwsSsoOidcService {
     }
 
     let createTokenResponse
-    if (this.repository.getAwsSsoConfiguration(configurationId).browserOpening === constants.inApp) {
+    if (!this.disableInAppBrowser && this.repository.getAwsSsoConfiguration(configurationId).browserOpening === constants.inApp) {
       createTokenResponse = await this.getAwsSsoOidcClient().createToken(createTokenRequest).promise()
     } else {
       createTokenResponse = await this.waitForToken(createTokenRequest)

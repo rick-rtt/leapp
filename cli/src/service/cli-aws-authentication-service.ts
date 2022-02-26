@@ -1,6 +1,6 @@
-import { IAwsAuthenticationService } from '@noovolari/leapp-core/interfaces/i-aws-authentication.service'
+import {IAwsAuthenticationService} from '@noovolari/leapp-core/interfaces/i-aws-authentication.service'
 import puppeteer from 'puppeteer'
-import { LeappModalClosedError } from '@noovolari/leapp-core/errors/leapp-modal-closed-error'
+import {LeappModalClosedError} from '@noovolari/leapp-core/errors/leapp-modal-closed-error'
 
 export class CliAwsAuthenticationService implements IAwsAuthenticationService {
   private browser: puppeteer.Browser
@@ -24,7 +24,10 @@ export class CliAwsAuthenticationService implements IAwsAuthenticationService {
         await request.continue()
       })
 
-      try { await page.goto(idpUrl) } catch (e) {}
+      try {
+        await page.goto(idpUrl)
+      } catch (e) {
+      }
     })
   }
 
@@ -47,21 +50,23 @@ export class CliAwsAuthenticationService implements IAwsAuthenticationService {
         await request.continue()
       })
 
-      page.on('close', ()=>{
+      page.on('close', () => {
         reject(new LeappModalClosedError(this, 'request window closed by user'))
       })
 
-      try { await page.goto(idpUrl) } catch (e) {}
+      try {
+        await page.goto(idpUrl)
+      } catch (e) {
+      }
     })
   }
 
   public async closeAuthenticationWindow(): Promise<void> {
     if (this.browser) {
-      for (const page of await this.browser.pages()){
+      for (const page of await this.browser.pages()) {
         page.removeAllListeners()
         await page.close()
       }
-
       await this.browser.close()
     }
   }
@@ -89,7 +94,7 @@ export class CliAwsAuthenticationService implements IAwsAuthenticationService {
       '.onelogin.com/login',
       '.okta.com/discovery/iframe.html',
       'https://accounts.google.com/ServiceLogin',
-      'https://signin.aws.amazon.com/saml'
+      'https://signin.aws.amazon.com/saml',
     ]
 
     return otherFilters.some(filter => requestUrl.indexOf(filter) !== -1)

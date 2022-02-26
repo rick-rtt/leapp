@@ -64,7 +64,7 @@ describe('ChangeRegion', () => {
         const newRegion = {} as any
 
         const leappCliService: any = {
-            regionService: {
+            regionsService: {
                 changeRegion: jest.fn()
             }
         }
@@ -73,7 +73,7 @@ describe('ChangeRegion', () => {
         command.log = jest.fn()
 
         await command.changeSessionRegion(session, newRegion)
-        expect(leappCliService.regionService.changeRegion).toHaveBeenCalledWith(session, newRegion)
+        expect(leappCliService.regionsService.changeRegion).toHaveBeenCalledWith(session, newRegion)
         expect(command.log).toHaveBeenCalledWith('session region changed')
     })
 
