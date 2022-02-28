@@ -19,7 +19,7 @@ import { KeychainService } from '../../keychain-service'
 import { Repository } from '../../repository'
 
 import { AwsSessionService } from './aws-session-service'
-import { AwsSsoOidcService } from './aws-sso-oidc.service'
+import { AwsSsoOidcService } from '../../aws-sso-oidc.service'
 import { AwsSsoRoleSessionRequest } from './aws-sso-role-session-request'
 import {AwsSsoIntegration} from "../../../models/aws-sso-integration";
 

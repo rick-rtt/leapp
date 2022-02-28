@@ -5,19 +5,19 @@ import SSO, {
   LogoutRequest,
   RoleInfo
 } from 'aws-sdk/clients/sso'
-import { AwsSsoRoleSession } from '../../../models/aws-sso-role-session'
-import { SessionType } from '../../../models/session-type'
-import { AwsCoreService } from '../../aws-core-service'
-import { FileService } from '../../file-service'
-import { KeychainService } from '../../keychain-service'
-import { Repository } from '../../repository'
+import { AwsSsoRoleSession } from '../models/aws-sso-role-session'
+import { SessionType } from '../models/session-type'
+import { AwsCoreService } from './aws-core-service'
+import { FileService } from './file-service'
+import { KeychainService } from './keychain-service'
+import { Repository } from './repository'
 
 import { AwsSsoOidcService } from './aws-sso-oidc.service'
-import {AwsSsoIntegration} from "../../../models/aws-sso-integration";
-import {AwsSsoRoleService} from "./aws-sso-role-service";
-import {constants} from "../../../models/constants";
-import {AwsSsoIntegrationTokenInfo} from "../../../models/aws-sso-integration-token-info";
-import {WorkspaceService} from "../../workspace-service";
+import {AwsSsoIntegration} from "../models/aws-sso-integration";
+import {AwsSsoRoleService} from "./session/aws/aws-sso-role-service";
+import {constants} from "../models/constants";
+import {AwsSsoIntegrationTokenInfo} from "../models/aws-sso-integration-token-info";
+import {WorkspaceService} from "./workspace-service";
 
 export interface LoginResponse {
   accessToken: string;

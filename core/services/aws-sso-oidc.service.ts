@@ -1,15 +1,15 @@
-import { LeappBaseError } from '../../../errors/leapp-base-error'
-import { LoggerLevel } from '../../logging-service'
-import { constants } from '../../../models/constants'
-import { Repository } from '../../repository'
+import { LeappBaseError } from '../errors/leapp-base-error'
+import { LoggerLevel } from './logging-service'
+import { constants } from '../models/constants'
+import { Repository } from './repository'
 import {
   GenerateSSOTokenResponse,
   RegisterClientResponse,
   StartDeviceAuthorizationResponse,
   VerificationResponse
-} from './aws-sso-role-service'
-import { IVerificationWindowService } from '../../../interfaces/i-verification-window.service'
-import { BrowserWindowClosing } from '../../../interfaces/i-browser-window-closing'
+} from './session/aws/aws-sso-role-service'
+import { IVerificationWindowService } from '../interfaces/i-verification-window.service'
+import { BrowserWindowClosing } from '../interfaces/i-browser-window-closing'
 import SSOOIDC, {
   CreateTokenRequest,
   RegisterClientRequest,
