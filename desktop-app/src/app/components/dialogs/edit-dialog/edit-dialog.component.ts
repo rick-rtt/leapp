@@ -10,7 +10,8 @@ import {KeychainService} from '@noovolari/leapp-core/services/keychain-service';
 import {constants} from '@noovolari/leapp-core/models/constants';
 import {LeappCoreService} from '../../../services/leapp-core.service';
 import {MessageToasterService, ToastLevel} from '../../../services/message-toaster.service';
-import {WindowService} from "../../../services/window.service";
+import {WindowService} from '../../../services/window.service';
+import {Repository} from '@noovolari/leapp-core/services/repository';
 
 @Component({
   selector: 'app-edit-dialog',
@@ -41,6 +42,7 @@ export class EditDialogComponent implements OnInit {
   });
 
   private workspaceService: WorkspaceService;
+  private repository: Repository;
 
   /* Setup the first account for the application */
   constructor(
@@ -53,6 +55,7 @@ export class EditDialogComponent implements OnInit {
     private leappCoreService: LeappCoreService
   ) {
     this.workspaceService = leappCoreService.workspaceService;
+    this.repository = this.leappCoreService.repository;
   }
 
   ngOnInit() {
@@ -86,6 +89,7 @@ export class EditDialogComponent implements OnInit {
       this.keychainService.saveSecret(constants.appName, `${this.selectedSession.sessionId}-iam-user-aws-session-access-key-id`, this.form.controls['accessKey'].value).then((_) => {});
       this.keychainService.saveSecret(constants.appName, `${this.selectedSession.sessionId}-iam-user-aws-session-secret-access-key`, this.form.controls['secretKey'].value).then((_) => {});
 
+      this.repository.updateSession(this.selectedSession.sessionId, this.selectedSession);
       this.workspaceService.updateSession(this.selectedSession.sessionId, this.selectedSession);
 
       this.messageToasterService.toast(`Session: ${this.form.value.name}, edited.`, ToastLevel.success, '');
