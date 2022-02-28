@@ -10,8 +10,6 @@ import {WorkspaceService} from '@noovolari/leapp-core/services/workspace-service
 import {AwsIamRoleFederatedService} from '@noovolari/leapp-core/services/session/aws/aws-iam-role-federated-service';
 import {AwsIamUserService} from '@noovolari/leapp-core/services/session/aws/aws-iam-user-service';
 import {AwsIamRoleChainedService} from '@noovolari/leapp-core/services/session/aws/aws-iam-role-chained-service';
-import {AwsSessionService} from '@noovolari/leapp-core/services/session/aws/aws-session-service';
-import {AzureService} from '@noovolari/leapp-core/services/session/azure/azure-service';
 import {LoggerLevel, LoggingService} from '@noovolari/leapp-core/services/logging-service';
 import {LeappCoreService} from '../../../services/leapp-core.service';
 import {constants} from '@noovolari/leapp-core/models/constants';
@@ -26,6 +24,7 @@ import {
 import {AzureSessionRequest} from '@noovolari/leapp-core/services/session/azure/azure-session-request';
 import {MessageToasterService, ToastLevel} from '../../../services/message-toaster.service';
 import {LeappParseError} from '@noovolari/leapp-core/errors/leapp-parse-error';
+import {AzureService} from '@noovolari/leapp-core/services/session/azure/azure-service';
 
 @Component({
   selector: 'app-create-dialog',
@@ -90,24 +89,28 @@ export class CreateDialogComponent implements OnInit {
   });
 
   private workspaceService: WorkspaceService;
+  private awsIamRoleFederatedService: AwsIamRoleFederatedService;
+  private awsIamUserService: AwsIamUserService;
+  private awsIamRoleChainedService: AwsIamRoleChainedService;
+  private azureService: AzureService;
+  private loggingService: LoggingService;
 
   /* Setup the first account for the application */
   constructor(
     private appService: AppService,
     private router: Router,
     private activatedRoute: ActivatedRoute,
-    private awsIamRoleFederatedService: AwsIamRoleFederatedService,
-    private awsIamUserService: AwsIamUserService,
-    private awsIamRoleChainedService: AwsIamRoleChainedService,
-    private awsSessionService: AwsSessionService,
-    private azureService: AzureService,
-    private loggingService: LoggingService,
     private bsModalService: BsModalService,
     private leappCoreService: LeappCoreService,
     private windowService: WindowService,
     private messageToasterService: MessageToasterService
   ) {
     this.workspaceService = leappCoreService.workspaceService;
+    this.awsIamRoleFederatedService = leappCoreService.awsIamRoleFederatedService;
+    this.awsIamUserService = leappCoreService.awsIamUserService;
+    this.awsIamRoleChainedService = leappCoreService.awsIamRoleChainedService;
+    this.azureService = leappCoreService.azureService;
+    this.loggingService = leappCoreService.loggingService;
   }
 
   public ngOnInit(): void {
@@ -393,7 +396,9 @@ export class CreateDialogComponent implements OnInit {
   private addProfileToWorkspace() {
     try {
       const profile = { id: this.selectedProfile.value, name: this.selectedProfile.label };
-      if(!this.leappCoreService.repository.getProfileName(profile.id)) {
+      try {
+        this.leappCoreService.repository.getProfileName(profile.id);
+      } catch(e) {
         this.leappCoreService.repository.addProfile(profile);
       }
     } catch(err) {

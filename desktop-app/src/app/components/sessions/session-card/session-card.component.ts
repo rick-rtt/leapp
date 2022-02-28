@@ -390,15 +390,20 @@ export class SessionCardComponent implements OnInit {
   }
 
   getProfileName(profileId: string): string {
-    const profileName = this.repository.getProfileName(profileId);
-    return profileName ? profileName : constants.defaultAwsProfileName;
+    let profileName = constants.defaultAwsProfileName;
+    try {
+      profileName = this.repository.getProfileName(profileId);
+    } catch(e) {}
+    return profileName;
   }
 
   async changeProfile() {
     if (this.selectedProfile) {
       let wasActive = false;
 
-      if(!this.repository.getProfileName(this.selectedProfile.id)) {
+      try {
+        this.repository.getProfileName(this.selectedProfile.id);
+      } catch(e) {
         this.repository.addProfile(this.selectedProfile);
       }
 

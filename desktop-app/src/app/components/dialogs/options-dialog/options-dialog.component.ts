@@ -5,7 +5,6 @@ import {Router} from '@angular/router';
 import * as uuid from 'uuid';
 import {MatTabGroup} from '@angular/material/tabs';
 import {Workspace} from '@noovolari/leapp-core/models/workspace';
-import {LeappCoreService} from '../../../services/leapp-core.service';
 import {constants} from '@noovolari/leapp-core/models/constants';
 import {LoggerLevel} from '@noovolari/leapp-core/services/logging-service';
 import {MessageToasterService, ToastLevel} from '../../../services/message-toaster.service';
@@ -13,6 +12,8 @@ import {WindowService} from '../../../services/window.service';
 import {SessionType} from '@noovolari/leapp-core/models/session-type';
 import {AwsIamRoleFederatedSession} from '@noovolari/leapp-core/models/aws-iam-role-federated-session';
 import {SessionStatus} from '@noovolari/leapp-core/models/session-status';
+import {SessionService} from '@noovolari/leapp-core/services/session/session-service';
+import {LeappCoreService} from '../../../services/leapp-core.service';
 
 @Component({
   selector: 'app-options-dialog',
@@ -65,7 +66,7 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
   });
 
   /* Simple profile page: shows the Idp Url and the workspace json */
-  private sessionService: any;
+  private sessionService: SessionService;
 
   constructor(
     private appService: AppService,
@@ -193,11 +194,11 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
   public deleteIdpUrl(id: string): void {
     // Assumable sessions with this id
     this.sessionService = this.leappCoreService.sessionFactory.getSessionService(SessionType.awsIamRoleFederated);
-    let sessions = this.sessionService.list().filter((s) => (s as AwsIamRoleFederatedSession).idpUrlId === id);
+    let sessions = this.leappCoreService.repository.getSessions().filter((s) => (s as AwsIamRoleFederatedSession).idpUrlId === id);
 
     // Add iam Role Chained from iam role iam_federated_role
     sessions.forEach((parent) => {
-      const childs = this.sessionService.listIamRoleChained(parent);
+      const childs = this.leappCoreService.repository.listIamRoleChained(parent);
       sessions = sessions.concat(childs);
     });
 
@@ -222,7 +223,7 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
         this.leappCoreService.repository.removeIdpUrl(id);
 
         sessions.forEach((session) => {
-          this.sessionService.delete(session.sessionId);
+          this.leappCoreService.repository.deleteSession(session.sessionId);
         });
 
         this.workspace = this.leappCoreService.repository.getWorkspace();
@@ -300,14 +301,15 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
           }
 
           (sess as any).profileId = this.leappCoreService.repository.getDefaultProfileId();
-          this.sessionService.update(sess.sessionId, sess);
+          this.leappCoreService.repository.updateSession(sess.sessionId, sess);
+          this.leappCoreService.workspaceService.updateSession(sess.sessionId, sess);
+          this.workspace = this.leappCoreService.repository.getWorkspace();
 
           if(wasActive) {
             this.sessionService.start(sess.sessionId);
           }
         }
 
-        this.workspace = this.leappCoreService.repository.getWorkspace();
       }
     }, 'Delete Profile', 'Cancel');
   }

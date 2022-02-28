@@ -1,20 +1,21 @@
-import { EventEmitter, Injectable } from '@angular/core'
-import { FormControl, FormGroup } from '@angular/forms'
-import { environment } from '../../environments/environment'
-import { ElectronService } from './electron.service'
-import { constants } from '@noovolari/leapp-core/models/constants'
-import { LoggerLevel, LoggingService } from '@noovolari/leapp-core/services/logging-service'
-import { LeappCoreService } from './leapp-core.service'
-import { MessageToasterService, ToastLevel } from './message-toaster.service'
-import { MatMenuTrigger } from '@angular/material/menu'
-import {WindowService} from "./window.service";
+import { EventEmitter, Injectable } from '@angular/core';
+import { FormControl, FormGroup } from '@angular/forms';
+import { ElectronService } from './electron.service';
+
+import { LeappCoreService } from './leapp-core.service';
+import { MessageToasterService, ToastLevel } from './message-toaster.service';
+import { MatMenuTrigger } from '@angular/material/menu';
+import {WindowService} from './window.service';
+import {BsModalService} from 'ngx-bootstrap/modal';
+import {LoggerLevel, LoggingService} from '@noovolari/leapp-core/services/logging-service';
+import {constants} from '@noovolari/leapp-core/models/constants';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AppService {
 
-  profileOpen: EventEmitter<boolean> = new EventEmitter<boolean>()
+  profileOpen: EventEmitter<boolean> = new EventEmitter<boolean>();
 
   /* Is used to detect if application is in compact or full mode */
   private _compactMode: boolean;
@@ -26,6 +27,7 @@ export class AppService {
   constructor(private electronService: ElectronService,
               private messageToasterService: MessageToasterService,
               private windowService: WindowService,
+              private modalService: BsModalService,
               leappCoreService: LeappCoreService) {
     this.triggers = [];
 
@@ -37,11 +39,11 @@ export class AppService {
         mac: `${this.electronService.process.env.HOME}/Library/Logs/Leapp/log.electronService.log`,
         linux: `${this.electronService.process.env.HOME}/.config/Leapp/logs/log.electronService.log`,
         windows: `${this.electronService.process.env.USERPROFILE}\\AppData\\Roaming\\Leapp\\log.electronService.log`
-      }
+      };
 
-      this.electronService.log.transports.console.format = '[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{processType}] {text}'
-      this.electronService.log.transports.file.format = '[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] [{processType}] {text}'
-      this.electronService.log.transports.file.resolvePath = () => logPaths[this.detectOs()]
+      this.electronService.log.transports.console.format = '[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{processType}] {text}';
+      this.electronService.log.transports.file.format = '[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] [{processType}] {text}';
+      this.electronService.log.transports.file.resolvePath = () => logPaths[this.detectOs()];
     }
   }
 
@@ -50,23 +52,23 @@ export class AppService {
    * Return the app object from node
    */
   getApp() {
-    return this.electronService.app
+    return this.electronService.app;
   }
 
   // TODO: get directly from electronService
   getMenu() {
-    return this.electronService.menu
+    return this.electronService.menu;
   }
 
   isDarkMode() {
-    return this.electronService.nativeTheme.shouldUseDarkColors
+    return this.electronService.nativeTheme.shouldUseDarkColors;
   }
 
   /**
    * Return the dialog native object
    */
   getDialog() {
-    return this.electronService.dialog
+    return this.electronService.dialog;
   }
 
   /**
@@ -77,47 +79,47 @@ export class AppService {
       linux: constants.linux,
       darwin: constants.mac,
       win32: constants.windows
-    }
-    const os = this.electronService.os.platform()
-    return hrNames[os]
+    };
+    const os = this.electronService.os.platform();
+    return hrNames[os];
   }
 
   /**
    * Quit the app
    */
   quit() {
-    this.electronService.app.exit(0)
+    this.electronService.app.exit(0);
   }
 
   /**
    * Restart the app
    */
   restart() {
-    this.electronService.app.relaunch()
-    this.electronService.app.exit(0)
+    this.electronService.app.relaunch();
+    this.electronService.app.exit(0);
   }
 
   public async logout() {
     try {
       // Clear all extra data
-      const getAppPath = this.electronService.path.join(this.electronService.app.getPath('appData'), constants.appName)
-      this.electronService.rimraf.sync(getAppPath + '/Partitions/leapp*')
+      const getAppPath = this.electronService.path.join(this.electronService.app.getPath('appData'), constants.appName);
+      this.electronService.rimraf.sync(getAppPath + '/Partitions/leapp*');
 
       // Cleaning Library Electron Cache
-      await this.electronService.session.defaultSession.clearStorageData()
+      await this.electronService.session.defaultSession.clearStorageData();
 
       // Clean localStorage
-      localStorage.clear()
+      localStorage.clear();
 
-      this.messageToasterService.toast('Cache and configuration file cleaned.', ToastLevel.success, 'Cleaning configuration file')
+      this.messageToasterService.toast('Cache and configuration file cleaned.', ToastLevel.success, 'Cleaning configuration file');
 
       // Restart
       setTimeout(() => {
-        this.restart()
-      }, 2000)
+        this.restart();
+      }, 2000);
     } catch (err) {
-      this.loggingService.logger(`Leapp has an error re-creating your configuration file and cache.`, LoggerLevel.error, this, err.stack)
-      this.messageToasterService.toast(`Leapp has an error re-creating your configuration file and cache.`, ToastLevel.error, 'Cleaning configuration file')
+      this.loggingService.logger(`Leapp has an error re-creating your configuration file and cache.`, LoggerLevel.error, this, err.stack);
+      this.messageToasterService.toast(`Leapp has an error re-creating your configuration file and cache.`, ToastLevel.error, 'Cleaning configuration file');
     }
   }
 
@@ -127,7 +129,7 @@ export class AppService {
    * @returns the semver object
    */
   semVer() {
-    return this.electronService.semver
+    return this.electronService.semver;
   }
 
   /**
@@ -136,17 +138,17 @@ export class AppService {
    * @param text - the element to copy to clipboard
    */
   copyToClipboard(text: string) {
-    const selBox = document.createElement('textarea')
-    selBox.style.position = 'fixed'
-    selBox.style.left = '0'
-    selBox.style.top = '0'
-    selBox.style.opacity = '0'
-    selBox.value = text
-    document.body.appendChild(selBox)
-    selBox.focus()
-    selBox.select()
-    document.execCommand('copy')
-    document.body.removeChild(selBox)
+    const selBox = document.createElement('textarea');
+    selBox.style.position = 'fixed';
+    selBox.style.left = '0';
+    selBox.style.top = '0';
+    selBox.style.opacity = '0';
+    selBox.value = text;
+    document.body.appendChild(selBox);
+    selBox.focus();
+    selBox.select();
+    document.execCommand('copy');
+    document.body.removeChild(selBox);
   }
 
   /**
@@ -155,14 +157,14 @@ export class AppService {
    * @param formGroup - the form formGroup
    */
   validateAllFormFields(formGroup: FormGroup) {
-    Object.keys(formGroup.controls).forEach(field => {
-      const control = formGroup.get(field)
+    Object.keys(formGroup.controls).forEach((field) => {
+      const control = formGroup.get(field);
       if (control instanceof FormControl) {
-        control.markAsTouched({onlySelf: true})
+        control.markAsTouched({onlySelf: true});
       } else if (control instanceof FormGroup) {
-        this.validateAllFormFields(control)
+        this.validateAllFormFields(control);
       }
-    })
+    });
   }
 
   /**
@@ -171,11 +173,11 @@ export class AppService {
    */
   setFilteringForEc2Calls() {
     // Modify the user agent for all requests to the following urls.
-    const filter = {urls: ['https://*.amazonaws.com/']}
+    const filter = {urls: ['https://*.amazonaws.com/']};
     this.electronService.session.defaultSession.webRequest.onBeforeSendHeaders(filter, (details, callback) => {
-      details.requestHeaders['Origin'] = 'http://localhost:4200'
-      callback({cancel: false, requestHeaders: details.requestHeaders})
-    })
+      details.requestHeaders['Origin'] = 'http://localhost:4200';
+      callback({cancel: false, requestHeaders: details.requestHeaders});
+    });
   }
 
   /**
@@ -204,8 +206,7 @@ export class AppService {
   }
 
   closeModal() {
-    // @ts-ignore: Accessing private variable as workaround for missing feature
-    this.modalService.loaders.forEach(loader => loader.instance.hide());
+    (this.modalService as any).loaders.forEach((loader) => loader.instance.hide());
   }
 
   about() {
@@ -223,7 +224,7 @@ export class AppService {
   }
 
   closeAllMenuTriggers() {
-    this.triggers.forEach(t => {
+    this.triggers.forEach((t) => {
       t.closeMenu();
     });
     this.triggers = [];

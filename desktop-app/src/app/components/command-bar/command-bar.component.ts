@@ -220,7 +220,12 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
         test ||= (session as any).roleArn?.toLowerCase().indexOf(searchText.toLowerCase()) > -1;
         test ||= (session as any).idpArn?.toLowerCase().indexOf(searchText.toLowerCase()) > -1;
         test ||= (session as any).roleSessionName?.toLowerCase().indexOf(searchText.toLowerCase()) > -1;
-        test ||= this.leappCoreService.repository.getProfileName((session as any).profileId)?.toLowerCase().indexOf(searchText.toLowerCase()) > -1;
+
+        try {
+          test ||= this.leappCoreService.repository.getProfileName((session as any).profileId)?.toLowerCase().indexOf(searchText.toLowerCase()) > -1;
+        } catch(e) {
+          test ||= false;
+        }
         return test;
       });
     }

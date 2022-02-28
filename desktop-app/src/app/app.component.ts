@@ -43,7 +43,7 @@ export class AppComponent implements OnInit {
               private updaterService: UpdaterService,
               private windowService: WindowService,
               private electronService: ElectronService,
-              leappCoreService: LeappCoreService
+              private leappCoreService: LeappCoreService
   ) {
     this.repository = leappCoreService.repository;
     this.fileService = leappCoreService.fileService;
@@ -99,6 +99,9 @@ export class AppComponent implements OnInit {
 
     // Check the existence of a pre-Leapp credential file and make a backup
     this.showCredentialBackupMessageIfNeeded();
+
+    console.log(this.workspaceService.sessions);
+    console.log(workspace.sessions);
 
     // All sessions start stopped when app is launched
     if (this.workspaceService.sessions.length > 0) {
