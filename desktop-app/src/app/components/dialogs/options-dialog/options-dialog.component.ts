@@ -215,11 +215,12 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
       if (res !== constants.confirmClosed) {
         this.leappCoreService.loggingService.logger(`Removing idp url with id: ${id}`, LoggerLevel.info, this);
 
-        this.leappCoreService.repository.removeIdpUrl(id);
-
         sessions.forEach((session) => {
           this.leappCoreService.repository.deleteSession(session.sessionId);
+          this.leappCoreService.workspaceService.deleteSession(session.sessionId);
         });
+
+        this.leappCoreService.repository.removeIdpUrl(id);
       }
     }, 'Delete IdP URL', 'Cancel');
   }
