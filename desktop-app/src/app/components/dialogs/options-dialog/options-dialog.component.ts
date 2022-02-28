@@ -4,7 +4,6 @@ import {AppService} from '../../../services/app.service';
 import {Router} from '@angular/router';
 import * as uuid from 'uuid';
 import {MatTabGroup} from '@angular/material/tabs';
-import {Workspace} from '@noovolari/leapp-core/models/workspace';
 import {constants} from '@noovolari/leapp-core/models/constants';
 import {LoggerLevel} from '@noovolari/leapp-core/services/logging-service';
 import {MessageToasterService, ToastLevel} from '../../../services/message-toaster.service';
@@ -43,8 +42,6 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
   proxyUsername;
   proxyPassword;
 
-  workspace: Workspace;
-
   locations: { location: string }[];
   regions: { region: string }[];
   selectedLocation: string;
@@ -69,21 +66,20 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
   private sessionService: SessionService;
 
   constructor(
+    public leappCoreService: LeappCoreService,
     private appService: AppService,
-    private leappCoreService: LeappCoreService,
     private windowService: WindowService,
     private toasterService: MessageToasterService,
     private router: Router
   ) {}
 
   public ngOnInit(): void {
-    this.workspace = this.leappCoreService.repository.getWorkspace();
     this.idpUrlValue = '';
-    this.proxyProtocol = this.workspace.proxyConfiguration.proxyProtocol;
-    this.proxyUrl = this.workspace.proxyConfiguration.proxyUrl;
-    this.proxyPort = this.workspace.proxyConfiguration.proxyPort;
-    this.proxyUsername = this.workspace.proxyConfiguration.username || '';
-    this.proxyPassword = this.workspace.proxyConfiguration.password || '';
+    this.proxyProtocol = this.leappCoreService.repository.getWorkspace().proxyConfiguration.proxyProtocol;
+    this.proxyUrl = this.leappCoreService.repository.getWorkspace().proxyConfiguration.proxyUrl;
+    this.proxyPort = this.leappCoreService.repository.getWorkspace().proxyConfiguration.proxyPort;
+    this.proxyUsername = this.leappCoreService.repository.getWorkspace().proxyConfiguration.username || '';
+    this.proxyPassword = this.leappCoreService.repository.getWorkspace().proxyConfiguration.password || '';
 
     this.form.controls['idpUrl'].setValue(this.idpUrlValue);
     this.form.controls['proxyUrl'].setValue(this.proxyUrl);
@@ -92,9 +88,9 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
     this.form.controls['proxyUsername'].setValue(this.proxyUsername);
     this.form.controls['proxyPassword'].setValue(this.proxyPassword);
 
-    const isProxyUrl = this.workspace.proxyConfiguration.proxyUrl &&
-                       this.workspace.proxyConfiguration.proxyUrl !== 'undefined';
-    this.proxyUrl = isProxyUrl ? this.workspace.proxyConfiguration.proxyUrl : '';
+    const isProxyUrl = this.leappCoreService.repository.getWorkspace().proxyConfiguration.proxyUrl &&
+                       this.leappCoreService.repository.getWorkspace().proxyConfiguration.proxyUrl !== 'undefined';
+    this.proxyUrl = isProxyUrl ? this.leappCoreService.repository.getWorkspace().proxyConfiguration.proxyUrl : '';
 
     if (this.proxyUsername || this.proxyPassword) {
       this.showProxyAuthentication = true;
@@ -102,8 +98,8 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
 
     this.regions = this.leappCoreService.awsCoreService.getRegions();
     this.locations = this.leappCoreService.azureCoreService.getLocations();
-    this.selectedRegion   = this.workspace.defaultRegion || constants.defaultRegion;
-    this.selectedLocation = this.workspace.defaultLocation || constants.defaultLocation;
+    this.selectedRegion   = this.leappCoreService.repository.getWorkspace().defaultRegion || constants.defaultRegion;
+    this.selectedLocation = this.leappCoreService.repository.getWorkspace().defaultLocation || constants.defaultLocation;
 
     this.appService.validateAllFormFields(this.form);
 
@@ -121,18 +117,18 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
    */
   public saveOptions(): void {
     if (this.form.valid) {
-      this.workspace.proxyConfiguration.proxyUrl = this.form.controls['proxyUrl'].value;
-      this.workspace.proxyConfiguration.proxyProtocol = this.form.controls['proxyProtocol'].value;
-      this.workspace.proxyConfiguration.proxyPort = this.form.controls['proxyPort'].value;
-      this.workspace.proxyConfiguration.username = this.form.controls['proxyUsername'].value;
-      this.workspace.proxyConfiguration.password = this.form.controls['proxyPassword'].value;
-      this.leappCoreService.repository.updateProxyConfiguration(this.workspace.proxyConfiguration);
+      this.leappCoreService.repository.getWorkspace().proxyConfiguration.proxyUrl = this.form.controls['proxyUrl'].value;
+      this.leappCoreService.repository.getWorkspace().proxyConfiguration.proxyProtocol = this.form.controls['proxyProtocol'].value;
+      this.leappCoreService.repository.getWorkspace().proxyConfiguration.proxyPort = this.form.controls['proxyPort'].value;
+      this.leappCoreService.repository.getWorkspace().proxyConfiguration.username = this.form.controls['proxyUsername'].value;
+      this.leappCoreService.repository.getWorkspace().proxyConfiguration.password = this.form.controls['proxyPassword'].value;
+      this.leappCoreService.repository.updateProxyConfiguration(this.leappCoreService.repository.getWorkspace().proxyConfiguration);
 
-      this.workspace.defaultRegion = this.selectedRegion;
-      this.leappCoreService.repository.updateDefaultRegion(this.workspace.defaultRegion);
+      this.leappCoreService.repository.getWorkspace().defaultRegion = this.selectedRegion;
+      this.leappCoreService.repository.updateDefaultRegion(this.leappCoreService.repository.getWorkspace().defaultRegion);
 
-      this.workspace.defaultLocation = this.selectedLocation;
-      this.leappCoreService.repository.updateDefaultLocation(this.workspace.defaultLocation);
+      this.leappCoreService.repository.getWorkspace().defaultLocation = this.selectedLocation;
+      this.leappCoreService.repository.updateDefaultLocation(this.leappCoreService.repository.getWorkspace().defaultLocation);
 
       if (this.checkIfNeedDialogBox()) {
         this.windowService.confirmDialog('You\'ve set a proxy url: the app must be restarted to update the configuration.', (res) => {
@@ -181,11 +177,10 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
     this.editingIdpUrl = false;
     this.idpUrlValue = undefined;
     this.form.get('idpUrl').setValue('');
-    this.workspace = this.leappCoreService.repository.getWorkspace();
   }
 
   public editIdpUrl(id: string): void {
-    const idpUrl = this.workspace.idpUrls.filter((u) => u.id === id)[0];
+    const idpUrl = this.leappCoreService.repository.getWorkspace().idpUrls.filter((u) => u.id === id)[0];
     this.idpUrlValue = idpUrl;
     this.form.get('idpUrl').setValue(idpUrl.url);
     this.editingIdpUrl = true;
@@ -225,8 +220,6 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
         sessions.forEach((session) => {
           this.leappCoreService.repository.deleteSession(session.sessionId);
         });
-
-        this.workspace = this.leappCoreService.repository.getWorkspace();
       }
     }, 'Delete IdP URL', 'Cancel');
   }
@@ -261,11 +254,10 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
     this.editingAwsProfile = false;
     this.awsProfileValue = undefined;
     this.form.get('awsProfile').setValue('');
-    this.workspace = this.leappCoreService.repository.getWorkspace();
   }
 
   public editAwsProfile(id: string): void {
-    const profile = this.workspace.profiles.filter((u) => u.id === id)[0];
+    const profile = this.leappCoreService.repository.getWorkspace().profiles.filter((u) => u.id === id)[0];
     this.awsProfileValue = profile;
     this.form.get('awsProfile').setValue(profile.name);
     this.editingAwsProfile = true;
@@ -286,7 +278,7 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
     this.windowService.confirmDialog(`Deleting this profile will set default to these sessions: <br><ul>${sessionsNames.join('')}</ul>Do you want to proceed?`, async (res) => {
       if (res !== constants.confirmClosed) {
         this.leappCoreService.loggingService.logger(`Reverting to default profile with id: ${id}`, LoggerLevel.info, this);
-        this.leappCoreService.repository.removeProfile(id);
+
         // Reverting all sessions to default profile
         // eslint-disable-next-line @typescript-eslint/prefer-for-of
         for(let i = 0; i < sessions.length; i++) {
@@ -300,15 +292,15 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
           }
 
           (sess as any).profileId = this.leappCoreService.repository.getDefaultProfileId();
+
           this.leappCoreService.repository.updateSession(sess.sessionId, sess);
           this.leappCoreService.workspaceService.updateSession(sess.sessionId, sess);
-          this.workspace = this.leappCoreService.repository.getWorkspace();
-
           if(wasActive) {
             this.sessionService.start(sess.sessionId);
           }
         }
 
+        this.leappCoreService.repository.removeProfile(id);
       }
     }, 'Delete Profile', 'Cancel');
   }
