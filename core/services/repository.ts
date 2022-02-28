@@ -81,6 +81,16 @@ export class Repository {
     this.persistWorkspace(workspace)
   }
 
+  updateSession(sessionId: string, session: Session) {
+    const sessions: Session[] = this.getSessions();
+    for(let i = 0; i < sessions.length; i++) {
+      if (sessions[i].sessionId === sessionId) {
+        (sessions[i] as any) = session;
+      }
+    }
+    this.updateSessions(sessions);
+  }
+
   updateSessions(sessions: Session[]): void {
     const workspace = this.getWorkspace()
     workspace.sessions = sessions
