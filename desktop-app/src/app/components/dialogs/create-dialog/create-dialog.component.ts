@@ -142,7 +142,7 @@ export class CreateDialogComponent implements OnInit {
       this.firstTime = params['firstTime'] || !this.hasOneGoodSession;
 
       // Show the assumable accounts
-      this.assumerAwsSessions = this.workspaceService.listAssumable().map((session) => ({
+      this.assumerAwsSessions = this.leappCoreService.repository.listAssumable().map((session) => ({
         sessionName: session.sessionName,
         session
       }));
@@ -178,7 +178,7 @@ export class CreateDialogComponent implements OnInit {
   public saveSession(): void {
     this.loggingService.logger(`Saving account...`, LoggerLevel.info, this);
     this.addProfileToWorkspace();
-    this.saveNewSsoRolesToWorkspace();
+    this.addIpdUrlToWorkspace();
     this.createSession();
     this.router.navigate(['/dashboard']).then(() => {});
   }
@@ -313,9 +313,6 @@ export class CreateDialogComponent implements OnInit {
    * @private
    */
   private createSession() {
-    console.log(this.selectedProfile);
-    console.log(this.selectedIdpUrl);
-
     if(this.formValid()) {
       switch (this.sessionType) {
         case (SessionType.awsIamRoleFederated):
@@ -375,7 +372,7 @@ export class CreateDialogComponent implements OnInit {
    *
    * @private
    */
-  private saveNewSsoRolesToWorkspace() {
+  private addIpdUrlToWorkspace() {
     if(this.sessionType === SessionType.awsIamRoleFederated) {
       try {
         const ipdUrl = { id: this.selectedIdpUrl.value, url: this.selectedIdpUrl.label };

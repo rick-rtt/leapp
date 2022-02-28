@@ -98,13 +98,6 @@ export class Repository {
     this.persistWorkspace(workspace)
   }
 
-  updateSession(sessionId: string, sessionToUpdate: Session) {
-    const workspace = this.getWorkspace()
-    workspace.sessions = workspace.sessions
-        .map(session => session.sessionId === sessionId ? sessionToUpdate : session)
-    this.persistWorkspace(workspace)
-  }
-
   deleteSession(sessionId: string) {
     const workspace = this.getWorkspace()
     const index = workspace.sessions.findIndex(sess => sess.sessionId === sessionId)
@@ -298,6 +291,10 @@ export class Repository {
   listAwsSsoRoles() {
     const workspace = this.getWorkspace()
     return (workspace.sessions && workspace.sessions.length > 0) ? workspace.sessions.filter((session) => session.type === SessionType.awsSsoRole) : []
+  }
+
+  listAssumable() {
+    return (this.getWorkspace().sessions.length > 0) ? this.getWorkspace().sessions.filter((session) => session.type !== SessionType.azure) : []
   }
 
   listIamRoleChained(parentSession?: Session): Session[] {
