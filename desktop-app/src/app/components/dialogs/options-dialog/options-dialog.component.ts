@@ -273,7 +273,6 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
 
   public deleteAwsProfile(id: string): void {
     // With profile
-    // TODO: add aws filtering list implementation in core
     const sessions = this.leappCoreService.repository.getSessions().filter((sess) => (sess as any).profileId === id);
 
     // Get only names for display

@@ -38,6 +38,7 @@
     "src/**/*"
   ],
   "exclude": [
+    "**/*.spec.ts",
     "coverage",
     "node_modules",
     "env",

@@ -3,15 +3,16 @@ import { LeappNotFoundError } from '../errors/leapp-not-found-error'
 import { INativeService } from '../interfaces/i-native-service'
 import { AwsIamRoleChainedSession } from '../models/aws-iam-role-chained-session'
 import { AwsNamedProfile } from '../models/aws-named-profile'
+import { AwsSsoIntegration } from '../models/aws-sso-integration'
 import { constants } from '../models/constants'
+import Segment from '../models/Segment'
 import { Session } from '../models/session'
 import { SessionStatus } from '../models/session-status'
 import { SessionType } from '../models/session-type'
 import { Workspace } from '../models/workspace'
 import { FileService } from './file-service'
+import { IdpUrl } from '../models/IdpUrl'
 import * as uuid from 'uuid'
-import {AwsSsoIntegration} from "../models/aws-sso-integration";
-import Segment from "../models/Segment";
 
 export class Repository {
   // Private singleton workspace
@@ -97,6 +98,13 @@ export class Repository {
     this.persistWorkspace(workspace)
   }
 
+  updateSession(sessionId: string, sessionToUpdate: Session) {
+    const workspace = this.getWorkspace()
+    workspace.sessions = workspace.sessions
+        .map(session => session.sessionId === sessionId ? sessionToUpdate : session)
+    this.persistWorkspace(workspace)
+  }
+
   deleteSession(sessionId: string) {
     const workspace = this.getWorkspace()
     const index = workspace.sessions.findIndex(sess => sess.sessionId === sessionId)
@@ -129,20 +137,19 @@ export class Repository {
   }
 
   // IDP URLS
-
   getIdpUrl(idpUrlId: string): string | null {
     const workspace = this.getWorkspace()
     const idpUrlFiltered = workspace.idpUrls.find(url => url.id === idpUrlId)
     return idpUrlFiltered ? idpUrlFiltered.url : null
   }
 
-  getIdpUrls() {
+  getIdpUrls(): IdpUrl[] {
     return this.getWorkspace().idpUrls
   }
 
-  addIdpUrl(idpUrl: { id: string; url: string }): void {
+  addIdpUrl(idpUrl: IdpUrl): void {
     const workspace = this.getWorkspace()
-    workspace.idpUrls.push(idpUrl)
+    workspace.addIpUrl(idpUrl)
     this.persistWorkspace(workspace)
   }
 

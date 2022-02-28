@@ -1,34 +1,35 @@
-import { CloudProviderService } from '@noovolari/leapp-core/services/cloud-provider-service'
-import { AwsIamUserService } from '@noovolari/leapp-core/services/session/aws/aws-iam-user-service'
-import { FileService } from '@noovolari/leapp-core/services/file-service'
-import { KeychainService } from '@noovolari/leapp-core/services/keychain-service'
-import { AwsCoreService } from '@noovolari/leapp-core/services/aws-core-service'
-import { LoggingService } from '@noovolari/leapp-core/services/logging-service'
-import { TimerService } from '@noovolari/leapp-core/services/timer-service'
-import { AwsIamRoleFederatedService } from '@noovolari/leapp-core/services/session/aws/aws-iam-role-federated-service'
-import { AzureService } from '@noovolari/leapp-core/services/session/azure/azure-service'
-import { ExecuteService } from '@noovolari/leapp-core/services/execute-service'
-import { RetroCompatibilityService } from '@noovolari/leapp-core/services/retro-compatibility-service'
-import { AwsParentSessionFactory } from '@noovolari/leapp-core/services/session/aws/aws-parent-session.factory'
-import { AwsIamRoleChainedService } from '@noovolari/leapp-core/services/session/aws/aws-iam-role-chained-service'
-import { Repository } from '@noovolari/leapp-core/services/repository'
-import { AwsSsoOidcService } from '@noovolari/leapp-core/services/session/aws/aws-sso-oidc.service'
-import { AwsSsoRoleService } from '@noovolari/leapp-core/services/session/aws/aws-sso-role-service'
-import { WorkspaceService } from '@noovolari/leapp-core/services/workspace-service'
-import { SessionFactory } from '@noovolari/leapp-core/services/session-factory'
-import { RotationService } from '@noovolari/leapp-core/services/rotation-service'
-import { AzureCoreService } from '@noovolari/leapp-core/services/azure-core-service'
-import { CliMfaCodePromptService } from './cli-mfa-code-prompt-service'
-import { CliAwsAuthenticationService } from './cli-aws-authentication-service'
-import { CliVerificationWindowService } from './cli-verification-window-service'
-import { CliNativeService } from './cli-native-service'
-import { constants } from '@noovolari/leapp-core/models/constants'
+import {CloudProviderService} from '@noovolari/leapp-core/services/cloud-provider-service'
+import {AwsIamUserService} from '@noovolari/leapp-core/services/session/aws/aws-iam-user-service'
+import {FileService} from '@noovolari/leapp-core/services/file-service'
+import {KeychainService} from '@noovolari/leapp-core/services/keychain-service'
+import {AwsCoreService} from '@noovolari/leapp-core/services/aws-core-service'
+import {LoggingService} from '@noovolari/leapp-core/services/logging-service'
+import {TimerService} from '@noovolari/leapp-core/services/timer-service'
+import {AwsIamRoleFederatedService} from '@noovolari/leapp-core/services/session/aws/aws-iam-role-federated-service'
+import {AzureService} from '@noovolari/leapp-core/services/session/azure/azure-service'
+import {ExecuteService} from '@noovolari/leapp-core/services/execute-service'
+import {RetroCompatibilityService} from '@noovolari/leapp-core/services/retro-compatibility-service'
+import {AwsParentSessionFactory} from '@noovolari/leapp-core/services/session/aws/aws-parent-session.factory'
+import {AwsIamRoleChainedService} from '@noovolari/leapp-core/services/session/aws/aws-iam-role-chained-service'
+import {Repository} from '@noovolari/leapp-core/services/repository'
+import {RegionsService} from '@noovolari/leapp-core/services/regions-service'
+import {AwsSsoOidcService} from '@noovolari/leapp-core/services/session/aws/aws-sso-oidc.service'
+import {AwsSsoRoleService} from '@noovolari/leapp-core/services/session/aws/aws-sso-role-service'
+import {WorkspaceService} from '@noovolari/leapp-core/services/workspace-service'
+import {SessionFactory} from '@noovolari/leapp-core/services/session-factory'
+import {RotationService} from '@noovolari/leapp-core/services/rotation-service'
+import {AzureCoreService} from '@noovolari/leapp-core/services/azure-core-service'
+import {CliMfaCodePromptService} from './cli-mfa-code-prompt-service'
+import {CliAwsAuthenticationService} from './cli-aws-authentication-service'
+import {CliVerificationWindowService} from './cli-verification-window-service'
+import {CliNativeService} from './cli-native-service'
+import {constants} from '@noovolari/leapp-core/models/constants'
+import {NamedProfilesService} from '@noovolari/leapp-core/services/named-profiles-service'
+import {IdpUrlsService} from '@noovolari/leapp-core/services/idp-urls-service'
+import {AwsIntegrationsService} from '@noovolari/leapp-core/services/aws-integrations-service'
 import CliInquirer from 'inquirer'
-import { CliSessionSelectionService } from './cli-session-selection-service'
-
 
 export class LeappCliService {
-
   private cliNativeServiceInstance: CliNativeService
 
   public get cliNativeService(): CliNativeService {
@@ -83,8 +84,7 @@ export class LeappCliService {
 
   public get awsIamUserService(): AwsIamUserService {
     if (!this.awsIamUserServiceInstance) {
-      this.awsIamUserServiceInstance = new AwsIamUserService(this.workspaceService, this.repository,
-        this.cliMfaCodePromptService, this.keyChainService, this.fileService, this.awsCoreService)
+      this.awsIamUserServiceInstance = new AwsIamUserService(this.workspaceService, this.repository, this.cliMfaCodePromptService, this.keyChainService, this.fileService, this.awsCoreService)
     }
 
     return this.awsIamUserServiceInstance
@@ -94,8 +94,7 @@ export class LeappCliService {
 
   get awsIamRoleFederatedService(): AwsIamRoleFederatedService {
     if (!this.awsIamRoleFederatedServiceInstance) {
-      this.awsIamRoleFederatedServiceInstance = new AwsIamRoleFederatedService(this.workspaceService, this.repository,
-        this.fileService, this.awsCoreService, this.cliAwsAuthenticationService, constants.samlRoleSessionDuration)
+      this.awsIamRoleFederatedServiceInstance = new AwsIamRoleFederatedService(this.workspaceService, this.repository, this.fileService, this.awsCoreService, this.cliAwsAuthenticationService, constants.samlRoleSessionDuration)
     }
 
     return this.awsIamRoleFederatedServiceInstance
@@ -105,8 +104,7 @@ export class LeappCliService {
 
   get awsIamRoleChainedService(): AwsIamRoleChainedService {
     if (!this.awsIamRoleChainedServiceInstance) {
-      this.awsIamRoleChainedServiceInstance = new AwsIamRoleChainedService(this.workspaceService, this.repository,
-        this.awsCoreService, this.fileService, this.awsIamUserService, this.awsParentSessionFactory)
+      this.awsIamRoleChainedServiceInstance = new AwsIamRoleChainedService(this.workspaceService, this.repository, this.awsCoreService, this.fileService, this.awsIamUserService, this.awsParentSessionFactory)
     }
 
     return this.awsIamRoleChainedServiceInstance
@@ -116,9 +114,7 @@ export class LeappCliService {
 
   get awsSsoRoleService(): AwsSsoRoleService {
     if (!this.awsSsoRoleServiceInstance) {
-      this.awsSsoRoleServiceInstance = new AwsSsoRoleService(this.workspaceService, this.repository, this.fileService,
-        this.keyChainService, this.awsCoreService, this.cliNativeService, this.awsSsoOidcService, constants.appName,
-        constants.defaultRegion)
+      this.awsSsoRoleServiceInstance = new AwsSsoRoleService(this.workspaceService, this.repository, this.fileService, this.keyChainService, this.awsCoreService, this.cliNativeService, this.awsSsoOidcService, constants.appName, constants.defaultRegion)
     }
 
     return this.awsSsoRoleServiceInstance
@@ -128,7 +124,7 @@ export class LeappCliService {
 
   get awsSsoOidcService(): AwsSsoOidcService {
     if (!this.awsSsoOidcServiceInstance) {
-      this.awsSsoOidcServiceInstance = new AwsSsoOidcService(this.cliVerificationWindowService, this.repository)
+      this.awsSsoOidcServiceInstance = new AwsSsoOidcService(this.cliVerificationWindowService, this.repository, true)
     }
 
     return this.awsSsoOidcServiceInstance
@@ -138,8 +134,7 @@ export class LeappCliService {
 
   get azureService(): AzureService {
     if (!this.azureServiceInstance) {
-      this.azureServiceInstance = new AzureService(this.workspaceService, this.repository, this.fileService,
-        this.executeService, constants.azureAccessTokens)
+      this.azureServiceInstance = new AzureService(this.workspaceService, this.repository, this.fileService, this.executeService, constants.azureAccessTokens)
     }
 
     return this.azureServiceInstance
@@ -150,7 +145,9 @@ export class LeappCliService {
   get sessionFactory(): SessionFactory {
     if (!this.sessionFactoryInstance) {
       this.sessionFactoryInstance = new SessionFactory(this.awsIamUserService,
-        this.awsIamRoleFederatedService, this.awsIamRoleChainedService, this.awsSsoRoleService,
+        this.awsIamRoleFederatedService,
+        this.awsIamRoleChainedService,
+        this.awsSsoRoleService,
         this.azureService)
     }
 
@@ -162,7 +159,8 @@ export class LeappCliService {
   get awsParentSessionFactory(): AwsParentSessionFactory {
     if (!this.awsParentSessionFactoryInstance) {
       this.awsParentSessionFactoryInstance = new AwsParentSessionFactory(this.awsIamUserService,
-        this.awsIamRoleFederatedService, this.awsSsoRoleService)
+        this.awsIamRoleFederatedService,
+        this.awsSsoRoleService)
     }
 
     return this.awsParentSessionFactoryInstance
@@ -188,7 +186,47 @@ export class LeappCliService {
     return this.repositoryInstance
   }
 
+  private regionsServiceInstance: RegionsService
+
+  get regionsService(): RegionsService {
+    if (!this.regionsServiceInstance) {
+      this.regionsServiceInstance = new RegionsService(this.sessionFactory, this.repository, this.workspaceService)
+    }
+
+    return this.regionsServiceInstance
+  }
+
+  private namedProfilesServiceInstance: NamedProfilesService
+
+  get namedProfilesService(): NamedProfilesService {
+    if (!this.namedProfilesServiceInstance) {
+      this.namedProfilesServiceInstance = new NamedProfilesService(this.sessionFactory, this.repository, this.workspaceService)
+    }
+
+    return this.namedProfilesServiceInstance
+  }
+
+  private idpUrlsServiceInstance: IdpUrlsService
+
+  get idpUrlsService(): IdpUrlsService {
+    if (!this.idpUrlsServiceInstance) {
+      this.idpUrlsServiceInstance = new IdpUrlsService(this.sessionFactory, this.repository)
+    }
+
+    return this.idpUrlsServiceInstance
+  }
+
   private keyChainServiceInstance: KeychainService
+
+  private awsIntegrationsServiceInstance: AwsIntegrationsService
+
+  get awsIntegrationsService(): AwsIntegrationsService {
+    if (!this.awsIntegrationsServiceInstance) {
+      this.awsIntegrationsServiceInstance = new AwsIntegrationsService(this.repository, this.awsSsoRoleService)
+    }
+
+    return this.awsIntegrationsServiceInstance
+  }
 
   get keyChainService(): KeychainService {
     if (!this.keyChainServiceInstance) {
@@ -232,7 +270,7 @@ export class LeappCliService {
 
   get rotationService(): RotationService {
     if (!this.rotationServiceInstance) {
-      this.rotationServiceInstance = new RotationService(this.sessionFactory, this.workspaceService)
+      this.rotationServiceInstance = new RotationService(this.sessionFactory)
     }
 
     return this.rotationServiceInstance
@@ -242,8 +280,7 @@ export class LeappCliService {
 
   get retroCompatibilityService(): RetroCompatibilityService {
     if (!this.retroCompatibilityServiceInstance) {
-      this.retroCompatibilityServiceInstance = new RetroCompatibilityService(this.fileService, this.keyChainService,
-        this.workspaceService, constants.appName, constants.lockFileDestination)
+      this.retroCompatibilityServiceInstance = new RetroCompatibilityService(this.fileService, this.keyChainService, this.repository, this.workspaceService, constants.appName, constants.lockFileDestination)
     }
 
     return this.retroCompatibilityServiceInstance
@@ -253,8 +290,7 @@ export class LeappCliService {
 
   get cloudProviderService(): CloudProviderService {
     if (!this.cloudProviderServiceInstance) {
-      this.cloudProviderServiceInstance = new CloudProviderService(this.awsCoreService, this.azureCoreService,
-        this.repository)
+      this.cloudProviderServiceInstance = new CloudProviderService(this.awsCoreService, this.azureCoreService, this.namedProfilesService, this.idpUrlsService, this.repository)
     }
 
     return this.cloudProviderServiceInstance
@@ -278,16 +314,6 @@ export class LeappCliService {
     }
 
     return this.azureCoreServiceInstance
-  }
-
-  private cliSessionSelectionServiceInstance: CliSessionSelectionService
-
-  get cliSessionSelectionService(): CliSessionSelectionService {
-    if (!this.cliSessionSelectionServiceInstance) {
-      this.cliSessionSelectionServiceInstance = new CliSessionSelectionService(this.inquirer,this.repository)
-    }
-
-    return this.cliSessionSelectionServiceInstance
   }
 
   get inquirer(): CliInquirer.Inquirer {

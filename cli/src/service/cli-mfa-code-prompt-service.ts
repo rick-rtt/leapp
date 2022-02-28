@@ -4,10 +4,11 @@ import CliInquirer from 'inquirer'
 export class CliMfaCodePromptService implements IMfaCodePrompter {
   constructor(private inquirer: CliInquirer.Inquirer) {
   }
-  promptForMFACode(_sessionName: string, callback: any): void {
+
+  promptForMFACode(sessionName: string, callback: any): void {
     this.inquirer.prompt([{
       name: 'mfaCode',
-      message: `Insert MFA code`,
+      message: `Insert MFA code for session ${sessionName}`,
       type: 'input'
     }]).then(mfaResponse => callback(mfaResponse.mfaCode))
   }

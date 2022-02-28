@@ -53,12 +53,12 @@ export abstract class AwsSessionService extends SessionService {
       if (this.repository.getSessionById(sessionId).status === SessionStatus.active) {
         await this.stop(sessionId);
       }
-      this.repository.listIamRoleChained(this.iSessionNotifier.getSessionById(sessionId)).forEach(sess => {
+      for (const sess of this.repository.listIamRoleChained(this.iSessionNotifier.getSessionById(sessionId))) {
         if (sess.status === SessionStatus.active) {
-          this.stop(sess.sessionId);
+          await this.stop(sess.sessionId);
         }
         this.repository.deleteSession(sess.sessionId);
-      });
+      }
       this.repository.deleteSession(sessionId);
 
       this.iSessionNotifier.setSessions(this.repository.getSessions());

@@ -96,4 +96,6 @@ export class AwsAuthenticationService implements IAwsAuthenticationService {
       idpWindow.loadURL(idpUrl)
     })
   }
+
+  async closeAuthenticationWindow(): Promise<void> {}
 }

@@ -1,15 +1,15 @@
-import { LeappBaseError } from '../../../errors/leapp-base-error'
-import { LoggerLevel } from '../../logging-service'
-import { constants } from '../../../models/constants'
-import { Repository } from '../../repository'
+import { LeappBaseError } from '../errors/leapp-base-error'
+import { LoggerLevel } from './logging-service'
+import { constants } from '../models/constants'
+import { Repository } from './repository'
 import {
   GenerateSSOTokenResponse,
   RegisterClientResponse,
   StartDeviceAuthorizationResponse,
   VerificationResponse
-} from './aws-sso-role-service'
-import { IVerificationWindowService } from '../../../interfaces/i-verification-window.service'
-import { BrowserWindowClosing } from '../../../interfaces/i-browser-window-closing'
+} from './session/aws/aws-sso-role-service'
+import { IVerificationWindowService } from '../interfaces/i-verification-window.service'
+import { BrowserWindowClosing } from '../interfaces/i-browser-window-closing'
 import SSOOIDC, {
   CreateTokenRequest,
   RegisterClientRequest,
@@ -26,7 +26,8 @@ export class AwsSsoOidcService {
   private timeoutOccurred: boolean
   private interruptOccurred: boolean
 
-  public constructor(private verificationWindowService: IVerificationWindowService, private repository: Repository) {
+  public constructor(private verificationWindowService: IVerificationWindowService, private repository: Repository,
+                     private disableInAppBrowser: Boolean = false) {
     this.listeners = []
     this.ssoOidc = null
     this.generateSSOTokenResponse = null
@@ -146,7 +147,7 @@ export class AwsSsoOidcService {
     }
 
     let createTokenResponse
-    if (this.repository.getAwsSsoConfiguration(configurationId).browserOpening === constants.inApp) {
+    if (!this.disableInAppBrowser && this.repository.getAwsSsoConfiguration(configurationId).browserOpening === constants.inApp) {
       createTokenResponse = await this.getAwsSsoOidcClient().createToken(createTokenRequest).promise()
     } else {
       createTokenResponse = await this.waitForToken(createTokenRequest)

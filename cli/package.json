@@ -12,9 +12,8 @@
     "@commitlint/cli": "^12.1.4",
     "@commitlint/config-conventional": "^12.1.4",
     "@noovolari/leapp-core": "file:../core/dist",
-    "@oclif/core": "^1",
+    "@oclif/core": "1.3.2",
     "@oclif/plugin-help": "^5",
-    "@oclif/plugin-plugins": "^2.0.1",
     "@types/inquirer": "^8.2.0",
     "@types/node": "^15.0.1",
     "@types/uuid": "^8.3.0",
@@ -43,6 +42,7 @@
     "ms": "^2.1.3",
     "node-log-rotate": "~0.1.5",
     "node-machine-id": "~1.1.12",
+    "puppeteer": "~13.2.0",
     "reflect-metadata": "^0.1.13",
     "rimraf": "~3.0.2",
     "rxjs": "~6.6.7",
@@ -71,6 +71,11 @@
     "tslib": "^2.3.1",
     "typescript": "^4.4.3"
   },
+  "jest": {
+    "collectCoverageFrom": [
+      "src/**/{!(cli-native-service|leapp-cli-service),}.ts"
+    ]
+  },
   "dirname": "oex",
   "engines": {
     "node": ">=12.0.0"
@@ -90,13 +95,24 @@
     "bin": "leapp",
     "commands": "./dist/commands",
     "plugins": [
-      "@oclif/plugin-help",
-      "@oclif/plugin-plugins"
+      "@oclif/plugin-help"
     ],
     "topicSeparator": " ",
     "topics": {
       "session": {
-        "description": "Permits to manage sessions"
+        "description": "Sessions management"
+      },
+      "profile": {
+        "description": "AWS named profiles management"
+      },
+      "idp-url": {
+        "description": "Identity providers URL management"
+      },
+      "region": {
+        "description": "AWS regions management"
+      },
+      "integration": {
+        "description": "AWS integrations management"
       }
     },
     "macos": {
@@ -114,7 +130,8 @@
     "pack-win": "oclif pack:win",
     "postpack": "gushio gushio/target-post-pack.js",
     "version": "oclif readme && git add README.md",
-    "start-session": "./bin/dev session start"
+    "list-session": "./bin/dev session list",
+    "integration-sync": "./bin/dev integration sync"
   },
   "types": "dist/index.d.ts"
 }

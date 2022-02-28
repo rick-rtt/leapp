@@ -20,7 +20,7 @@ $ npm install -g leapp
 $ leapp COMMAND
 running command...
 $ leapp (--version)
-leapp/0.1.0 darwin-x64 node-v16.13.1
+leapp/0.1.0 darwin-x64 node-v16.13.2
 $ leapp --help [COMMAND]
 USAGE
   $ leapp COMMAND
@@ -30,13 +30,20 @@ USAGE
 # Commands
 <!-- commands -->
 * [`leapp help [COMMAND]`](#leapp-help-command)
-* [`leapp plugins`](#leapp-plugins)
-* [`leapp plugins:inspect PLUGIN...`](#leapp-pluginsinspect-plugin)
-* [`leapp plugins:install PLUGIN...`](#leapp-pluginsinstall-plugin)
-* [`leapp plugins:link PLUGIN`](#leapp-pluginslink-plugin)
-* [`leapp plugins:uninstall PLUGIN...`](#leapp-pluginsuninstall-plugin)
-* [`leapp plugins update`](#leapp-plugins-update)
+* [`leapp idp-url create`](#leapp-idp-url-create)
+* [`leapp idp-url delete`](#leapp-idp-url-delete)
+* [`leapp idp-url edit`](#leapp-idp-url-edit)
+* [`leapp integration list`](#leapp-integration-list)
+* [`leapp integration login`](#leapp-integration-login)
+* [`leapp profile create`](#leapp-profile-create)
+* [`leapp profile delete`](#leapp-profile-delete)
+* [`leapp profile edit`](#leapp-profile-edit)
+* [`leapp region get-default`](#leapp-region-get-default)
+* [`leapp region set-default`](#leapp-region-set-default)
 * [`leapp session add`](#leapp-session-add)
+* [`leapp session change-region`](#leapp-session-change-region)
+* [`leapp session delete`](#leapp-session-delete)
+* [`leapp session list`](#leapp-session-list)
 * [`leapp session start`](#leapp-session-start)
 * [`leapp session stop`](#leapp-session-stop)
 
@@ -60,150 +67,166 @@ DESCRIPTION
 
 _See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v5.1.10/src/commands/help.ts)_
 
-## `leapp plugins`
+## `leapp idp-url create`
 
-List installed plugins.
+Create a new identity provider URL
 
 ```
 USAGE
-  $ leapp plugins [--core]
-
-FLAGS
-  --core  Show core plugins.
+  $ leapp idp-url create
 
 DESCRIPTION
-  List installed plugins.
+  Create a new identity provider URL
 
 EXAMPLES
-  $ leapp plugins
+  $leapp idp-url create
 ```
 
-_See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v2.1.0/src/commands/plugins/index.ts)_
+## `leapp idp-url delete`
 
-## `leapp plugins:inspect PLUGIN...`
-
-Displays installation properties of a plugin.
+Delete an identity provider URL
 
 ```
 USAGE
-  $ leapp plugins:inspect PLUGIN...
-
-ARGUMENTS
-  PLUGIN  [default: .] Plugin to inspect.
-
-FLAGS
-  -h, --help     Show CLI help.
-  -v, --verbose
+  $ leapp idp-url delete
 
 DESCRIPTION
-  Displays installation properties of a plugin.
+  Delete an identity provider URL
 
 EXAMPLES
-  $ leapp plugins:inspect myplugin
+  $leapp idp-url delete
 ```
 
-## `leapp plugins:install PLUGIN...`
+## `leapp idp-url edit`
 
-Installs a plugin into the CLI.
+Edit an identity provider URL
 
 ```
 USAGE
-  $ leapp plugins:install PLUGIN...
-
-ARGUMENTS
-  PLUGIN  Plugin to install.
-
-FLAGS
-  -f, --force    Run yarn install with force flag.
-  -h, --help     Show CLI help.
-  -v, --verbose
+  $ leapp idp-url edit
 
 DESCRIPTION
-  Installs a plugin into the CLI.
-
-  Can be installed from npm or a git url.
-
-  Installation of a user-installed plugin will override a core plugin.
-
-  e.g. If you have a core plugin that has a 'hello' command, installing a user-installed plugin with a 'hello' command
-  will override the core plugin implementation. This is useful if a user needs to update core plugin functionality in
-  the CLI without the need to patch and update the whole CLI.
-
-ALIASES
-  $ leapp plugins add
+  Edit an identity provider URL
 
 EXAMPLES
-  $ leapp plugins:install myplugin 
-
-  $ leapp plugins:install https://github.com/someuser/someplugin
-
-  $ leapp plugins:install someuser/someplugin
+  $leapp idp-url edit
 ```
 
-## `leapp plugins:link PLUGIN`
+## `leapp integration list`
 
-Links a plugin into the CLI for development.
+Show integrations list
 
 ```
 USAGE
-  $ leapp plugins:link PLUGIN
-
-ARGUMENTS
-  PATH  [default: .] path to plugin
+  $ leapp integration list [--columns <value> | -x] [--sort <value>] [--filter <value>] [--output csv|json|yaml |  |
+    [--csv | --no-truncate]] [--no-header | ]
 
 FLAGS
-  -h, --help     Show CLI help.
-  -v, --verbose
+  -x, --extended     show extra columns
+  --columns=<value>  only show provided columns (comma-separated)
+  --csv              output is csv format [alias: --output=csv]
+  --filter=<value>   filter property by partial string matching, ex: name=foo
+  --no-header        hide table header from output
+  --no-truncate      do not truncate output to fit screen
+  --output=<option>  output in a more machine friendly format
+                     <options: csv|json|yaml>
+  --sort=<value>     property to sort by (prepend '-' for descending)
 
 DESCRIPTION
-  Links a plugin into the CLI for development.
-
-  Installation of a linked plugin will override a user-installed or core plugin.
-
-  e.g. If you have a user-installed or core plugin that has a 'hello' command, installing a linked plugin with a 'hello'
-  command will override the user-installed or core plugin implementation. This is useful for development work.
+  Show integrations list
 
 EXAMPLES
-  $ leapp plugins:link myplugin
+  $leapp integration list
 ```
 
-## `leapp plugins:uninstall PLUGIN...`
+## `leapp integration login`
 
-Removes a plugin from the CLI.
-
-```
-USAGE
-  $ leapp plugins:uninstall PLUGIN...
-
-ARGUMENTS
-  PLUGIN  plugin to uninstall
-
-FLAGS
-  -h, --help     Show CLI help.
-  -v, --verbose
-
-DESCRIPTION
-  Removes a plugin from the CLI.
-
-ALIASES
-  $ leapp plugins unlink
-  $ leapp plugins remove
-```
-
-## `leapp plugins update`
-
-Update installed plugins.
+Login to synchronize integration sessions
 
 ```
 USAGE
-  $ leapp plugins update [-h] [-v]
-
-FLAGS
-  -h, --help     Show CLI help.
-  -v, --verbose
+  $ leapp integration login
 
 DESCRIPTION
-  Update installed plugins.
+  Login to synchronize integration sessions
+
+EXAMPLES
+  $leapp integration login
+```
+
+## `leapp profile create`
+
+Create a new AWS named profile
+
+```
+USAGE
+  $ leapp profile create
+
+DESCRIPTION
+  Create a new AWS named profile
+
+EXAMPLES
+  $leapp profile create
+```
+
+## `leapp profile delete`
+
+Delete an AWS named profile
+
+```
+USAGE
+  $ leapp profile delete
+
+DESCRIPTION
+  Delete an AWS named profile
+
+EXAMPLES
+  $leapp profile delete
+```
+
+## `leapp profile edit`
+
+Rename an AWS named profile
+
+```
+USAGE
+  $ leapp profile edit
+
+DESCRIPTION
+  Rename an AWS named profile
+
+EXAMPLES
+  $leapp profile edit
+```
+
+## `leapp region get-default`
+
+Displays the default region
+
+```
+USAGE
+  $ leapp region get-default
+
+DESCRIPTION
+  Displays the default region
+
+EXAMPLES
+  $leapp region get-default
+```
+
+## `leapp region set-default`
+
+Change the default region
+
+```
+USAGE
+  $ leapp region set-default
+
+DESCRIPTION
+  Change the default region
+
+EXAMPLES
+  $leapp region set-default
 ```
 
 ## `leapp session add`
@@ -221,16 +244,73 @@ EXAMPLES
   $leapp session add
 ```
 
+## `leapp session change-region`
+
+Change a session region
+
+```
+USAGE
+  $ leapp session change-region
+
+DESCRIPTION
+  Change a session region
+
+EXAMPLES
+  $leapp session change-region
+```
+
+## `leapp session delete`
+
+Delete a session
+
+```
+USAGE
+  $ leapp session delete
+
+DESCRIPTION
+  Delete a session
+
+EXAMPLES
+  $leapp session delete
+```
+
+## `leapp session list`
+
+Show sessions list
+
+```
+USAGE
+  $ leapp session list [--columns <value> | -x] [--sort <value>] [--filter <value>] [--output csv|json|yaml |  |
+    [--csv | --no-truncate]] [--no-header | ]
+
+FLAGS
+  -x, --extended     show extra columns
+  --columns=<value>  only show provided columns (comma-separated)
+  --csv              output is csv format [alias: --output=csv]
+  --filter=<value>   filter property by partial string matching, ex: name=foo
+  --no-header        hide table header from output
+  --no-truncate      do not truncate output to fit screen
+  --output=<option>  output in a more machine friendly format
+                     <options: csv|json|yaml>
+  --sort=<value>     property to sort by (prepend '-' for descending)
+
+DESCRIPTION
+  Show sessions list
+
+EXAMPLES
+  $leapp session list
+```
+
 ## `leapp session start`
 
-Start session
+Start a session
 
 ```
 USAGE
   $ leapp session start
 
 DESCRIPTION
-  Start session
+  Start a session
 
 EXAMPLES
   $leapp session start
@@ -238,19 +318,16 @@ EXAMPLES
 
 ## `leapp session stop`
 
-Stop a specific session
+Stop a session
 
 ```
 USAGE
-  $ leapp session stop -i <value>
-
-FLAGS
-  -i, --sessionId=<value>  (required) Session ID
+  $ leapp session stop
 
 DESCRIPTION
-  Stop a specific session
+  Stop a session
 
 EXAMPLES
-  $ oex stop --sessionId 1234567890
+  $leapp session stop
 ```
 <!-- commandsstop -->
