@@ -28,14 +28,14 @@ export const syncAllEvent = new BehaviorSubject<boolean>(false);
 @Component({
   selector: 'app-integration-bar',
   templateUrl: './integration-bar.component.html',
-  styleUrls: ['./integration-bar.component.scss']
+  styleUrls: ['./integration-bar.component.scss'],
 })
 export class IntegrationBarComponent implements OnInit, OnDestroy {
 
   @ViewChildren(MatMenuTrigger)
   triggers: QueryList<MatMenuTrigger>;
 
-  @ViewChild('ssoModalTemplate', { static: false })
+  @ViewChild('ssoModalTemplate', {static: false})
   ssoModalTemplate: TemplateRef<any>;
 
   eConstants = constants;
@@ -54,7 +54,7 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
     alias: new FormControl('', [Validators.required]),
     portalUrl: new FormControl('', [Validators.required, Validators.pattern('https?://.+')]),
     awsRegion: new FormControl('', [Validators.required]),
-    defaultBrowserOpening: new FormControl('', [Validators.required])
+    defaultBrowserOpening: new FormControl('', [Validators.required]),
   });
 
   logoutLoadings: any;
@@ -68,28 +68,32 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
               private router: Router,
               private windowService: WindowService,
               private toasterService: MessageToasterService,
-              private leappCoreService: LeappCoreService) { }
+              private leappCoreService: LeappCoreService) {
+  }
 
   public ngOnInit(): void {
     this.subscription = integrationsFilter.subscribe(() => {
       this.setValues();
-      this.selectedIntegrations = this.awsSsoConfigurations.map((awsIntegration) => ({ id: awsIntegration.id, selected: false }));
+      this.selectedIntegrations = this.awsSsoConfigurations.map((awsIntegration) => ({
+        id: awsIntegration.id,
+        selected: false,
+      }));
     });
     integrationsFilter.next(this.leappCoreService.repository.listAwsSsoConfigurations());
 
     this.subscription2 = openIntegrationEvent.subscribe((value) => {
-      if(value) {
+      if (value) {
         this.gotoForm(1, this.selectedAwsSsoConfiguration);
       }
     });
 
     this.subscription3 = syncAllEvent.subscribe(async (value) => {
-      if(value) {
+      if (value) {
         // eslint-disable-next-line @typescript-eslint/prefer-for-of
         for (let i = 0; i < this.awsSsoConfigurations.length; i++) {
           const integration = this.awsSsoConfigurations[i];
-          if(this.isOnline(integration)) {
-             await this.forceSync(integration.id);
+          if (this.isOnline(integration)) {
+            await this.forceSync(integration.id);
           }
         }
         this.toasterService.toast('Integrations synchronized.', ToastLevel.info, '');
@@ -143,8 +147,8 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
 
     globalFilteredSessions.next(
       this.leappCoreService.repository.getSessions().filter(
-        (s) => (s as AwsSsoRoleSession).awsSsoConfigurationId === awsSsoConfiguration.id
-      )
+        (s) => (s as AwsSsoRoleSession).awsSsoConfigurationId === awsSsoConfiguration.id,
+      ),
     );
   }
 
@@ -165,18 +169,19 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
       this.loadingInBrowser = (this.selectedAwsSsoConfiguration.browserOpening === constants.inBrowser.toString());
       this.loadingInApp = (this.selectedAwsSsoConfiguration.browserOpening === constants.inApp.toString());
 
-      if(this.loadingInBrowser && !this.isOnline(this.selectedAwsSsoConfiguration)) {
-        this.modalRef = this.bsModalService.show(this.ssoModalTemplate, { class: 'sso-modal'});
+      if (this.loadingInBrowser && !this.isOnline(this.selectedAwsSsoConfiguration)) {
+        this.modalRef = this.bsModalService.show(this.ssoModalTemplate, {class: 'sso-modal'});
       }
 
       try {
-        const ssoRoleSessions: SsoRoleSession[] = await this.leappCoreService.awsSsoRoleService.sync(configurationId);
+        const ssoRoleSessions: SsoRoleSession[] =
+          await this.leappCoreService.awsSsoRoleService.loginAndGetSsoSessions(configurationId);
         ssoRoleSessions.forEach((ssoRoleSession: SsoRoleSession) => {
           ssoRoleSession.awsSsoConfigurationId = configurationId;
           this.leappCoreService.awsSsoRoleService.create(ssoRoleSession);
         });
 
-        if(this.modalRef) {
+        if (this.modalRef) {
           this.modalRef.hide();
         }
 
@@ -211,7 +216,7 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
       region: this.regions[0].region,
       portalUrl: '',
       browserOpening: constants.inApp,
-      accessTokenExpiration: undefined
+      accessTokenExpiration: undefined,
     };
   }
 
@@ -235,14 +240,14 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
     this.modifying = modifying;
     this.selectedAwsSsoConfiguration = currentAwsSsoConfiguration;
 
-    if(modifying === 1) {
+    if (modifying === 1) {
       this.selectedAwsSsoConfiguration = {
         id: 'new AWS Single Sign-On',
         alias: '',
         region: this.regions[0].region,
         portalUrl: '',
         browserOpening: constants.inApp,
-        accessTokenExpiration: undefined
+        accessTokenExpiration: undefined,
       };
     }
 
@@ -251,32 +256,32 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
     this.form.get('awsRegion').setValue(this.selectedAwsSsoConfiguration.region);
     this.form.get('defaultBrowserOpening').setValue(this.selectedAwsSsoConfiguration.browserOpening);
 
-    this.modalRef = this.bsModalService.show(this.ssoModalTemplate, { class: 'sso-modal'});
+    this.modalRef = this.bsModalService.show(this.ssoModalTemplate, {class: 'sso-modal'});
   }
 
   public save(): void {
-    if(this.form.valid) {
+    if (this.form.valid) {
       const alias = this.form.get('alias').value;
       const portalUrl = this.form.get('portalUrl').value;
       const region = this.form.get('awsRegion').value;
       const browserOpening = this.form.get('defaultBrowserOpening').value;
 
-      if(this.modifying === 1) {
+      if (this.modifying === 1) {
         // Save
         this.leappCoreService.repository.addAwsSsoIntegration(
           portalUrl,
           alias,
           region,
-          browserOpening
+          browserOpening,
         );
-      } else if(this.modifying === 2 && this.selectedAwsSsoConfiguration.portalUrl !== '') {
+      } else if (this.modifying === 2 && this.selectedAwsSsoConfiguration.portalUrl !== '') {
         // Edit
         this.leappCoreService.repository.updateAwsSsoIntegration(
           this.selectedAwsSsoConfiguration.id,
           alias,
           region,
           portalUrl,
-          browserOpening
+          browserOpening,
         );
       }
       integrationsFilter.next(this.leappCoreService.repository.listAwsSsoConfigurations());
@@ -311,7 +316,7 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
     return formatDistance(
       new Date(awsSsoConfiguration.accessTokenExpiration),
       new Date(),
-      { addSuffix: true }
+      {addSuffix: true},
     );
   }
 }

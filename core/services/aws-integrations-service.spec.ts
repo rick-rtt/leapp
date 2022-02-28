@@ -90,7 +90,7 @@ describe('AwsIntegrationsService', () => {
     } as any
 
     const awsIntegrationService = new AwsIntegrationsService(null, awsSsoRoleService)
-    const sessions = await awsIntegrationService.sync('iid')
+    const sessions = await awsIntegrationService.loginAndGetOnlineSessions('iid')
 
     expect(sessions).toBe(expectedSessions)
   })
