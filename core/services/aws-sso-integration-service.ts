@@ -295,18 +295,6 @@ export class AwsSsoIntegrationService {
     return await this.keyChainService.getSecret(constants.appName, this.getIntegrationAccessTokenKey(integrationId))
   }
 
-<<<<<<< HEAD
-  private async configureAwsSso(configurationId: string, alias: string, region: string, portalUrl: string,
-                          browserOpening: string, expirationTime: string, accessToken: string) {
-
-    this.repository.updateAwsSsoIntegration(configurationId, alias, region, portalUrl, browserOpening, expirationTime)
-
-    await this.keyChainService.saveSecret(
-      constants.appName,
-      `aws-sso-integration-access-token-${configurationId}`,
-      accessToken
-    ).then(_ => {});
-=======
   private async configureAwsSso(integrationId: string, alias: string, region: string, portalUrl: string,
                                 browserOpening: string, expirationTime: string, accessToken: string): Promise<void> {
     this.repository.updateAwsSsoIntegration(integrationId, alias, region, portalUrl, browserOpening, expirationTime)
@@ -315,7 +303,6 @@ export class AwsSsoIntegrationService {
 
   private getIntegrationAccessTokenKey(integrationId: string | number) {
     return `aws-sso-integration-access-token-${integrationId}`
->>>>>>> cli-integration-creation
   }
 
   private ssoExpired(configurationId: string | number): boolean {
