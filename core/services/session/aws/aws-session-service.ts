@@ -9,8 +9,8 @@ import { Repository } from '../../repository';
 export abstract class AwsSessionService extends SessionService {
 
   /* This service manage the session manipulation as we need top generate credentials and maintain them for a specific duration */
-  protected constructor(iSessionNotifier: ISessionNotifier, repository: Repository) {
-    super(iSessionNotifier, repository);
+  protected constructor(protected sessionNotifier: ISessionNotifier, protected repository: Repository) {
+    super(sessionNotifier, repository);
   }
 
   async start(sessionId: string): Promise<void> {
@@ -53,7 +53,7 @@ export abstract class AwsSessionService extends SessionService {
       if (this.repository.getSessionById(sessionId).status === SessionStatus.active) {
         await this.stop(sessionId);
       }
-      for (const sess of this.repository.listIamRoleChained(this.iSessionNotifier.getSessionById(sessionId))) {
+      for (const sess of this.repository.listIamRoleChained(this.sessionNotifier.getSessionById(sessionId))) {
         if (sess.status === SessionStatus.active) {
           await this.stop(sess.sessionId);
         }
@@ -61,7 +61,7 @@ export abstract class AwsSessionService extends SessionService {
       }
       this.repository.deleteSession(sessionId);
 
-      this.iSessionNotifier.setSessions(this.repository.getSessions());
+      this.sessionNotifier.setSessions(this.repository.getSessions());
       await this.removeSecrets(sessionId);
     } catch(error) {
       this.sessionError(sessionId, error);

@@ -13,7 +13,6 @@ import {AwsParentSessionFactory} from '@noovolari/leapp-core/services/session/aw
 import {AwsIamRoleChainedService} from '@noovolari/leapp-core/services/session/aws/aws-iam-role-chained-service'
 import {Repository} from '@noovolari/leapp-core/services/repository'
 import {RegionsService} from '@noovolari/leapp-core/services/regions-service'
-import {AwsSsoOidcService} from '@noovolari/leapp-core/services/session/aws/aws-sso-oidc.service'
 import {AwsSsoRoleService} from '@noovolari/leapp-core/services/session/aws/aws-sso-role-service'
 import {WorkspaceService} from '@noovolari/leapp-core/services/workspace-service'
 import {SessionFactory} from '@noovolari/leapp-core/services/session-factory'
@@ -26,11 +25,16 @@ import {CliNativeService} from './cli-native-service'
 import {constants} from '@noovolari/leapp-core/models/constants'
 import {NamedProfilesService} from '@noovolari/leapp-core/services/named-profiles-service'
 import {IdpUrlsService} from '@noovolari/leapp-core/services/idp-urls-service'
-import {AwsIntegrationsService} from '@noovolari/leapp-core/services/aws-integrations-service'
+import {AwsSsoIntegrationService} from '@noovolari/leapp-core/services/aws-sso-integration-service'
 import CliInquirer from 'inquirer'
+import {AwsSsoOidcService} from '@noovolari/leapp-core/services/aws-sso-oidc.service'
 
 export class LeappCliService {
   private cliNativeServiceInstance: CliNativeService
+
+  constructor() {
+    this.awsSsoRoleService.setAwsIntegrationDelegate(this.awsSsoIntegrationService)
+  }
 
   public get cliNativeService(): CliNativeService {
     if (!this.cliNativeServiceInstance) {
@@ -114,7 +118,7 @@ export class LeappCliService {
 
   get awsSsoRoleService(): AwsSsoRoleService {
     if (!this.awsSsoRoleServiceInstance) {
-      this.awsSsoRoleServiceInstance = new AwsSsoRoleService(this.workspaceService, this.repository, this.fileService, this.keyChainService, this.awsCoreService, this.cliNativeService, this.awsSsoOidcService, constants.appName, constants.defaultRegion)
+      this.awsSsoRoleServiceInstance = new AwsSsoRoleService(this.workspaceService, this.repository, this.fileService, this.keyChainService, this.awsCoreService, this.cliNativeService, this.awsSsoOidcService)
     }
 
     return this.awsSsoRoleServiceInstance
@@ -216,17 +220,18 @@ export class LeappCliService {
     return this.idpUrlsServiceInstance
   }
 
-  private keyChainServiceInstance: KeychainService
 
-  private awsIntegrationsServiceInstance: AwsIntegrationsService
+  private awsSsoIntegrationServiceInstance: AwsSsoIntegrationService
 
-  get awsIntegrationsService(): AwsIntegrationsService {
-    if (!this.awsIntegrationsServiceInstance) {
-      this.awsIntegrationsServiceInstance = new AwsIntegrationsService(this.repository, this.awsSsoRoleService)
+  get awsSsoIntegrationService(): AwsSsoIntegrationService {
+    if (!this.awsSsoIntegrationServiceInstance) {
+      this.awsSsoIntegrationServiceInstance = new AwsSsoIntegrationService(this.repository, this.awsSsoOidcService, this.awsSsoRoleService, this.keyChainService, this.workspaceService, this.cliNativeService)
     }
 
-    return this.awsIntegrationsServiceInstance
+    return this.awsSsoIntegrationServiceInstance
   }
+
+  private keyChainServiceInstance: KeychainService
 
   get keyChainService(): KeychainService {
     if (!this.keyChainServiceInstance) {

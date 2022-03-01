@@ -6,7 +6,7 @@ import { CreateSessionRequest } from './create-session-request'
 
 export abstract class SessionService {
 
-  protected constructor(protected iSessionNotifier: ISessionNotifier, protected repository: Repository) {
+  protected constructor(protected sessionNotifier: ISessionNotifier, protected repository: Repository) {
   }
 
   protected sessionActivate(sessionId: string) {
@@ -22,8 +22,8 @@ export abstract class SessionService {
 
       this.repository.updateSessions(sessions)
 
-      if (this.iSessionNotifier) {
-        this.iSessionNotifier.setSessions([...sessions])
+      if (this.sessionNotifier) {
+        this.sessionNotifier.setSessions([...sessions])
       }
     }
   }
@@ -40,8 +40,8 @@ export abstract class SessionService {
 
       this.repository.updateSessions(sessions)
 
-      if (this.iSessionNotifier) {
-        this.iSessionNotifier.setSessions([...sessions])
+      if (this.sessionNotifier) {
+        this.sessionNotifier.setSessions([...sessions])
       }
     }
   }
@@ -59,8 +59,8 @@ export abstract class SessionService {
 
       this.repository.updateSessions(sessions)
 
-      if (this.iSessionNotifier) {
-        this.iSessionNotifier.setSessions([...sessions])
+      if (this.sessionNotifier) {
+        this.sessionNotifier.setSessions([...sessions])
       }
     }
   }
@@ -78,8 +78,8 @@ export abstract class SessionService {
 
       this.repository.updateSessions(sessions)
 
-      if (this.iSessionNotifier) {
-        this.iSessionNotifier.setSessions([...sessions])
+      if (this.sessionNotifier) {
+        this.sessionNotifier.setSessions([...sessions])
       }
     }
   }

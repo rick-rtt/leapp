@@ -64,7 +64,7 @@ export class AwsIamUserService extends AwsSessionService {
       .catch((err: any) => console.error(err))
 
     this.repository.addSession(session)
-    this.iSessionNotifier?.addSession(session)
+    this.sessionNotifier?.addSession(session)
   }
 
   async applyCredentials(sessionId: string, credentialsInfo: CredentialsInfo): Promise<void> {
@@ -241,6 +241,6 @@ export class AwsIamUserService extends AwsSessionService {
     sessions[index] = currentSession
 
     this.repository.updateSessions(sessions)
-    this.iSessionNotifier.setSessions([...sessions])
+    this.sessionNotifier.setSessions([...sessions])
   }
 }

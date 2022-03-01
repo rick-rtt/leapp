@@ -1,14 +1,14 @@
-import {AwsIntegrationsService} from './aws-integrations-service'
+import {AwsSsoIntegrationService} from './aws-sso-integration-service'
 
-describe('AwsIntegrationsService', () => {
+describe('AwsSsoIntegrationService', () => {
 
   test('getIntegrations', () => {
     const expectedIntegrations = [{id: 1}]
     const repository = {
-      listAwsSsoConfigurations: () => expectedIntegrations
+      listAwsSsoConfigurations: () => expectedIntegrations,
     } as any
 
-    const awsIntegrationsService = new AwsIntegrationsService(repository, null)
+    const awsIntegrationsService = new AwsSsoIntegrationService(repository, null, null, null, null, null)
 
     const integrations = awsIntegrationsService.getIntegrations()
 
@@ -17,7 +17,7 @@ describe('AwsIntegrationsService', () => {
 
   test('getOnlineIntegrations', () => {
     const expectedIntegrations = [{id: 1}]
-    const awsIntegrationsService = new AwsIntegrationsService(null, null)
+    const awsIntegrationsService = new AwsSsoIntegrationService(null, null, null, null, null, null)
     awsIntegrationsService.getIntegrations = () => expectedIntegrations as any
     awsIntegrationsService.isOnline = jest.fn(() => true)
 
@@ -30,7 +30,7 @@ describe('AwsIntegrationsService', () => {
 
   test('getOfflineIntegrations', () => {
     const expectedIntegrations = [{id: 1}]
-    const awsIntegrationsService = new AwsIntegrationsService(null, null)
+    const awsIntegrationsService = new AwsSsoIntegrationService(null, null, null, null, null, null)
     awsIntegrationsService.getIntegrations = () => expectedIntegrations as any
     awsIntegrationsService.isOnline = jest.fn(() => false)
 
@@ -42,7 +42,7 @@ describe('AwsIntegrationsService', () => {
   })
 
   test('isOnline, token missing', () => {
-    const awsIntegrationsService = new AwsIntegrationsService(null, null);
+    const awsIntegrationsService = new AwsSsoIntegrationService(null, null, null, null, null, null);
     (awsIntegrationsService as any).getDate = () => new Date('2022-02-24T10:00:00')
 
     const isOnline = awsIntegrationsService.isOnline({} as any)
@@ -50,11 +50,11 @@ describe('AwsIntegrationsService', () => {
   })
 
   test('isOnline, token expired', () => {
-    const awsIntegrationsService = new AwsIntegrationsService(null, null);
+    const awsIntegrationsService = new AwsSsoIntegrationService(null, null, null, null, null, null);
     (awsIntegrationsService as any).getDate = () => new Date('2022-02-24T10:00:00')
 
     const integration = {
-      accessTokenExpiration: '2022-02-24T10:00:00'
+      accessTokenExpiration: '2022-02-24T10:00:00',
     } as any
 
     const isOnline = awsIntegrationsService.isOnline(integration)
@@ -62,11 +62,11 @@ describe('AwsIntegrationsService', () => {
   })
 
   test('isOnline, token not expired', () => {
-    const awsIntegrationsService = new AwsIntegrationsService(null, null);
+    const awsIntegrationsService = new AwsSsoIntegrationService(null, null, null, null, null, null);
     (awsIntegrationsService as any).getDate = () => new Date('2022-02-24T10:00:00')
 
     const integration = {
-      accessTokenExpiration: '2022-02-24T10:00:01'
+      accessTokenExpiration: '2022-02-24T10:00:01',
     } as any
 
     const isOnline = awsIntegrationsService.isOnline(integration)
@@ -74,32 +74,20 @@ describe('AwsIntegrationsService', () => {
   })
 
   test('remainingHours', () => {
-    const awsIntegrationService = new AwsIntegrationsService(null, null)
+    const awsIntegrationService = new AwsSsoIntegrationService(null, null, null, null, null, null)
     const integration = {
-      accessTokenExpiration: '2022-02-24T10:30:00'
+      accessTokenExpiration: '2022-02-24T10:30:00',
     } as any;
-    (awsIntegrationService as any).getDate = () => new Date('2022-02-24T10:00:00');
-    const remainingHours = awsIntegrationService.remainingHours(integration);
-    expect(remainingHours).toBe('in 30 minutes');
-  })
-
-  test('sync', async () => {
-    const expectedSessions = [{sessionId: 'id'} as any]
-    const awsSsoRoleService = {
-      sync: async () => expectedSessions
-    } as any
-
-    const awsIntegrationService = new AwsIntegrationsService(null, awsSsoRoleService)
-    const sessions = await awsIntegrationService.sync('iid')
-
-    expect(sessions).toBe(expectedSessions)
+    (awsIntegrationService as any).getDate = () => new Date('2022-02-24T10:00:00')
+    const remainingHours = awsIntegrationService.remainingHours(integration)
+    expect(remainingHours).toBe('in 30 minutes')
   })
 
   test('getDate', () => {
-    const awsIntegrationService = new AwsIntegrationsService(null, null)
-    const time: Date = (awsIntegrationService as any).getDate();
+    const awsIntegrationService = new AwsSsoIntegrationService(null, null, null, null, null, null)
+    const time: Date = (awsIntegrationService as any).getDate()
 
-    expect(time).toBeInstanceOf(Date);
-    expect(time.getDay()).toBe(new Date().getDay());
+    expect(time).toBeInstanceOf(Date)
+    expect(time.getDay()).toBe(new Date().getDay())
   })
 })

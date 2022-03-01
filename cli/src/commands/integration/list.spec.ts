@@ -3,7 +3,6 @@ import {CliUx} from '@oclif/core'
 import {describe, expect, jest, test} from '@jest/globals'
 
 describe('ListIntegrations', () => {
-
   test('run', async () => {
     const command = new ListIntegrations([], {} as any) as any
     command.showIntegrations = jest.fn()
@@ -15,7 +14,7 @@ describe('ListIntegrations', () => {
   test('run - showIntegrations throw an error', async () => {
     const command = new ListIntegrations([], {} as any, {} as any) as any
     command.showIntegrations = jest.fn(async () => {
-      throw Error('error')
+      throw new Error('error')
     })
     try {
       await command.run()
@@ -44,7 +43,7 @@ describe('ListIntegrations', () => {
       accessTokenExpiration: 'expiration',
     }]
     const leapCliService = {
-      awsIntegrationsService: {
+      awsSsoIntegrationService: {
         getIntegrations: () => integrations,
         isOnline: jest.fn(() => true),
         remainingHours: jest.fn(() => 'remainingHours'),
@@ -56,7 +55,6 @@ describe('ListIntegrations', () => {
 
     await command.showIntegrations()
 
-
     const expectedData = [{
       integrationName: 'integrationName',
       portalUrl: 'portalUrl',
@@ -67,8 +65,8 @@ describe('ListIntegrations', () => {
 
     expect(tableSpy.mock.calls[0][0]).toEqual(expectedData)
 
-    expect(leapCliService.awsIntegrationsService.isOnline).toHaveBeenCalledWith(integrations[0])
-    expect(leapCliService.awsIntegrationsService.remainingHours).toHaveBeenCalledWith(integrations[0])
+    expect(leapCliService.awsSsoIntegrationService.isOnline).toHaveBeenCalledWith(integrations[0])
+    expect(leapCliService.awsSsoIntegrationService.remainingHours).toHaveBeenCalledWith(integrations[0])
 
     const expectedColumns = {
       integrationName: {header: 'Integration Name'},
@@ -78,6 +76,5 @@ describe('ListIntegrations', () => {
       expirationInHours: {header: 'Expiration'},
     }
     expect(tableSpy.mock.calls[0][1]).toEqual(expectedColumns)
-
   })
 })
