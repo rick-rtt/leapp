@@ -94,7 +94,7 @@ describe('LoginIntegration', () => {
     }
 
     expect(command.selectIntegration).toHaveBeenCalled()
-    expect(command.login).toHaveBeenCalled()
+    expect(command.login).toHaveBeenCalledWith(selectedIntegration)
     if (errorToThrow) {
       expect(occurredError).toEqual(new Error(expectedErrorMessage))
     }

@@ -33,6 +33,7 @@ USAGE
 * [`leapp idp-url create`](#leapp-idp-url-create)
 * [`leapp idp-url delete`](#leapp-idp-url-delete)
 * [`leapp idp-url edit`](#leapp-idp-url-edit)
+* [`leapp integration create`](#leapp-integration-create)
 * [`leapp integration list`](#leapp-integration-list)
 * [`leapp integration login`](#leapp-integration-login)
 * [`leapp profile create`](#leapp-profile-create)
@@ -110,6 +111,21 @@ DESCRIPTION
 
 EXAMPLES
   $leapp idp-url edit
+```
+
+## `leapp integration create`
+
+Create a new AWS SSO integration
+
+```
+USAGE
+  $ leapp integration create
+
+DESCRIPTION
+  Create a new AWS SSO integration
+
+EXAMPLES
+  $leapp integration create
 ```
 
 ## `leapp integration list`
