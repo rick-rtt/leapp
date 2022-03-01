@@ -98,26 +98,31 @@ export class AwsIamUserService extends AwsSessionService {
     // Get the session in question
     //const session = this.workspaceService.get(sessionId);
     const session = this.repository.getSessions().find(sess => sess.sessionId === sessionId)
-
     if (session === undefined) {
       throw new LeappNotFoundError(this, `session with id ${sessionId} not found.`)
     }
+
     // Retrieve session token expiration
     const tokenExpiration = (session as AwsIamUserSession).sessionTokenExpiration
+
     // Check if token is expired
     if (!tokenExpiration || AwsIamUserService.isTokenExpired(tokenExpiration)) {
       // Token is Expired!
       // Retrieve access keys from keychain
       const accessKeyId = await this.getAccessKeyFromKeychain(sessionId)
       const secretAccessKey = await this.getSecretKeyFromKeychain(sessionId)
+
       // Get session token
       // https://docs.aws.amazon.com/STS/latest/APIReference/API_GetSessionToken.html
       AWS.config.update({accessKeyId, secretAccessKey})
+
       // Configure sts client options
       const sts = new AWS.STS(this.awsCoreService.stsOptions(session))
+
       // Configure sts get-session-token api call params
       // eslint-disable-next-line @typescript-eslint/naming-convention
       const params = {DurationSeconds: constants.sessionTokenDuration}
+
       // Check if MFA is needed or not
       if ((session as AwsIamUserSession).mfaDevice) {
         // Return session token after calling MFA modal
