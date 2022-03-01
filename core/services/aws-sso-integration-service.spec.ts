@@ -2,6 +2,48 @@ import {AwsSsoIntegrationService} from './aws-sso-integration-service'
 
 describe('AwsSsoIntegrationService', () => {
 
+  test('validateAlias - empty alias', () => {
+    const aliasParam = ''
+    const actualValidationResult = AwsSsoIntegrationService.validateAlias(aliasParam)
+
+    expect(actualValidationResult).toBe('Empty alias')
+  })
+
+  test('validateAlias - only spaces alias', () => {
+    const aliasParam = '      '
+    const actualValidationResult = AwsSsoIntegrationService.validateAlias(aliasParam)
+
+    expect(actualValidationResult).toBe('Empty alias')
+  })
+
+  test('validateAlias - valid alias', () => {
+    const aliasParam = 'alias'
+    const actualValidationResult = AwsSsoIntegrationService.validateAlias(aliasParam)
+
+    expect(actualValidationResult).toBe(true)
+  })
+
+  test('validatePortalUrl - invalid Url', () => {
+    const portalUrlParam = 'www.url.com'
+    const actualValidationPortalUrl = AwsSsoIntegrationService.validatePortalUrl(portalUrlParam)
+
+    expect(actualValidationPortalUrl).toBe('Invalid portal URL')
+  })
+
+  test('validatePortalUrl - http Url', () => {
+    const portalUrlParam = 'http://www.url.com'
+    const actualValidationPortalUrl = AwsSsoIntegrationService.validatePortalUrl(portalUrlParam)
+
+    expect(actualValidationPortalUrl).toBe(true)
+  })
+
+  test('validatePortalUrl - https Url', () => {
+    const portalUrlParam = 'https://www.url.com'
+    const actualValidationPortalUrl = AwsSsoIntegrationService.validatePortalUrl(portalUrlParam)
+
+    expect(actualValidationPortalUrl).toBe(true)
+  })
+
   test('getIntegrations', () => {
     const expectedIntegrations = [{id: 1}]
     const repository = {
@@ -89,5 +131,14 @@ describe('AwsSsoIntegrationService', () => {
 
     expect(time).toBeInstanceOf(Date)
     expect(time.getDay()).toBe(new Date().getDay())
+  })
+
+  test('getIntegrationAccessTokenKey', () => {
+    const awsIntegrationService = new AwsSsoIntegrationService(null, null, null, null, null, null)
+    const integrationId: string = 'integration1';
+
+    const actualIntegrationAccessTokenKey = (awsIntegrationService as any).getIntegrationAccessTokenKey(integrationId)
+
+    expect(actualIntegrationAccessTokenKey).toBe(`aws-sso-integration-access-token-${integrationId}`)
   })
 })

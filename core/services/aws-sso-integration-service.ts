@@ -17,6 +17,15 @@ import {SessionType} from '../models/session-type'
 import {AwsSsoRoleSession} from '../models/aws-sso-role-session'
 import {ISessionNotifier} from '../interfaces/i-session-notifier'
 
+const portalUrlValidationRegex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&/=]*)/
+
+export interface IntegrationCreationParams {
+  alias: string,
+  portalUrl: string,
+  region: string,
+  browserOpening: string
+}
+
 export class AwsSsoIntegrationService {
 
   private ssoPortal: SSO
@@ -24,6 +33,14 @@ export class AwsSsoIntegrationService {
   constructor(private repository: Repository, private awsSsoOidcService: AwsSsoOidcService,
               private awsSsoRoleService: AwsSsoRoleService, private keyChainService: KeychainService,
               private iSessionNotifier: ISessionNotifier, private nativeService: INativeService) {
+  }
+
+  public static validateAlias(alias: string): boolean | string {
+    return alias.trim() !== '' ? true : 'Empty alias'
+  }
+
+  public static validatePortalUrl(portalUrl: string): boolean | string {
+    return portalUrlValidationRegex.test(portalUrl) ? true : 'Invalid portal URL'
   }
 
   public getIntegrations(): AwsSsoIntegration[] {
@@ -104,7 +121,7 @@ export class AwsSsoIntegrationService {
     // Obtain region and access token
     const configuration: AwsSsoIntegration = this.repository.getAwsSsoConfiguration(integrationId)
     const region = configuration.region
-    const savedAccessToken = await this.getAccessTokenFromKeychain()
+    const savedAccessToken = await this.getAccessTokenFromKeychain(integrationId)
 
     // Configure Sso Portal Client
     this.setupSsoPortalClient(region)
@@ -118,20 +135,20 @@ export class AwsSsoIntegrationService {
       this.ssoPortal = null
 
       // Delete access token and remove sso configuration info from workspace
-      this.keyChainService.deletePassword(constants.appName, 'aws-sso-access-token')
+      await this.keyChainService.deletePassword(constants.appName, this.getIntegrationAccessTokenKey(integrationId))
       this.repository.unsetAwsSsoIntegrationExpiration(integrationId.toString())
 
       await this.awsSsoRoleService.removeSsoSessionsFromWorkspace()
     })
   }
 
-  public async getAccessToken(configurationId: string, region: string, portalUrl: string): Promise<string> {
-    if (this.ssoExpired(configurationId)) {
-      const loginResponse = await this.login(configurationId, region, portalUrl)
-      const configuration: AwsSsoIntegration = this.repository.getAwsSsoConfiguration(configurationId)
+  public async getAccessToken(integrationId: string, region: string, portalUrl: string): Promise<string> {
+    if (this.ssoExpired(integrationId)) {
+      const loginResponse = await this.login(integrationId, region, portalUrl)
+      const configuration: AwsSsoIntegration = this.repository.getAwsSsoConfiguration(integrationId)
 
-      this.configureAwsSso(
-        configurationId,
+      await this.configureAwsSso(
+        integrationId,
         configuration.alias,
         region,
         loginResponse.portalUrlUnrolled,
@@ -142,7 +159,7 @@ export class AwsSsoIntegrationService {
 
       return loginResponse.accessToken
     } else {
-      return await this.getAccessTokenFromKeychain()
+      return await this.getAccessTokenFromKeychain(integrationId)
     }
   }
 
@@ -156,6 +173,10 @@ export class AwsSsoIntegrationService {
     }
 
     return this.ssoPortal.getRoleCredentials(getRoleCredentialsRequest).promise()
+  }
+
+  public createIntegration(creationParams: IntegrationCreationParams) {
+    this.repository.addAwsSsoIntegration(creationParams.portalUrl, creationParams.alias, creationParams.region, creationParams.browserOpening)
   }
 
   private async getSessions(configurationId: string, accessToken: string, region: string): Promise<SsoRoleSession[]> {
@@ -270,20 +291,18 @@ export class AwsSsoIntegrationService {
     })
   }
 
-  private async getAccessTokenFromKeychain(): Promise<string> {
-    return this.keyChainService.getSecret(constants.appName, 'aws-sso-access-token')
+  private async getAccessTokenFromKeychain(integrationId: string | number): Promise<string> {
+    return await this.keyChainService.getSecret(constants.appName, this.getIntegrationAccessTokenKey(integrationId))
   }
 
-  private async configureAwsSso(configurationId: string, alias: string, region: string, portalUrl: string,
-                          browserOpening: string, expirationTime: string, accessToken: string) {
+  private async configureAwsSso(integrationId: string, alias: string, region: string, portalUrl: string,
+                                browserOpening: string, expirationTime: string, accessToken: string): Promise<void> {
+    this.repository.updateAwsSsoIntegration(integrationId, alias, region, portalUrl, browserOpening, expirationTime)
+    await this.keyChainService.saveSecret(constants.appName, this.getIntegrationAccessTokenKey(integrationId), accessToken)
+  }
 
-    this.repository.updateAwsSsoIntegration(configurationId, alias, region, portalUrl, browserOpening, expirationTime)
-
-    await this.keyChainService.saveSecret(
-      constants.appName,
-      `aws-sso-integration-access-token-${configurationId}`,
-      accessToken
-    ).then(_ => {});
+  private getIntegrationAccessTokenKey(integrationId: string | number) {
+    return `aws-sso-integration-access-token-${integrationId}`
   }
 
   private ssoExpired(configurationId: string | number): boolean {
