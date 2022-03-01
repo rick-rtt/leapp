@@ -1,31 +1,32 @@
-import { Injectable } from '@angular/core';
-import { AwsIamUserService } from '@noovolari/leapp-core/services/session/aws/aws-iam-user-service';
-import { FileService } from '@noovolari/leapp-core/services/file-service';
-import { KeychainService } from '@noovolari/leapp-core/services/keychain-service';
-import { AwsCoreService } from '@noovolari/leapp-core/services/aws-core-service';
-import { LoggingService } from '@noovolari/leapp-core/services/logging-service';
-import { TimerService } from '@noovolari/leapp-core/services/timer-service';
-import { AwsIamRoleFederatedService } from '@noovolari/leapp-core/services/session/aws/aws-iam-role-federated-service';
-import { AzureService } from '@noovolari/leapp-core/services/session/azure/azure-service';
-import { ElectronService } from './electron.service';
-import { MfaCodePromptService } from './mfa-code-prompt.service';
-import { ExecuteService } from '@noovolari/leapp-core/services/execute-service';
-import { RetroCompatibilityService } from '@noovolari/leapp-core/services/retro-compatibility-service';
-import { AwsAuthenticationService } from './session/aws/aws-authentication.service';
-import { AwsParentSessionFactory } from '@noovolari/leapp-core/services/session/aws/aws-parent-session.factory';
-import { AwsIamRoleChainedService } from '@noovolari/leapp-core/services/session/aws/aws-iam-role-chained-service';
-import { Repository } from '@noovolari/leapp-core/services/repository';
-import { AwsSsoOidcService } from '@noovolari/leapp-core/services/aws-sso-oidc.service';
-import { AwsSsoRoleService } from '@noovolari/leapp-core/services/session/aws/aws-sso-role-service';
-import { VerificationWindowService } from './verification-window.service';
-import { WorkspaceService } from '@noovolari/leapp-core/services/workspace-service';
-import { SessionFactory } from '@noovolari/leapp-core/services/session-factory';
-import { RotationService } from '@noovolari/leapp-core/services/rotation-service';
-import { AzureCoreService } from '@noovolari/leapp-core/services/azure-core-service';
-import { constants } from '@noovolari/leapp-core/models/constants';
+import {Injectable} from '@angular/core';
+import {AwsIamUserService} from '@noovolari/leapp-core/services/session/aws/aws-iam-user-service';
+import {FileService} from '@noovolari/leapp-core/services/file-service';
+import {KeychainService} from '@noovolari/leapp-core/services/keychain-service';
+import {AwsCoreService} from '@noovolari/leapp-core/services/aws-core-service';
+import {LoggingService} from '@noovolari/leapp-core/services/logging-service';
+import {TimerService} from '@noovolari/leapp-core/services/timer-service';
+import {AwsIamRoleFederatedService} from '@noovolari/leapp-core/services/session/aws/aws-iam-role-federated-service';
+import {AzureService} from '@noovolari/leapp-core/services/session/azure/azure-service';
+import {ElectronService} from './electron.service';
+import {MfaCodePromptService} from './mfa-code-prompt.service';
+import {ExecuteService} from '@noovolari/leapp-core/services/execute-service';
+import {RetroCompatibilityService} from '@noovolari/leapp-core/services/retro-compatibility-service';
+import {AwsAuthenticationService} from './session/aws/aws-authentication.service';
+import {AwsParentSessionFactory} from '@noovolari/leapp-core/services/session/aws/aws-parent-session.factory';
+import {AwsIamRoleChainedService} from '@noovolari/leapp-core/services/session/aws/aws-iam-role-chained-service';
+import {Repository} from '@noovolari/leapp-core/services/repository';
+import {AwsSsoRoleService} from '@noovolari/leapp-core/services/session/aws/aws-sso-role-service';
+import {AwsSsoOidcService} from '@noovolari/leapp-core/services/aws-sso-oidc.service';
+import {VerificationWindowService} from './verification-window.service';
+import {WorkspaceService} from '@noovolari/leapp-core/services/workspace-service';
+import {SessionFactory} from '@noovolari/leapp-core/services/session-factory';
+import {RotationService} from '@noovolari/leapp-core/services/rotation-service';
+import {AzureCoreService} from '@noovolari/leapp-core/services/azure-core-service';
+import {constants} from '@noovolari/leapp-core/models/constants';
+import {AwsIntegrationsService} from '@noovolari/leapp-core/services/aws-integrations-service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class LeappCoreService {
 
@@ -34,6 +35,7 @@ export class LeappCoreService {
   private awsIamRoleFederatedServiceInstance: AwsIamRoleFederatedService;
   private awsIamRoleChainedServiceInstance: AwsIamRoleChainedService;
   private awsSsoRoleServiceInstance: AwsSsoRoleService;
+  private awsIntegrationsServiceInstance: AwsIntegrationsService;
   private awsSsoOidcServiceInstance: AwsSsoOidcService;
   private awsCoreServiceInstance: AwsCoreService;
   private azureServiceInstance: AzureService;
@@ -84,11 +86,19 @@ export class LeappCoreService {
     return this.awsIamRoleChainedServiceInstance;
   }
 
+  public get awsIntegrationsService(): AwsIntegrationsService {
+    if (!this.awsIntegrationsServiceInstance) {
+      this.awsIntegrationsServiceInstance = new AwsIntegrationsService(this.repository, this.awsSsoOidcService,
+        this.keyChainService, this.workspaceService, this.electronService);
+    }
+    return this.awsIntegrationsServiceInstance;
+  }
+
   public get awsSsoRoleService(): AwsSsoRoleService {
     if (!this.awsSsoRoleServiceInstance) {
       this.awsSsoRoleServiceInstance = new AwsSsoRoleService(this.workspaceService, this.repository, this.fileService,
-        this.keyChainService, this.awsCoreService, this.electronService, this.awsSsoOidcService, constants.appName,
-        constants.defaultRegion);
+        this.keyChainService, this.awsCoreService, this.electronService, this.awsSsoOidcService,
+        this.awsIntegrationsService);
     }
     return this.awsSsoRoleServiceInstance;
   }

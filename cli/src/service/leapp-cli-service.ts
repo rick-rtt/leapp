@@ -13,7 +13,6 @@ import {AwsParentSessionFactory} from '@noovolari/leapp-core/services/session/aw
 import {AwsIamRoleChainedService} from '@noovolari/leapp-core/services/session/aws/aws-iam-role-chained-service'
 import {Repository} from '@noovolari/leapp-core/services/repository'
 import {RegionsService} from '@noovolari/leapp-core/services/regions-service'
-import {AwsSsoOidcService} from '@noovolari/leapp-core/services/session/aws/aws-sso-oidc.service'
 import {AwsSsoRoleService} from '@noovolari/leapp-core/services/session/aws/aws-sso-role-service'
 import {WorkspaceService} from '@noovolari/leapp-core/services/workspace-service'
 import {SessionFactory} from '@noovolari/leapp-core/services/session-factory'
@@ -28,6 +27,7 @@ import {NamedProfilesService} from '@noovolari/leapp-core/services/named-profile
 import {IdpUrlsService} from '@noovolari/leapp-core/services/idp-urls-service'
 import {AwsIntegrationsService} from '@noovolari/leapp-core/services/aws-integrations-service'
 import CliInquirer from 'inquirer'
+import {AwsSsoOidcService} from '@noovolari/leapp-core/services/aws-sso-oidc.service'
 
 export class LeappCliService {
   private cliNativeServiceInstance: CliNativeService
@@ -114,7 +114,7 @@ export class LeappCliService {
 
   get awsSsoRoleService(): AwsSsoRoleService {
     if (!this.awsSsoRoleServiceInstance) {
-      this.awsSsoRoleServiceInstance = new AwsSsoRoleService(this.workspaceService, this.repository, this.fileService, this.keyChainService, this.awsCoreService, this.cliNativeService, this.awsSsoOidcService, constants.appName, constants.defaultRegion)
+      this.awsSsoRoleServiceInstance = new AwsSsoRoleService(this.workspaceService, this.repository, this.fileService, this.keyChainService, this.awsCoreService, this.cliNativeService, this.awsSsoOidcService, this.awsIntegrationsService)
     }
 
     return this.awsSsoRoleServiceInstance
@@ -222,7 +222,7 @@ export class LeappCliService {
 
   get awsIntegrationsService(): AwsIntegrationsService {
     if (!this.awsIntegrationsServiceInstance) {
-      this.awsIntegrationsServiceInstance = new AwsIntegrationsService(this.repository, this.awsSsoRoleService)
+      this.awsIntegrationsServiceInstance = new AwsIntegrationsService(this.repository, this.awsSsoOidcService, this.keyChainService, this.workspaceService, this.cliNativeService)
     }
 
     return this.awsIntegrationsServiceInstance
