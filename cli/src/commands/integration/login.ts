@@ -25,13 +25,13 @@ export default class LoginIntegration extends Command {
 
   public async login(integration: AwsSsoIntegration): Promise<void> {
     this.log('waiting for browser authorization using your AWS sign-in...')
-    const sessionsToSync = await this.leappCliService.awsIntegrationsService.loginAndGetOnlineSessions(integration.id)
+    const sessionsToSync = await this.leappCliService.awsSsoIntegrationService.loginAndGetOnlineSessions(integration.id)
     this.log(`login successful (${sessionsToSync.length} sessions ready to be synchronized)`)
     await this.leappCliService.cliVerificationWindowService.closeBrowser()
   }
 
   public async selectIntegration(): Promise<AwsSsoIntegration> {
-    const offlineIntegrations = this.leappCliService.awsIntegrationsService.getOfflineIntegrations()
+    const offlineIntegrations = this.leappCliService.awsSsoIntegrationService.getOfflineIntegrations()
     if (offlineIntegrations.length === 0) {
       throw new Error('no offline integrations available')
     }
@@ -40,7 +40,7 @@ export default class LoginIntegration extends Command {
       name: 'selectedIntegration',
       message: 'select an integration',
       type: 'list',
-      choices: offlineIntegrations.map(integration => ({name: integration.alias, value: integration})),
+      choices: offlineIntegrations.map((integration : any) => ({name: integration.alias, value: integration})),
     }])
     return answer.selectedIntegration
   }

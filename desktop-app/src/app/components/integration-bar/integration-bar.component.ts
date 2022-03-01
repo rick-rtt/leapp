@@ -155,7 +155,7 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
   public async logout(configurationId: string): Promise<void> {
     this.logoutLoadings[configurationId] = true;
     this.selectedAwsSsoConfiguration = this.leappCoreService.repository.getAwsSsoConfiguration(configurationId);
-    await this.leappCoreService.awsSsoRoleService.logout(this.selectedAwsSsoConfiguration.id);
+    await this.leappCoreService.awsSsoIntegrationService.logout(this.selectedAwsSsoConfiguration.id);
 
     this.loadingInBrowser = false;
     this.loadingInApp = false;
@@ -175,7 +175,7 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
 
       try {
         const ssoRoleSessions: SsoRoleSession[] =
-          await this.leappCoreService.awsSsoRoleService.loginAndGetSsoSessions(configurationId);
+          await this.leappCoreService.awsSsoIntegrationService.loginAndGetOnlineSessions(configurationId);
         ssoRoleSessions.forEach((ssoRoleSession: SsoRoleSession) => {
           ssoRoleSession.awsSsoConfigurationId = configurationId;
           this.leappCoreService.awsSsoRoleService.create(ssoRoleSession);

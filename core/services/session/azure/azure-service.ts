@@ -32,7 +32,7 @@ export class AzureService extends SessionService {
     const session = new AzureSession(sessionRequest.sessionName, sessionRequest.region,
       sessionRequest.subscriptionId, sessionRequest.tenantId)
     this.repository.addSession(session)
-    this.iSessionNotifier?.addSession(session)
+    this.sessionNotifier?.addSession(session)
   }
 
   async start(sessionId: string): Promise<void> {
@@ -107,7 +107,7 @@ export class AzureService extends SessionService {
       //TODO: check if session is currently active before trying to stop it?
       await this.stop(sessionId)
       this.repository.deleteSession(sessionId)
-      this.iSessionNotifier.deleteSession(sessionId)
+      this.sessionNotifier.deleteSession(sessionId)
     } catch (error) {
       throw new LeappParseError(this, error.message)
     }

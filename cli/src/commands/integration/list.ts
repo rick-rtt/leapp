@@ -4,10 +4,10 @@ import {Config} from '@oclif/core/lib/config/config'
 
 export default class ListIntegrations extends Command {
   static description = 'Show integrations list'
-  static examples = [`$leapp integration list`]
+  static examples = ['$leapp integration list']
 
   static flags = {
-    ...CliUx.ux.table.flags()
+    ...CliUx.ux.table.flags(),
   }
 
   constructor(argv: string[], config: Config, private leappCliService = new LeappCliService()) {
@@ -23,18 +23,17 @@ export default class ListIntegrations extends Command {
   }
 
   private async showIntegrations(): Promise<void> {
-
     const {flags} = await this.parse(ListIntegrations)
-    const data = this.leappCliService.awsIntegrationsService.getIntegrations().map(integration => {
-      const isOnline = this.leappCliService.awsIntegrationsService.isOnline(integration)
+    const data = this.leappCliService.awsSsoIntegrationService.getIntegrations().map((integration: any) => {
+      const isOnline = this.leappCliService.awsSsoIntegrationService.isOnline(integration)
       return {
         integrationName: integration.alias,
         portalUrl: integration.portalUrl,
         region: integration.region,
         status: isOnline ? 'Online' : 'Offline',
-        expirationInHours: isOnline
-          ? `Expiring ${this.leappCliService.awsIntegrationsService.remainingHours(integration)}`
-          : '-'
+        expirationInHours: isOnline ?
+          `Expiring ${this.leappCliService.awsSsoIntegrationService.remainingHours(integration)}` :
+          '-',
       }
     }) as any as Record<string, unknown> []
 
@@ -43,7 +42,7 @@ export default class ListIntegrations extends Command {
       portalUrl: {header: 'Portal URL'},
       region: {header: 'Region'},
       status: {header: 'Status'},
-      expirationInHours: {header: 'Expiration'}
+      expirationInHours: {header: 'Expiration'},
     }
 
     CliUx.ux.table(data, columns, {...flags})
