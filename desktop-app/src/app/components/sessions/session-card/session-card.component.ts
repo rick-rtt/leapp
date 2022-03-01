@@ -1,7 +1,6 @@
 import {Component, Input, OnInit, TemplateRef, ViewChild} from '@angular/core';
 import {AppService} from '../../../services/app.service';
 import {Router} from '@angular/router';
-import {environment} from '../../../../environments/environment';
 import * as uuid from 'uuid';
 import {BsModalRef, BsModalService} from 'ngx-bootstrap/modal';
 import {optionBarIds} from '../sessions.component';
@@ -62,7 +61,6 @@ export class SessionCardComponent implements OnInit {
   @ViewChild(MatMenuTrigger)
   trigger: MatMenuTrigger;
 
-
   eSessionType = SessionType;
   eSessionStatus = SessionStatus;
   eOptionIds = optionBarIds;
@@ -87,6 +85,7 @@ export class SessionCardComponent implements OnInit {
   menuY: number;
 
   repository: Repository;
+
   private loggingService: LoggingService;
   private sessionFactory: SessionFactory;
   private fileService: FileService;
@@ -115,7 +114,7 @@ export class SessionCardComponent implements OnInit {
     this.azureCoreService = leappCoreService.azureCoreService;
   }
 
-  ngOnInit() {
+  public ngOnInit(): void {
     // Retrieve the singleton service for the concrete implementation of SessionService
     this.sessionService = this.sessionFactory.getSessionService(this.session.type);
 
@@ -124,13 +123,13 @@ export class SessionCardComponent implements OnInit {
     const azureLocations = this.azureCoreService.getLocations();
 
     // Get profiles
-    this.profiles = this.repository.getWorkspace().profiles;
+    this.profiles = this.repository.getProfiles();
 
     // Array and labels for regions and locations
     this.regionOrLocations = this.session.type !== SessionType.azure ? this.awsRegions : azureLocations;
     this.placeholder = this.session.type !== SessionType.azure ? 'Select a default region' : 'Select a default location';
 
-    // Pre selected Region and Profile
+    // Pre-selected Region and Profile
     this.selectedDefaultRegion = this.session.region;
     this.selectedProfile = this.getProfileId(this.session);
   }
@@ -138,7 +137,7 @@ export class SessionCardComponent implements OnInit {
   /**
    * Used to call for start or stop depending on sessions status
    */
-  switchCredentials() {
+  public switchCredentials(): void {
     if (this.session.status === SessionStatus.active) {
       this.stopSession();
     } else {
@@ -146,7 +145,7 @@ export class SessionCardComponent implements OnInit {
     }
   }
 
-  openOptionBar(session: Session) {
+  public openOptionBar(session: Session): void {
     this.clearOptionIds();
     optionBarIds[session.sessionId] = true;
     document.querySelector('.sessions').classList.add('option-bar-opened');
@@ -155,8 +154,8 @@ export class SessionCardComponent implements OnInit {
   /**
    * Start the selected sessions
    */
-  startSession() {
-    this.sessionService.start(this.session.sessionId).then((_) => {});
+  public startSession(): void {
+    this.sessionService.start(this.session.sessionId).then(() => {});
     this.logSessionData(this.session, `Starting Session`);
     this.trigger.closeMenu();
   }
@@ -164,8 +163,8 @@ export class SessionCardComponent implements OnInit {
   /**
    * Stop sessions
    */
-  stopSession() {
-    this.sessionService.stop(this.session.sessionId).then((_) => {});
+  public stopSession(): void {
+    this.sessionService.stop(this.session.sessionId).then(() => {});
     this.logSessionData(this.session, `Stopped Session`);
     this.trigger.closeMenu();
   }
@@ -176,7 +175,7 @@ export class SessionCardComponent implements OnInit {
    * @param session - the sessions to remove
    * @param event - for stopping propagation bubbles
    */
-  deleteSession(session, event) {
+  public deleteSession(session: Session, event: Event): void {
     event.preventDefault();
     event.stopPropagation();
     this.trigger.closeMenu();
@@ -185,7 +184,7 @@ export class SessionCardComponent implements OnInit {
 
     this.windowService.confirmDialog(dialogMessage, (status) => {
       if (status === constants.confirmed) {
-        this.sessionService.delete(session.sessionId).then((_) => {});
+        this.sessionService.delete(session.sessionId).then(() => {});
         this.logSessionData(session, 'Session Deleted');
         this.clearOptionIds();
       }
@@ -198,19 +197,20 @@ export class SessionCardComponent implements OnInit {
    * @param session - the sessions to edit
    * @param event - to remove propagation bubbles
    */
-  editSession(session: Session, event) {
+  public editSession(session: Session, event: Event): void {
     this.clearOptionIds();
     event.preventDefault();
     event.stopPropagation();
     this.trigger.closeMenu();
 
-    this.bsModalService.show(EditDialogComponent, { animated: false, class: 'edit-modal', initialState: { selectedSessionId: session.sessionId }});
+    this.bsModalService.show(EditDialogComponent,
+      { animated: false, class: 'edit-modal', initialState: { selectedSessionId: session.sessionId }});
   }
 
   /**
    * Copy credentials in the clipboard
    */
-  async copyCredentials(session: Session, type: number, event) {
+  public async copyCredentials(session: Session, type: number, event: Event): Promise<void> {
     event.preventDefault();
     event.stopPropagation();
     this.trigger.closeMenu();
@@ -219,6 +219,7 @@ export class SessionCardComponent implements OnInit {
       const workspace = this.repository.getWorkspace();
       if (workspace) {
         const texts = {
+          // eslint-disable-next-line max-len
           1: (session as AwsIamRoleFederatedSession).roleArn ? `${(session as AwsIamRoleFederatedSession).roleArn.split('/')[0].substring(13, 25)}` : '',
           2: (session as AwsIamRoleFederatedSession).roleArn ? `${(session as AwsIamRoleFederatedSession).roleArn}` : ''
         };
@@ -232,7 +233,10 @@ export class SessionCardComponent implements OnInit {
         }
 
         this.appService.copyToClipboard(text);
-        this.messageToasterService.toast('Your information have been successfully copied!', ToastLevel.success, 'Information copied!');
+        this.messageToasterService.toast(
+          'Your information have been successfully copied!',
+          ToastLevel.success,
+          'Information copied!');
       }
     } catch (err) {
       this.messageToasterService.toast(err, ToastLevel.warn);
@@ -243,16 +247,16 @@ export class SessionCardComponent implements OnInit {
   // ============================== //
   // ========== SSM AREA ========== //
   // ============================== //
-  addNewProfile(tag: string) {
+  public addNewProfile(tag: string): {id: string; name: string} {
     return {id: uuid.v4(), name: tag};
   }
 
   /**
    * SSM Modal open given the correct sessions
    *
-   * @param session - the sessions to check for possible ssm sessions
+   * @param event - event from click to stop before continuing
    */
-  ssmModalOpen(event, session) {
+  public ssmModalOpen(event: Event): void {
     event.preventDefault();
     event.stopPropagation();
     this.trigger.closeMenu();
@@ -268,9 +272,8 @@ export class SessionCardComponent implements OnInit {
   /**
    * SSM Modal open given the correct sessions
    *
-   * @param session - the sessions to check for possible ssm sessions
    */
-  changeRegionModalOpen(event, session) {
+  public changeRegionModalOpen(event: Event): void {
     event.preventDefault();
     event.stopPropagation();
     this.trigger.closeMenu();
@@ -285,7 +288,7 @@ export class SessionCardComponent implements OnInit {
    * @param event - the change select event
    * @param session - The sessions in which the aws region need to change
    */
-  async changeSsmRegion(event, session: Session) {
+  public async changeSsmRegion(event: Event, session: Session): Promise<void> {
 
     // We have a valid SSM region
     if (this.selectedSsmRegion) {
@@ -310,7 +313,7 @@ export class SessionCardComponent implements OnInit {
   /**
    * Set the region for the sessions
    */
-  async changeRegion() { // TODO: Use the brand new RegionService
+  public async changeRegion(): Promise<void> {
     if (this.selectedDefaultRegion) {
       let wasActive = false;
 
@@ -327,9 +330,9 @@ export class SessionCardComponent implements OnInit {
         }
       }
       this.repository.updateSessions(sessions);
+      this.workspaceService.updateSession(this.session.sessionId, this.session);
 
       this.session.region = this.selectedDefaultRegion;
-      this.workspaceService.updateSession(this.session.sessionId, this.session);
 
       if (wasActive) {
         this.startSession();
@@ -346,7 +349,7 @@ export class SessionCardComponent implements OnInit {
    * @param sessionId - id of the sessions
    * @param instanceId - instance id to start ssm sessions
    */
-  async startSsmSession(sessionId, instanceId) {
+  public async startSsmSession(sessionId: string, instanceId: string): Promise<void> {
     this.instances.forEach((instance) => {
      if (instance.InstanceId === instanceId) {
        instance.loading = true;
@@ -370,7 +373,8 @@ export class SessionCardComponent implements OnInit {
     this.ssmLoading = false;
   }
 
-  searchSSMInstance(event) {
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+  public searchSSMInstance(event): void {
     if (event.target.value !== '') {
       this.instances = this.duplicateInstances.filter((i) =>
                                  i.InstanceId.indexOf(event.target.value) > -1 ||
@@ -381,7 +385,7 @@ export class SessionCardComponent implements OnInit {
     }
   }
 
-  getProfileId(session: Session): string {
+  public getProfileId(session: Session): string {
     if(session.type !== SessionType.azure) {
       return (session as any).profileId;
     } else {
@@ -389,7 +393,7 @@ export class SessionCardComponent implements OnInit {
     }
   }
 
-  getProfileName(profileId: string): string {
+  public getProfileName(profileId: string): string {
     let profileName = constants.defaultAwsProfileName;
     try {
       profileName = this.repository.getProfileName(profileId);
@@ -397,7 +401,7 @@ export class SessionCardComponent implements OnInit {
     return profileName;
   }
 
-  async changeProfile() {
+  public async changeProfile(): Promise<void> {
     if (this.selectedProfile) {
       let wasActive = false;
 
@@ -432,7 +436,7 @@ export class SessionCardComponent implements OnInit {
     }
   }
 
-  changeProfileModalOpen(event) {
+  public changeProfileModalOpen(event: Event): void {
     event.preventDefault();
     event.stopPropagation();
     this.trigger.closeMenu();
@@ -440,20 +444,15 @@ export class SessionCardComponent implements OnInit {
     this.modalRef = this.modalService.show(this.defaultProfileModalTemplate, { class: 'ssm-modal'});
   }
 
-  goBack() {
+  public goBack(): void {
     this.modalRef.hide();
   }
 
-  getIcon(session: Session) {
-    const iconName = this.getProfileName(this.getProfileId(session)) === constants.defaultAwsProfileName ? 'home' : 'user';
-    return session.status === SessionStatus.active ? `${iconName} orange` : iconName;
-  }
-
-  getSessionTypeIcon(type: SessionType) {
+  public getSessionTypeIcon(type: SessionType): string {
     return type === SessionType.azure ? 'azure' : 'aws';
   }
 
-  getSessionProviderClass(type: SessionType) {
+  public getSessionProviderClass(type: SessionType): string {
     switch (type) {
       case SessionType.azure: return 'blue';
       case SessionType.awsIamUser: return 'orange';
@@ -463,7 +462,7 @@ export class SessionCardComponent implements OnInit {
     }
   }
 
-  getSessionProviderLabel(type: SessionType) {
+  public getSessionProviderLabel(type: SessionType): string {
     switch (type) {
       case SessionType.azure: return 'Azure';
       case SessionType.awsIamUser: return 'IAM User';
@@ -473,13 +472,14 @@ export class SessionCardComponent implements OnInit {
     }
   }
 
-  copyProfile(profileName: string) {
+  public copyProfile(profileName: string): void {
     this.appService.copyToClipboard(profileName);
     this.messageToasterService.toast('Profile name copied!', ToastLevel.success, 'Information copied!');
     this.trigger.closeMenu();
   }
 
-  openContextMenu(event, session) {
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+  public openContextMenu(event): void {
     this.appService.closeAllMenuTriggers();
 
     setTimeout(() => {
@@ -491,39 +491,25 @@ export class SessionCardComponent implements OnInit {
     }, 100);
   }
 
-
-
-  pinSession(session: Session, event: MouseEvent) {
+  public pinSession(session: Session, event: MouseEvent): void {
     event.preventDefault();
     event.stopPropagation();
     this.workspaceService.pinSession(session);
     this.trigger.closeMenu();
   }
 
-  unpinSession(session: Session, event: MouseEvent) {
+  public unpinSession(session: Session, event: MouseEvent): void {
     event.preventDefault();
     event.stopPropagation();
     this.workspaceService.unpinSession(session);
     this.trigger.closeMenu();
   }
 
-  clearOptionIds() {
+  public clearOptionIds(): void {
     for (const prop of Object.getOwnPropertyNames(optionBarIds)) {
       optionBarIds[prop] = false;
     }
     document.querySelector('.sessions').classList.remove('option-bar-opened');
-  }
-
-  openAmazonConsole(event: MouseEvent, session: Session) {
-    event.preventDefault();
-    event.stopPropagation();
-    this.trigger.closeMenu();
-  }
-
-  openTerminal(event: MouseEvent, session: Session) {
-    event.preventDefault();
-    event.stopPropagation();
-    this.trigger.closeMenu();
   }
 
   private logSessionData(session: Session, message: string): void {
@@ -552,6 +538,7 @@ export class SessionCardComponent implements OnInit {
     if (iamRoleChainedSessionString !== '') {
       return 'This sessions has iamRoleChained sessions: <br><ul>' +
         iamRoleChainedSessionString +
+        // eslint-disable-next-line max-len
         '</ul><br>Removing the sessions will also remove the iamRoleChained sessions associated with it. Do you want to proceed?';
     } else {
       return 'Do you really want to delete this session?';
