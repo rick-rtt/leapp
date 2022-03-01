@@ -131,7 +131,8 @@
     "postpack": "gushio gushio/target-post-pack.js",
     "version": "oclif readme && git add README.md",
     "list-session": "./bin/dev session list",
-    "integration-sync": "./bin/dev integration sync"
+    "integration-sync": "./bin/dev integration sync",
+    "idp-url-edit": "./bin/dev idp-url edit"
   },
   "types": "dist/index.d.ts"
 }

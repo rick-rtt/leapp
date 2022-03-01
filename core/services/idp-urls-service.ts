@@ -7,66 +7,52 @@ import {AwsIamRoleFederatedSession} from '../models/aws-iam-role-federated-sessi
 
 export class IdpUrlsService {
 
-    constructor(private sessionFactory: SessionFactory, private repository: Repository) {
-    }
+  constructor(private sessionFactory: SessionFactory, private repository: Repository) {
+  }
 
-    public getIdpUrls(): IdpUrl[] {
-        return this.repository.getIdpUrls()
-    }
+  public getIdpUrls(): IdpUrl[] {
+    return this.repository.getIdpUrls()
+  }
 
-    createIdpUrl(idpUrl: string): IdpUrl {
-        const validIdpUrl = this.validateNewIdpUrl(idpUrl)
-        const newIdpUrl = new IdpUrl(this.getNewId(), validIdpUrl)
-        this.repository.addIdpUrl(newIdpUrl)
-        return newIdpUrl
-    }
+  public createIdpUrl(idpUrl: string): IdpUrl {
+    const newIdpUrl = new IdpUrl(this.getNewId(), idpUrl.trim())
+    this.repository.addIdpUrl(newIdpUrl)
+    return newIdpUrl
+  }
 
-    editIdpUrl(id: string, newIdpUrl: string) {
-        const validIdpUrl = this.validateNewIdpUrl(newIdpUrl)
-        this.repository.updateIdpUrl(id, validIdpUrl)
-    }
+  public editIdpUrl(id: string, newIdpUrl: string) {
+    this.repository.updateIdpUrl(id, newIdpUrl.trim())
+  }
 
-    getDependantSessions(idpUrlId: string, includingChained: boolean = true): Session[] {
-        const dependantSessions = this.repository.getSessions()
-            .filter(session => (session as AwsIamRoleFederatedSession).idpUrlId === idpUrlId)
-        return includingChained ? dependantSessions
-                .flatMap(parentSession => [parentSession, ...this.repository.listIamRoleChained(parentSession)]) :
-            dependantSessions
+  public async deleteIdpUrl(id: string) {
+    for (const sessionToDelete of this.getDependantSessions(id, false)) {
+      const sessionService = this.sessionFactory.getSessionService(sessionToDelete.type)
+      await sessionService.delete(sessionToDelete.sessionId)
     }
+    this.repository.removeIdpUrl(id)
+  }
 
-    async deleteIdpUrl(id: string) {
-        for (const sessionToDelete of this.getDependantSessions(id, false)) {
-            const sessionService = this.sessionFactory.getSessionService(sessionToDelete.type)
-            await sessionService.delete(sessionToDelete.sessionId)
-        }
-        this.repository.removeIdpUrl(id)
+  public validateIdpUrl(url: string): boolean | string {
+    const trimmedUrl = url.trim()
+    if (trimmedUrl.length === 0) {
+      return 'Empty IdP URL'
     }
+    const existingUrls = this.getIdpUrls().map(idpUrl => idpUrl.url)
+    if (existingUrls.includes(trimmedUrl)) {
+      return 'IdP URL already exists'
+    }
+    return true
+  }
 
-    getNewId() {
-        return uuid.v4()
-    }
+  public getDependantSessions(idpUrlId: string, includingChained: boolean = true): Session[] {
+    const dependantSessions = this.repository.getSessions()
+      .filter(session => (session as AwsIamRoleFederatedSession).idpUrlId === idpUrlId)
+    return includingChained ? dependantSessions
+        .flatMap(parentSession => [parentSession, ...this.repository.listIamRoleChained(parentSession)]) :
+      dependantSessions
+  }
 
-    validateNewIdpUrl(url: string) {
-        const trimmedUrl = url.trim()
-        if (trimmedUrl.length === 0) {
-            throw new EmptyIdpUrlError()
-        }
-        const existingUrls = this.getIdpUrls().map(idpUrl => idpUrl.url)
-        if (existingUrls.includes(trimmedUrl)) {
-            throw new IdpUrlAlreadyExistsError()
-        }
-        return trimmedUrl
-    }
-}
-
-export class EmptyIdpUrlError extends Error {
-    constructor() {
-        super('Empty IdP URL')
-    }
-}
-
-export class IdpUrlAlreadyExistsError extends Error {
-    constructor() {
-        super('IdP URL already exists')
-    }
+  private getNewId() {
+    return uuid.v4()
+  }
 }

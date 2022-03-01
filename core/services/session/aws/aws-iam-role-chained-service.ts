@@ -106,8 +106,7 @@ export class AwsIamRoleChainedService extends AwsSessionService {
     return this.generateSessionToken(sts, params)
   }
 
-  removeSecrets(sessionId: string): void {
-  }
+  removeSecrets(sessionId: string): void {}
 
   private async generateSessionToken(sts, params): Promise<CredentialsInfo> {
     try {

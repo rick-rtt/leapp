@@ -143,6 +143,5 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
     return AwsIamRoleFederatedService.sessionTokenFromGetSessionTokenResponse(assumeRoleWithSamlResponse)
   }
 
-  removeSecrets(sessionId: string): void {
-  }
+  removeSecrets(sessionId: string): void {}
 }
