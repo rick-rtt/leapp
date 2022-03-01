@@ -19,19 +19,19 @@ import {Repository} from '@noovolari/leapp-core/services/repository';
   styleUrls: ['./edit-dialog.component.scss']
 })
 export class EditDialogComponent implements OnInit {
-  @ViewChild('roleInput', {static: false}) roleInput: ElementRef;
+  @ViewChild('roleInput', {static: false})
+  public roleInput: ElementRef;
 
   @Input()
-  selectedSessionId: string;
+  public selectedSessionId: string;
 
-  accountType = SessionType.awsIamUser;
-  provider = SessionType.awsIamRoleFederated;
-  selectedSession: AwsIamUserSession;
-  selectedAccountNumber = '';
-  selectedRole = '';
-  selectedRegion;
-  regions = [];
-  workspace: Workspace;
+  public accountType = SessionType.awsIamUser;
+  public provider = SessionType.awsIamRoleFederated;
+  public selectedSession: AwsIamUserSession;
+  public selectedAccountNumber = '';
+  public selectedRegion;
+  public regions = [];
+  public workspace: Workspace;
 
   public form = new FormGroup({
     secretKey: new FormControl('', [Validators.required]),
@@ -58,9 +58,9 @@ export class EditDialogComponent implements OnInit {
     this.repository = this.leappCoreService.repository;
   }
 
-  ngOnInit() {
+  public ngOnInit(): void  {
     // Get the workspace and the account you need
-    this.selectedSession = this.workspaceService.sessions.find((session) => session.sessionId === this.selectedSessionId) as AwsIamUserSession;
+    this.selectedSession = this.repository.getSessionById(this.selectedSessionId) as AwsIamUserSession;
 
     // Get the region
     this.regions = this.leappCoreService.awsCoreService.getRegions();
@@ -71,22 +71,27 @@ export class EditDialogComponent implements OnInit {
     this.form.controls['name'].setValue(this.selectedSession.sessionName);
     this.form.controls['mfaDevice'].setValue(this.selectedSession.mfaDevice);
 
+    // eslint-disable-next-line max-len
     this.keychainService.getSecret(constants.appName, `${this.selectedSession.sessionId}-iam-user-aws-session-access-key-id`).then((value) => {
       this.form.controls['accessKey'].setValue(value);
     });
+    // eslint-disable-next-line max-len
     this.keychainService.getSecret(constants.appName, `${this.selectedSession.sessionId}-iam-user-aws-session-secret-access-key`).then((value) => {
       this.form.controls['secretKey'].setValue(value);
     });
   }
+
   /**
    * Save the edited account in the workspace
    */
-  saveAccount() {
+  public saveAccount(): void {
     if (this.formValid()) {
       this.selectedSession.sessionName =  this.form.controls['name'].value;
       this.selectedSession.region      =  this.selectedRegion;
       this.selectedSession.mfaDevice   =  this.form.controls['mfaDevice'].value;
+      // eslint-disable-next-line max-len
       this.keychainService.saveSecret(constants.appName, `${this.selectedSession.sessionId}-iam-user-aws-session-access-key-id`, this.form.controls['accessKey'].value).then((_) => {});
+      // eslint-disable-next-line max-len
       this.keychainService.saveSecret(constants.appName, `${this.selectedSession.sessionId}-iam-user-aws-session-secret-access-key`, this.form.controls['secretKey'].value).then((_) => {});
 
       this.repository.updateSession(this.selectedSession.sessionId, this.selectedSession);
@@ -99,7 +104,7 @@ export class EditDialogComponent implements OnInit {
     }
   }
 
-  formValid() {
+  public formValid(): boolean {
     return this.form.get('name').valid &&
       this.selectedRegion &&
       this.form.get('mfaDevice').valid &&
@@ -107,20 +112,11 @@ export class EditDialogComponent implements OnInit {
       this.form.get('secretKey').valid;
   }
 
-  goBack() {
+  public goBack(): void {
     this.appService.closeModal();
   }
 
-  getNameForProvider(provider: SessionType) {
-    switch (provider) {
-      case SessionType.azure: return 'Microsoft Azure session';
-      case SessionType.google: return 'Google Cloud session';
-      case SessionType.alibaba: return 'Alibaba Cloud session';
-      default: return 'Amazon AWS session';
-    }
-  }
-
-  getIconForProvider(provider: SessionType) {
+  public getIconForProvider(provider: SessionType): string {
     switch (provider) {
       case SessionType.azure: return 'azure-logo.svg';
       case SessionType.google: return 'google.png';
@@ -129,12 +125,8 @@ export class EditDialogComponent implements OnInit {
     }
   }
 
-  closeModal() {
+  public closeModal(): void {
     this.appService.closeModal();
-  }
-
-  openAccessStrategyDocumentation() {
-    this.windowService.openExternalUrl('https://github.com/Noovolari/leapp/blob/master/README.md');
   }
 }
 

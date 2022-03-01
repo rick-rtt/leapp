@@ -15,7 +15,7 @@ import { AwsAuthenticationService } from './session/aws/aws-authentication.servi
 import { AwsParentSessionFactory } from '@noovolari/leapp-core/services/session/aws/aws-parent-session.factory';
 import { AwsIamRoleChainedService } from '@noovolari/leapp-core/services/session/aws/aws-iam-role-chained-service';
 import { Repository } from '@noovolari/leapp-core/services/repository';
-import { AwsSsoOidcService } from '@noovolari/leapp-core/services/session/aws/aws-sso-oidc.service';
+import { AwsSsoOidcService } from '@noovolari/leapp-core/services/aws-sso-oidc.service';
 import { AwsSsoRoleService } from '@noovolari/leapp-core/services/session/aws/aws-sso-role-service';
 import { VerificationWindowService } from './verification-window.service';
 import { WorkspaceService } from '@noovolari/leapp-core/services/workspace-service';

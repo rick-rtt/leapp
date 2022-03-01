@@ -10,7 +10,7 @@ import { AwsIamRoleChainedSession } from '@noovolari/leapp-core/models/aws-iam-r
   name: 'detail'
 })
 export class DetailPipe implements PipeTransform {
-  transform(session: Session): string {
+  public transform(session: Session): string {
     switch (session.type) {
       case(SessionType.awsIamRoleFederated):
         return (session as AwsIamRoleFederatedSession).roleArn.split('role/')[1];
