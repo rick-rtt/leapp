@@ -26,11 +26,12 @@ export class MessageToasterService {
    * @param type - the type of message from Toast Level
    * @param title - [optional]
    */
-  toast(message: string, type: ToastLevel | LoggerLevel, title?: string): void {
+  public toast(message: string, type: ToastLevel | LoggerLevel, title?: string): void {
     switch (type) {
       case ToastLevel.success: this.openSnackBar(message, title, 'toast-success'); break;
       case ToastLevel.info || LoggerLevel.info: this.openSnackBar(message, title, 'toast-info'); break;
       case ToastLevel.warn || LoggerLevel.warn: this.openSnackBar(message, title, 'toast-warning'); break;
+      // eslint-disable-next-line max-len
       case ToastLevel.error || LoggerLevel.error: this.openSnackBar(message, title ? title : 'Invalid Action!', 'toast-error'); break;
       default: this.openSnackBar(message, title, 'toast-error'); break;
     }

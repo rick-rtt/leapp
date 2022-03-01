@@ -18,7 +18,6 @@ export class AppService {
   profileOpen: EventEmitter<boolean> = new EventEmitter<boolean>();
 
   /* Is used to detect if application is in compact or full mode */
-  private _compactMode: boolean;
   private triggers: MatMenuTrigger[];
 
   /* This service is defined to provide different app wide methods as utilities */
@@ -42,6 +41,7 @@ export class AppService {
       };
 
       this.electronService.log.transports.console.format = '[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{processType}] {text}';
+      // eslint-disable-next-line max-len
       this.electronService.log.transports.file.format = '[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] [{processType}] {text}';
       this.electronService.log.transports.file.resolvePath = () => logPaths[this.detectOs()];
     }
@@ -51,30 +51,30 @@ export class AppService {
   /**
    * Return the app object from node
    */
-  getApp() {
+  public getApp(): any {
     return this.electronService.app;
   }
 
   // TODO: get directly from electronService
-  getMenu() {
+  public getMenu(): any {
     return this.electronService.menu;
   }
 
-  isDarkMode() {
+  public isDarkMode(): boolean {
     return this.electronService.nativeTheme.shouldUseDarkColors;
   }
 
   /**
    * Return the dialog native object
    */
-  getDialog() {
+  public getDialog(): any {
     return this.electronService.dialog;
   }
 
   /**
-   * Return the type of OS in human readable form
+   * Return the type of OS in human-readable form
    */
-  detectOs() {
+  public detectOs(): string {
     const hrNames = {
       linux: constants.linux,
       darwin: constants.mac,
@@ -87,19 +87,19 @@ export class AppService {
   /**
    * Quit the app
    */
-  quit() {
+  public quit(): void {
     this.electronService.app.exit(0);
   }
 
   /**
    * Restart the app
    */
-  restart() {
+  public restart(): void {
     this.electronService.app.relaunch();
     this.electronService.app.exit(0);
   }
 
-  public async logout() {
+  public async logout(): Promise<void> {
     try {
       // Clear all extra data
       const getAppPath = this.electronService.path.join(this.electronService.app.getPath('appData'), constants.appName);
@@ -111,15 +111,18 @@ export class AppService {
       // Clean localStorage
       localStorage.clear();
 
-      this.messageToasterService.toast('Cache and configuration file cleaned.', ToastLevel.success, 'Cleaning configuration file');
+      this.messageToasterService.toast(
+        'Cache and configuration file cleaned.', ToastLevel.success, 'Cleaning configuration file');
 
       // Restart
       setTimeout(() => {
         this.restart();
       }, 2000);
     } catch (err) {
-      this.loggingService.logger(`Leapp has an error re-creating your configuration file and cache.`, LoggerLevel.error, this, err.stack);
-      this.messageToasterService.toast(`Leapp has an error re-creating your configuration file and cache.`, ToastLevel.error, 'Cleaning configuration file');
+      this.loggingService.logger(`Leapp has an error re-creating your configuration file and cache.`,
+        LoggerLevel.error, this, err.stack);
+      this.messageToasterService.toast(`Leapp has an error re-creating your configuration file and cache.`,
+        ToastLevel.error, 'Cleaning configuration file');
     }
   }
 
@@ -128,7 +131,7 @@ export class AppService {
    *
    * @returns the semver object
    */
-  semVer() {
+  public semVer(): any {
     return this.electronService.semver;
   }
 
@@ -137,7 +140,7 @@ export class AppService {
    *
    * @param text - the element to copy to clipboard
    */
-  copyToClipboard(text: string) {
+  public copyToClipboard(text: string): void {
     const selBox = document.createElement('textarea');
     selBox.style.position = 'fixed';
     selBox.style.left = '0';
@@ -156,7 +159,7 @@ export class AppService {
    *
    * @param formGroup - the form formGroup
    */
-  validateAllFormFields(formGroup: FormGroup) {
+  public validateAllFormFields(formGroup: FormGroup): void {
     Object.keys(formGroup.controls).forEach((field) => {
       const control = formGroup.get(field);
       if (control instanceof FormControl) {
@@ -171,7 +174,7 @@ export class AppService {
    * To use EC2 services with the client you need to change the
    * request header because the origin for electron app is of type file
    */
-  setFilteringForEc2Calls() {
+  public setFilteringForEc2Calls(): void {
     // Modify the user agent for all requests to the following urls.
     const filter = {urls: ['https://*.amazonaws.com/']};
     this.electronService.session.defaultSession.webRequest.onBeforeSendHeaders(filter, (details, callback) => {
@@ -186,7 +189,7 @@ export class AppService {
    * @param url - the url to point to launch the window with the protocol, it can also be a file://
    * @returns return a new browser window
    */
-  newInvisibleWindow(url: string) {
+  public newInvisibleWindow(url: string): void {
     const win = new this.electronService.browserWindow({ width: 1, height: 1, show: false });
     win.loadURL(url);
     return win;
@@ -198,18 +201,19 @@ export class AppService {
    * @param token - a string token
    * @returns the json object decoded
    */
-  parseJwt(token) {
+  public parseJwt(token: string): any {
     const base64Url = token.split('.')[1];
     const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    const jsonPayload = decodeURIComponent(atob(base64).split('').map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+    const jsonPayload = decodeURIComponent(atob(base64).split('')
+      .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
     return JSON.parse(jsonPayload);
   }
 
-  closeModal() {
+  public closeModal(): void {
     (this.modalService as any).loaders.forEach((loader) => loader.instance.hide());
   }
 
-  about() {
+  public about(): void {
     const version = this.getApp().getVersion();
     this.windowService.getCurrentWindow().show();
     this.getDialog().showMessageBox({
@@ -219,11 +223,11 @@ export class AppService {
     });
   }
 
-  setMenuTrigger(trigger) {
+  public setMenuTrigger(trigger: MatMenuTrigger): void {
     this.triggers.push(trigger);
   }
 
-  closeAllMenuTriggers() {
+  public closeAllMenuTriggers(): void {
     this.triggers.forEach((t) => {
       t.closeMenu();
     });

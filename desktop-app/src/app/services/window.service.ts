@@ -1,18 +1,18 @@
-import { Injectable } from '@angular/core'
-import { ElectronService } from './electron.service'
-import { environment } from '../../environments/environment'
-import { ConfirmationDialogComponent } from '../components/dialogs/confirmation-dialog/confirmation-dialog.component'
-import { BsModalService } from 'ngx-bootstrap/modal'
-import { LoggerLevel } from '@noovolari/leapp-core/services/logging-service'
+import { Injectable } from '@angular/core';
+import { ElectronService } from './electron.service';
+import { environment } from '../../environments/environment';
+import { ConfirmationDialogComponent } from '../components/dialogs/confirmation-dialog/confirmation-dialog.component';
+import { BsModalService } from 'ngx-bootstrap/modal';
+import { LoggerLevel } from '@noovolari/leapp-core/services/logging-service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class WindowService {
 
-  private currentWindow: any
+  private currentWindow: any;
 
-  public constructor(private modalService: BsModalService, private electronService: ElectronService) {
+  constructor(private modalService: BsModalService, private electronService: ElectronService) {
   }
 
   /**
@@ -23,10 +23,9 @@ export class WindowService {
    * @param title - the window title
    * @param x - position x
    * @param y - position y
-   * @param javascript - javascript to be run when the window starts
    * @returns return a new browser window
    */
-  public newWindow(url: string, show: boolean, title?: string, x?: number, y?: number, javascript?: string) {
+  public newWindow(url: string, show: boolean, title?: string, x?: number, y?: number): any {
     const opts = {
       width: 514,
       height: 550,
@@ -39,24 +38,24 @@ export class WindowService {
         worldSafeExecuteJavaScript: true,
         partition: `persist:Leapp-${btoa(url)}`
       }
-    }
+    };
 
     if (x && y) {
       Object.assign(opts, {
         x: x + 50,
         y: y + 50
-      })
+      });
     }
 
     if (this.currentWindow) {
       try {
-        this.currentWindow.close()
+        this.currentWindow.close();
       } catch (e) {
       }
-      this.currentWindow = null
+      this.currentWindow = null;
     }
-    this.currentWindow = new this.electronService.browserWindow(opts)
-    return this.currentWindow
+    this.currentWindow = new this.electronService.browserWindow(opts);
+    return this.currentWindow;
   }
 
   public getCurrentWindow(): any {
