@@ -6,7 +6,7 @@ describe('LoginIntegration', () => {
   test('selectIntegration', async () => {
     const integration = {alias: 'integration1'}
     const leappCliService: any = {
-      awsIntegrationsService: {
+      awsSsoIntegrationService: {
         getOfflineIntegrations: jest.fn(() => [integration]),
       },
       inquirer: {
@@ -25,13 +25,13 @@ describe('LoginIntegration', () => {
     const command = new LoginIntegration([], {} as any, leappCliService)
     const selectedIntegration = await command.selectIntegration()
 
-    expect(leappCliService.awsIntegrationsService.getOfflineIntegrations).toHaveBeenCalled()
+    expect(leappCliService.awsSsoIntegrationService.getOfflineIntegrations).toHaveBeenCalled()
     expect(selectedIntegration).toBe(integration)
   })
 
   test('selectIntegration, no integrations', async () => {
     const leappCliService: any = {
-      awsIntegrationsService: {
+      awsSsoIntegrationService: {
         getOfflineIntegrations: jest.fn(() => []),
       },
     }
@@ -43,8 +43,8 @@ describe('LoginIntegration', () => {
   test('login', async () => {
     const sessionsSynced = ['session1', 'session2']
     const leappCliService: any = {
-      awsIntegrationsService: {
-        sync: jest.fn(async () => sessionsSynced),
+      awsSsoIntegrationService: {
+        loginAndGetOnlineSessions: jest.fn(async () => sessionsSynced),
       },
       cliVerificationWindowService: {
         closeBrowser: jest.fn(),
@@ -58,7 +58,7 @@ describe('LoginIntegration', () => {
     await command.login(integration)
 
     expect(command.log).toHaveBeenNthCalledWith(1, 'waiting for browser authorization using your AWS sign-in...')
-    expect(leappCliService.awsIntegrationsService.sync).toHaveBeenCalledWith(integration.id)
+    expect(leappCliService.awsSsoIntegrationService.loginAndGetOnlineSessions).toHaveBeenCalledWith(integration.id)
     expect(command.log).toHaveBeenLastCalledWith('login successful (2 sessions ready to be synchronized)')
     expect(leappCliService.cliVerificationWindowService.closeBrowser).toHaveBeenCalled()
   })

@@ -39,11 +39,11 @@ export class AwsIamRoleChainedService extends AwsSessionService {
       request.roleArn, request.profileId, request.parentSessionId, request.roleSessionName)
 
     this.repository.addSession(session)
-    this.iSessionNotifier?.addSession(session)
+    this.sessionNotifier?.addSession(session)
   }
 
   async applyCredentials(sessionId: string, credentialsInfo: CredentialsInfo): Promise<void> {
-    const session = this.iSessionNotifier.getSessionById(sessionId)
+    const session = this.sessionNotifier.getSessionById(sessionId)
     const profileName = this.repository.getProfileName((session as AwsIamRoleChainedSession).profileId)
     const credentialObject = {}
     credentialObject[profileName] = {
@@ -59,7 +59,7 @@ export class AwsIamRoleChainedService extends AwsSessionService {
   }
 
   async deApplyCredentials(sessionId: string): Promise<void> {
-    const session = this.iSessionNotifier.getSessionById(sessionId)
+    const session = this.sessionNotifier.getSessionById(sessionId)
     const profileName = this.repository.getProfileName((session as AwsIamRoleChainedSession).profileId)
     const credentialsFile = await this.fileService.iniParseSync(this.awsCoreService.awsCredentialPath())
     delete credentialsFile[profileName]
@@ -68,12 +68,12 @@ export class AwsIamRoleChainedService extends AwsSessionService {
 
   async generateCredentials(sessionId: string): Promise<CredentialsInfo> {
     // Retrieve Session
-    const session = this.iSessionNotifier.getSessionById(sessionId)
+    const session = this.sessionNotifier.getSessionById(sessionId)
 
     // Retrieve Parent Session
     let parentSession: Session
     try {
-      parentSession = this.iSessionNotifier.getSessionById((session as AwsIamRoleChainedSession).parentSessionId)
+      parentSession = this.sessionNotifier.getSessionById((session as AwsIamRoleChainedSession).parentSessionId)
     } catch (err) {
       throw new LeappNotFoundError(this, `Parent Account Session  not found for Chained Account ${session.sessionName}`)
     }

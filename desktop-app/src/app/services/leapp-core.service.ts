@@ -23,7 +23,7 @@ import {SessionFactory} from '@noovolari/leapp-core/services/session-factory';
 import {RotationService} from '@noovolari/leapp-core/services/rotation-service';
 import {AzureCoreService} from '@noovolari/leapp-core/services/azure-core-service';
 import {constants} from '@noovolari/leapp-core/models/constants';
-import {AwsIntegrationsService} from '@noovolari/leapp-core/services/aws-integrations-service';
+import {AwsSsoIntegrationService} from '@noovolari/leapp-core/services/aws-sso-integration-service';
 
 @Injectable({
   providedIn: 'root',
@@ -35,7 +35,7 @@ export class LeappCoreService {
   private awsIamRoleFederatedServiceInstance: AwsIamRoleFederatedService;
   private awsIamRoleChainedServiceInstance: AwsIamRoleChainedService;
   private awsSsoRoleServiceInstance: AwsSsoRoleService;
-  private awsIntegrationsServiceInstance: AwsIntegrationsService;
+  private awsSsoIntegrationServiceInstance: AwsSsoIntegrationService;
   private awsSsoOidcServiceInstance: AwsSsoOidcService;
   private awsCoreServiceInstance: AwsCoreService;
   private azureServiceInstance: AzureService;
@@ -86,19 +86,18 @@ export class LeappCoreService {
     return this.awsIamRoleChainedServiceInstance;
   }
 
-  public get awsIntegrationsService(): AwsIntegrationsService {
-    if (!this.awsIntegrationsServiceInstance) {
-      this.awsIntegrationsServiceInstance = new AwsIntegrationsService(this.repository, this.awsSsoOidcService,
-        this.keyChainService, this.workspaceService, this.electronService);
+  public get awsSsoIntegrationService(): AwsSsoIntegrationService {
+    if (!this.awsSsoIntegrationServiceInstance) {
+      this.awsSsoIntegrationServiceInstance = new AwsSsoIntegrationService(this.repository, this.awsSsoOidcService,
+        this.awsSsoRoleService, this.keyChainService, this.workspaceService, this.electronService);
     }
-    return this.awsIntegrationsServiceInstance;
+    return this.awsSsoIntegrationServiceInstance;
   }
 
   public get awsSsoRoleService(): AwsSsoRoleService {
     if (!this.awsSsoRoleServiceInstance) {
       this.awsSsoRoleServiceInstance = new AwsSsoRoleService(this.workspaceService, this.repository, this.fileService,
-        this.keyChainService, this.awsCoreService, this.electronService, this.awsSsoOidcService,
-        this.awsIntegrationsService);
+        this.keyChainService, this.awsCoreService, this.electronService, this.awsSsoOidcService);
     }
     return this.awsSsoRoleServiceInstance;
   }

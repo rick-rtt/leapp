@@ -1,5 +1,5 @@
 import {Repository} from './repository'
-import {LoginResponse, SsoRoleSession} from './session/aws/aws-sso-role-service'
+import {AwsSsoRoleService, LoginResponse, SsoRoleSession} from './session/aws/aws-sso-role-service'
 import {AwsSsoIntegration} from '../models/aws-sso-integration'
 import {formatDistance} from 'date-fns'
 import {INativeService} from '../interfaces/i-native-service'
@@ -17,13 +17,13 @@ import {SessionType} from '../models/session-type'
 import {AwsSsoRoleSession} from '../models/aws-sso-role-session'
 import {ISessionNotifier} from '../interfaces/i-session-notifier'
 
-export class AwsIntegrationsService {
+export class AwsSsoIntegrationService {
 
   private ssoPortal: SSO
 
   constructor(private repository: Repository, private awsSsoOidcService: AwsSsoOidcService,
-              private keyChainService: KeychainService, private iSessionNotifier: ISessionNotifier,
-              private nativeService: INativeService) {
+              private awsSsoRoleService: AwsSsoRoleService, private keyChainService: KeychainService,
+              private iSessionNotifier: ISessionNotifier, private nativeService: INativeService) {
   }
 
   public getIntegrations(): AwsSsoIntegration[] {
@@ -52,10 +52,55 @@ export class AwsIntegrationsService {
     const region = this.repository.getAwsSsoConfiguration(integrationId).region
     const portalUrl = this.repository.getAwsSsoConfiguration(integrationId).portalUrl
     const accessToken = await this.getAccessToken(integrationId, region, portalUrl)
-    return await this.getSessions(integrationId, accessToken, region)
+    const onlineSessions = await this.getSessions(integrationId, accessToken, region)
+
+    const persistedSessions = this.repository.getAwsSsoIntegrationSessions(integrationId)
+    const sessionsToBeDeleted: SsoRoleSession[] = []
+
+    for (let i = 0; i < persistedSessions.length; i++) {
+      const persistedSession = persistedSessions[i]
+      const shouldBeDeleted = onlineSessions.filter(s =>
+        (persistedSession as unknown as SsoRoleSession).sessionName === s.sessionName &&
+        (persistedSession as unknown as SsoRoleSession).roleArn === s.roleArn &&
+        (persistedSession as unknown as SsoRoleSession).email === s.email).length === 0
+
+      if (shouldBeDeleted) {
+        sessionsToBeDeleted.push(persistedSession as unknown as SsoRoleSession)
+
+        const iamRoleChainedSessions = this.repository.listIamRoleChained(persistedSession)
+
+        for (let j = 0; j < iamRoleChainedSessions.length; j++) {
+          await this.awsSsoRoleService.delete(iamRoleChainedSessions[j].sessionId)
+        }
+
+        await this.awsSsoRoleService.stop(persistedSession.sessionId)
+        this.repository.deleteSession(persistedSession.sessionId)
+      }
+    }
+
+    const finalSessions = []
+
+    for (let j = 0; j < onlineSessions.length; j++) {
+      const session = onlineSessions[j]
+      let found = false
+      for (let i = 0; i < persistedSessions.length; i++) {
+        const persistedSession = persistedSessions[i]
+        if ((persistedSession as unknown as SsoRoleSession).sessionName === session.sessionName &&
+          (persistedSession as unknown as SsoRoleSession).roleArn === session.roleArn &&
+          (persistedSession as unknown as SsoRoleSession).email === session.email) {
+          found = true
+          break
+        }
+      }
+      if (!found) {
+        finalSessions.push(session)
+      }
+    }
+
+    return finalSessions
   }
 
-  public async logout(integrationId: string | number, onLogoutComplete: () => Promise<void>): Promise<void> {
+  public async logout(integrationId: string | number): Promise<void> {
     // Obtain region and access token
     const configuration: AwsSsoIntegration = this.repository.getAwsSsoConfiguration(integrationId)
     const region = configuration.region
@@ -76,7 +121,7 @@ export class AwsIntegrationsService {
       this.keyChainService.deletePassword(constants.appName, 'aws-sso-access-token')
       this.repository.unsetAwsSsoIntegrationExpiration(integrationId.toString())
 
-      await onLogoutComplete()
+      await this.awsSsoRoleService.removeSsoSessionsFromWorkspace()
     })
   }
 
