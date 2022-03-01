@@ -71,10 +71,12 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
               private leappCoreService: LeappCoreService) { }
 
   public ngOnInit(): void {
+    // TODO: probably integrationsFilter is no more needed
     this.subscription = integrationsFilter.subscribe(() => {
       this.setValues();
       this.selectedIntegrations = this.awsSsoConfigurations.map((awsIntegration) => ({ id: awsIntegration.id, selected: false }));
     });
+
     integrationsFilter.next(this.leappCoreService.repository.listAwsSsoConfigurations());
 
     this.subscription2 = openIntegrationEvent.subscribe((value) => {
@@ -150,6 +152,7 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
 
   public async logout(configurationId: string): Promise<void> {
     this.logoutLoadings[configurationId] = true;
+
     this.selectedAwsSsoConfiguration = this.leappCoreService.repository.getAwsSsoConfiguration(configurationId);
     await this.leappCoreService.awsSsoRoleService.logout(this.selectedAwsSsoConfiguration.id);
 
@@ -279,6 +282,7 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
           browserOpening
         );
       }
+
       integrationsFilter.next(this.leappCoreService.repository.listAwsSsoConfigurations());
       this.modalRef.hide();
     } else {
@@ -293,8 +297,12 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
       if (res !== constants.confirmClosed) {
         // eslint-disable-next-line max-len
         this.leappCoreService.loggingService.logger(`Removing sessions with attached aws sso config id: ${awsSsoConfiguration.id}`, LoggerLevel.info, this);
+
         await this.logout(awsSsoConfiguration.id);
+
         this.leappCoreService.repository.deleteAwsSsoIntegration(awsSsoConfiguration.id);
+        integrationsFilter.next(this.leappCoreService.repository.listAwsSsoConfigurations());
+
         this.modifying = 0;
       }
     }, 'Delete Configuration', 'Cancel');
