@@ -20,7 +20,7 @@ $ npm install -g leapp
 $ leapp COMMAND
 running command...
 $ leapp (--version)
-leapp/0.1.0 darwin-x64 node-v16.14.0
+leapp/0.1.0 win32-x64 node-v16.14.0
 $ leapp --help [COMMAND]
 USAGE
   $ leapp COMMAND
@@ -36,6 +36,7 @@ USAGE
 * [`leapp integration create`](#leapp-integration-create)
 * [`leapp integration list`](#leapp-integration-list)
 * [`leapp integration login`](#leapp-integration-login)
+* [`leapp integration logout`](#leapp-integration-logout)
 * [`leapp profile create`](#leapp-profile-create)
 * [`leapp profile delete`](#leapp-profile-delete)
 * [`leapp profile edit`](#leapp-profile-edit)
@@ -66,7 +67,7 @@ DESCRIPTION
   Display help for leapp.
 ```
 
-_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v5.1.10/src/commands/help.ts)_
+_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v5.1.11/src/commands/help.ts)_
 
 ## `leapp idp-url create`
 
@@ -168,6 +169,21 @@ DESCRIPTION
 
 EXAMPLES
   $leapp integration login
+```
+
+## `leapp integration logout`
+
+Logout from integration
+
+```
+USAGE
+  $ leapp integration logout
+
+DESCRIPTION
+  Logout from integration
+
+EXAMPLES
+  $leapp integration logout
 ```
 
 ## `leapp profile create`
