@@ -494,14 +494,14 @@ export class SessionCardComponent implements OnInit {
   public pinSession(session: Session, event: MouseEvent): void {
     event.preventDefault();
     event.stopPropagation();
-    this.workspaceService.pinSession(session);
+    this.repository.pinSession(session);
     this.trigger.closeMenu();
   }
 
   public unpinSession(session: Session, event: MouseEvent): void {
     event.preventDefault();
     event.stopPropagation();
-    this.workspaceService.unpinSession(session);
+    this.repository.unpinSession(session);
     this.trigger.closeMenu();
   }
 

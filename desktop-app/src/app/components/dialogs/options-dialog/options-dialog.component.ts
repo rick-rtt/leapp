@@ -13,7 +13,6 @@ import {AwsIamRoleFederatedSession} from '@noovolari/leapp-core/models/aws-iam-r
 import {SessionStatus} from '@noovolari/leapp-core/models/session-status';
 import {SessionService} from '@noovolari/leapp-core/services/session/session-service';
 import {LeappCoreService} from '../../../services/leapp-core.service';
-import {Repository} from "@noovolari/leapp-core/services/repository";
 
 @Component({
   selector: 'app-options-dialog',
@@ -70,7 +69,7 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
 
   constructor(
     public leappCoreService: LeappCoreService,
-    private appService: AppService,
+    public appService: AppService,
     private windowService: WindowService,
     private toasterService: MessageToasterService,
     private router: Router

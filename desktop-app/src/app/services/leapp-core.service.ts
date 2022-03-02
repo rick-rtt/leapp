@@ -179,7 +179,7 @@ export class LeappCoreService {
 
   public get executeService(): ExecuteService {
     if (!this.executeServiceInstance) {
-      this.executeServiceInstance = new ExecuteService(this.electronService);
+      this.executeServiceInstance = new ExecuteService(this.electronService, this.repository);
     }
     return this.executeServiceInstance;
   }

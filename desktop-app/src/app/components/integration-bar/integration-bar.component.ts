@@ -81,7 +81,7 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
       }));
     });
 
-    integrationsFilter.next(this.leappCoreService.repository.listAwsSsoConfigurations());
+    integrationsFilter.next(this.leappCoreService.repository.listAwsSsoIntegrations());
 
     this.subscription2 = openIntegrationEvent.subscribe((value) => {
       if (value) {
@@ -157,7 +157,7 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
   public async logout(configurationId: string): Promise<void> {
     this.logoutLoadings[configurationId] = true;
 
-    this.selectedAwsSsoConfiguration = this.leappCoreService.repository.getAwsSsoConfiguration(configurationId);
+    this.selectedAwsSsoConfiguration = this.leappCoreService.repository.getAwsSsoIntegration(configurationId);
     await this.leappCoreService.awsSsoIntegrationService.logout(this.selectedAwsSsoConfiguration.id);
 
     this.loadingInBrowser = false;
@@ -166,7 +166,7 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
   }
 
   public async forceSync(configurationId: string): Promise<void> {
-    this.selectedAwsSsoConfiguration = this.leappCoreService.repository.getAwsSsoConfiguration(configurationId);
+    this.selectedAwsSsoConfiguration = this.leappCoreService.repository.getAwsSsoIntegration(configurationId);
 
     if (this.selectedAwsSsoConfiguration && !this.loadingInApp) {
       this.loadingInBrowser = (this.selectedAwsSsoConfiguration.browserOpening === constants.inBrowser.toString());
@@ -178,7 +178,7 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
 
       try {
         const ssoRoleSessions: SsoRoleSession[] =
-          await this.leappCoreService.awsSsoIntegrationService.loginAndGetOnlineSessions(configurationId);
+          await this.leappCoreService.awsSsoIntegrationService.loginAndProvisionSessions(configurationId);
 
         ssoRoleSessions.forEach((ssoRoleSession: SsoRoleSession) => {
           ssoRoleSession.awsSsoConfigurationId = configurationId;
@@ -208,7 +208,7 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
     this.modifying = 0;
     this.regions = this.leappCoreService.awsCoreService.getRegions();
     this.regions = this.leappCoreService.awsCoreService.getRegions();
-    this.awsSsoConfigurations = this.leappCoreService.repository.listAwsSsoConfigurations();
+    this.awsSsoConfigurations = this.leappCoreService.repository.listAwsSsoIntegrations();
     this.logoutLoadings = {};
     this.awsSsoConfigurations.forEach((sc) => {
       this.logoutLoadings[sc.id] = false;
@@ -289,7 +289,7 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
         );
       }
 
-      integrationsFilter.next(this.leappCoreService.repository.listAwsSsoConfigurations());
+      integrationsFilter.next(this.leappCoreService.repository.listAwsSsoIntegrations());
       this.modalRef.hide();
     } else {
       this.toasterService.toast('Form is not valid', ToastLevel.warn, 'Form validation');
@@ -307,7 +307,7 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
         await this.logout(awsSsoConfiguration.id);
 
         this.leappCoreService.repository.deleteAwsSsoIntegration(awsSsoConfiguration.id);
-        integrationsFilter.next(this.leappCoreService.repository.listAwsSsoConfigurations());
+        integrationsFilter.next(this.leappCoreService.repository.listAwsSsoIntegrations());
 
         this.modifying = 0;
       }
