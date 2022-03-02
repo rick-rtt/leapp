@@ -13,6 +13,7 @@ import { Workspace } from '../models/workspace'
 import { FileService } from './file-service'
 import { IdpUrl } from '../models/IdpUrl'
 import * as uuid from 'uuid'
+import Folder from "../models/folder";
 
 export class Repository {
   // Private singleton workspace
@@ -306,6 +307,7 @@ export class Repository {
     this.persistWorkspace(workspace)
   }
 
+  // SEGMENTS
   getSegments() {
     const workspace = this.getWorkspace();
     return workspace.segments;
@@ -331,6 +333,37 @@ export class Repository {
     }
   }
 
+  // FOLDERS
+  getFolders() {
+    const workspace = this.getWorkspace();
+    return workspace.folders;
+  }
+
+  setFolders(folders: Folder[]) {
+    const workspace = this.getWorkspace();
+    workspace.folders = folders;
+    this.persistWorkspace(workspace);
+  }
+
+  // PINS
+  pinSession(session: Session) {
+    const workspace = this.getWorkspace();
+    if(workspace.pinned.indexOf(session.sessionId) === -1) {
+      workspace.pinned.push(session.sessionId);
+      this.persistWorkspace(workspace);
+    }
+  }
+
+  unpinSession(session: Session) {
+    const workspace = this.getWorkspace();
+    const index = workspace.pinned.indexOf(session.sessionId);
+    if(index > -1) {
+      workspace.pinned.splice(index, 1);
+      this.persistWorkspace(workspace);
+    }
+  }
+
+  // MACOS TERMINAL
   updateMacOsTerminal(macOsTerminal: string) {
     const workspace = this.getWorkspace();
     workspace.macOsTerminal = macOsTerminal;
