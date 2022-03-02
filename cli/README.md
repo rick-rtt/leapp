@@ -20,7 +20,7 @@ $ npm install -g leapp
 $ leapp COMMAND
 running command...
 $ leapp (--version)
-leapp/0.1.0 win32-x64 node-v16.14.0
+leapp/0.1.0 darwin-x64 node-v16.14.0
 $ leapp --help [COMMAND]
 USAGE
   $ leapp COMMAND
@@ -34,6 +34,7 @@ USAGE
 * [`leapp idp-url delete`](#leapp-idp-url-delete)
 * [`leapp idp-url edit`](#leapp-idp-url-edit)
 * [`leapp integration create`](#leapp-integration-create)
+* [`leapp integration delete`](#leapp-integration-delete)
 * [`leapp integration list`](#leapp-integration-list)
 * [`leapp integration login`](#leapp-integration-login)
 * [`leapp integration logout`](#leapp-integration-logout)
@@ -127,6 +128,21 @@ DESCRIPTION
 
 EXAMPLES
   $leapp integration create
+```
+
+## `leapp integration delete`
+
+Delete an integration
+
+```
+USAGE
+  $ leapp integration delete
+
+DESCRIPTION
+  Delete an integration
+
+EXAMPLES
+  $leapp integration delete
 ```
 
 ## `leapp integration list`

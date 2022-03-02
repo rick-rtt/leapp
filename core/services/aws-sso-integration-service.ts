@@ -179,6 +179,11 @@ export class AwsSsoIntegrationService {
     this.repository.addAwsSsoIntegration(creationParams.portalUrl, creationParams.alias, creationParams.region, creationParams.browserOpening)
   }
 
+  public async deleteIntegration(integrationId: string) {
+    await this.logout(integrationId);
+    this.repository.deleteAwsSsoIntegration(integrationId);
+  }
+
   private async getSessions(configurationId: string, accessToken: string, region: string): Promise<SsoRoleSession[]> {
     const accounts: AccountInfo[] = await this.listAccounts(accessToken, region)
 
