@@ -141,4 +141,32 @@ describe('AwsSsoIntegrationService', () => {
 
     expect(actualIntegrationAccessTokenKey).toBe(`aws-sso-integration-access-token-${integrationId}`)
   })
+
+  test('createIntegration', () => {
+    const repository = {
+      addAwsSsoIntegration: jest.fn()
+    } as any
+
+    const awsIntegrationService = new AwsSsoIntegrationService(repository, null, null, null, null, null)
+
+    const creationParams = {alias: 'alias', portalUrl: 'portalUrl', region: 'region', browserOpening: 'browserOpening'}
+    awsIntegrationService.createIntegration(creationParams)
+
+    expect(repository.addAwsSsoIntegration).toHaveBeenCalledWith('portalUrl', 'alias', 'region', 'browserOpening')
+  })
+
+  test('deleteIntegration', async () => {
+    const repository = {
+      deleteAwsSsoIntegration: jest.fn()
+    } as any
+
+    const awsIntegrationService = new AwsSsoIntegrationService(repository, null, null, null, null, null)
+    awsIntegrationService.logout = jest.fn()
+
+    const integrationId = 'integrationId';
+    await awsIntegrationService.deleteIntegration(integrationId)
+
+    expect(awsIntegrationService.logout).toHaveBeenCalledWith(integrationId)
+    expect(repository.deleteAwsSsoIntegration).toHaveBeenCalledWith(integrationId)
+  })
 })

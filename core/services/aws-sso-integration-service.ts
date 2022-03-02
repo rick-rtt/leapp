@@ -198,6 +198,11 @@ export class AwsSsoIntegrationService {
     return !awsSsoAccessTokenInfo.expiration || awsSsoAccessTokenInfo.expiration < Date.now();
   }
 
+  public async deleteIntegration(integrationId: string) {
+    await this.logout(integrationId);
+    this.repository.deleteAwsSsoIntegration(integrationId);
+  }
+
   private async getSessions(integrationId: string, accessToken: string, region: string): Promise<SsoRoleSession[]> {
     const accounts: AccountInfo[] = await this.listAccounts(accessToken, region)
 

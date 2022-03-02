@@ -34,8 +34,10 @@ USAGE
 * [`leapp idp-url delete`](#leapp-idp-url-delete)
 * [`leapp idp-url edit`](#leapp-idp-url-edit)
 * [`leapp integration create`](#leapp-integration-create)
+* [`leapp integration delete`](#leapp-integration-delete)
 * [`leapp integration list`](#leapp-integration-list)
 * [`leapp integration login`](#leapp-integration-login)
+* [`leapp integration logout`](#leapp-integration-logout)
 * [`leapp profile create`](#leapp-profile-create)
 * [`leapp profile delete`](#leapp-profile-delete)
 * [`leapp profile edit`](#leapp-profile-edit)
@@ -66,7 +68,7 @@ DESCRIPTION
   Display help for leapp.
 ```
 
-_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v5.1.10/src/commands/help.ts)_
+_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v5.1.11/src/commands/help.ts)_
 
 ## `leapp idp-url create`
 
@@ -128,6 +130,21 @@ EXAMPLES
   $leapp integration create
 ```
 
+## `leapp integration delete`
+
+Delete an integration
+
+```
+USAGE
+  $ leapp integration delete
+
+DESCRIPTION
+  Delete an integration
+
+EXAMPLES
+  $leapp integration delete
+```
+
 ## `leapp integration list`
 
 Show integrations list
@@ -168,6 +185,21 @@ DESCRIPTION
 
 EXAMPLES
   $leapp integration login
+```
+
+## `leapp integration logout`
+
+Logout from integration
+
+```
+USAGE
+  $ leapp integration logout
+
+DESCRIPTION
+  Logout from integration
+
+EXAMPLES
+  $leapp integration logout
 ```
 
 ## `leapp profile create`
