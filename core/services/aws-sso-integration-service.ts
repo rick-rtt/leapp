@@ -198,11 +198,6 @@ export class AwsSsoIntegrationService {
     return !awsSsoAccessTokenInfo.expiration || awsSsoAccessTokenInfo.expiration < Date.now();
   }
 
-  private ssoExpired(integrationId: string | number): boolean {
-    const expirationTime = this.repository.getAwsSsoIntegration(integrationId).accessTokenExpiration
-    return !expirationTime || Date.parse(expirationTime) < Date.now()
-  }
-
   private async getSessions(integrationId: string, accessToken: string, region: string): Promise<SsoRoleSession[]> {
     const accounts: AccountInfo[] = await this.listAccounts(accessToken, region)
 
