@@ -107,6 +107,34 @@ export class Repository {
     }
   }
 
+  listPending(): Session[] {
+    const workspace = this.getWorkspace()
+    return (workspace.sessions && workspace.sessions.length > 0) ? workspace.sessions.filter((session) => session.status === SessionStatus.pending) : []
+  }
+
+  listActive(): Session[] {
+    const workspace = this.getWorkspace()
+    return (workspace.sessions && workspace.sessions.length > 0) ? workspace.sessions.filter((session) => session.status === SessionStatus.active) : []
+  }
+
+  listAwsSsoRoles() {
+    const workspace = this.getWorkspace()
+    return (workspace.sessions && workspace.sessions.length > 0) ? workspace.sessions.filter((session) => session.type === SessionType.awsSsoRole) : []
+  }
+
+  listAssumable() {
+    return (this.getWorkspace().sessions.length > 0) ? this.getWorkspace().sessions.filter((session) => session.type !== SessionType.azure) : []
+  }
+
+  listIamRoleChained(parentSession?: Session): Session[] {
+    const workspace = this.getWorkspace()
+    let childSession = (workspace.sessions && workspace.sessions.length > 0) ? workspace.sessions.filter((session) => session.type === SessionType.awsIamRoleChained) : []
+    if (parentSession) {
+      childSession = childSession.filter(session => (session as AwsIamRoleChainedSession).parentSessionId === parentSession.sessionId)
+    }
+    return childSession
+  }
+
   // REGION AND LOCATION
 
   getDefaultRegion() {
@@ -213,12 +241,12 @@ export class Repository {
   }
 
   // AWS SSO INTEGRATION
-  listAwsSsoConfigurations() {
+  listAwsSsoIntegrations() {
     const workspace = this.getWorkspace();
     return workspace.awsSsoIntegrations;
   }
 
-  getAwsSsoConfiguration(id: string | number): AwsSsoIntegration {
+  getAwsSsoIntegration(id: string | number): AwsSsoIntegration {
     return this.getWorkspace().awsSsoIntegrations.filter(ssoConfig => ssoConfig.id === id)[0];
   }
 
@@ -278,34 +306,6 @@ export class Repository {
     this.persistWorkspace(workspace)
   }
 
-  listPending(): Session[] {
-    const workspace = this.getWorkspace()
-    return (workspace.sessions && workspace.sessions.length > 0) ? workspace.sessions.filter((session) => session.status === SessionStatus.pending) : []
-  }
-
-  listActive(): Session[] {
-    const workspace = this.getWorkspace()
-    return (workspace.sessions && workspace.sessions.length > 0) ? workspace.sessions.filter((session) => session.status === SessionStatus.active) : []
-  }
-
-  listAwsSsoRoles() {
-    const workspace = this.getWorkspace()
-    return (workspace.sessions && workspace.sessions.length > 0) ? workspace.sessions.filter((session) => session.type === SessionType.awsSsoRole) : []
-  }
-
-  listAssumable() {
-    return (this.getWorkspace().sessions.length > 0) ? this.getWorkspace().sessions.filter((session) => session.type !== SessionType.azure) : []
-  }
-
-  listIamRoleChained(parentSession?: Session): Session[] {
-    const workspace = this.getWorkspace()
-    let childSession = (workspace.sessions && workspace.sessions.length > 0) ? workspace.sessions.filter((session) => session.type === SessionType.awsIamRoleChained) : []
-    if (parentSession) {
-      childSession = childSession.filter(session => (session as AwsIamRoleChainedSession).parentSessionId === parentSession.sessionId)
-    }
-    return childSession
-  }
-
   getSegments() {
     const workspace = this.getWorkspace();
     return workspace.segments;
@@ -325,15 +325,9 @@ export class Repository {
   removeSegment(segment: Segment) {
     const workspace = this.getWorkspace();
     const index = workspace.segments.findIndex(s => s.name === segment.name);
-    if(index > -1) {
+    if (index > -1) {
       workspace.segments.splice(index, 1);
       this.persistWorkspace(workspace);
     }
   }
-
-  listAwsSsoIntegrations() {
-    const workspace = this.getWorkspace();
-    return workspace.awsSsoIntegrations;
-  }
-
 }

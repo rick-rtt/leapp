@@ -16,6 +16,7 @@ import SSO, {
 import {SessionType} from '../models/session-type'
 import {AwsSsoRoleSession} from '../models/aws-sso-role-session'
 import {ISessionNotifier} from '../interfaces/i-session-notifier'
+import {AwsSsoIntegrationTokenInfo} from "../models/aws-sso-integration-token-info";
 
 const portalUrlValidationRegex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&/=]*)/
 
@@ -32,7 +33,7 @@ export class AwsSsoIntegrationService {
 
   constructor(private repository: Repository, private awsSsoOidcService: AwsSsoOidcService,
               private awsSsoRoleService: AwsSsoRoleService, private keyChainService: KeychainService,
-              private iSessionNotifier: ISessionNotifier, private nativeService: INativeService) {
+              private sessionNotifier: ISessionNotifier, private nativeService: INativeService) {
   }
 
   public static validateAlias(alias: string): boolean | string {
@@ -43,14 +44,22 @@ export class AwsSsoIntegrationService {
     return portalUrlValidationRegex.test(portalUrl) ? true : 'Invalid portal URL'
   }
 
-  public getIntegrations(): AwsSsoIntegration[] {
-    return this.repository.listAwsSsoConfigurations()
+  // TODO: understand if we want to use an object that contains params
+  public createIntegration(creationParams: IntegrationCreationParams) {
+    this.repository.addAwsSsoIntegration(creationParams.portalUrl, creationParams.alias, creationParams.region, creationParams.browserOpening)
   }
 
+  // TODO: to be moved in repository
+  public getIntegrations(): AwsSsoIntegration[] {
+    return this.repository.listAwsSsoIntegrations()
+  }
+
+  // TODO: to be moved in repository
   public getOnlineIntegrations(): AwsSsoIntegration[] {
     return this.getIntegrations().filter(integration => this.isOnline(integration))
   }
 
+  // TODO: to be moved in repository
   public getOfflineIntegrations(): AwsSsoIntegration[] {
     return this.getIntegrations().filter(integration => !this.isOnline(integration))
   }
@@ -65,9 +74,9 @@ export class AwsSsoIntegrationService {
     return formatDistance(new Date(integration.accessTokenExpiration), this.getDate(), {addSuffix: true})
   }
 
-  public async loginAndGetOnlineSessions(integrationId: string): Promise<SsoRoleSession[]> {
-    const region = this.repository.getAwsSsoConfiguration(integrationId).region
-    const portalUrl = this.repository.getAwsSsoConfiguration(integrationId).portalUrl
+  public async loginAndProvisionSessions(integrationId: string): Promise<SsoRoleSession[]> {
+    const region = this.repository.getAwsSsoIntegration(integrationId).region
+    const portalUrl = this.repository.getAwsSsoIntegration(integrationId).portalUrl
     const accessToken = await this.getAccessToken(integrationId, region, portalUrl)
     const onlineSessions = await this.getSessions(integrationId, accessToken, region)
 
@@ -119,8 +128,8 @@ export class AwsSsoIntegrationService {
 
   public async logout(integrationId: string | number): Promise<void> {
     // Obtain region and access token
-    const configuration: AwsSsoIntegration = this.repository.getAwsSsoConfiguration(integrationId)
-    const region = configuration.region
+    const integration: AwsSsoIntegration = this.repository.getAwsSsoIntegration(integrationId)
+    const region = integration.region
     const savedAccessToken = await this.getAccessTokenFromKeychain(integrationId)
 
     // Configure Sso Portal Client
@@ -131,28 +140,31 @@ export class AwsSsoIntegrationService {
 
     this.ssoPortal.logout(logoutRequest).promise().then(_ => {
     }, async _ => {
+      // logout request has to be handled in reject Promise by design
+
       // Clean clients
       this.ssoPortal = null
 
-      // Delete access token and remove sso configuration info from workspace
+      // Delete access token and remove sso integration info from workspace
       await this.keyChainService.deletePassword(constants.appName, this.getIntegrationAccessTokenKey(integrationId))
       this.repository.unsetAwsSsoIntegrationExpiration(integrationId.toString())
-
-      await this.awsSsoRoleService.removeSsoSessionsFromWorkspace()
+      await this.removeSsoSessionsFromWorkspace()
     })
   }
 
   public async getAccessToken(integrationId: string, region: string, portalUrl: string): Promise<string> {
-    if (this.ssoExpired(integrationId)) {
+    const isAwsSsoAccessTokenExpired = await this.isAwsSsoAccessTokenExpired(integrationId);
+
+    if (isAwsSsoAccessTokenExpired) {
       const loginResponse = await this.login(integrationId, region, portalUrl)
-      const configuration: AwsSsoIntegration = this.repository.getAwsSsoConfiguration(integrationId)
+      const integration: AwsSsoIntegration = this.repository.getAwsSsoIntegration(integrationId)
 
       await this.configureAwsSso(
         integrationId,
-        configuration.alias,
+        integration.alias,
         region,
         loginResponse.portalUrlUnrolled,
-        configuration.browserOpening,
+        integration.browserOpening,
         loginResponse.expirationTime.toISOString(),
         loginResponse.accessToken,
       )
@@ -175,17 +187,29 @@ export class AwsSsoIntegrationService {
     return this.ssoPortal.getRoleCredentials(getRoleCredentialsRequest).promise()
   }
 
-  public createIntegration(creationParams: IntegrationCreationParams) {
-    this.repository.addAwsSsoIntegration(creationParams.portalUrl, creationParams.alias, creationParams.region, creationParams.browserOpening)
+  async getAwsSsoIntegrationTokenInfo(awsSsoIntegrationId: string): Promise<AwsSsoIntegrationTokenInfo> {
+    const accessToken = await this.keyChainService.getSecret(constants.appName, `aws-sso-integration-access-token-${awsSsoIntegrationId}`);
+    const expiration = this.repository.getAwsSsoIntegration(awsSsoIntegrationId) ? new Date(this.repository.getAwsSsoIntegration(awsSsoIntegrationId).accessTokenExpiration).getTime() : undefined;
+    return { accessToken, expiration };
   }
 
-  private async getSessions(configurationId: string, accessToken: string, region: string): Promise<SsoRoleSession[]> {
+  async isAwsSsoAccessTokenExpired(awsSsoIntegrationId: string): Promise<boolean> {
+    const awsSsoAccessTokenInfo = await this.getAwsSsoIntegrationTokenInfo(awsSsoIntegrationId);
+    return !awsSsoAccessTokenInfo.expiration || awsSsoAccessTokenInfo.expiration < Date.now();
+  }
+
+  private ssoExpired(integrationId: string | number): boolean {
+    const expirationTime = this.repository.getAwsSsoIntegration(integrationId).accessTokenExpiration
+    return !expirationTime || Date.parse(expirationTime) < Date.now()
+  }
+
+  private async getSessions(integrationId: string, accessToken: string, region: string): Promise<SsoRoleSession[]> {
     const accounts: AccountInfo[] = await this.listAccounts(accessToken, region)
 
     const promiseArray: Promise<SsoRoleSession[]>[] = []
 
     accounts.forEach((account) => {
-      promiseArray.push(this.getSessionsFromAccount(configurationId, account, accessToken, region))
+      promiseArray.push(this.getSessionsFromAccount(integrationId, account, accessToken, region))
     })
 
     return new Promise((resolve, _) => {
@@ -193,6 +217,62 @@ export class AwsSsoIntegrationService {
         resolve(sessionMatrix.flat())
       })
     })
+  }
+
+  private async configureAwsSso(integrationId: string, alias: string, region: string, portalUrl: string,
+                                browserOpening: string, expirationTime: string, accessToken: string): Promise<void> {
+    this.repository.updateAwsSsoIntegration(integrationId, alias, region, portalUrl, browserOpening, expirationTime)
+    await this.keyChainService.saveSecret(constants.appName, this.getIntegrationAccessTokenKey(integrationId), accessToken)
+  }
+
+  private async getAccessTokenFromKeychain(integrationId: string | number): Promise<string> {
+    return await this.keyChainService.getSecret(constants.appName, this.getIntegrationAccessTokenKey(integrationId))
+  }
+
+  private getIntegrationAccessTokenKey(integrationId: string | number) {
+    return `aws-sso-integration-access-token-${integrationId}`
+  }
+
+  private async login(integrationId: string | number, region: string, portalUrl: string): Promise<LoginResponse> {
+    const redirectClient = this.nativeService.followRedirects[this.getProtocol(portalUrl)]
+    portalUrl = await new Promise((resolve, _) => {
+      const request = redirectClient.request(portalUrl, response => resolve(response.responseUrl))
+      request.end()
+    })
+
+    const generateSsoTokenResponse = await this.awsSsoOidcService.login(integrationId, region, portalUrl)
+
+    return {
+      portalUrlUnrolled: portalUrl,
+      accessToken: generateSsoTokenResponse.accessToken,
+      region,
+      expirationTime: generateSsoTokenResponse.expirationTime,
+    }
+  }
+
+  private async removeSsoSessionsFromWorkspace(): Promise<void> {
+    const sessions = this.repository.listAwsSsoRoles()
+
+    for (let i = 0; i < sessions.length; i++) {
+      const sess = sessions[i]
+
+      const iamRoleChainedSessions = this.repository.listIamRoleChained(sess)
+
+      for (let j = 0; j < iamRoleChainedSessions.length; j++) {
+        await this.awsSsoRoleService.delete(iamRoleChainedSessions[j].sessionId)
+      }
+
+      await this.awsSsoRoleService.stop(sess.sessionId)
+
+      this.repository.deleteSession(sess.sessionId)
+      this.sessionNotifier?.deleteSession(sess.sessionId)
+    }
+  }
+
+  private setupSsoPortalClient(region: string): void {
+    if (!this.ssoPortal) {
+      this.ssoPortal = new SSO({region})
+    }
   }
 
   private async listAccounts(accessToken: string, region: string): Promise<AccountInfo[]> {
@@ -219,13 +299,7 @@ export class AwsSsoIntegrationService {
     })
   }
 
-  private setupSsoPortalClient(region: string): void {
-    if (!this.ssoPortal) {
-      this.ssoPortal = new SSO({region})
-    }
-  }
-
-  private async getSessionsFromAccount(configurationId: string, accountInfo: AccountInfo, accessToken: string, region: string): Promise<SsoRoleSession[]> {
+  private async getSessionsFromAccount(integrationId: string, accountInfo: AccountInfo, accessToken: string, region: string): Promise<SsoRoleSession[]> {
     this.setupSsoPortalClient(region)
 
     const listAccountRolesRequest: ListAccountRolesRequest = {
@@ -251,31 +325,13 @@ export class AwsSsoIntegrationService {
         roleArn: `arn:aws:iam::${accountInfo.accountId}/${accountRole.roleName}`,
         sessionName: accountInfo.accountName,
         profileId: oldSession?.profileId || this.repository.getDefaultProfileId(),
-        awsSsoConfigurationId: configurationId,
+        awsSsoConfigurationId: integrationId,
       }
 
       awsSsoSessions.push(awsSsoSession)
     })
 
     return awsSsoSessions
-  }
-
-  private findOldSession(accountInfo: SSO.AccountInfo, accountRole: SSO.RoleInfo): { region: string; profileId: string } {
-    //TODO: use map and filter in order to make this method more readable
-    for (let i = 0; i < this.iSessionNotifier.getSessions().length; i++) {
-      const sess = this.iSessionNotifier.getSessions()[i]
-
-      if (sess.type === SessionType.awsSsoRole) {
-        if (
-          ((sess as AwsSsoRoleSession).email === accountInfo.emailAddress) &&
-          ((sess as AwsSsoRoleSession).roleArn === `arn:aws:iam::${accountInfo.accountId}/${accountRole.roleName}`)
-        ) {
-          return {region: (sess as AwsSsoRoleSession).region, profileId: (sess as AwsSsoRoleSession).profileId}
-        }
-      }
-    }
-
-    return undefined
   }
 
   private recursiveListRoles(accountRoles: RoleInfo[], listAccountRolesRequest: ListAccountRolesRequest, promiseCallback: any) {
@@ -291,40 +347,22 @@ export class AwsSsoIntegrationService {
     })
   }
 
-  private async getAccessTokenFromKeychain(integrationId: string | number): Promise<string> {
-    return await this.keyChainService.getSecret(constants.appName, this.getIntegrationAccessTokenKey(integrationId))
-  }
+  private findOldSession(accountInfo: SSO.AccountInfo, accountRole: SSO.RoleInfo): { region: string; profileId: string } {
+    //TODO: use map and filter in order to make this method more readable
+    for (let i = 0; i < this.sessionNotifier.getSessions().length; i++) {
+      const sess = this.sessionNotifier.getSessions()[i]
 
-  private async configureAwsSso(integrationId: string, alias: string, region: string, portalUrl: string,
-                                browserOpening: string, expirationTime: string, accessToken: string): Promise<void> {
-    this.repository.updateAwsSsoIntegration(integrationId, alias, region, portalUrl, browserOpening, expirationTime)
-    await this.keyChainService.saveSecret(constants.appName, this.getIntegrationAccessTokenKey(integrationId), accessToken)
-  }
-
-  private getIntegrationAccessTokenKey(integrationId: string | number) {
-    return `aws-sso-integration-access-token-${integrationId}`
-  }
-
-  private ssoExpired(configurationId: string | number): boolean {
-    const expirationTime = this.repository.getAwsSsoConfiguration(configurationId).accessTokenExpiration
-    return !expirationTime || Date.parse(expirationTime) < Date.now()
-  }
-
-  private async login(configurationId: string | number, region: string, portalUrl: string): Promise<LoginResponse> {
-    const redirectClient = this.nativeService.followRedirects[this.getProtocol(portalUrl)]
-    portalUrl = await new Promise((resolve, _) => {
-      const request = redirectClient.request(portalUrl, response => resolve(response.responseUrl))
-      request.end()
-    })
-
-    const generateSsoTokenResponse = await this.awsSsoOidcService.login(configurationId, region, portalUrl)
-
-    return {
-      portalUrlUnrolled: portalUrl,
-      accessToken: generateSsoTokenResponse.accessToken,
-      region,
-      expirationTime: generateSsoTokenResponse.expirationTime,
+      if (sess.type === SessionType.awsSsoRole) {
+        if (
+          ((sess as AwsSsoRoleSession).email === accountInfo.emailAddress) &&
+          ((sess as AwsSsoRoleSession).roleArn === `arn:aws:iam::${accountInfo.accountId}/${accountRole.roleName}`)
+        ) {
+          return {region: (sess as AwsSsoRoleSession).region, profileId: (sess as AwsSsoRoleSession).profileId}
+        }
+      }
     }
+
+    return undefined
   }
 
   private getProtocol(aliasedUrl: string): string {
@@ -335,6 +373,7 @@ export class AwsSsoIntegrationService {
     return protocol
   }
 
+  // TODO: is it needed?
   private getDate(): Date {
     return new Date()
   }

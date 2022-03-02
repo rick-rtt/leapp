@@ -126,7 +126,7 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
 
   async generateCredentials(sessionId: string): Promise<CredentialsInfo> {
     const session: AwsSsoRoleSession = (this.sessionNotifier.getSessionById(sessionId) as AwsSsoRoleSession)
-    const awsSsoConfiguration = this.repository.getAwsSsoConfiguration(session.awsSsoConfigurationId)
+    const awsSsoConfiguration = this.repository.getAwsSsoIntegration(session.awsSsoConfigurationId)
     const region = awsSsoConfiguration.region
     const portalUrl = awsSsoConfiguration.portalUrl
     const roleArn = session.roleArn
@@ -142,24 +142,5 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
   }
 
   removeSecrets(sessionId: string): void {
-  }
-
-  public async removeSsoSessionsFromWorkspace(): Promise<void> {
-    const sessions = this.sessionNotifier.listAwsSsoRoles()
-
-    for (let i = 0; i < sessions.length; i++) {
-      const sess = sessions[i]
-
-      const iamRoleChainedSessions = this.sessionNotifier.listIamRoleChained(sess)
-
-      for (let j = 0; j < iamRoleChainedSessions.length; j++) {
-        await this.delete(iamRoleChainedSessions[j].sessionId)
-      }
-
-      await this.stop(sess.sessionId)
-
-      this.repository.deleteSession(sess.sessionId)
-      this.sessionNotifier.deleteSession(sess.sessionId)
-    }
   }
 }

@@ -57,7 +57,7 @@ export class AwsSsoOidcService {
 
       const registerClientResponse = await this.registerSsoOidcClient()
       const startDeviceAuthorizationResponse = await this.startDeviceAuthorization(registerClientResponse, portalUrl)
-      const windowModality = this.repository.getAwsSsoConfiguration(configurationId).browserOpening
+      const windowModality = this.repository.getAwsSsoIntegration(configurationId).browserOpening
       const verificationResponse = await this.verificationWindowService.openVerificationWindow(registerClientResponse,
         startDeviceAuthorizationResponse, windowModality, () => this.closeVerificationWindow())
       try {
@@ -147,7 +147,7 @@ export class AwsSsoOidcService {
     }
 
     let createTokenResponse
-    if (!this.disableInAppBrowser && this.repository.getAwsSsoConfiguration(configurationId).browserOpening === constants.inApp) {
+    if (!this.disableInAppBrowser && this.repository.getAwsSsoIntegration(configurationId).browserOpening === constants.inApp) {
       createTokenResponse = await this.getAwsSsoOidcClient().createToken(createTokenRequest).promise()
     } else {
       createTokenResponse = await this.waitForToken(createTokenRequest)
