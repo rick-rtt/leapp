@@ -147,6 +147,9 @@ export class AwsSsoOidcService {
     }
 
     let createTokenResponse
+    // disableInAppBrowser is a client-specific parameter. If disableInAppBrowser is true, the client will open aws sso
+    // login page using the Browser instead of the Electron BrowserWindow, regardless the value specified in Leapp
+    // configuration's browserOpening parameter.
     if (!this.disableInAppBrowser && this.repository.getAwsSsoIntegration(configurationId).browserOpening === constants.inApp) {
       createTokenResponse = await this.getAwsSsoOidcClient().createToken(createTokenRequest).promise()
     } else {
