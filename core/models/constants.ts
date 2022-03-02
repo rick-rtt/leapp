@@ -30,5 +30,8 @@ export const constants = {
   confirmed: '**CONFIRMED**',
   confirmClosed: '**MODAL_CLOSED**',
   confirmClosedAndIgnoreUpdate: '**IGNORE_UPDATE_AND_MODAL_CLOSED**',
-  confirmCloseAndDownloadUpdate: '**GO_TO_DOWNLOAD_PAGE_AND_MODAL_CLOSED**'
+  confirmCloseAndDownloadUpdate: '**GO_TO_DOWNLOAD_PAGE_AND_MODAL_CLOSED**',
+
+  macOsTerminal: 'Terminal',
+  macOsIterm2: 'iTerm2'
 }

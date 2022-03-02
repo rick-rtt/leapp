@@ -16,6 +16,7 @@ export class Workspace {
   private _sessions: Session[]
   private _defaultRegion: string
   private _defaultLocation: string
+  private _macOsTerminal: string
   private _idpUrls: IdpUrl[]
   private _profiles: AwsNamedProfile[]
 
@@ -40,6 +41,7 @@ export class Workspace {
     this._segments = [];
     this._defaultRegion = constants.defaultRegion;
     this._defaultLocation = constants.defaultLocation;
+    this._macOsTerminal = constants.macOsTerminal;
     this._idpUrls = [];
     this._profiles = [
       { id: uuid.v4(), name: constants.defaultAwsProfileName }
@@ -58,6 +60,14 @@ export class Workspace {
 
   addIpUrl(idpUrl: IdpUrl): void{
     this._idpUrls.push(idpUrl)
+  }
+
+  get macOsTerminal(): string {
+    return this._macOsTerminal;
+  }
+
+  set macOsTerminal(value: string) {
+    this._macOsTerminal = value;
   }
 
   get idpUrls(): IdpUrl[] {

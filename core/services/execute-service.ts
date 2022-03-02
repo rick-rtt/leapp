@@ -1,7 +1,11 @@
 import { INativeService } from '../interfaces/i-native-service'
+import {constants} from "../models/constants";
+import {Repository} from "./repository";
 
 export class ExecuteService {
-  public constructor(private nativeService: INativeService) {
+  public constructor(
+    private nativeService: INativeService,
+    private repository: Repository) {
   }
 
   public getQuote(): string{
@@ -58,13 +62,24 @@ export class ExecuteService {
    */
   public openTerminal(command: string, env?: any): Promise<string> {
     if (this.nativeService.process.platform === 'darwin') {
-      return this.execute(`osascript -e "tell app \\"Terminal\\"
-                              do script \\"${command}\\"
-                              end tell"`, env)
+
+      const terminalType = this.repository.getWorkspace().macOsTerminal;
+      if(terminalType === constants.macOsTerminal) {
+        return this.execute(`osascript -e "tell app \\"Terminal\\"
+                              activate (do script \\"${command} && unset AWS_SESSION_TOKEN && unset AWS_SECRET_ACCESS_KEY && unset AWS_ACCESS_KEY_ID\\")
+                              end tell"`, Object.assign(this.nativeService.process.env, env));
+      } else {
+        return this.execute(`osascript -e "tell app \\"iTerm\\"
+                              set newWindow to (create window with default profile)
+                              tell current session of newWindow
+                                write text \\"${command} && unset AWS_SESSION_TOKEN && unset AWS_SECRET_ACCESS_KEY && unset AWS_ACCESS_KEY_ID\\"
+                              end tell
+                            end tell"`, Object.assign(this.nativeService.process.env, env));
+      }
     } else if (this.nativeService.process.platform === 'win32') {
-      return this.execute(`start cmd /k ${command}`, env)
+      return this.execute(`start cmd /k ${command}`, env);
     } else {
-      return this.execute(`gnome-terminal -- sh -c "${command}; bash"`, Object.assign(this.nativeService.process.env, env))
+      return this.execute(`gnome-terminal -- sh -c "${command}; bash"`, Object.assign(this.nativeService.process.env, env));
     }
   }
 }

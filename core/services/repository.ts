@@ -330,4 +330,10 @@ export class Repository {
       this.persistWorkspace(workspace);
     }
   }
+
+  updateMacOsTerminal(macOsTerminal: string) {
+    const workspace = this.getWorkspace();
+    workspace.macOsTerminal = macOsTerminal;
+    this.persistWorkspace(workspace);
+  }
 }

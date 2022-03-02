@@ -13,6 +13,7 @@ import {AwsIamRoleFederatedSession} from '@noovolari/leapp-core/models/aws-iam-r
 import {SessionStatus} from '@noovolari/leapp-core/models/session-status';
 import {SessionService} from '@noovolari/leapp-core/services/session/session-service';
 import {LeappCoreService} from '../../../services/leapp-core.service';
+import {Repository} from "@noovolari/leapp-core/services/repository";
 
 @Component({
   selector: 'app-options-dialog',
@@ -47,6 +48,7 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
   selectedLocation: string;
   selectedRegion: string;
   selectedBrowserOpening = constants.inApp.toString();
+  selectedTerminal;
 
   form = new FormGroup({
     idpUrl: new FormControl(''),
@@ -59,7 +61,8 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
     showAuthCheckbox: new FormControl(''),
     regionsSelect: new FormControl(''),
     locationsSelect: new FormControl(''),
-    defaultBrowserOpening: new FormControl('')
+    defaultBrowserOpening: new FormControl(''),
+    terminalSelect: new FormControl('')
   });
 
   /* Simple profile page: shows the Idp Url and the workspace json */
@@ -71,7 +74,9 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
     private windowService: WindowService,
     private toasterService: MessageToasterService,
     private router: Router
-  ) {}
+  ) {
+    this.selectedTerminal = this.leappCoreService.repository.getWorkspace().macOsTerminal || constants.macOsTerminal;
+  }
 
   public ngOnInit(): void {
     this.idpUrlValue = '';
@@ -129,6 +134,9 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
 
       this.leappCoreService.repository.getWorkspace().defaultLocation = this.selectedLocation;
       this.leappCoreService.repository.updateDefaultLocation(this.leappCoreService.repository.getWorkspace().defaultLocation);
+
+      this.leappCoreService.repository.getWorkspace().macOsTerminal = this.selectedTerminal;
+      this.leappCoreService.repository.updateMacOsTerminal(this.leappCoreService.repository.getWorkspace().macOsTerminal);
 
       if (this.checkIfNeedDialogBox()) {
         this.windowService.confirmDialog('You\'ve set a proxy url: the app must be restarted to update the configuration.', (res) => {
