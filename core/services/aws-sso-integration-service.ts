@@ -126,6 +126,18 @@ export class AwsSsoIntegrationService {
     return finalSessions
   }
 
+  public async syncSessions(integrationId: string): Promise<SsoRoleSession[]> {
+    const ssoRoleSessions: SsoRoleSession[] =
+      await this.loginAndProvisionSessions(integrationId);
+
+    ssoRoleSessions.forEach((ssoRoleSession: SsoRoleSession) => {
+      ssoRoleSession.awsSsoConfigurationId = integrationId;
+      this.awsSsoRoleService.create(ssoRoleSession);
+    });
+
+    return ssoRoleSessions
+  }
+
   public async logout(integrationId: string | number): Promise<void> {
     // Obtain region and access token
     const integration: AwsSsoIntegration = this.repository.getAwsSsoIntegration(integrationId)

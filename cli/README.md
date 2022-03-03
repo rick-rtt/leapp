@@ -20,7 +20,7 @@ $ npm install -g leapp
 $ leapp COMMAND
 running command...
 $ leapp (--version)
-leapp/0.1.0 darwin-x64 node-v16.14.0
+leapp/0.1.0 win32-x64 node-v16.14.0
 $ leapp --help [COMMAND]
 USAGE
   $ leapp COMMAND
@@ -38,6 +38,7 @@ USAGE
 * [`leapp integration list`](#leapp-integration-list)
 * [`leapp integration login`](#leapp-integration-login)
 * [`leapp integration logout`](#leapp-integration-logout)
+* [`leapp integration sync`](#leapp-integration-sync)
 * [`leapp profile create`](#leapp-profile-create)
 * [`leapp profile delete`](#leapp-profile-delete)
 * [`leapp profile edit`](#leapp-profile-edit)
@@ -200,6 +201,21 @@ DESCRIPTION
 
 EXAMPLES
   $leapp integration logout
+```
+
+## `leapp integration sync`
+
+Synchronize integration sessions
+
+```
+USAGE
+  $ leapp integration sync
+
+DESCRIPTION
+  Synchronize integration sessions
+
+EXAMPLES
+  $leapp integration sync
 ```
 
 ## `leapp profile create`

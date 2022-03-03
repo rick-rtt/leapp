@@ -1,13 +1,13 @@
 import {jest, describe, test, expect} from '@jest/globals'
-import LoginIntegration from './login'
+import SyncIntegration from './sync'
 
-describe('LoginIntegration', () => {
+describe('SyncIntegration', () => {
 
   test('selectIntegration', async () => {
     const integration = {alias: 'integration1'}
     const leappCliService: any = {
       awsSsoIntegrationService: {
-        getOfflineIntegrations: jest.fn(() => [integration]),
+        getOnlineIntegrations: jest.fn(() => [integration]),
       },
       inquirer: {
         prompt: async (params: any) => {
@@ -22,65 +22,60 @@ describe('LoginIntegration', () => {
       },
     }
 
-    const command = new LoginIntegration([], {} as any, leappCliService)
+    const command = new SyncIntegration([], {} as any, leappCliService)
     const selectedIntegration = await command.selectIntegration()
 
-    expect(leappCliService.awsSsoIntegrationService.getOfflineIntegrations).toHaveBeenCalled()
+    expect(leappCliService.awsSsoIntegrationService.getOnlineIntegrations).toHaveBeenCalled()
     expect(selectedIntegration).toBe(integration)
   })
 
   test('selectIntegration, no integrations', async () => {
     const leappCliService: any = {
       awsSsoIntegrationService: {
-        getOfflineIntegrations: jest.fn(() => []),
+        getOnlineIntegrations: jest.fn(() => []),
       },
     }
 
-    const command = new LoginIntegration([], {} as any, leappCliService)
-    await expect(command.selectIntegration()).rejects.toThrow(new Error('no offline integrations available'))
+    const command = new SyncIntegration([], {} as any, leappCliService)
+    await expect(command.selectIntegration()).rejects.toThrow(new Error('no online integrations available'))
   })
 
-  test('login', async () => {
+  test('sync', async () => {
     const sessionsSynced = ['session1', 'session2']
     const leappCliService: any = {
       awsSsoIntegrationService: {
-        loginAndProvisionSessions: jest.fn(async () => sessionsSynced),
-      },
-      cliVerificationWindowService: {
-        closeBrowser: jest.fn(),
-      },
+        syncSessions: jest.fn(async () => sessionsSynced),
+      }
     }
 
-    const command = new LoginIntegration([], {} as any, leappCliService)
+    const command = new SyncIntegration([], {} as any, leappCliService)
     command.log = jest.fn()
 
     const integration = {id: 'id1'} as any
-    await command.login(integration)
+    await command.sync(integration)
 
-    expect(command.log).toHaveBeenNthCalledWith(1, 'waiting for browser authorization using your AWS sign-in...')
-    expect(leappCliService.awsSsoIntegrationService.loginAndProvisionSessions).toHaveBeenCalledWith(integration.id)
-    expect(command.log).toHaveBeenLastCalledWith('login successful (2 sessions ready to be synchronized)')
-    expect(leappCliService.cliVerificationWindowService.closeBrowser).toHaveBeenCalled()
+    expect(leappCliService.awsSsoIntegrationService.syncSessions).toHaveBeenCalledWith(integration.id)
+    expect(command.log).toHaveBeenCalledWith(`${sessionsSynced.length} sessions synchronized`)
   })
 
   test('run', async () => {
     await runCommand(undefined, '')
   })
 
-  test('run - login throws exception', async () => {
+  test('run - sync throws exception', async () => {
     await runCommand(new Error('errorMessage'), 'errorMessage')
   })
 
-  test('run - login throws undefined object', async () => {
+  test('run - sync throws undefined object', async () => {
     await runCommand({hello: 'randomObj'}, 'Unknown error: [object Object]')
   })
 
   async function runCommand(errorToThrow: any, expectedErrorMessage: string) {
     const selectedIntegration = {id: '1'}
 
-    const command = new LoginIntegration([], {} as any, null)
+    const command = new SyncIntegration([], {} as any, null)
     command.selectIntegration = jest.fn(async (): Promise<any> => selectedIntegration)
-    command.login = jest.fn(async () => {
+    command.sync = jest.fn(async () => {
       if (errorToThrow) {
         throw errorToThrow
       }
@@ -94,7 +89,7 @@ describe('LoginIntegration', () => {
     }
 
     expect(command.selectIntegration).toHaveBeenCalled()
-    expect(command.login).toHaveBeenCalledWith(selectedIntegration)
+    expect(command.sync).toHaveBeenCalledWith(selectedIntegration)
     if (errorToThrow) {
       expect(occurredError).toEqual(new Error(expectedErrorMessage))
     }

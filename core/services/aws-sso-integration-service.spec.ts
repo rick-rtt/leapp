@@ -47,7 +47,7 @@ describe('AwsSsoIntegrationService', () => {
   test('getIntegrations', () => {
     const expectedIntegrations = [{id: 1}]
     const repository = {
-      listAwsSsoConfigurations: () => expectedIntegrations,
+      listAwsSsoIntegrations: () => expectedIntegrations,
     } as any
 
     const awsIntegrationsService = new AwsSsoIntegrationService(repository, null, null, null, null, null)
@@ -123,6 +123,23 @@ describe('AwsSsoIntegrationService', () => {
     (awsIntegrationService as any).getDate = () => new Date('2022-02-24T10:00:00')
     const remainingHours = awsIntegrationService.remainingHours(integration)
     expect(remainingHours).toBe('in 30 minutes')
+  })
+
+  test('syncSessions', async () => {
+    const awsSsoRoleService = {
+      create: jest.fn()
+    }
+    const awsIntegrationService = new AwsSsoIntegrationService(null, null, awsSsoRoleService as any, null, null, null)
+    const integrationId = 'integrationId'
+    const sessions = [{}, {}]
+    awsIntegrationService.loginAndProvisionSessions = jest.fn(async () => sessions as any)
+
+    const sessionsSynced = await awsIntegrationService.syncSessions(integrationId)
+
+    expect(awsIntegrationService.loginAndProvisionSessions).toHaveBeenCalledWith(integrationId)
+    expect(awsSsoRoleService.create).toHaveBeenNthCalledWith(1, {awsSsoConfigurationId: integrationId})
+    expect(awsSsoRoleService.create).toHaveBeenNthCalledWith(2, {awsSsoConfigurationId: integrationId})
+    expect(sessionsSynced).toBe(sessions)
   })
 
   test('getDate', () => {
