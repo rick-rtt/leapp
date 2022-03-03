@@ -17,7 +17,10 @@ export default class DeleteSession extends Command {
     async run(): Promise<void> {
         try {
             const selectedSession = await this.selectSession()
-            await this.deleteSession(selectedSession)
+            const affectedSessions = this.getAffectedSessions(selectedSession)
+            if (await this.askForConfirmation(affectedSessions)) {
+              await this.deleteSession(selectedSession)
+            }
         } catch (error) {
             this.error(error instanceof Error ? error.message : `Unknown error: ${error}`)
         }
@@ -42,5 +45,23 @@ export default class DeleteSession extends Command {
         const sessionService = this.leappCliService.sessionFactory.getSessionService(session.type)
         await sessionService.delete(session.sessionId)
         this.log('session deleted')
+    }
+
+    public getAffectedSessions(session: Session): Session[] {
+      const sessionService = this.leappCliService.sessionFactory.getSessionService(session.type)
+      return sessionService.getDependantSessions(session.sessionId)
+    }
+
+    public async askForConfirmation(affectedSessions: Session[]): Promise<boolean> {
+      if (affectedSessions.length === 0) {
+        return true
+      }
+      const sessionsList = affectedSessions.map(session => `- ${session.sessionName}`).join('\n')
+      const answer: any = await this.leappCliService.inquirer.prompt([{
+        name: 'confirmation',
+        message: `deleting this session will delete also these chained sessions\n${sessionsList}\nDo you want to continue?`,
+        type: 'confirm'
+      }])
+      return answer.confirmation
     }
 }

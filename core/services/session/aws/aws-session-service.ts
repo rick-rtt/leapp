@@ -1,103 +1,112 @@
-import {CredentialsInfo} from '../../../models/credentials-info';
-import {SessionStatus} from '../../../models/session-status';
-import {LeappBaseError} from '../../../errors/leapp-base-error';
-import {LoggerLevel} from '../../logging-service';
-import {SessionService} from '../session-service';
-import {ISessionNotifier} from '../../../interfaces/i-session-notifier';
-import { Repository } from '../../repository';
+import { CredentialsInfo } from '../../../models/credentials-info'
+import { Session } from '../../../models/session'
+import { SessionStatus } from '../../../models/session-status'
+import { LeappBaseError } from '../../../errors/leapp-base-error'
+import { LoggerLevel } from '../../logging-service'
+import { SessionService } from '../session-service'
+import { ISessionNotifier } from '../../../interfaces/i-session-notifier'
+import { Repository } from '../../repository'
 
 export abstract class AwsSessionService extends SessionService {
 
   /* This service manage the session manipulation as we need top generate credentials and maintain them for a specific duration */
   protected constructor(protected sessionNotifier: ISessionNotifier, protected repository: Repository) {
-    super(sessionNotifier, repository);
+    super(sessionNotifier, repository)
+  }
+
+  public getDependantSessions(sessionId: string): Session[] {
+    return this.repository.listIamRoleChained(this.sessionNotifier.getSessionById(sessionId));
   }
 
   async start(sessionId: string): Promise<void> {
     try {
       if (this.isThereAnotherPendingSessionWithSameNamedProfile(sessionId)) {
-        throw new LeappBaseError('Pending session with same named profile', this, LoggerLevel.info, 'Pending session with same named profile');
+        throw new LeappBaseError('Pending session with same named profile', this, LoggerLevel.info, 'Pending session with same named profile')
       }
-      this.stopAllWithSameNameProfile(sessionId);
-      this.sessionLoading(sessionId);
-      const credentialsInfo = await this.generateCredentials(sessionId);
-      await this.applyCredentials(sessionId, credentialsInfo);
-      this.sessionActivate(sessionId);
+      this.stopAllWithSameNameProfile(sessionId)
+      this.sessionLoading(sessionId)
+      const credentialsInfo = await this.generateCredentials(sessionId)
+      await this.applyCredentials(sessionId, credentialsInfo)
+      this.sessionActivate(sessionId)
     } catch (error) {
-      this.sessionError(sessionId, error);
+      this.sessionError(sessionId, error)
     }
   }
 
   async rotate(sessionId: string): Promise<void> {
     try {
-      this.sessionLoading(sessionId);
-      const credentialsInfo = await this.generateCredentials(sessionId);
-      await this.applyCredentials(sessionId, credentialsInfo);
-      this.sessionRotated(sessionId);
+      this.sessionLoading(sessionId)
+      const credentialsInfo = await this.generateCredentials(sessionId)
+      await this.applyCredentials(sessionId, credentialsInfo)
+      this.sessionRotated(sessionId)
     } catch (error) {
-      this.sessionError(sessionId, error);
+      this.sessionError(sessionId, error)
     }
   }
 
   async stop(sessionId: string): Promise<void> {
     try {
-      await this.deApplyCredentials(sessionId);
-      this.sessionDeactivated(sessionId);
+      await this.deApplyCredentials(sessionId)
+      this.sessionDeactivated(sessionId)
     } catch (error) {
-      this.sessionError(sessionId, error);
+      this.sessionError(sessionId, error)
     }
   }
 
   async delete(sessionId: string): Promise<void> {
     try {
       if (this.repository.getSessionById(sessionId).status === SessionStatus.active) {
-        await this.stop(sessionId);
+        await this.stop(sessionId)
       }
-      for (const sess of this.repository.listIamRoleChained(this.sessionNotifier.getSessionById(sessionId))) {
+      for (const sess of this.getDependantSessions(sessionId)) {
         if (sess.status === SessionStatus.active) {
-          await this.stop(sess.sessionId);
+          await this.stop(sess.sessionId)
         }
-        this.repository.deleteSession(sess.sessionId);
+        this.repository.deleteSession(sess.sessionId)
       }
-      this.repository.deleteSession(sessionId);
+      this.repository.deleteSession(sessionId)
 
-      this.sessionNotifier.setSessions(this.repository.getSessions());
-      await this.removeSecrets(sessionId);
-    } catch(error) {
-      this.sessionError(sessionId, error);
+      this.sessionNotifier.setSessions(this.repository.getSessions())
+      await this.removeSecrets(sessionId)
+    } catch (error) {
+      this.sessionError(sessionId, error)
     }
   }
 
   private isThereAnotherPendingSessionWithSameNamedProfile(sessionId: string) {
-    const session = this.repository.getSessionById(sessionId);
-    const profileId = (session as any).profileId;
-    const pendingSessions = this.repository.listPending();
+    const session = this.repository.getSessionById(sessionId)
+    const profileId = (session as any).profileId
+    const pendingSessions = this.repository.listPending()
 
-    for(let i = 0; i < pendingSessions.length; i++) {
+    for (let i = 0; i < pendingSessions.length; i++) {
       if ((pendingSessions[i] as any).profileId === profileId && (pendingSessions[i] as any).sessionId !== sessionId) {
-        return true;
+        return true
       }
     }
 
-    return false;
+    return false
   }
 
   private stopAllWithSameNameProfile(sessionId: string) {
     // Get profile to check
-    const session = this.repository.getSessionById(sessionId);
-    const profileId = (session as any).profileId;
+    const session = this.repository.getSessionById(sessionId)
+    const profileId = (session as any).profileId
     // Get all active sessions
-    const activeSessions = this.repository.listActive();
+    const activeSessions = this.repository.listActive()
     // Stop all that shares the same profile
     activeSessions.forEach(sess => {
-      if( (sess as any).profileId === profileId ) {
-        this.stop(sess.sessionId).then(_ => {});
+      if ((sess as any).profileId === profileId) {
+        this.stop(sess.sessionId).then(_ => {
+        })
       }
-    });
+    })
   }
 
   abstract generateCredentials(sessionId: string): Promise<CredentialsInfo>;
+
   abstract applyCredentials(sessionId: string, credentialsInfo: CredentialsInfo): Promise<void>;
+
   abstract deApplyCredentials(sessionId: string): Promise<void>;
+
   abstract removeSecrets(sessionId: string): void;
 }
