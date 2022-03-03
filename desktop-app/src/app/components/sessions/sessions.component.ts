@@ -241,7 +241,9 @@ export class SessionsComponent implements OnInit, OnDestroy {
   }
 
   public orderSessionsByStartTime(): void {
-      globalOrderingFilter.next(JSON.parse(JSON.stringify(this.eGlobalFilteredSessions.sort((a, b) => {
+      globalOrderingFilter.next(
+        JSON.parse(
+          JSON.stringify(this.eGlobalFilteredSessions.sort((a, b) => {
         if(a.startDateTime === undefined) {
           return 'z'.localeCompare(b.startDateTime);
         } else if (b.startDateTime === undefined) {
@@ -274,7 +276,7 @@ export class SessionsComponent implements OnInit, OnDestroy {
     }
   }
 
-  private resetArrowsExcept(c) {
+  private resetArrowsExcept(c): void {
     this.columnSettings.forEach((column, index) => {
       if(index !== c) {
         column.orderStyle = false;

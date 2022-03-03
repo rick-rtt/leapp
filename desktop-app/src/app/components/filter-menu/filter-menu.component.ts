@@ -40,41 +40,45 @@ export class FilterMenuComponent implements OnInit {
     this.searchable = false;
   }
 
-  ngOnInit(): void {
+  public ngOnInit(): void {
     this.data = this.data.map((o) => {
       o.show = true;
       return o;
     });
   }
 
-  updateValue(event: any, data: { id?: string; category?: string; name: string; value: boolean; show?: boolean }[], form: FormGroup) {
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types,max-len
+  public updateValue(event: any, data: { id?: string; category?: string; name: string; value: boolean; show?: boolean }[], form: FormGroup) {
     data = data.map((o) => ({ id: o.id, name: o.name, value: o.value, category: o.category }));
     form.get(this.control).setValue(data);
   }
 
-  searchContent(event: any) {
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+  public searchContent(event: any) {
     this.data = this.data.map((o) => {
       o.show = (o.name.toLowerCase().indexOf(event.target.value) > -1);
       return o;
     });
   }
 
-  applyCallback(event: MouseEvent, data: { id?: string; category?: string; name: string; value: boolean; show?: boolean }[], form: FormGroup) {
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types,max-len
+  public applyCallback(event: MouseEvent, data: { id?: string; category?: string; name: string; value: boolean; show?: boolean }[], form: FormGroup) {
     if(this.callback) {
       this.callback(event, data, form);
     }
   }
 
-  dataActive() {
+  public dataActive(): boolean {
     return this.data.filter((d) => d.value).length > 0;
   }
 
-  dataLabel() {
+  public dataLabel(): string {
     const result = this.data.filter((d) => d.value).map((d) => d.name);
     return result.length > 0 ? (result.length > 2 ? `${this.name} · ${result.length}`: result.join(', ')) : this.name;
   }
 
-  resetData(event, form: FormGroup) {
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+  public resetData(event: any, form: FormGroup): void {
     event.preventDefault();
     event.stopPropagation();
 

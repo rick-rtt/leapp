@@ -18,7 +18,7 @@
       </mat-expansion-panel-header>
 
       <mat-list-item [disableRipple]="true" *ngFor="let segment of segments" [ngClass]="selectedSegmentCheck(segment)" (click)="applySegmentFilter(segment, $event);">
-          <div mat-line class="visible-option-menu"><i class="moon-Tag"></i> <span>{{segment.name}}</span><i class="moon-Close" (click)="showConfirmationDialog(segment, $event)"></i></div>
+        <div mat-line class="visible-option-menu"><i class="moon-Tag"></i> <span>{{segment.name}}</span><i class="moon-Close" (click)="showConfirmationDialog(segment, $event)"></i></div>
       </mat-list-item>
 
     </mat-expansion-panel>

@@ -14,6 +14,7 @@ import {syncAllEvent} from '../integration-bar/integration-bar.component';
 import {LeappCoreService} from '../../services/leapp-core.service';
 import {ElectronService} from '../../services/electron.service';
 import {AppService} from '../../services/app.service';
+import {AwsSsoRoleSession} from "@noovolari/leapp-core/models/aws-sso-role-session";
 
 export const compactMode = new BehaviorSubject<boolean>(false);
 export const globalFilteredSessions = new BehaviorSubject<Session[]>([]);
@@ -74,12 +75,13 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
               private leappCoreService: LeappCoreService,
               public appService: AppService,
               public electronService: ElectronService) {
+
     this.workspaceService = leappCoreService.workspaceService;
 
     this.filterExtended = false;
     this.compactMode = false;
 
-    globalFilteredSessions.next(this.leappCoreService.workspaceService.sessions);
+    globalFilteredSessions.next(this.workspaceService.sessions);
 
     globalColumns.next({
       role: true,
@@ -95,7 +97,7 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
     document.querySelector('.sessions').classList.toggle('filtered');
   }
 
-  ngOnInit(): void {
+  public ngOnInit(): void {
     this.subscription = this.filterForm.valueChanges.subscribe((values: GlobalFilters) => {
       globalFilterGroup.next(values);
       this.applyFiltersToSessions(values, this.workspaceService.sessions);
@@ -105,7 +107,7 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
       this.filterExtended = value;
     });
 
-    this.subscription3 = globalResetFilter.subscribe((_) => {
+    this.subscription3 = globalResetFilter.subscribe(() => {
       this.setInitialArrayFilters();
 
       this.filterForm.get('searchFilter').setValue('');
@@ -145,7 +147,7 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
     });
   }
 
-  ngOnDestroy(): void {
+  public ngOnDestroy(): void {
     this.subscription.unsubscribe();
     this.subscription2.unsubscribe();
     this.subscription3.unsubscribe();
@@ -154,7 +156,7 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
     this.subscription6.unsubscribe();
   }
 
-  ngAfterContentChecked(): void {
+  public ngAfterContentChecked(): void {
     if(this.parent && this.child) {
       const parentW = parseInt(this.parent.nativeElement.clientWidth, 10);
       const childW = parseInt(this.child.nativeElement.clientWidth, 10);
@@ -162,15 +164,15 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
     }
   }
 
-  showOptionDialog() {
+  public showOptionDialog(): void {
     this.bsModalService.show(OptionsDialogComponent, { animated: false, class: 'option-modal'});
   }
 
-  showCreateDialog() {
+  public showCreateDialog(): void {
     this.bsModalService.show(CreateDialogComponent, { animated: false, class: 'create-modal'});
   }
 
-  toggleCompactMode() {
+  public toggleCompactMode(): void {
     this.compactMode = !this.compactMode;
     this.filterExtended = false;
     compactMode.next(this.compactMode);
@@ -178,22 +180,22 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
     // this.saveTemporarySegmentAndApply();
   }
 
-  toggleFilters() {
+  public toggleFilters(): void {
     this.filterExtended = !this.filterExtended;
     globalHasFilter.next(this.filterExtended);
     // this.saveTemporarySegmentAndApply();
     CommandBarComponent.changeSessionsTableHeight();
   }
 
-  toggleDateFilter() {
+  public toggleDateFilter(): void {
     this.filterForm.get('dateFilter').setValue(!this.filterForm.get('dateFilter').value);
   }
 
-  openSaveSegmentDialog() {
+  public openSaveSegmentDialog(): void {
     this.bsModalService.show(SegmentDialogComponent, { animated: false, class: 'segment-modal'});
   }
 
-  checkFormIsDirty() {
+  public checkFormIsDirty(): boolean {
     return this.filterForm.get('dateFilter').value ||
            this.filterForm.get('providerFilter').value.length > 0 ||
            this.filterForm.get('profileFilter').value.length > 0 ||
@@ -202,7 +204,7 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
            this.filterForm.get('typeFilter').value.length > 0;
   }
 
-  syncAll() {
+  public syncAll(): void {
     syncAllEvent.next(true);
   }
 
@@ -222,7 +224,8 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
         test ||= (session as any).roleSessionName?.toLowerCase().indexOf(searchText.toLowerCase()) > -1;
 
         try {
-          test ||= this.leappCoreService.repository.getProfileName((session as any).profileId)?.toLowerCase().indexOf(searchText.toLowerCase()) > -1;
+          test ||= this.leappCoreService.repository.getProfileName((session as any).profileId)?.toLowerCase()
+            .indexOf(searchText.toLowerCase()) > -1;
         } catch(e) {
           test ||= false;
         }
@@ -276,15 +279,17 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
 
     if(this.filterForm.get('integrationFilter').value.filter((v) => v.value).length > 0) {
       filteredSessions = filteredSessions.filter((session) => {
+        let test = false;
         this.integrations.forEach((integration) => {
-            //TODO implement integration filter
+          if(integration.value) {
+            test ||= (session.type === SessionType.awsSsoRole && (session as AwsSsoRoleSession).awsSsoConfigurationId.indexOf(integration.id) > -1);
+          }
         });
-        return true;
+        return test;
       });
     }
 
     if(this.filterForm.get('typeFilter').value.filter((v) => v.value).length > 0) {
-      console.log('present');
       filteredSessions = filteredSessions.filter((session) => {
         let test = false;
         this.types.forEach((type) => {
@@ -297,7 +302,8 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
     }
 
     filteredSessions = filteredSessions.sort((x, y) => {
-      if ((this.leappCoreService.repository.getWorkspace().pinned.indexOf(x.sessionId) !== -1) === (this.leappCoreService.repository.getWorkspace().pinned.indexOf(y.sessionId) !== -1)) {
+      const pinnedList = this.leappCoreService.repository.getWorkspace().pinned;
+      if ((pinnedList.indexOf(x.sessionId) !== -1) === (pinnedList.indexOf(y.sessionId) !== -1)) {
         return 0;
       } else if(this.leappCoreService.repository.getWorkspace().pinned.indexOf(x.sessionId) !== -1) {
         return -1;
@@ -358,6 +364,7 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
     this.integrations = [];
 
     this.types = [
+      // eslint-disable-next-line max-len
       { show: true, id: SessionType.awsIamRoleFederated, category: 'Amazon AWS', name: 'IAM Role Federated', value: false },
       { show: true, id: SessionType.awsIamUser, category: 'Amazon AWS', name: 'IAM User', value: false },
       { show: true, id: SessionType.awsIamRoleChained, category: 'Amazon AWS', name: 'IAM Role Chained', value: false },
@@ -365,9 +372,11 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
       { show: true, id: SessionType.azure, category: 'Microsoft Azure', name: 'Azure Subscription', value: false }
     ];
 
-    this.profiles = this.leappCoreService.repository.getProfiles().map((element) => ({ name: element.name, id: element.id, value: false, show: true}));
+    this.profiles = this.leappCoreService.repository.getProfiles()
+      .map((element) => ({ name: element.name, id: element.id, value: false, show: true}));
 
-    this.regions = this.leappCoreService.awsCoreService.getRegions().map((element) => ({ name: element.region, value: false, show: true }));
+    this.regions = this.leappCoreService.awsCoreService.getRegions()
+      .map((element) => ({ name: element.region, value: false, show: true }));
   }
 
   private saveTemporarySegmentAndApply() {
@@ -389,6 +398,4 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
       globalSegmentFilter.next(this.currentSegment);
     }
   }
-
-
 }

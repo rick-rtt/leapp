@@ -17,7 +17,7 @@ import SSOOIDC, {
 } from 'aws-sdk/clients/ssooidc';
 
 export class AwsSsoOidcService {
-  private readonly listeners: BrowserWindowClosing[]
+  public readonly listeners: BrowserWindowClosing[]
   private ssoOidc: SSOOIDC
   private generateSSOTokenResponse: GenerateSSOTokenResponse
   private setIntervalQueue: Array<any>

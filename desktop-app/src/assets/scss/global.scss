@@ -442,7 +442,7 @@ small.text-error {
   transition: all 0.2s ease;
 
   .mat-list-item-content {
-    padding: 0 7px!important;
+    padding: 0 6px!important;
 
     .status {
       left: 19px;
@@ -634,5 +634,43 @@ button, a, input, i {
         }
       }
     }
+  }
+}
+
+::ng-deep {
+.mat-tooltip {
+    font-size: 10px;
+    background-color: $text-black;
+  }
+}
+
+.modal + .modal {
+  background: rgba(41, 32, 68, 0.5);
+  &:after {
+    content: '';
+    top: 0;
+    left: 0; right: 0;
+    position: fixed;
+    height: 50px;
+    background: rgba(41, 32, 68, 0.5);
+  }
+}
+
+.fa-spinner:before {
+  display: block;
+  margin-top: 1px;
+}
+
+.command-bar:not(.compact) .top-right-option-button {
+  position: relative;
+  left: -10px;
+}
+
+::ng-deep {
+  .ng-select .ng-arrow-wrapper:hover .ng-arrow {
+    border-color: #666;
+  }
+  .mat-menu-panel {
+    min-height: initial!important;
   }
 }

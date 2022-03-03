@@ -191,33 +191,36 @@ export class CreateDialogComponent implements OnInit {
     switch (this.sessionType) {
       case SessionType.awsIamRoleFederated:
         result = this.form.get('name').valid &&
-                 this.selectedProfile &&
-                 this.form.get('awsRegion').valid &&
-                 this.form.get('roleArn').valid &&
-                 this.selectedIdpUrl &&
-                 this.form.get('idpArn').valid;
+          this.selectedProfile &&
+          this.form.get('awsRegion').valid &&
+          this.form.get('awsRegion').value !== null &&
+          this.form.get('roleArn').valid &&
+          this.selectedIdpUrl &&
+          this.form.get('idpArn').valid;
         break;
       case SessionType.awsIamRoleChained:
         result = this.form.get('name').valid &&
-                 this.selectedProfile &&
-                 this.form.get('awsRegion').valid &&
-                 this.form.get('roleArn').valid &&
-                 this.form.get('roleSessionName').valid &&
-                 this.selectedSession;
+          this.selectedProfile &&
+          this.form.get('awsRegion').valid &&
+          this.form.get('awsRegion').value !== null &&
+          this.form.get('roleArn').valid &&
+          this.form.get('roleSessionName').valid &&
+          this.selectedSession;
         break;
       case SessionType.awsIamUser:
         result = this.form.get('name').valid &&
-                 this.selectedProfile &&
-                 this.form.get('awsRegion').valid &&
-                 this.form.get('mfaDevice').valid &&
-                 this.form.get('accessKey').valid &&
-                 this.form.get('secretKey').valid;
+          this.selectedProfile &&
+          this.form.get('awsRegion').valid &&
+          this.form.get('awsRegion').value !== null &&
+          this.form.get('mfaDevice').valid &&
+          this.form.get('accessKey').valid &&
+          this.form.get('secretKey').valid;
         break;
       case SessionType.azure:
         result = this.form.get('name').valid &&
-                 this.form.get('subscriptionId').valid &&
-                 this.form.get('tenantId').valid &&
-                 this.form.get('azureLocation').valid;
+          this.form.get('subscriptionId').valid &&
+          this.form.get('tenantId').valid &&
+          this.form.get('azureLocation').valid;
         break;
     }
     return result;
@@ -270,7 +273,7 @@ export class CreateDialogComponent implements OnInit {
    */
   public goToAwsSso(): void {
     this.appService.closeModal();
-    openIntegrationEvent.next(true);
+    setTimeout(() => openIntegrationEvent.next(true), 100);
   }
 
   /**

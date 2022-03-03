@@ -64,6 +64,8 @@ form {
 
       i {
         font-size: 23px;
+        position: relative;
+        top: -1px;
       }
     }
   }
@@ -103,6 +105,11 @@ form {
     input {
       display: inline-flex;
       width: 72%;
+    }
+    button {
+      padding: 0;
+      margin-right: 25px;
+      margin-top: 10px;
     }
   }
 

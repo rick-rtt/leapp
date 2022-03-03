@@ -56,35 +56,46 @@ export class LeappSelectComponent implements AfterViewInit {
     return !!(obj && obj.constructor && obj.call && obj.apply);
   }
 
-  ngAfterViewInit(): void {
+  public ngAfterViewInit(): void {
     this.ngSelectComponent.handleClearClick();
   }
 
-  setTemporaryName($event: any) {
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+  public setTemporaryName($event: any): void {
     this.temporaryName = $event.target.value;
   }
 
-  checkNewElement(): boolean {
-    return this.temporaryName !== '' && this.items.filter(s => s[this.bindLabel].indexOf(this.temporaryName) > -1).length === 0;
+  public checkNewElement(): boolean {
+    return this.temporaryName !== '' &&
+           this.items.filter((s) => s[this.bindLabel].indexOf(this.temporaryName) > -1).length === 0;
   }
 
-  addNewElement(): void {
+  public addNewElement(): void {
     const newElement = {};
     newElement[this.bindLabel] = this.temporaryName;
-    newElement[this.bindValue] = LeappSelectComponent.isFunction(this.defaultNewValue) ? this.defaultNewValue() : this.defaultNewValue;
+    newElement[this.bindValue] = LeappSelectComponent.isFunction(this.defaultNewValue) ?
+      this.defaultNewValue() : this.defaultNewValue;
 
     this.items.push(newElement);
     this.items = [...this.items];
+    this.ngSelectComponent.select(newElement);
     this.selected.emit({ items: this.items, item: newElement });
   }
 
-  change() {
+  public change(): void {
     if(this.ngSelectComponent.selectedItems[0]?.selected) {
+      // eslint-disable-next-line max-len
       this.selected.emit({ items: this.items, item: { label: this.ngSelectComponent.selectedItems[0].label, value: this.ngSelectComponent.selectedItems[0].value[this.bindValue] }});
     } else {
       this.selected.emit({ items: this.items, item: null });
     }
   }
 
-  reset() {}
+  public setByEnter(): void {
+    if(this.checkNewElement()) {
+      this.addNewElement();
+    }
+  }
+
+  public reset(): void {}
 }

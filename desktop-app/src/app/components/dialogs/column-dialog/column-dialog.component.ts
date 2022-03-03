@@ -1,4 +1,4 @@
-import {Component, Input, OnDestroy, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {BsModalRef} from 'ngx-bootstrap/modal';
 import {AppService} from '../../../services/app.service';
 import {FormControl, FormGroup} from '@angular/forms';
@@ -28,7 +28,7 @@ export class ColumnDialogComponent implements OnInit, OnDestroy {
 
   constructor(private bsModalRef: BsModalRef, private appService: AppService) {}
 
-  ngOnInit(): void {
+  public ngOnInit(): void {
     // Set new state
     Object.keys(this.eGlobalColumns).forEach((key) => {
       this.columnForm.get(key).setValue(this.eGlobalColumns[key]);
@@ -41,16 +41,16 @@ export class ColumnDialogComponent implements OnInit, OnDestroy {
     this.subscription2 = compactMode.subscribe((value) => this.showRegion = !value);
   }
 
-  ngOnDestroy(): void {
+  public ngOnDestroy(): void {
     this.subscription.unsubscribe();
     this.subscription2.unsubscribe();
   }
 
-  closeModal() {
+  public closeModal(): void {
     this.appService.closeModal();
   }
 
-  setColumns() {
+  public setColumns(): void {
     globalColumns.next(this.values);
     this.appService.closeModal();
   }

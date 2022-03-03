@@ -22,20 +22,20 @@ export class UpdateDialogComponent implements OnInit {
   /* Just a restyled modal to show a confirmation for delete actions */
   constructor(private bsModalRef: BsModalRef) { }
 
-  ngOnInit() {}
+  public ngOnInit(): void {}
 
-  close() {
+  public close(): void {
     this.remindMeLater();
   }
 
-  remindMeLater() {
+  public remindMeLater(): void {
     if (this.callback) {
       this.callback(constants.confirmClosedAndIgnoreUpdate);
     }
     this.bsModalRef.hide();
   }
 
-  goToDownloadPage() {
+  public goToDownloadPage(): void {
     if (this.callback) {
       this.callback(constants.confirmCloseAndDownloadUpdate);
     }
