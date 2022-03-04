@@ -1,10 +1,10 @@
-import {ComponentFixture, TestBed} from '@angular/core/testing';
+import { ComponentFixture, TestBed } from "@angular/core/testing";
 
-import {InputDialogComponent} from './input-dialog.component';
-import {mustInjected} from '../../../../base-injectables';
-import {RouterTestingModule} from '@angular/router/testing';
+import { InputDialogComponent } from "./input-dialog.component";
+import { mustInjected } from "../../../../base-injectables";
+import { RouterTestingModule } from "@angular/router/testing";
 
-describe('InputDialogComponent', () => {
+describe("InputDialogComponent", () => {
   let component: InputDialogComponent;
   let fixture: ComponentFixture<InputDialogComponent>;
 
@@ -12,7 +12,7 @@ describe('InputDialogComponent', () => {
     TestBed.configureTestingModule({
       imports: [RouterTestingModule],
       declarations: [InputDialogComponent],
-      providers: [].concat(mustInjected())
+      providers: [].concat(mustInjected()),
     }).compileComponents();
 
     fixture = TestBed.createComponent(InputDialogComponent);
@@ -20,7 +20,7 @@ describe('InputDialogComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it("should create", () => {
     expect(component).toBeTruthy();
   });
 });

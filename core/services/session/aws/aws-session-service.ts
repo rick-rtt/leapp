@@ -1,13 +1,12 @@
-import {CredentialsInfo} from '../../../models/credentials-info';
-import {SessionStatus} from '../../../models/session-status';
-import {LeappBaseError} from '../../../errors/leapp-base-error';
-import {LoggerLevel} from '../../logging-service';
-import {SessionService} from '../session-service';
-import {ISessionNotifier} from '../../../interfaces/i-session-notifier';
-import { Repository } from '../../repository';
+import { CredentialsInfo } from "../../../models/credentials-info";
+import { SessionStatus } from "../../../models/session-status";
+import { LeappBaseError } from "../../../errors/leapp-base-error";
+import { LoggerLevel } from "../../logging-service";
+import { SessionService } from "../session-service";
+import { ISessionNotifier } from "../../../interfaces/i-session-notifier";
+import { Repository } from "../../repository";
 
 export abstract class AwsSessionService extends SessionService {
-
   /* This service manage the session manipulation as we need top generate credentials and maintain them for a specific duration */
   protected constructor(protected sessionNotifier: ISessionNotifier, protected repository: Repository) {
     super(sessionNotifier, repository);
@@ -16,7 +15,7 @@ export abstract class AwsSessionService extends SessionService {
   async start(sessionId: string): Promise<void> {
     try {
       if (this.isThereAnotherPendingSessionWithSameNamedProfile(sessionId)) {
-        throw new LeappBaseError('Pending session with same named profile', this, LoggerLevel.info, 'Pending session with same named profile');
+        throw new LeappBaseError("Pending session with same named profile", this, LoggerLevel.info, "Pending session with same named profile");
       }
       this.stopAllWithSameNameProfile(sessionId);
       this.sessionLoading(sessionId);
@@ -63,7 +62,7 @@ export abstract class AwsSessionService extends SessionService {
 
       this.sessionNotifier.setSessions(this.repository.getSessions());
       await this.removeSecrets(sessionId);
-    } catch(error) {
+    } catch (error) {
       this.sessionError(sessionId, error);
     }
   }
@@ -73,7 +72,7 @@ export abstract class AwsSessionService extends SessionService {
     const profileId = (session as any).profileId;
     const pendingSessions = this.repository.listPending();
 
-    for(let i = 0; i < pendingSessions.length; i++) {
+    for (let i = 0; i < pendingSessions.length; i++) {
       if ((pendingSessions[i] as any).profileId === profileId && (pendingSessions[i] as any).sessionId !== sessionId) {
         return true;
       }
@@ -89,9 +88,9 @@ export abstract class AwsSessionService extends SessionService {
     // Get all active sessions
     const activeSessions = this.repository.listActive();
     // Stop all that shares the same profile
-    activeSessions.forEach(sess => {
-      if( (sess as any).profileId === profileId ) {
-        this.stop(sess.sessionId).then(_ => {});
+    activeSessions.forEach((sess) => {
+      if ((sess as any).profileId === profileId) {
+        this.stop(sess.sessionId).then((_) => {});
       }
     });
   }

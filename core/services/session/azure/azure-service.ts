@@ -1,12 +1,12 @@
-import { LeappExecuteError } from '../../../errors/leapp-execute-error'
-import { LeappParseError } from '../../../errors/leapp-parse-error'
-import { ISessionNotifier } from '../../../interfaces/i-session-notifier'
-import { AzureSession } from '../../../models/azure-session'
-import { ExecuteService } from '../../execute-service'
-import { FileService } from '../../file-service'
-import { Repository } from '../../repository'
-import { SessionService } from '../session-service'
-import { AzureSessionRequest } from './azure-session-request'
+import { LeappExecuteError } from "../../../errors/leapp-execute-error";
+import { LeappParseError } from "../../../errors/leapp-parse-error";
+import { ISessionNotifier } from "../../../interfaces/i-session-notifier";
+import { AzureSession } from "../../../models/azure-session";
+import { ExecuteService } from "../../execute-service";
+import { FileService } from "../../file-service";
+import { Repository } from "../../repository";
+import { SessionService } from "../session-service";
+import { AzureSessionRequest } from "./azure-session-request";
 
 export interface AzureSessionToken {
   tokenType: string;
@@ -23,121 +23,125 @@ export interface AzureSessionToken {
 }
 
 export class AzureService extends SessionService {
-  public constructor(iSessionNotifier: ISessionNotifier, repository: Repository, private fileService: FileService,
-                     private executeService: ExecuteService, private azureAccessTokens: string) {
-    super(iSessionNotifier, repository)
+  constructor(
+    iSessionNotifier: ISessionNotifier,
+    repository: Repository,
+    private fileService: FileService,
+    private executeService: ExecuteService,
+    private azureAccessTokens: string
+  ) {
+    super(iSessionNotifier, repository);
   }
 
   async create(sessionRequest: AzureSessionRequest): Promise<void> {
-    const session = new AzureSession(sessionRequest.sessionName, sessionRequest.region,
-      sessionRequest.subscriptionId, sessionRequest.tenantId)
-    this.repository.addSession(session)
-    this.sessionNotifier?.addSession(session)
+    const session = new AzureSession(sessionRequest.sessionName, sessionRequest.region, sessionRequest.subscriptionId, sessionRequest.tenantId);
+    this.repository.addSession(session);
+    this.sessionNotifier?.addSession(session);
   }
 
   async start(sessionId: string): Promise<void> {
-    this.sessionLoading(sessionId)
+    this.sessionLoading(sessionId);
 
-    const session = this.repository.getSessionById(sessionId)
+    const session = this.repository.getSessionById(sessionId);
 
     // Try parse accessToken.json
-    let accessTokensFile = this.parseAccessTokens()
+    let accessTokensFile = this.parseAccessTokens();
 
     // extract accessToken corresponding to the specific tenant (if not present, require az login)
-    let accessTokenExpirationTime
+    let accessTokenExpirationTime;
     if (accessTokensFile) {
-      accessTokenExpirationTime = this.extractAccessTokenExpirationTime(accessTokensFile, (session as AzureSession).tenantId)
+      accessTokenExpirationTime = this.extractAccessTokenExpirationTime(accessTokensFile, (session as AzureSession).tenantId);
     }
 
     if (!accessTokenExpirationTime) {
       try {
-        await this.executeService.execute(`az login --tenant ${(session as AzureSession).tenantId} 2>&1`)
-        accessTokensFile = this.parseAccessTokens()
-        accessTokenExpirationTime = this.extractAccessTokenExpirationTime(accessTokensFile, (session as AzureSession).tenantId)
+        await this.executeService.execute(`az login --tenant ${(session as AzureSession).tenantId} 2>&1`);
+        accessTokensFile = this.parseAccessTokens();
+        accessTokenExpirationTime = this.extractAccessTokenExpirationTime(accessTokensFile, (session as AzureSession).tenantId);
       } catch (err) {
-        this.sessionDeactivated(sessionId)
-        throw new LeappExecuteError(this, err.message)
+        this.sessionDeactivated(sessionId);
+        throw new LeappExecuteError(this, err.message);
       }
     }
 
     // if access token is expired
     if (new Date(accessTokenExpirationTime).getTime() < Date.now()) {
       try {
-        await this.executeService.execute(`az account get-access-token --subscription ${(session as AzureSession).subscriptionId}`)
+        await this.executeService.execute(`az account get-access-token --subscription ${(session as AzureSession).subscriptionId}`);
       } catch (err) {
-        this.sessionDeactivated(sessionId)
-        throw new LeappExecuteError(this, err.message)
+        this.sessionDeactivated(sessionId);
+        throw new LeappExecuteError(this, err.message);
       }
     }
 
     try {
       // az account set —subscription <xxx> 2>&1
-      await this.executeService.execute(`az account set --subscription ${(session as AzureSession).subscriptionId} 2>&1`)
+      await this.executeService.execute(`az account set --subscription ${(session as AzureSession).subscriptionId} 2>&1`);
       // az configure —default location <region(location)>
-      await this.executeService.execute(`az configure --default location=${(session as AzureSession).region} 2>&1`)
+      await this.executeService.execute(`az configure --default location=${(session as AzureSession).region} 2>&1`);
       // delete refresh token from accessTokens
-      this.deleteRefreshToken()
+      this.deleteRefreshToken();
     } catch (err) {
-      this.sessionDeactivated(sessionId)
-      throw new LeappExecuteError(this, err.message)
+      this.sessionDeactivated(sessionId);
+      throw new LeappExecuteError(this, err.message);
     }
 
-    this.sessionActivate(sessionId)
-    return Promise.resolve(undefined)
+    this.sessionActivate(sessionId);
+    return Promise.resolve(undefined);
   }
 
   async rotate(sessionId: string): Promise<void> {
-    return this.start(sessionId)
+    return this.start(sessionId);
   }
 
   async stop(sessionId: string): Promise<void> {
-    this.sessionLoading(sessionId)
+    this.sessionLoading(sessionId);
     try {
-      await this.executeService.execute(`az account clear 2>&1`)
-      await this.executeService.execute(`az configure --defaults location='' 2>&1`)
+      await this.executeService.execute(`az account clear 2>&1`);
+      await this.executeService.execute(`az configure --defaults location='' 2>&1`);
     } catch (err) {
-      throw new LeappExecuteError(this, err.message)
+      throw new LeappExecuteError(this, err.message);
     } finally {
-      this.sessionDeactivated(sessionId)
+      this.sessionDeactivated(sessionId);
     }
   }
 
   async delete(sessionId: string): Promise<void> {
     try {
       //TODO: check if session is currently active before trying to stop it?
-      await this.stop(sessionId)
-      this.repository.deleteSession(sessionId)
-      this.sessionNotifier.deleteSession(sessionId)
+      await this.stop(sessionId);
+      this.repository.deleteSession(sessionId);
+      this.sessionNotifier.deleteSession(sessionId);
     } catch (error) {
-      throw new LeappParseError(this, error.message)
+      throw new LeappParseError(this, error.message);
     }
   }
 
   private extractAccessTokenExpirationTime(accessTokens: AzureSessionToken[], tenantId: string): string {
-    const correctToken = accessTokens.find(accessToken => accessToken._authority.split('/')[1] === tenantId)
-    return correctToken ? correctToken.expiresOn : undefined
+    const correctToken = accessTokens.find((accessToken) => accessToken._authority.split("/")[1] === tenantId);
+    return correctToken ? correctToken.expiresOn : undefined;
   }
 
   private deleteRefreshToken(): void {
-    const accessTokensString = this.fileService.readFileSync(`${this.fileService.homeDir()}/${this.azureAccessTokens}`)
-    let azureSessionTokens = JSON.parse(accessTokensString) as AzureSessionToken[]
-    azureSessionTokens = azureSessionTokens.map(azureSessionToken => {
-      delete azureSessionToken.refreshToken
-      return azureSessionToken
-    })
-    this.fileService.writeFileSync(`${this.fileService.homeDir()}/${this.azureAccessTokens}`, JSON.stringify(azureSessionTokens))
+    const accessTokensString = this.fileService.readFileSync(`${this.fileService.homeDir()}/${this.azureAccessTokens}`);
+    let azureSessionTokens = JSON.parse(accessTokensString) as AzureSessionToken[];
+    azureSessionTokens = azureSessionTokens.map((azureSessionToken) => {
+      delete azureSessionToken.refreshToken;
+      return azureSessionToken;
+    });
+    this.fileService.writeFileSync(`${this.fileService.homeDir()}/${this.azureAccessTokens}`, JSON.stringify(azureSessionTokens));
   }
 
   private parseAccessTokens(): AzureSessionToken[] {
     if (!this.accessTokenFileExists()) {
-      return undefined
+      return undefined;
     }
 
-    const accessTokensString = this.fileService.readFileSync(`${this.fileService.homeDir()}/${this.azureAccessTokens}`)
-    return JSON.parse(accessTokensString) as AzureSessionToken[]
+    const accessTokensString = this.fileService.readFileSync(`${this.fileService.homeDir()}/${this.azureAccessTokens}`);
+    return JSON.parse(accessTokensString) as AzureSessionToken[];
   }
 
   private accessTokenFileExists(): boolean {
-    return this.fileService.existsSync(`${this.fileService.homeDir()}/${this.azureAccessTokens}`)
+    return this.fileService.existsSync(`${this.fileService.homeDir()}/${this.azureAccessTokens}`);
   }
 }

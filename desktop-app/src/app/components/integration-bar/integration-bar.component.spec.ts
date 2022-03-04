@@ -1,16 +1,15 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from "@angular/core/testing";
 
-import { IntegrationBarComponent } from './integration-bar.component';
+import { IntegrationBarComponent } from "./integration-bar.component";
 
-describe('IntegrationBarComponent', () => {
+describe("IntegrationBarComponent", () => {
   let component: IntegrationBarComponent;
   let fixture: ComponentFixture<IntegrationBarComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ IntegrationBarComponent ]
-    })
-    .compileComponents();
+      declarations: [IntegrationBarComponent],
+    }).compileComponents();
   });
 
   beforeEach(() => {
@@ -19,7 +18,7 @@ describe('IntegrationBarComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it("should create", () => {
     expect(component).toBeTruthy();
   });
 });

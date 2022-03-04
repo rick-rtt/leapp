@@ -1,7 +1,6 @@
-import {LoggerLevel} from '../services/logging-service';
+import { LoggerLevel } from "../services/logging-service";
 
 export class LeappBaseError extends Error {
-
   private readonly _context: any;
   private readonly _severity: LoggerLevel;
 

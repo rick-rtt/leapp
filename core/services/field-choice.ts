@@ -1,4 +1,3 @@
 export class FieldChoice {
-    constructor(public fieldName: string, public fieldValue: string) {
-    }
+  constructor(public fieldName: string, public fieldValue: string) {}
 }

@@ -1,19 +1,19 @@
-import {AfterContentChecked, Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {BsModalService} from 'ngx-bootstrap/modal';
-import {OptionsDialogComponent} from '../dialogs/options-dialog/options-dialog.component';
-import {CreateDialogComponent} from '../dialogs/create-dialog/create-dialog.component';
-import {SegmentDialogComponent} from '../dialogs/segment-dialog/segment-dialog.component';
-import {FormControl, FormGroup} from '@angular/forms';
-import {BehaviorSubject} from 'rxjs';
-import {globalOrderingFilter} from '../sessions/sessions.component';
-import { Session } from '@noovolari/leapp-core/models/session';
-import Segment, {GlobalFilters} from '@noovolari/leapp-core/models/Segment';
-import {SessionType} from '@noovolari/leapp-core/models/session-type';
-import {WorkspaceService} from '@noovolari/leapp-core/services/workspace-service';
-import {syncAllEvent} from '../integration-bar/integration-bar.component';
-import {LeappCoreService} from '../../services/leapp-core.service';
-import {ElectronService} from '../../services/electron.service';
-import {AppService} from '../../services/app.service';
+import { AfterContentChecked, Component, ElementRef, OnDestroy, OnInit, ViewChild } from "@angular/core";
+import { BsModalService } from "ngx-bootstrap/modal";
+import { OptionsDialogComponent } from "../dialogs/options-dialog/options-dialog.component";
+import { CreateDialogComponent } from "../dialogs/create-dialog/create-dialog.component";
+import { SegmentDialogComponent } from "../dialogs/segment-dialog/segment-dialog.component";
+import { FormControl, FormGroup } from "@angular/forms";
+import { BehaviorSubject } from "rxjs";
+import { globalOrderingFilter } from "../sessions/sessions.component";
+import { Session } from "@noovolari/leapp-core/models/session";
+import Segment, { GlobalFilters } from "@noovolari/leapp-core/models/Segment";
+import { SessionType } from "@noovolari/leapp-core/models/session-type";
+import { WorkspaceService } from "@noovolari/leapp-core/services/workspace-service";
+import { syncAllEvent } from "../integration-bar/integration-bar.component";
+import { LeappCoreService } from "../../services/leapp-core.service";
+import { ElectronService } from "../../services/electron.service";
+import { AppService } from "../../services/app.service";
 
 export const compactMode = new BehaviorSubject<boolean>(false);
 export const globalFilteredSessions = new BehaviorSubject<Session[]>([]);
@@ -31,30 +31,30 @@ export interface IGlobalColumns {
 export const globalColumns = new BehaviorSubject<IGlobalColumns>(null);
 
 @Component({
-  selector: 'app-command-bar',
-  templateUrl: './command-bar.component.html',
-  styleUrls: ['./command-bar.component.scss']
+  selector: "app-command-bar",
+  templateUrl: "./command-bar.component.html",
+  styleUrls: ["./command-bar.component.scss"],
 })
 export class CommandBarComponent implements OnInit, OnDestroy, AfterContentChecked {
-  @ViewChild('parent') parent: ElementRef;
-  @ViewChild('child') child: ElementRef;
+  @ViewChild("parent") parent: ElementRef;
+  @ViewChild("child") child: ElementRef;
   overflowed = false;
 
   filterForm = new FormGroup({
-    searchFilter: new FormControl(''),
+    searchFilter: new FormControl(""),
     dateFilter: new FormControl(true),
     providerFilter: new FormControl([]),
     profileFilter: new FormControl([]),
     regionFilter: new FormControl([]),
     integrationFilter: new FormControl([]),
-    typeFilter: new FormControl([])
+    typeFilter: new FormControl([]),
   });
 
-  providers: {show: boolean; id: string; name: string; value: boolean}[];
-  profiles: {show: boolean; id: string; name: string; value: boolean}[];
-  integrations: {show: boolean; id: string; name: string; value: boolean}[];
-  types: {show: boolean; id: SessionType; category: string; name: string; value: boolean}[];
-  regions: {show: boolean; name: string; value: boolean}[];
+  providers: { show: boolean; id: string; name: string; value: boolean }[];
+  profiles: { show: boolean; id: string; name: string; value: boolean }[];
+  integrations: { show: boolean; id: string; name: string; value: boolean }[];
+  types: { show: boolean; id: SessionType; category: string; name: string; value: boolean }[];
+  regions: { show: boolean; name: string; value: boolean }[];
 
   filterExtended: boolean;
   compactMode: boolean;
@@ -70,10 +70,12 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
 
   private workspaceService: WorkspaceService;
 
-  constructor(private bsModalService: BsModalService,
-              private leappCoreService: LeappCoreService,
-              public appService: AppService,
-              public electronService: ElectronService) {
+  constructor(
+    private bsModalService: BsModalService,
+    private leappCoreService: LeappCoreService,
+    public appService: AppService,
+    public electronService: ElectronService
+  ) {
     this.workspaceService = leappCoreService.workspaceService;
 
     this.filterExtended = false;
@@ -85,14 +87,14 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
       role: true,
       provider: true,
       namedProfile: true,
-      region: true
+      region: true,
     });
 
     this.setInitialArrayFilters();
   }
 
   private static changeSessionsTableHeight() {
-    document.querySelector('.sessions').classList.toggle('filtered');
+    document.querySelector(".sessions").classList.toggle("filtered");
   }
 
   ngOnInit(): void {
@@ -108,31 +110,31 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
     this.subscription3 = globalResetFilter.subscribe((_) => {
       this.setInitialArrayFilters();
 
-      this.filterForm.get('searchFilter').setValue('');
-      this.filterForm.get('dateFilter').setValue(true);
-      this.filterForm.get('providerFilter').setValue(this.providers);
-      this.filterForm.get('profileFilter').setValue(this.profiles);
-      this.filterForm.get('regionFilter').setValue(this.regions);
-      this.filterForm.get('integrationFilter').setValue(this.integrations);
-      this.filterForm.get('typeFilter').setValue(this.types);
+      this.filterForm.get("searchFilter").setValue("");
+      this.filterForm.get("dateFilter").setValue(true);
+      this.filterForm.get("providerFilter").setValue(this.providers);
+      this.filterForm.get("profileFilter").setValue(this.profiles);
+      this.filterForm.get("regionFilter").setValue(this.regions);
+      this.filterForm.get("integrationFilter").setValue(this.integrations);
+      this.filterForm.get("typeFilter").setValue(this.types);
     });
 
     this.subscription4 = this.workspaceService.sessions$.subscribe((sessions) => {
       const actualFilterValues: GlobalFilters = {
-        dateFilter: this.filterForm.get('dateFilter').value,
-        integrationFilter: this.filterForm.get('integrationFilter').value,
-        profileFilter: this.filterForm.get('profileFilter').value,
-        providerFilter: this.filterForm.get('providerFilter').value,
-        regionFilter: this.filterForm.get('regionFilter').value,
-        searchFilter: this.filterForm.get('searchFilter').value,
-        typeFilter: this.filterForm.get('typeFilter').value
+        dateFilter: this.filterForm.get("dateFilter").value,
+        integrationFilter: this.filterForm.get("integrationFilter").value,
+        profileFilter: this.filterForm.get("profileFilter").value,
+        providerFilter: this.filterForm.get("providerFilter").value,
+        regionFilter: this.filterForm.get("regionFilter").value,
+        searchFilter: this.filterForm.get("searchFilter").value,
+        typeFilter: this.filterForm.get("typeFilter").value,
       };
 
       this.applyFiltersToSessions(actualFilterValues, sessions);
     });
 
     this.subscription5 = globalSegmentFilter.subscribe((segment: Segment) => {
-      if(segment) {
+      if (segment) {
         const values = segment.filterGroup;
         globalFilterGroup.next(values);
         this.updateFilterForm(values);
@@ -155,7 +157,7 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
   }
 
   ngAfterContentChecked(): void {
-    if(this.parent && this.child) {
+    if (this.parent && this.child) {
       const parentW = parseInt(this.parent.nativeElement.clientWidth, 10);
       const childW = parseInt(this.child.nativeElement.clientWidth, 10);
       this.overflowed = childW > parentW;
@@ -163,11 +165,11 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
   }
 
   showOptionDialog() {
-    this.bsModalService.show(OptionsDialogComponent, { animated: false, class: 'option-modal'});
+    this.bsModalService.show(OptionsDialogComponent, { animated: false, class: "option-modal" });
   }
 
   showCreateDialog() {
-    this.bsModalService.show(CreateDialogComponent, { animated: false, class: 'create-modal'});
+    this.bsModalService.show(CreateDialogComponent, { animated: false, class: "create-modal" });
   }
 
   toggleCompactMode() {
@@ -186,20 +188,22 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
   }
 
   toggleDateFilter() {
-    this.filterForm.get('dateFilter').setValue(!this.filterForm.get('dateFilter').value);
+    this.filterForm.get("dateFilter").setValue(!this.filterForm.get("dateFilter").value);
   }
 
   openSaveSegmentDialog() {
-    this.bsModalService.show(SegmentDialogComponent, { animated: false, class: 'segment-modal'});
+    this.bsModalService.show(SegmentDialogComponent, { animated: false, class: "segment-modal" });
   }
 
   checkFormIsDirty() {
-    return this.filterForm.get('dateFilter').value ||
-           this.filterForm.get('providerFilter').value.length > 0 ||
-           this.filterForm.get('profileFilter').value.length > 0 ||
-           this.filterForm.get('regionFilter').value.length > 0 ||
-           this.filterForm.get('integrationFilter').value.length > 0 ||
-           this.filterForm.get('typeFilter').value.length > 0;
+    return (
+      this.filterForm.get("dateFilter").value ||
+      this.filterForm.get("providerFilter").value.length > 0 ||
+      this.filterForm.get("profileFilter").value.length > 0 ||
+      this.filterForm.get("regionFilter").value.length > 0 ||
+      this.filterForm.get("integrationFilter").value.length > 0 ||
+      this.filterForm.get("typeFilter").value.length > 0
+    );
   }
 
   syncAll() {
@@ -207,10 +211,9 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
   }
 
   private applyFiltersToSessions(values: GlobalFilters, sessions: Session[]) {
-
     let filteredSessions = sessions;
-    const searchText = this.filterForm.get('searchFilter').value;
-    if(searchText !== '') {
+    const searchText = this.filterForm.get("searchFilter").value;
+    if (searchText !== "") {
       filteredSessions = filteredSessions.filter((session) => {
         let test = false;
         test ||= session.sessionName.toLowerCase().indexOf(searchText.toLowerCase()) > -1;
@@ -222,25 +225,29 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
         test ||= (session as any).roleSessionName?.toLowerCase().indexOf(searchText.toLowerCase()) > -1;
 
         try {
-          test ||= this.leappCoreService.repository.getProfileName((session as any).profileId)?.toLowerCase().indexOf(searchText.toLowerCase()) > -1;
-        } catch(e) {
+          test ||=
+            this.leappCoreService.repository
+              .getProfileName((session as any).profileId)
+              ?.toLowerCase()
+              .indexOf(searchText.toLowerCase()) > -1;
+        } catch (e) {
           test ||= false;
         }
         return test;
       });
     }
 
-    if(this.filterForm.get('dateFilter').value) {
+    if (this.filterForm.get("dateFilter").value) {
       filteredSessions = this.orderByDate(filteredSessions);
     } else {
       filteredSessions = filteredSessions.sort((a, b) => a.sessionName.localeCompare(b.sessionName));
     }
 
-    if(this.filterForm.get('providerFilter').value.filter((v) => v.value).length > 0) {
+    if (this.filterForm.get("providerFilter").value.filter((v) => v.value).length > 0) {
       filteredSessions = filteredSessions.filter((session) => {
         let test = false;
         this.providers.forEach((provider) => {
-          if(provider.value) {
+          if (provider.value) {
             test ||= session.type.indexOf(provider.id) > -1;
           }
         });
@@ -248,12 +255,12 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
       });
     }
 
-    if(this.filterForm.get('profileFilter').value.filter((v) => v.value).length > 0) {
+    if (this.filterForm.get("profileFilter").value.filter((v) => v.value).length > 0) {
       filteredSessions = filteredSessions.filter((session) => {
         let test = false;
         this.profiles.forEach((profile) => {
-          if(profile.value) {
-            if((session as any).profileId) {
+          if (profile.value) {
+            if ((session as any).profileId) {
               test ||= (session as any).profileId.indexOf(profile.id) > -1;
             }
           }
@@ -262,11 +269,11 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
       });
     }
 
-    if(this.filterForm.get('regionFilter').value.filter((v) => v.value).length > 0) {
+    if (this.filterForm.get("regionFilter").value.filter((v) => v.value).length > 0) {
       filteredSessions = filteredSessions.filter((session) => {
         let test = false;
         this.regions.forEach((region) => {
-          if(region.value) {
+          if (region.value) {
             test ||= session.region.indexOf(region.name) > -1;
           }
         });
@@ -274,21 +281,21 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
       });
     }
 
-    if(this.filterForm.get('integrationFilter').value.filter((v) => v.value).length > 0) {
+    if (this.filterForm.get("integrationFilter").value.filter((v) => v.value).length > 0) {
       filteredSessions = filteredSessions.filter((session) => {
         this.integrations.forEach((integration) => {
-            //TODO implement integration filter
+          //TODO implement integration filter
         });
         return true;
       });
     }
 
-    if(this.filterForm.get('typeFilter').value.filter((v) => v.value).length > 0) {
-      console.log('present');
+    if (this.filterForm.get("typeFilter").value.filter((v) => v.value).length > 0) {
+      console.log("present");
       filteredSessions = filteredSessions.filter((session) => {
         let test = false;
         this.types.forEach((type) => {
-          if(type.value) {
+          if (type.value) {
             test ||= session.type.indexOf(type.id) > -1;
           }
         });
@@ -297,9 +304,12 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
     }
 
     filteredSessions = filteredSessions.sort((x, y) => {
-      if ((this.leappCoreService.repository.getWorkspace().pinned.indexOf(x.sessionId) !== -1) === (this.leappCoreService.repository.getWorkspace().pinned.indexOf(y.sessionId) !== -1)) {
+      if (
+        (this.leappCoreService.repository.getWorkspace().pinned.indexOf(x.sessionId) !== -1) ===
+        (this.leappCoreService.repository.getWorkspace().pinned.indexOf(y.sessionId) !== -1)
+      ) {
         return 0;
-      } else if(this.leappCoreService.repository.getWorkspace().pinned.indexOf(x.sessionId) !== -1) {
+      } else if (this.leappCoreService.repository.getWorkspace().pinned.indexOf(x.sessionId) !== -1) {
         return -1;
       } else {
         return 1;
@@ -310,38 +320,38 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
   }
 
   private orderByDate(filteredSession: Session[]) {
-    return filteredSession.sort((a,b) => new Date(a.startDateTime).getTime() - new Date(b.startDateTime).getTime());
+    return filteredSession.sort((a, b) => new Date(a.startDateTime).getTime() - new Date(b.startDateTime).getTime());
   }
 
   private updateFilterForm(values: GlobalFilters) {
-    console.log('inside filter form', values);
-    this.filterForm.get('searchFilter').setValue(values.searchFilter);
-    this.filterForm.get('dateFilter').setValue(values.dateFilter);
-    this.filterForm.get('providerFilter').setValue(values.providerFilter);
-    this.filterForm.get('profileFilter').setValue(values.profileFilter);
-    this.filterForm.get('regionFilter').setValue(values.regionFilter);
-    this.filterForm.get('integrationFilter').setValue(values.integrationFilter);
-    this.filterForm.get('typeFilter').setValue(values.typeFilter);
+    console.log("inside filter form", values);
+    this.filterForm.get("searchFilter").setValue(values.searchFilter);
+    this.filterForm.get("dateFilter").setValue(values.dateFilter);
+    this.filterForm.get("providerFilter").setValue(values.providerFilter);
+    this.filterForm.get("profileFilter").setValue(values.profileFilter);
+    this.filterForm.get("regionFilter").setValue(values.regionFilter);
+    this.filterForm.get("integrationFilter").setValue(values.integrationFilter);
+    this.filterForm.get("typeFilter").setValue(values.typeFilter);
 
-    if(values.providerFilter.length > 0) {
+    if (values.providerFilter.length > 0) {
       this.providers = values.providerFilter;
       this.providers.forEach((provider) => {
         provider.show = true;
       });
     }
-    if(values.profileFilter.length > 0) {
+    if (values.profileFilter.length > 0) {
       this.profiles = values.profileFilter;
       this.profiles.forEach((profile) => {
         profile.show = true;
       });
     }
-    if(values.regionFilter.length > 0) {
+    if (values.regionFilter.length > 0) {
       this.regions = values.regionFilter;
       this.regions.forEach((region) => {
         region.show = true;
       });
     }
-    if(values.typeFilter.length > 0) {
+    if (values.typeFilter.length > 0) {
       this.types = values.typeFilter;
       this.types.forEach((type) => {
         type.show = true;
@@ -351,44 +361,46 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
 
   private setInitialArrayFilters() {
     this.providers = [
-      { show: true, id: 'aws', name: 'Amazon AWS', value: false },
-      { show: true, id: 'azure', name: 'Microsoft Azure', value: false }
+      { show: true, id: "aws", name: "Amazon AWS", value: false },
+      { show: true, id: "azure", name: "Microsoft Azure", value: false },
     ];
 
     this.integrations = [];
 
     this.types = [
-      { show: true, id: SessionType.awsIamRoleFederated, category: 'Amazon AWS', name: 'IAM Role Federated', value: false },
-      { show: true, id: SessionType.awsIamUser, category: 'Amazon AWS', name: 'IAM User', value: false },
-      { show: true, id: SessionType.awsIamRoleChained, category: 'Amazon AWS', name: 'IAM Role Chained', value: false },
-      { show: true, id: SessionType.awsSsoRole, category: 'Amazon AWS', name: 'IAM Single Sign-On', value: false },
-      { show: true, id: SessionType.azure, category: 'Microsoft Azure', name: 'Azure Subscription', value: false }
+      { show: true, id: SessionType.awsIamRoleFederated, category: "Amazon AWS", name: "IAM Role Federated", value: false },
+      { show: true, id: SessionType.awsIamUser, category: "Amazon AWS", name: "IAM User", value: false },
+      { show: true, id: SessionType.awsIamRoleChained, category: "Amazon AWS", name: "IAM Role Chained", value: false },
+      { show: true, id: SessionType.awsSsoRole, category: "Amazon AWS", name: "IAM Single Sign-On", value: false },
+      { show: true, id: SessionType.azure, category: "Microsoft Azure", name: "Azure Subscription", value: false },
     ];
 
-    this.profiles = this.leappCoreService.repository.getProfiles().map((element) => ({ name: element.name, id: element.id, value: false, show: true}));
+    this.profiles = this.leappCoreService.repository
+      .getProfiles()
+      .map((element) => ({ name: element.name, id: element.id, value: false, show: true }));
 
     this.regions = this.leappCoreService.awsCoreService.getRegions().map((element) => ({ name: element.region, value: false, show: true }));
   }
 
   private saveTemporarySegmentAndApply() {
     if (!this.filterExtended) {
-      this.currentSegment = JSON.parse(JSON.stringify({
-        name: 'temp',
-        filterGroup: {
-          dateFilter: this.filterForm.get('dateFilter').value,
-          integrationFilter: this.filterForm.get('integrationFilter').value,
-          profileFilter: this.filterForm.get('profileFilter').value,
-          providerFilter: this.filterForm.get('providerFilter').value,
-          regionFilter: this.filterForm.get('regionFilter').value,
-          searchFilter: this.filterForm.get('searchFilter').value,
-          typeFilter: this.filterForm.get('typeFilter').value
-        }
-      }));
+      this.currentSegment = JSON.parse(
+        JSON.stringify({
+          name: "temp",
+          filterGroup: {
+            dateFilter: this.filterForm.get("dateFilter").value,
+            integrationFilter: this.filterForm.get("integrationFilter").value,
+            profileFilter: this.filterForm.get("profileFilter").value,
+            providerFilter: this.filterForm.get("providerFilter").value,
+            regionFilter: this.filterForm.get("regionFilter").value,
+            searchFilter: this.filterForm.get("searchFilter").value,
+            typeFilter: this.filterForm.get("typeFilter").value,
+          },
+        })
+      );
       globalResetFilter.next(true);
     } else {
       globalSegmentFilter.next(this.currentSegment);
     }
   }
-
-
 }

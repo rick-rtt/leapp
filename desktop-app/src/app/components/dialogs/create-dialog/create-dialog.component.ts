@@ -1,45 +1,39 @@
-import {Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
-import {FormControl, FormGroup, Validators} from '@angular/forms';
-import {AppService} from '../../../services/app.service';
-import {ActivatedRoute, Router} from '@angular/router';
-import * as uuid from 'uuid';
-import {BsModalService} from 'ngx-bootstrap/modal';
-import {openIntegrationEvent} from '../../integration-bar/integration-bar.component';
-import { SessionType } from '@noovolari/leapp-core/models/session-type';
-import {WorkspaceService} from '@noovolari/leapp-core/services/workspace-service';
-import {AwsIamRoleFederatedService} from '@noovolari/leapp-core/services/session/aws/aws-iam-role-federated-service';
-import {AwsIamUserService} from '@noovolari/leapp-core/services/session/aws/aws-iam-user-service';
-import {AwsIamRoleChainedService} from '@noovolari/leapp-core/services/session/aws/aws-iam-role-chained-service';
-import {LoggerLevel, LoggingService} from '@noovolari/leapp-core/services/logging-service';
-import {LeappCoreService} from '../../../services/leapp-core.service';
-import {constants} from '@noovolari/leapp-core/models/constants';
-import {WindowService} from '../../../services/window.service';
-import {
-  AwsIamRoleFederatedSessionRequest
-} from '@noovolari/leapp-core/services/session/aws/aws-iam-role-federated-session-request';
-import {AwsIamUserSessionRequest} from '@noovolari/leapp-core/services/session/aws/aws-iam-user-session-request';
-import {
-  AwsIamRoleChainedSessionRequest
-} from '@noovolari/leapp-core/services/session/aws/aws-iam-role-chained-session-request';
-import {AzureSessionRequest} from '@noovolari/leapp-core/services/session/azure/azure-session-request';
-import {MessageToasterService, ToastLevel} from '../../../services/message-toaster.service';
-import {LeappParseError} from '@noovolari/leapp-core/errors/leapp-parse-error';
-import {AzureService} from '@noovolari/leapp-core/services/session/azure/azure-service';
+import { Component, ElementRef, Input, OnInit, ViewChild } from "@angular/core";
+import { FormControl, FormGroup, Validators } from "@angular/forms";
+import { AppService } from "../../../services/app.service";
+import { ActivatedRoute, Router } from "@angular/router";
+import * as uuid from "uuid";
+import { BsModalService } from "ngx-bootstrap/modal";
+import { openIntegrationEvent } from "../../integration-bar/integration-bar.component";
+import { SessionType } from "@noovolari/leapp-core/models/session-type";
+import { WorkspaceService } from "@noovolari/leapp-core/services/workspace-service";
+import { AwsIamRoleFederatedService } from "@noovolari/leapp-core/services/session/aws/aws-iam-role-federated-service";
+import { AwsIamUserService } from "@noovolari/leapp-core/services/session/aws/aws-iam-user-service";
+import { AwsIamRoleChainedService } from "@noovolari/leapp-core/services/session/aws/aws-iam-role-chained-service";
+import { LoggerLevel, LoggingService } from "@noovolari/leapp-core/services/logging-service";
+import { LeappCoreService } from "../../../services/leapp-core.service";
+import { constants } from "@noovolari/leapp-core/models/constants";
+import { WindowService } from "../../../services/window.service";
+import { AwsIamRoleFederatedSessionRequest } from "@noovolari/leapp-core/services/session/aws/aws-iam-role-federated-session-request";
+import { AwsIamUserSessionRequest } from "@noovolari/leapp-core/services/session/aws/aws-iam-user-session-request";
+import { AwsIamRoleChainedSessionRequest } from "@noovolari/leapp-core/services/session/aws/aws-iam-role-chained-session-request";
+import { AzureSessionRequest } from "@noovolari/leapp-core/services/session/azure/azure-session-request";
+import { MessageToasterService, ToastLevel } from "../../../services/message-toaster.service";
+import { LeappParseError } from "@noovolari/leapp-core/errors/leapp-parse-error";
+import { AzureService } from "@noovolari/leapp-core/services/session/azure/azure-service";
 
 @Component({
-  selector: 'app-create-dialog',
-  templateUrl: './create-dialog.component.html',
-  styleUrls: ['./create-dialog.component.scss']
+  selector: "app-create-dialog",
+  templateUrl: "./create-dialog.component.html",
+  styleUrls: ["./create-dialog.component.scss"],
 })
-
 export class CreateDialogComponent implements OnInit {
-
   @Input() selectedSession;
-  @Input() selectedAccountNumber = '';
-  @Input() selectedRole = '';
-  @Input() selectedSamlUrl = '';
+  @Input() selectedAccountNumber = "";
+  @Input() selectedRole = "";
+  @Input() selectedSamlUrl = "";
 
-  @ViewChild('roleInput', {static: false})
+  @ViewChild("roleInput", { static: false })
   roleInput: ElementRef;
 
   firstTime = false;
@@ -51,11 +45,11 @@ export class CreateDialogComponent implements OnInit {
   sessionType;
   provider;
 
-  idpUrls: { value: string; label: string}[] = [];
-  selectedIdpUrl: {value: string; label: string};
+  idpUrls: { value: string; label: string }[] = [];
+  selectedIdpUrl: { value: string; label: string };
 
-  profiles: { value: string; label: string}[] = [];
-  selectedProfile: {value: string; label: string};
+  profiles: { value: string; label: string }[] = [];
+  selectedProfile: { value: string; label: string };
 
   assumerAwsSessions = [];
 
@@ -67,25 +61,25 @@ export class CreateDialogComponent implements OnInit {
   eSessionType = SessionType;
 
   public form = new FormGroup({
-    idpArn: new FormControl('', [Validators.required]),
-    accountNumber: new FormControl('', [Validators.required, Validators.maxLength(12), Validators.minLength(12)]),
-    subscriptionId: new FormControl('', [Validators.required]),
-    tenantId: new FormControl('', [Validators.required]),
-    name: new FormControl('', [Validators.required]),
-    role: new FormControl('', [Validators.required]),
-    roleArn: new FormControl('', [Validators.required]),
-    roleSessionName: new FormControl('', [Validators.pattern('[a-zA-Z\\d\\-\\_\\@\\=\\,\\.]+')]),
-    federatedOrIamRoleChained: new FormControl('', [Validators.required]),
-    federatedRole: new FormControl('', [Validators.required]),
-    federationUrl: new FormControl('', [Validators.required, Validators.pattern('https?://.+')]),
-    secretKey: new FormControl('', [Validators.required]),
-    accessKey: new FormControl('', [Validators.required]),
-    awsRegion: new FormControl(''),
-    mfaDevice: new FormControl(''),
-    awsProfile: new FormControl('', [Validators.required]),
-    azureLocation: new FormControl('', [Validators.required]),
-    assumerSession: new FormControl('', [Validators.required]),
-    selectAccessStrategy: new FormControl(SessionType.awsIamRoleFederated, [Validators.required])
+    idpArn: new FormControl("", [Validators.required]),
+    accountNumber: new FormControl("", [Validators.required, Validators.maxLength(12), Validators.minLength(12)]),
+    subscriptionId: new FormControl("", [Validators.required]),
+    tenantId: new FormControl("", [Validators.required]),
+    name: new FormControl("", [Validators.required]),
+    role: new FormControl("", [Validators.required]),
+    roleArn: new FormControl("", [Validators.required]),
+    roleSessionName: new FormControl("", [Validators.pattern("[a-zA-Z\\d\\-\\_\\@\\=\\,\\.]+")]),
+    federatedOrIamRoleChained: new FormControl("", [Validators.required]),
+    federatedRole: new FormControl("", [Validators.required]),
+    federationUrl: new FormControl("", [Validators.required, Validators.pattern("https?://.+")]),
+    secretKey: new FormControl("", [Validators.required]),
+    accessKey: new FormControl("", [Validators.required]),
+    awsRegion: new FormControl(""),
+    mfaDevice: new FormControl(""),
+    awsProfile: new FormControl("", [Validators.required]),
+    azureLocation: new FormControl("", [Validators.required]),
+    assumerSession: new FormControl("", [Validators.required]),
+    selectAccessStrategy: new FormControl(SessionType.awsIamRoleFederated, [Validators.required]),
   });
 
   private workspaceService: WorkspaceService;
@@ -113,10 +107,8 @@ export class CreateDialogComponent implements OnInit {
     this.loggingService = leappCoreService.loggingService;
   }
 
-  public ngOnInit(): void {
-
+  ngOnInit(): void {
     this.activatedRoute.queryParams.subscribe((params) => {
-
       // Get the workspace and the accounts you need
       const workspace = this.leappCoreService.repository.getWorkspace();
 
@@ -124,7 +116,7 @@ export class CreateDialogComponent implements OnInit {
       if (workspace.idpUrls && workspace.idpUrls.length > 0) {
         workspace.idpUrls.forEach((idp) => {
           if (idp !== null && idp.id) {
-            this.idpUrls.push({value: idp.id, label: idp.url});
+            this.idpUrls.push({ value: idp.id, label: idp.url });
           }
         });
       }
@@ -133,23 +125,23 @@ export class CreateDialogComponent implements OnInit {
       // Note: we don't use azure profile so we remove default azure profile from the list
       workspace.profiles.forEach((idp) => {
         if (idp !== null && idp.name !== constants.defaultAzureProfileName && idp.id) {
-          this.profiles.push({value: idp.id, label: idp.name});
+          this.profiles.push({ value: idp.id, label: idp.name });
         }
       });
 
       // This way we also fix potential incongruences when you have half saved setup
       this.hasOneGoodSession = workspace.sessions.length > 0;
-      this.firstTime = params['firstTime'] || !this.hasOneGoodSession;
+      this.firstTime = params["firstTime"] || !this.hasOneGoodSession;
 
       // Show the assumable accounts
       this.assumerAwsSessions = this.leappCoreService.repository.listAssumable().map((session) => ({
         sessionName: session.sessionName,
-        session
+        session,
       }));
 
       // Only for start screen: disable IAM Chained creation
       if (this.firstTime) {
-        this.form.controls['federatedOrIamRoleChained'].disable({ onlySelf: true });
+        this.form.controls["federatedOrIamRoleChained"].disable({ onlySelf: true });
       }
 
       // Get all regions and locations from app service lists
@@ -159,65 +151,67 @@ export class CreateDialogComponent implements OnInit {
       // Select default values
       this.selectedRegion = workspace.defaultRegion || constants.defaultRegion || this.regions[0].region;
       this.selectedLocation = workspace.defaultLocation || constants.defaultLocation || this.locations[0].location;
-      this.selectedProfile = workspace.profiles.filter((p) => p.name === 'default')
-                                               .map((p) => ({ value: p.id, label: p.name }))[0];
+      this.selectedProfile = workspace.profiles.filter((p) => p.name === "default").map((p) => ({ value: p.id, label: p.name }))[0];
     });
   }
-
 
   /**
    * Add a new UUID
    */
-  public addNewUUID(): string {
+  addNewUUID(): string {
     return uuid.v4();
   }
 
   /**
    * Save the first account in the workspace
    */
-  public saveSession(): void {
+  saveSession(): void {
     this.loggingService.logger(`Saving account...`, LoggerLevel.info, this);
     this.addProfileToWorkspace();
     this.addIpdUrlToWorkspace();
     this.createSession();
-    this.router.navigate(['/dashboard']).then(() => {});
+    this.router.navigate(["/dashboard"]).then(() => {});
   }
 
   /**
    * Form validation mechanic
    */
-  public formValid(): boolean {
+  formValid(): boolean {
     let result = false;
     switch (this.sessionType) {
       case SessionType.awsIamRoleFederated:
-        result = this.form.get('name').valid &&
-                 this.selectedProfile &&
-                 this.form.get('awsRegion').valid &&
-                 this.form.get('roleArn').valid &&
-                 this.selectedIdpUrl &&
-                 this.form.get('idpArn').valid;
+        result =
+          this.form.get("name").valid &&
+          this.selectedProfile &&
+          this.form.get("awsRegion").valid &&
+          this.form.get("roleArn").valid &&
+          this.selectedIdpUrl &&
+          this.form.get("idpArn").valid;
         break;
       case SessionType.awsIamRoleChained:
-        result = this.form.get('name').valid &&
-                 this.selectedProfile &&
-                 this.form.get('awsRegion').valid &&
-                 this.form.get('roleArn').valid &&
-                 this.form.get('roleSessionName').valid &&
-                 this.selectedSession;
+        result =
+          this.form.get("name").valid &&
+          this.selectedProfile &&
+          this.form.get("awsRegion").valid &&
+          this.form.get("roleArn").valid &&
+          this.form.get("roleSessionName").valid &&
+          this.selectedSession;
         break;
       case SessionType.awsIamUser:
-        result = this.form.get('name').valid &&
-                 this.selectedProfile &&
-                 this.form.get('awsRegion').valid &&
-                 this.form.get('mfaDevice').valid &&
-                 this.form.get('accessKey').valid &&
-                 this.form.get('secretKey').valid;
+        result =
+          this.form.get("name").valid &&
+          this.selectedProfile &&
+          this.form.get("awsRegion").valid &&
+          this.form.get("mfaDevice").valid &&
+          this.form.get("accessKey").valid &&
+          this.form.get("secretKey").valid;
         break;
       case SessionType.azure:
-        result = this.form.get('name').valid &&
-                 this.form.get('subscriptionId').valid &&
-                 this.form.get('tenantId').valid &&
-                 this.form.get('azureLocation').valid;
+        result =
+          this.form.get("name").valid &&
+          this.form.get("subscriptionId").valid &&
+          this.form.get("tenantId").valid &&
+          this.form.get("azureLocation").valid;
         break;
     }
     return result;
@@ -228,11 +222,11 @@ export class CreateDialogComponent implements OnInit {
    *
    * @param name
    */
-  public setProvider(name: SessionType): void {
+  setProvider(name: SessionType): void {
     this.provider = name;
     this.providerSelected = true;
     this.sessionType = name;
-    this.typeSelection = name.toString().indexOf('aws') > -1;
+    this.typeSelection = name.toString().indexOf("aws") > -1;
   }
 
   /**
@@ -240,12 +234,12 @@ export class CreateDialogComponent implements OnInit {
    *
    * @param strategy
    */
-  public setAccessStrategy(strategy: SessionType): void {
+  setAccessStrategy(strategy: SessionType): void {
     this.sessionType = strategy;
     this.provider = strategy;
     this.typeSelection = false;
 
-    if(strategy === SessionType.awsIamRoleFederated) {
+    if (strategy === SessionType.awsIamRoleFederated) {
       this.hasSsoUrl = true;
     }
   }
@@ -254,12 +248,12 @@ export class CreateDialogComponent implements OnInit {
    * Open the Leapp documentation in the default browser
    *
    */
-  public openAccessStrategyDocumentation(): void {
-    let url = 'https://docs.leapp.cloud/configuring-session/configure-aws-iam-role-federated/';
-    if(this.provider === SessionType.awsIamRoleChained) {
-      url = 'https://docs.leapp.cloud/configuring-session/configure-aws-iam-role-chained/';
-    } else if(this.provider === SessionType.awsIamUser) {
-      url = 'https://docs.leapp.cloud/configuring-session/configure-aws-iam-user/';
+  openAccessStrategyDocumentation(): void {
+    let url = "https://docs.leapp.cloud/configuring-session/configure-aws-iam-role-federated/";
+    if (this.provider === SessionType.awsIamRoleChained) {
+      url = "https://docs.leapp.cloud/configuring-session/configure-aws-iam-role-chained/";
+    } else if (this.provider === SessionType.awsIamUser) {
+      url = "https://docs.leapp.cloud/configuring-session/configure-aws-iam-user/";
     }
     this.windowService.openExternalUrl(url);
   }
@@ -268,7 +262,7 @@ export class CreateDialogComponent implements OnInit {
    * Go to the Single Sing-On integration page
    *
    */
-  public goToAwsSso(): void {
+  goToAwsSso(): void {
     this.appService.closeModal();
     openIntegrationEvent.next(true);
   }
@@ -276,33 +270,41 @@ export class CreateDialogComponent implements OnInit {
   /**
    * Go to Session Selection screen by closing the modal
    */
-  public goBack(): void {
+  goBack(): void {
     this.appService.closeModal();
   }
 
-  public getNameForProvider(provider: SessionType): string {
+  getNameForProvider(provider: SessionType): string {
     switch (provider) {
-      case SessionType.azure: return 'Microsoft Azure session';
-      case SessionType.google: return 'Google Cloud session';
-      case SessionType.alibaba: return 'Alibaba Cloud session';
-      default: return 'Amazon AWS session';
+      case SessionType.azure:
+        return "Microsoft Azure session";
+      case SessionType.google:
+        return "Google Cloud session";
+      case SessionType.alibaba:
+        return "Alibaba Cloud session";
+      default:
+        return "Amazon AWS session";
     }
   }
 
-  public getIconForProvider(provider: SessionType): string {
+  getIconForProvider(provider: SessionType): string {
     switch (provider) {
-      case SessionType.azure: return 'azure-logo.svg';
-      case SessionType.google: return 'google.png';
-      case SessionType.alibaba: return 'alibaba.png';
-      default: return 'aws-logo.svg';
+      case SessionType.azure:
+        return "azure-logo.svg";
+      case SessionType.google:
+        return "google.png";
+      case SessionType.alibaba:
+        return "alibaba.png";
+      default:
+        return "aws-logo.svg";
     }
   }
 
-  public closeModal(): void {
+  closeModal(): void {
     this.appService.closeModal();
   }
 
-  public selectedIdpUrlEvent($event: { items: any[]; item: any }): void {
+  selectedIdpUrlEvent($event: { items: any[]; item: any }): void {
     this.idpUrls = $event.items;
     this.selectedIdpUrl = $event.item;
   }
@@ -313,57 +315,57 @@ export class CreateDialogComponent implements OnInit {
    * @private
    */
   private createSession() {
-    if(this.formValid()) {
+    if (this.formValid()) {
       switch (this.sessionType) {
-        case (SessionType.awsIamRoleFederated):
+        case SessionType.awsIamRoleFederated:
           const awsFederatedAccountRequest: AwsIamRoleFederatedSessionRequest = {
             sessionName: this.form.value.name.trim(),
             region: this.selectedRegion,
             idpUrl: this.selectedIdpUrl.value.trim(),
             idpArn: this.form.value.idpArn.trim(),
             roleArn: this.form.value.roleArn.trim(),
-            profileId: this.selectedProfile.value
+            profileId: this.selectedProfile.value,
           };
           this.awsIamRoleFederatedService.create(awsFederatedAccountRequest);
           break;
-        case (SessionType.awsIamUser):
+        case SessionType.awsIamUser:
           const awsIamUserSessionRequest: AwsIamUserSessionRequest = {
             sessionName: this.form.value.name.trim(),
             region: this.selectedRegion,
             accessKey: this.form.value.accessKey.trim(),
             secretKey: this.form.value.secretKey.trim(),
             mfaDevice: this.form.value.mfaDevice.trim(),
-            profileId: this.selectedProfile.value
+            profileId: this.selectedProfile.value,
           };
           this.awsIamUserService.create(awsIamUserSessionRequest).then(() => {});
           break;
-        case (SessionType.awsIamRoleChained):
+        case SessionType.awsIamRoleChained:
           const awsIamRoleChainedAccountRequest: AwsIamRoleChainedSessionRequest = {
             sessionName: this.form.value.name.trim(),
             region: this.selectedRegion,
             roleArn: this.form.value.roleArn.trim(),
             roleSessionName: this.form.value.roleSessionName.trim(),
             parentSessionId: this.selectedSession.sessionId,
-            profileId: this.selectedProfile.value
+            profileId: this.selectedProfile.value,
           };
           this.awsIamRoleChainedService.create(awsIamRoleChainedAccountRequest);
           break;
-        case (SessionType.azure):
+        case SessionType.azure:
           const azureSessionRequest: AzureSessionRequest = {
             region: this.selectedLocation,
             sessionName: this.form.value.name,
             subscriptionId: this.form.value.subscriptionId,
-            tenantId: this.form.value.tenantId
+            tenantId: this.form.value.tenantId,
           };
           this.azureService.create(azureSessionRequest);
           break;
       }
 
-      this.messageToasterService.toast(`Session: ${this.form.value.name}, created.`, ToastLevel.success, '');
+      this.messageToasterService.toast(`Session: ${this.form.value.name}, created.`, ToastLevel.success, "");
       this.closeModal();
     } else {
       // eslint-disable-next-line max-len
-      this.messageToasterService.toast(`Session is missing some required properties, please fill them.`, ToastLevel.warn, '');
+      this.messageToasterService.toast(`Session is missing some required properties, please fill them.`, ToastLevel.warn, "");
     }
   }
 
@@ -373,13 +375,13 @@ export class CreateDialogComponent implements OnInit {
    * @private
    */
   private addIpdUrlToWorkspace() {
-    if(this.sessionType === SessionType.awsIamRoleFederated) {
+    if (this.sessionType === SessionType.awsIamRoleFederated) {
       try {
         const ipdUrl = { id: this.selectedIdpUrl.value, url: this.selectedIdpUrl.label };
-        if(!this.leappCoreService.repository.getIdpUrl(ipdUrl.id)) {
+        if (!this.leappCoreService.repository.getIdpUrl(ipdUrl.id)) {
           this.leappCoreService.repository.addIdpUrl(ipdUrl);
         }
-      } catch(err) {
+      } catch (err) {
         throw new LeappParseError(this, err.message);
       }
     }
@@ -395,12 +397,11 @@ export class CreateDialogComponent implements OnInit {
       const profile = { id: this.selectedProfile.value, name: this.selectedProfile.label };
       try {
         this.leappCoreService.repository.getProfileName(profile.id);
-      } catch(e) {
+      } catch (e) {
         this.leappCoreService.repository.addProfile(profile);
       }
-    } catch(err) {
+    } catch (err) {
       throw new LeappParseError(this, err.message);
     }
   }
 }
-

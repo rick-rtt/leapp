@@ -1,16 +1,15 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from "@angular/core/testing";
 
-import { FilterMenuComponent } from './filter-menu.component';
+import { FilterMenuComponent } from "./filter-menu.component";
 
-describe('FilterMenuComponent', () => {
+describe("FilterMenuComponent", () => {
   let component: FilterMenuComponent;
   let fixture: ComponentFixture<FilterMenuComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ FilterMenuComponent ]
-    })
-    .compileComponents();
+      declarations: [FilterMenuComponent],
+    }).compileComponents();
   });
 
   beforeEach(() => {
@@ -19,7 +18,7 @@ describe('FilterMenuComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it("should create", () => {
     expect(component).toBeTruthy();
   });
 });

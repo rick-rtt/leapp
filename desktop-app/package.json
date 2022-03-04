@@ -128,9 +128,6 @@
     }
   },
   "dependencies": {
-    "aws-sdk": "2.928.0",
-    "aws-sdk-mock": "5.3.0",
-    "@types/aws-sdk": "^2.7.0",
     "@angular/animations": "~12.2.7",
     "@angular/cdk": "^12.2.9",
     "@angular/common": "~12.2.7",
@@ -149,7 +146,10 @@
     "@ngx-translate/http-loader": "~6.0.0",
     "@noovolari/leapp-core": "file:../core/dist",
     "@sebgroup/magic-iframe": "1.1.2",
+    "@types/aws-sdk": "^2.7.0",
     "assert": "2.0.0",
+    "aws-sdk": "2.928.0",
+    "aws-sdk-mock": "5.3.0",
     "bootstrap": "~4.6.0",
     "chdir": "0.0.0",
     "class-transformer": "^0.4.0",
@@ -206,11 +206,6 @@
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~12.2.7",
-    "@angular-eslint/builder": "~12.5.0",
-    "@angular-eslint/eslint-plugin": "~12.5.0",
-    "@angular-eslint/eslint-plugin-template": "~12.5.0",
-    "@angular-eslint/schematics": "~12.5.0",
-    "@angular-eslint/template-parser": "~12.5.0",
     "@angular/cli": "~12.2.7",
     "@angular/compiler-cli": "~12.2.7",
     "@angular/language-service": "~12.2.7",
@@ -219,8 +214,6 @@
     "@types/jasminewd2": "~2.0.8",
     "@types/node": "^15.0.1",
     "@types/uuid": "^8.3.0",
-    "@typescript-eslint/eslint-plugin": "4.16.1",
-    "@typescript-eslint/parser": "4.16.1",
     "dotenv": "^10.0.0",
     "electron": "15.0.0",
     "electron-builder": "22.14.3",
@@ -228,10 +221,7 @@
     "electron-installer-dmg": "3.0.0",
     "electron-packager": "15.4.0",
     "electron-rebuild": "3.2.3",
-    "eslint": "^7.6.0",
-    "eslint-plugin-import": "latest",
-    "eslint-plugin-jsdoc": "latest",
-    "eslint-plugin-prefer-arrow": "latest",
+    "gushio": "~0.5.0",
     "husky": "^7.0.0",
     "jasmine": "^3.7.0",
     "jasmine-core": "~3.7.1",
@@ -248,7 +238,6 @@
     "protractor": "^7.0.0",
     "ts-node": "^9.1.1",
     "typescript": "4.3.5",
-    "util": "^0.12.4",
-    "gushio": "~0.5.0"
+    "util": "^0.12.4"
   }
 }

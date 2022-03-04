@@ -1,8 +1,8 @@
-import { TestBed } from '@angular/core/testing';
+import { TestBed } from "@angular/core/testing";
 
-import { MfaCodePromptService } from './mfa-code-prompt.service';
+import { MfaCodePromptService } from "./mfa-code-prompt.service";
 
-describe('MfaCodePromptService', () => {
+describe("MfaCodePromptService", () => {
   let service: MfaCodePromptService;
 
   beforeEach(() => {
@@ -10,7 +10,7 @@ describe('MfaCodePromptService', () => {
     service = TestBed.inject(MfaCodePromptService);
   });
 
-  it('should be created', () => {
+  it("should be created", () => {
     expect(service).toBeTruthy();
   });
 });

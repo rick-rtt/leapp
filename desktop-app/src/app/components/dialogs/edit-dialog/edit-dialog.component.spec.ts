@@ -1,16 +1,15 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from "@angular/core/testing";
 
-import { EditDialogComponent } from './edit-dialog.component';
+import { EditDialogComponent } from "./edit-dialog.component";
 
-describe('EditDialogComponent', () => {
+describe("EditDialogComponent", () => {
   let component: EditDialogComponent;
   let fixture: ComponentFixture<EditDialogComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ EditDialogComponent ]
-    })
-    .compileComponents();
+      declarations: [EditDialogComponent],
+    }).compileComponents();
   });
 
   beforeEach(() => {
@@ -19,7 +18,7 @@ describe('EditDialogComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it("should create", () => {
     expect(component).toBeTruthy();
   });
 });

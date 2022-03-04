@@ -1,7 +1,7 @@
-import { CreateSessionRequest } from '../create-session-request'
+import { CreateSessionRequest } from "../create-session-request";
 
-export interface AzureSessionRequest extends CreateSessionRequest{
-    region: string;
-    subscriptionId: string;
-    tenantId: string;
+export interface AzureSessionRequest extends CreateSessionRequest {
+  region: string;
+  subscriptionId: string;
+  tenantId: string;
 }

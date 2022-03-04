@@ -1,327 +1,385 @@
-import {CloudProviderService} from '@noovolari/leapp-core/services/cloud-provider-service'
-import {AwsIamUserService} from '@noovolari/leapp-core/services/session/aws/aws-iam-user-service'
-import {FileService} from '@noovolari/leapp-core/services/file-service'
-import {KeychainService} from '@noovolari/leapp-core/services/keychain-service'
-import {AwsCoreService} from '@noovolari/leapp-core/services/aws-core-service'
-import {LoggingService} from '@noovolari/leapp-core/services/logging-service'
-import {TimerService} from '@noovolari/leapp-core/services/timer-service'
-import {AwsIamRoleFederatedService} from '@noovolari/leapp-core/services/session/aws/aws-iam-role-federated-service'
-import {AzureService} from '@noovolari/leapp-core/services/session/azure/azure-service'
-import {ExecuteService} from '@noovolari/leapp-core/services/execute-service'
-import {RetroCompatibilityService} from '@noovolari/leapp-core/services/retro-compatibility-service'
-import {AwsParentSessionFactory} from '@noovolari/leapp-core/services/session/aws/aws-parent-session.factory'
-import {AwsIamRoleChainedService} from '@noovolari/leapp-core/services/session/aws/aws-iam-role-chained-service'
-import {Repository} from '@noovolari/leapp-core/services/repository'
-import {RegionsService} from '@noovolari/leapp-core/services/regions-service'
-import {AwsSsoRoleService} from '@noovolari/leapp-core/services/session/aws/aws-sso-role-service'
-import {WorkspaceService} from '@noovolari/leapp-core/services/workspace-service'
-import {SessionFactory} from '@noovolari/leapp-core/services/session-factory'
-import {RotationService} from '@noovolari/leapp-core/services/rotation-service'
-import {AzureCoreService} from '@noovolari/leapp-core/services/azure-core-service'
-import {CliMfaCodePromptService} from './cli-mfa-code-prompt-service'
-import {CliAwsAuthenticationService} from './cli-aws-authentication-service'
-import {CliVerificationWindowService} from './cli-verification-window-service'
-import {CliNativeService} from './cli-native-service'
-import {constants} from '@noovolari/leapp-core/models/constants'
-import {NamedProfilesService} from '@noovolari/leapp-core/services/named-profiles-service'
-import {IdpUrlsService} from '@noovolari/leapp-core/services/idp-urls-service'
-import {AwsSsoIntegrationService} from '@noovolari/leapp-core/services/aws-sso-integration-service'
-import CliInquirer from 'inquirer'
-import {AwsSsoOidcService} from '@noovolari/leapp-core/services/aws-sso-oidc.service'
+import { CloudProviderService } from "@noovolari/leapp-core/services/cloud-provider-service";
+import { AwsIamUserService } from "@noovolari/leapp-core/services/session/aws/aws-iam-user-service";
+import { FileService } from "@noovolari/leapp-core/services/file-service";
+import { KeychainService } from "@noovolari/leapp-core/services/keychain-service";
+import { AwsCoreService } from "@noovolari/leapp-core/services/aws-core-service";
+import { LoggingService } from "@noovolari/leapp-core/services/logging-service";
+import { TimerService } from "@noovolari/leapp-core/services/timer-service";
+import { AwsIamRoleFederatedService } from "@noovolari/leapp-core/services/session/aws/aws-iam-role-federated-service";
+import { AzureService } from "@noovolari/leapp-core/services/session/azure/azure-service";
+import { ExecuteService } from "@noovolari/leapp-core/services/execute-service";
+import { RetroCompatibilityService } from "@noovolari/leapp-core/services/retro-compatibility-service";
+import { AwsParentSessionFactory } from "@noovolari/leapp-core/services/session/aws/aws-parent-session.factory";
+import { AwsIamRoleChainedService } from "@noovolari/leapp-core/services/session/aws/aws-iam-role-chained-service";
+import { Repository } from "@noovolari/leapp-core/services/repository";
+import { RegionsService } from "@noovolari/leapp-core/services/regions-service";
+import { AwsSsoRoleService } from "@noovolari/leapp-core/services/session/aws/aws-sso-role-service";
+import { WorkspaceService } from "@noovolari/leapp-core/services/workspace-service";
+import { SessionFactory } from "@noovolari/leapp-core/services/session-factory";
+import { RotationService } from "@noovolari/leapp-core/services/rotation-service";
+import { AzureCoreService } from "@noovolari/leapp-core/services/azure-core-service";
+import { CliMfaCodePromptService } from "./cli-mfa-code-prompt-service";
+import { CliAwsAuthenticationService } from "./cli-aws-authentication-service";
+import { CliVerificationWindowService } from "./cli-verification-window-service";
+import { CliNativeService } from "./cli-native-service";
+import { constants } from "@noovolari/leapp-core/models/constants";
+import { NamedProfilesService } from "@noovolari/leapp-core/services/named-profiles-service";
+import { IdpUrlsService } from "@noovolari/leapp-core/services/idp-urls-service";
+import { AwsSsoIntegrationService } from "@noovolari/leapp-core/services/aws-sso-integration-service";
+import CliInquirer from "inquirer";
+import { AwsSsoOidcService } from "@noovolari/leapp-core/services/aws-sso-oidc.service";
 
 export class LeappCliService {
-  private cliNativeServiceInstance: CliNativeService
+  private cliNativeServiceInstance: CliNativeService;
 
   constructor() {
-    this.awsSsoRoleService.setAwsIntegrationDelegate(this.awsSsoIntegrationService)
+    this.awsSsoRoleService.setAwsIntegrationDelegate(this.awsSsoIntegrationService);
   }
 
   public get cliNativeService(): CliNativeService {
     if (!this.cliNativeServiceInstance) {
-      this.cliNativeServiceInstance = new CliNativeService()
+      this.cliNativeServiceInstance = new CliNativeService();
     }
 
-    return this.cliNativeServiceInstance
+    return this.cliNativeServiceInstance;
   }
 
-  private cliVerificationWindowServiceInstance: CliVerificationWindowService
+  private cliVerificationWindowServiceInstance: CliVerificationWindowService;
 
   public get cliVerificationWindowService(): CliVerificationWindowService {
     if (!this.cliVerificationWindowServiceInstance) {
-      this.cliVerificationWindowServiceInstance = new CliVerificationWindowService()
+      this.cliVerificationWindowServiceInstance = new CliVerificationWindowService();
     }
 
-    return this.cliVerificationWindowServiceInstance
+    return this.cliVerificationWindowServiceInstance;
   }
 
-  private cliAwsAuthenticationServiceInstance: CliAwsAuthenticationService
+  private cliAwsAuthenticationServiceInstance: CliAwsAuthenticationService;
 
   public get cliAwsAuthenticationService(): CliAwsAuthenticationService {
     if (!this.cliAwsAuthenticationServiceInstance) {
-      this.cliAwsAuthenticationServiceInstance = new CliAwsAuthenticationService()
+      this.cliAwsAuthenticationServiceInstance = new CliAwsAuthenticationService();
     }
 
-    return this.cliAwsAuthenticationServiceInstance
+    return this.cliAwsAuthenticationServiceInstance;
   }
 
-  private cliMfaCodePromptServiceInstance: CliMfaCodePromptService
+  private cliMfaCodePromptServiceInstance: CliMfaCodePromptService;
 
   public get cliMfaCodePromptService(): CliMfaCodePromptService {
     if (!this.cliMfaCodePromptServiceInstance) {
-      this.cliMfaCodePromptServiceInstance = new CliMfaCodePromptService(this.inquirer)
+      this.cliMfaCodePromptServiceInstance = new CliMfaCodePromptService(this.inquirer);
     }
 
-    return this.cliMfaCodePromptServiceInstance
+    return this.cliMfaCodePromptServiceInstance;
   }
 
-  private workspaceServiceInstance: WorkspaceService
+  private workspaceServiceInstance: WorkspaceService;
 
   public get workspaceService(): WorkspaceService {
     if (!this.workspaceServiceInstance) {
-      this.workspaceServiceInstance = new WorkspaceService(this.repository)
+      this.workspaceServiceInstance = new WorkspaceService(this.repository);
     }
 
-    return this.workspaceServiceInstance
+    return this.workspaceServiceInstance;
   }
 
-  private awsIamUserServiceInstance: AwsIamUserService
+  private awsIamUserServiceInstance: AwsIamUserService;
 
   public get awsIamUserService(): AwsIamUserService {
     if (!this.awsIamUserServiceInstance) {
-      this.awsIamUserServiceInstance = new AwsIamUserService(this.workspaceService, this.repository, this.cliMfaCodePromptService, this.keyChainService, this.fileService, this.awsCoreService)
+      this.awsIamUserServiceInstance = new AwsIamUserService(
+        this.workspaceService,
+        this.repository,
+        this.cliMfaCodePromptService,
+        this.keyChainService,
+        this.fileService,
+        this.awsCoreService
+      );
     }
 
-    return this.awsIamUserServiceInstance
+    return this.awsIamUserServiceInstance;
   }
 
-  private awsIamRoleFederatedServiceInstance: AwsIamRoleFederatedService
+  private awsIamRoleFederatedServiceInstance: AwsIamRoleFederatedService;
 
   get awsIamRoleFederatedService(): AwsIamRoleFederatedService {
     if (!this.awsIamRoleFederatedServiceInstance) {
-      this.awsIamRoleFederatedServiceInstance = new AwsIamRoleFederatedService(this.workspaceService, this.repository, this.fileService, this.awsCoreService, this.cliAwsAuthenticationService, constants.samlRoleSessionDuration)
+      this.awsIamRoleFederatedServiceInstance = new AwsIamRoleFederatedService(
+        this.workspaceService,
+        this.repository,
+        this.fileService,
+        this.awsCoreService,
+        this.cliAwsAuthenticationService,
+        constants.samlRoleSessionDuration
+      );
     }
 
-    return this.awsIamRoleFederatedServiceInstance
+    return this.awsIamRoleFederatedServiceInstance;
   }
 
-  private awsIamRoleChainedServiceInstance: AwsIamRoleChainedService
+  private awsIamRoleChainedServiceInstance: AwsIamRoleChainedService;
 
   get awsIamRoleChainedService(): AwsIamRoleChainedService {
     if (!this.awsIamRoleChainedServiceInstance) {
-      this.awsIamRoleChainedServiceInstance = new AwsIamRoleChainedService(this.workspaceService, this.repository, this.awsCoreService, this.fileService, this.awsIamUserService, this.awsParentSessionFactory)
+      this.awsIamRoleChainedServiceInstance = new AwsIamRoleChainedService(
+        this.workspaceService,
+        this.repository,
+        this.awsCoreService,
+        this.fileService,
+        this.awsIamUserService,
+        this.awsParentSessionFactory
+      );
     }
 
-    return this.awsIamRoleChainedServiceInstance
+    return this.awsIamRoleChainedServiceInstance;
   }
 
-  private awsSsoRoleServiceInstance: AwsSsoRoleService
+  private awsSsoRoleServiceInstance: AwsSsoRoleService;
 
   get awsSsoRoleService(): AwsSsoRoleService {
     if (!this.awsSsoRoleServiceInstance) {
-      this.awsSsoRoleServiceInstance = new AwsSsoRoleService(this.workspaceService, this.repository, this.fileService, this.keyChainService, this.awsCoreService, this.cliNativeService, this.awsSsoOidcService)
+      this.awsSsoRoleServiceInstance = new AwsSsoRoleService(
+        this.workspaceService,
+        this.repository,
+        this.fileService,
+        this.keyChainService,
+        this.awsCoreService,
+        this.cliNativeService,
+        this.awsSsoOidcService
+      );
     }
 
-    return this.awsSsoRoleServiceInstance
+    return this.awsSsoRoleServiceInstance;
   }
 
-  private awsSsoOidcServiceInstance: AwsSsoOidcService
+  private awsSsoOidcServiceInstance: AwsSsoOidcService;
 
   get awsSsoOidcService(): AwsSsoOidcService {
     if (!this.awsSsoOidcServiceInstance) {
-      this.awsSsoOidcServiceInstance = new AwsSsoOidcService(this.cliVerificationWindowService, this.repository, true)
+      this.awsSsoOidcServiceInstance = new AwsSsoOidcService(this.cliVerificationWindowService, this.repository, true);
     }
 
-    return this.awsSsoOidcServiceInstance
+    return this.awsSsoOidcServiceInstance;
   }
 
-  private azureServiceInstance: AzureService
+  private azureServiceInstance: AzureService;
 
   get azureService(): AzureService {
     if (!this.azureServiceInstance) {
-      this.azureServiceInstance = new AzureService(this.workspaceService, this.repository, this.fileService, this.executeService, constants.azureAccessTokens)
+      this.azureServiceInstance = new AzureService(
+        this.workspaceService,
+        this.repository,
+        this.fileService,
+        this.executeService,
+        constants.azureAccessTokens
+      );
     }
 
-    return this.azureServiceInstance
+    return this.azureServiceInstance;
   }
 
-  private sessionFactoryInstance: SessionFactory
+  private sessionFactoryInstance: SessionFactory;
 
   get sessionFactory(): SessionFactory {
     if (!this.sessionFactoryInstance) {
-      this.sessionFactoryInstance = new SessionFactory(this.awsIamUserService,
+      this.sessionFactoryInstance = new SessionFactory(
+        this.awsIamUserService,
         this.awsIamRoleFederatedService,
         this.awsIamRoleChainedService,
         this.awsSsoRoleService,
-        this.azureService)
+        this.azureService
+      );
     }
 
-    return this.sessionFactoryInstance
+    return this.sessionFactoryInstance;
   }
 
-  private awsParentSessionFactoryInstance: AwsParentSessionFactory
+  private awsParentSessionFactoryInstance: AwsParentSessionFactory;
 
   get awsParentSessionFactory(): AwsParentSessionFactory {
     if (!this.awsParentSessionFactoryInstance) {
-      this.awsParentSessionFactoryInstance = new AwsParentSessionFactory(this.awsIamUserService,
+      this.awsParentSessionFactoryInstance = new AwsParentSessionFactory(
+        this.awsIamUserService,
         this.awsIamRoleFederatedService,
-        this.awsSsoRoleService)
+        this.awsSsoRoleService
+      );
     }
 
-    return this.awsParentSessionFactoryInstance
+    return this.awsParentSessionFactoryInstance;
   }
 
-  private fileServiceInstance: FileService
+  private fileServiceInstance: FileService;
 
   get fileService(): FileService {
     if (!this.fileServiceInstance) {
-      this.fileServiceInstance = new FileService(this.cliNativeService)
+      this.fileServiceInstance = new FileService(this.cliNativeService);
     }
 
-    return this.fileServiceInstance
+    return this.fileServiceInstance;
   }
 
-  private repositoryInstance: Repository
+  private repositoryInstance: Repository;
 
   get repository(): Repository {
     if (!this.repositoryInstance) {
-      this.repositoryInstance = new Repository(this.cliNativeService, this.fileService)
+      this.repositoryInstance = new Repository(this.cliNativeService, this.fileService);
     }
 
-    return this.repositoryInstance
+    return this.repositoryInstance;
   }
 
-  private regionsServiceInstance: RegionsService
+  private regionsServiceInstance: RegionsService;
 
   get regionsService(): RegionsService {
     if (!this.regionsServiceInstance) {
-      this.regionsServiceInstance = new RegionsService(this.sessionFactory, this.repository, this.workspaceService)
+      this.regionsServiceInstance = new RegionsService(this.sessionFactory, this.repository, this.workspaceService);
     }
 
-    return this.regionsServiceInstance
+    return this.regionsServiceInstance;
   }
 
-  private namedProfilesServiceInstance: NamedProfilesService
+  private namedProfilesServiceInstance: NamedProfilesService;
 
   get namedProfilesService(): NamedProfilesService {
     if (!this.namedProfilesServiceInstance) {
-      this.namedProfilesServiceInstance = new NamedProfilesService(this.sessionFactory, this.repository, this.workspaceService)
+      this.namedProfilesServiceInstance = new NamedProfilesService(this.sessionFactory, this.repository, this.workspaceService);
     }
 
-    return this.namedProfilesServiceInstance
+    return this.namedProfilesServiceInstance;
   }
 
-  private idpUrlsServiceInstance: IdpUrlsService
+  private idpUrlsServiceInstance: IdpUrlsService;
 
   get idpUrlsService(): IdpUrlsService {
     if (!this.idpUrlsServiceInstance) {
-      this.idpUrlsServiceInstance = new IdpUrlsService(this.sessionFactory, this.repository)
+      this.idpUrlsServiceInstance = new IdpUrlsService(this.sessionFactory, this.repository);
     }
 
-    return this.idpUrlsServiceInstance
+    return this.idpUrlsServiceInstance;
   }
 
-
-  private awsSsoIntegrationServiceInstance: AwsSsoIntegrationService
+  private awsSsoIntegrationServiceInstance: AwsSsoIntegrationService;
 
   get awsSsoIntegrationService(): AwsSsoIntegrationService {
     if (!this.awsSsoIntegrationServiceInstance) {
-      this.awsSsoIntegrationServiceInstance = new AwsSsoIntegrationService(this.repository, this.awsSsoOidcService, this.awsSsoRoleService, this.keyChainService, this.workspaceService, this.cliNativeService)
+      this.awsSsoIntegrationServiceInstance = new AwsSsoIntegrationService(
+        this.repository,
+        this.awsSsoOidcService,
+        this.awsSsoRoleService,
+        this.keyChainService,
+        this.workspaceService,
+        this.cliNativeService
+      );
     }
 
-    return this.awsSsoIntegrationServiceInstance
+    return this.awsSsoIntegrationServiceInstance;
   }
 
-  private keyChainServiceInstance: KeychainService
+  private keyChainServiceInstance: KeychainService;
 
   get keyChainService(): KeychainService {
     if (!this.keyChainServiceInstance) {
-      this.keyChainServiceInstance = new KeychainService(this.cliNativeService)
+      this.keyChainServiceInstance = new KeychainService(this.cliNativeService);
     }
 
-    return this.keyChainServiceInstance
+    return this.keyChainServiceInstance;
   }
 
-  private loggingServiceInstance: LoggingService
+  private loggingServiceInstance: LoggingService;
 
   get loggingService(): LoggingService {
     if (!this.loggingServiceInstance) {
-      this.loggingServiceInstance = new LoggingService(this.cliNativeService)
+      this.loggingServiceInstance = new LoggingService(this.cliNativeService);
     }
 
-    return this.loggingServiceInstance
+    return this.loggingServiceInstance;
   }
 
-  private timerServiceInstance: TimerService
+  private timerServiceInstance: TimerService;
 
   get timerService(): TimerService {
     if (!this.timerServiceInstance) {
-      this.timerServiceInstance = new TimerService()
+      this.timerServiceInstance = new TimerService();
     }
 
-    return this.timerServiceInstance
+    return this.timerServiceInstance;
   }
 
-  private executeServiceInstance: ExecuteService
+  private executeServiceInstance: ExecuteService;
 
   get executeService(): ExecuteService {
     if (!this.executeServiceInstance) {
-      this.executeServiceInstance = new ExecuteService(this.cliNativeService)
+      this.executeServiceInstance = new ExecuteService(this.cliNativeService);
     }
 
-    return this.executeServiceInstance
+    return this.executeServiceInstance;
   }
 
-  private rotationServiceInstance: RotationService
+  private rotationServiceInstance: RotationService;
 
   get rotationService(): RotationService {
     if (!this.rotationServiceInstance) {
-      this.rotationServiceInstance = new RotationService(this.sessionFactory, this.repository)
+      this.rotationServiceInstance = new RotationService(this.sessionFactory, this.repository);
     }
 
-    return this.rotationServiceInstance
+    return this.rotationServiceInstance;
   }
 
-  private retroCompatibilityServiceInstance: RetroCompatibilityService
+  private retroCompatibilityServiceInstance: RetroCompatibilityService;
 
   get retroCompatibilityService(): RetroCompatibilityService {
     if (!this.retroCompatibilityServiceInstance) {
-      this.retroCompatibilityServiceInstance = new RetroCompatibilityService(this.fileService, this.keyChainService, this.repository, this.workspaceService, constants.appName, constants.lockFileDestination)
+      this.retroCompatibilityServiceInstance = new RetroCompatibilityService(
+        this.fileService,
+        this.keyChainService,
+        this.repository,
+        this.workspaceService,
+        constants.appName,
+        constants.lockFileDestination
+      );
     }
 
-    return this.retroCompatibilityServiceInstance
+    return this.retroCompatibilityServiceInstance;
   }
 
-  private cloudProviderServiceInstance: CloudProviderService
+  private cloudProviderServiceInstance: CloudProviderService;
 
   get cloudProviderService(): CloudProviderService {
     if (!this.cloudProviderServiceInstance) {
-      this.cloudProviderServiceInstance = new CloudProviderService(this.awsCoreService, this.azureCoreService, this.namedProfilesService, this.idpUrlsService, this.repository)
+      this.cloudProviderServiceInstance = new CloudProviderService(
+        this.awsCoreService,
+        this.azureCoreService,
+        this.namedProfilesService,
+        this.idpUrlsService,
+        this.repository
+      );
     }
 
-    return this.cloudProviderServiceInstance
+    return this.cloudProviderServiceInstance;
   }
 
-  private awsCoreServiceInstance: AwsCoreService
+  private awsCoreServiceInstance: AwsCoreService;
 
   get awsCoreService(): AwsCoreService {
     if (!this.awsCoreServiceInstance) {
-      this.awsCoreServiceInstance = new AwsCoreService(this.cliNativeService)
+      this.awsCoreServiceInstance = new AwsCoreService(this.cliNativeService);
     }
 
-    return this.awsCoreServiceInstance
+    return this.awsCoreServiceInstance;
   }
 
-  private azureCoreServiceInstance: AzureCoreService
+  private azureCoreServiceInstance: AzureCoreService;
 
   get azureCoreService(): AzureCoreService {
     if (!this.azureCoreServiceInstance) {
-      this.azureCoreServiceInstance = new AzureCoreService()
+      this.azureCoreServiceInstance = new AzureCoreService();
     }
 
-    return this.azureCoreServiceInstance
+    return this.azureCoreServiceInstance;
   }
 
   get inquirer(): CliInquirer.Inquirer {
-    return CliInquirer
+    return CliInquirer;
   }
 }

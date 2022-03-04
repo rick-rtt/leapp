@@ -1,8 +1,7 @@
-import {SessionType} from './session-type';
-import {Session} from './session';
+import { SessionType } from "./session-type";
+import { Session } from "./session";
 
 export class AwsIamUserSession extends Session {
-
   mfaDevice?: string;
   sessionTokenExpiration: string;
   profileId: string;
@@ -15,4 +14,3 @@ export class AwsIamUserSession extends Session {
     this.profileId = profileId;
   }
 }
-

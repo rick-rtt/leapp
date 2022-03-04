@@ -1,17 +1,12 @@
-import { INativeService } from '../interfaces/i-native-service'
-import {constants} from "../models/constants";
-import {Repository} from "./repository";
+import { INativeService } from "../interfaces/i-native-service";
+import { constants } from "../models/constants";
+import { Repository } from "./repository";
 
 export class ExecuteService {
-  public constructor(
-    private nativeService: INativeService,
-    private repository: Repository) {
-  }
+  constructor(private nativeService: INativeService, private repository: Repository) {}
 
-  public getQuote(): string{
-    return this.nativeService.process.platform === 'darwin'
-      ? '\''
-      : ''
+  getQuote(): string {
+    return this.nativeService.process.platform === "darwin" ? "'" : "";
   }
 
   /**
@@ -24,33 +19,31 @@ export class ExecuteService {
    * @returns an {Observable<any>} to use for subscribing to success or error event on the command termination:
    *          the default unix standard is used so 0 represent a success code, everything else is an error code
    */
-  public execute(command: string, env?: boolean): Promise<string> {
-    return new Promise(
-      (resolve, reject) => {
-        let exec = this.nativeService.exec
-        if (command.startsWith('sudo')) {
-          exec = this.nativeService.sudo.exec
-          command = command.substring(5, command.length)
-        }
-
-        if (this.nativeService.process.platform === 'darwin') {
-          if (command.indexOf('osascript') === -1) {
-            command = '/usr/local/bin/' + command
-          } else {
-            command = '/usr/bin/' + command
-          }
-        }
-
-        exec(command, {env, name: 'Leapp', timeout: 60000}, (err, stdout, stderr) => {
-          this.nativeService.log.info('execute from Leapp: ', {error: err, standardout: stdout, standarderror: stderr})
-          if (err) {
-            reject(err)
-          } else {
-            resolve(stdout ? stdout : stderr)
-          }
-        })
+  execute(command: string, env?: boolean): Promise<string> {
+    return new Promise((resolve, reject) => {
+      let exec = this.nativeService.exec;
+      if (command.startsWith("sudo")) {
+        exec = this.nativeService.sudo.exec;
+        command = command.substring(5, command.length);
       }
-    )
+
+      if (this.nativeService.process.platform === "darwin") {
+        if (command.indexOf("osascript") === -1) {
+          command = "/usr/local/bin/" + command;
+        } else {
+          command = "/usr/bin/" + command;
+        }
+      }
+
+      exec(command, { env, name: "Leapp", timeout: 60000 }, (err, stdout, stderr) => {
+        this.nativeService.log.info("execute from Leapp: ", { error: err, standardout: stdout, standarderror: stderr });
+        if (err) {
+          reject(err);
+        } else {
+          resolve(stdout ? stdout : stderr);
+        }
+      });
+    });
   }
 
   /**
@@ -60,23 +53,28 @@ export class ExecuteService {
    * @param env - optional the environment object we can set to pass environment variables
    * @returns an {Observable<any>} to subscribe to
    */
-  public openTerminal(command: string, env?: any): Promise<string> {
-    if (this.nativeService.process.platform === 'darwin') {
-
+  openTerminal(command: string, env?: any): Promise<string> {
+    if (this.nativeService.process.platform === "darwin") {
       const terminalType = this.repository.getWorkspace().macOsTerminal;
-      if(terminalType === constants.macOsTerminal) {
-        return this.execute(`osascript -e "tell app \\"Terminal\\"
+      if (terminalType === constants.macOsTerminal) {
+        return this.execute(
+          `osascript -e "tell app \\"Terminal\\"
                               activate (do script \\"${command} && unset AWS_SESSION_TOKEN && unset AWS_SECRET_ACCESS_KEY && unset AWS_ACCESS_KEY_ID\\")
-                              end tell"`, Object.assign(this.nativeService.process.env, env));
+                              end tell"`,
+          Object.assign(this.nativeService.process.env, env)
+        );
       } else {
-        return this.execute(`osascript -e "tell app \\"iTerm\\"
+        return this.execute(
+          `osascript -e "tell app \\"iTerm\\"
                               set newWindow to (create window with default profile)
                               tell current session of newWindow
                                 write text \\"${command} && unset AWS_SESSION_TOKEN && unset AWS_SECRET_ACCESS_KEY && unset AWS_ACCESS_KEY_ID\\"
                               end tell
-                            end tell"`, Object.assign(this.nativeService.process.env, env));
+                            end tell"`,
+          Object.assign(this.nativeService.process.env, env)
+        );
       }
-    } else if (this.nativeService.process.platform === 'win32') {
+    } else if (this.nativeService.process.platform === "win32") {
       return this.execute(`start cmd /k ${command}`, env);
     } else {
       return this.execute(`gnome-terminal -- sh -c "${command}; bash"`, Object.assign(this.nativeService.process.env, env));

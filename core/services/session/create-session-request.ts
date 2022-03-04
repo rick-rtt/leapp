@@ -1,3 +1,3 @@
 export interface CreateSessionRequest {
-    sessionName: string
+  sessionName: string;
 }

@@ -1,16 +1,15 @@
-import {describe, expect, jest, test} from '@jest/globals'
-import GetDefaultRegion from './get-default'
+import { describe, expect, jest, test } from "@jest/globals";
+import GetDefaultRegion from "./get-default";
 
-describe('GetDefaultRegion', () => {
+describe("GetDefaultRegion", () => {
+  test("run", async () => {
+    const leappCliService = { regionsService: { getDefaultAwsRegion: () => "defaultRegion" } } as any;
 
-    test('run', async () => {
-        const leappCliService = {regionsService: {getDefaultAwsRegion: () => 'defaultRegion'}} as any
+    const command = new GetDefaultRegion([], {} as any, leappCliService);
+    command.log = jest.fn();
 
-        const command = new GetDefaultRegion([], {} as any, leappCliService)
-        command.log = jest.fn()
+    await command.run();
 
-        await command.run()
-
-        expect(command.log).toHaveBeenCalledWith('defaultRegion')
-    })
-})
+    expect(command.log).toHaveBeenCalledWith("defaultRegion");
+  });
+});

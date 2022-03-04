@@ -1,10 +1,9 @@
-import * as uuid from 'uuid';
-import {SessionStatus} from './session-status';
-import {SessionType} from './session-type';
-import {constants} from './constants';
+import * as uuid from "uuid";
+import { SessionStatus } from "./session-status";
+import { SessionType } from "./session-type";
+import { constants } from "./constants";
 
 export class Session {
-
   sessionId: string;
   sessionName: string;
   status: SessionStatus;
@@ -27,5 +26,5 @@ export class Session {
     const currentTime = new Date().getTime();
     const startTime = new Date(this.startDateTime).getTime();
     return (currentTime - startTime) / 1000 > constants.sessionDuration;
-  };
+  }
 }

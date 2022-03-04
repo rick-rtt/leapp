@@ -1,15 +1,14 @@
-import {CreateNewIdpUrlFieldChoice} from '../services/cloud-provider-service'
-import {IdpUrlAccessMethodField} from './idp-url-access-method-field'
+import { CreateNewIdpUrlFieldChoice } from "../services/cloud-provider-service";
+import { IdpUrlAccessMethodField } from "./idp-url-access-method-field";
 
-describe('IdpUrlAccessMethodField', () => {
+describe("IdpUrlAccessMethodField", () => {
+  test('isIdpUrlToCreate, field is "create new idp url"', () => {
+    const idpUrlAccessMethodField = new IdpUrlAccessMethodField(null, null, null);
+    expect(idpUrlAccessMethodField.isIdpUrlToCreate(CreateNewIdpUrlFieldChoice)).toBe(true);
+  });
 
-    test('isIdpUrlToCreate, field is "create new idp url"', () => {
-        const idpUrlAccessMethodField = new IdpUrlAccessMethodField(null, null, null)
-        expect(idpUrlAccessMethodField.isIdpUrlToCreate(CreateNewIdpUrlFieldChoice)).toBe(true)
-    })
-
-    test('isIdpUrlToCreate, field is not "create new idp url"', () => {
-        const idpUrlAccessMethodField = new IdpUrlAccessMethodField(null, null, null)
-        expect(idpUrlAccessMethodField.isIdpUrlToCreate('anotherChoice')).toBe(false)
-    })
-})
+  test('isIdpUrlToCreate, field is not "create new idp url"', () => {
+    const idpUrlAccessMethodField = new IdpUrlAccessMethodField(null, null, null);
+    expect(idpUrlAccessMethodField.isIdpUrlToCreate("anotherChoice")).toBe(false);
+  });
+});

@@ -1,8 +1,7 @@
-import {SessionType} from './session-type';
-import {Session} from './session';
+import { SessionType } from "./session-type";
+import { Session } from "./session";
 
 export class AzureSession extends Session {
-
   subscriptionId: string;
   tenantId: string;
 

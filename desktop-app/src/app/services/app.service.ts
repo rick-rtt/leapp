@@ -1,20 +1,19 @@
-import { EventEmitter, Injectable } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
-import { ElectronService } from './electron.service';
+import { EventEmitter, Injectable } from "@angular/core";
+import { FormControl, FormGroup } from "@angular/forms";
+import { ElectronService } from "./electron.service";
 
-import { LeappCoreService } from './leapp-core.service';
-import { MessageToasterService, ToastLevel } from './message-toaster.service';
-import { MatMenuTrigger } from '@angular/material/menu';
-import {WindowService} from './window.service';
-import {BsModalService} from 'ngx-bootstrap/modal';
-import {LoggerLevel, LoggingService} from '@noovolari/leapp-core/services/logging-service';
-import {constants} from '@noovolari/leapp-core/models/constants';
+import { LeappCoreService } from "./leapp-core.service";
+import { MessageToasterService, ToastLevel } from "./message-toaster.service";
+import { MatMenuTrigger } from "@angular/material/menu";
+import { WindowService } from "./window.service";
+import { BsModalService } from "ngx-bootstrap/modal";
+import { LoggerLevel, LoggingService } from "@noovolari/leapp-core/services/logging-service";
+import { constants } from "@noovolari/leapp-core/models/constants";
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root",
 })
 export class AppService {
-
   profileOpen: EventEmitter<boolean> = new EventEmitter<boolean>();
 
   /* Is used to detect if application is in compact or full mode */
@@ -23,11 +22,13 @@ export class AppService {
   /* This service is defined to provide different app wide methods as utilities */
   private loggingService: LoggingService;
 
-  constructor(private electronService: ElectronService,
-              private messageToasterService: MessageToasterService,
-              private windowService: WindowService,
-              private modalService: BsModalService,
-              leappCoreService: LeappCoreService) {
+  constructor(
+    private electronService: ElectronService,
+    private messageToasterService: MessageToasterService,
+    private windowService: WindowService,
+    private modalService: BsModalService,
+    leappCoreService: LeappCoreService
+  ) {
     this.triggers = [];
 
     this.loggingService = leappCoreService.loggingService;
@@ -37,12 +38,12 @@ export class AppService {
       const logPaths = {
         mac: `${this.electronService.process.env.HOME}/Library/Logs/Leapp/log.electronService.log`,
         linux: `${this.electronService.process.env.HOME}/.config/Leapp/logs/log.electronService.log`,
-        windows: `${this.electronService.process.env.USERPROFILE}\\AppData\\Roaming\\Leapp\\log.electronService.log`
+        windows: `${this.electronService.process.env.USERPROFILE}\\AppData\\Roaming\\Leapp\\log.electronService.log`,
       };
 
-      this.electronService.log.transports.console.format = '[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{processType}] {text}';
+      this.electronService.log.transports.console.format = "[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{processType}] {text}";
       // eslint-disable-next-line max-len
-      this.electronService.log.transports.file.format = '[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] [{processType}] {text}';
+      this.electronService.log.transports.file.format = "[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] [{processType}] {text}";
       this.electronService.log.transports.file.resolvePath = () => logPaths[this.detectOs()];
     }
   }
@@ -51,34 +52,34 @@ export class AppService {
   /**
    * Return the app object from node
    */
-  public getApp(): any {
+  getApp(): any {
     return this.electronService.app;
   }
 
   // TODO: get directly from electronService
-  public getMenu(): any {
+  getMenu(): any {
     return this.electronService.menu;
   }
 
-  public isDarkMode(): boolean {
+  isDarkMode(): boolean {
     return this.electronService.nativeTheme.shouldUseDarkColors;
   }
 
   /**
    * Return the dialog native object
    */
-  public getDialog(): any {
+  getDialog(): any {
     return this.electronService.dialog;
   }
 
   /**
    * Return the type of OS in human-readable form
    */
-  public detectOs(): string {
+  detectOs(): string {
     const hrNames = {
       linux: constants.linux,
       darwin: constants.mac,
-      win32: constants.windows
+      win32: constants.windows,
     };
     const os = this.electronService.os.platform();
     return hrNames[os];
@@ -87,23 +88,23 @@ export class AppService {
   /**
    * Quit the app
    */
-  public quit(): void {
+  quit(): void {
     this.electronService.app.exit(0);
   }
 
   /**
    * Restart the app
    */
-  public restart(): void {
+  restart(): void {
     this.electronService.app.relaunch();
     this.electronService.app.exit(0);
   }
 
-  public async logout(): Promise<void> {
+  async logout(): Promise<void> {
     try {
       // Clear all extra data
-      const getAppPath = this.electronService.path.join(this.electronService.app.getPath('appData'), constants.appName);
-      this.electronService.rimraf.sync(getAppPath + '/Partitions/leapp*');
+      const getAppPath = this.electronService.path.join(this.electronService.app.getPath("appData"), constants.appName);
+      this.electronService.rimraf.sync(getAppPath + "/Partitions/leapp*");
 
       // Cleaning Library Electron Cache
       await this.electronService.session.defaultSession.clearStorageData();
@@ -111,18 +112,19 @@ export class AppService {
       // Clean localStorage
       localStorage.clear();
 
-      this.messageToasterService.toast(
-        'Cache and configuration file cleaned.', ToastLevel.success, 'Cleaning configuration file');
+      this.messageToasterService.toast("Cache and configuration file cleaned.", ToastLevel.success, "Cleaning configuration file");
 
       // Restart
       setTimeout(() => {
         this.restart();
       }, 2000);
     } catch (err) {
-      this.loggingService.logger(`Leapp has an error re-creating your configuration file and cache.`,
-        LoggerLevel.error, this, err.stack);
-      this.messageToasterService.toast(`Leapp has an error re-creating your configuration file and cache.`,
-        ToastLevel.error, 'Cleaning configuration file');
+      this.loggingService.logger(`Leapp has an error re-creating your configuration file and cache.`, LoggerLevel.error, this, err.stack);
+      this.messageToasterService.toast(
+        `Leapp has an error re-creating your configuration file and cache.`,
+        ToastLevel.error,
+        "Cleaning configuration file"
+      );
     }
   }
 
@@ -131,7 +133,7 @@ export class AppService {
    *
    * @returns the semver object
    */
-  public semVer(): any {
+  semVer(): any {
     return this.electronService.semver;
   }
 
@@ -140,17 +142,17 @@ export class AppService {
    *
    * @param text - the element to copy to clipboard
    */
-  public copyToClipboard(text: string): void {
-    const selBox = document.createElement('textarea');
-    selBox.style.position = 'fixed';
-    selBox.style.left = '0';
-    selBox.style.top = '0';
-    selBox.style.opacity = '0';
+  copyToClipboard(text: string): void {
+    const selBox = document.createElement("textarea");
+    selBox.style.position = "fixed";
+    selBox.style.left = "0";
+    selBox.style.top = "0";
+    selBox.style.opacity = "0";
     selBox.value = text;
     document.body.appendChild(selBox);
     selBox.focus();
     selBox.select();
-    document.execCommand('copy');
+    document.execCommand("copy");
     document.body.removeChild(selBox);
   }
 
@@ -159,11 +161,11 @@ export class AppService {
    *
    * @param formGroup - the form formGroup
    */
-  public validateAllFormFields(formGroup: FormGroup): void {
+  validateAllFormFields(formGroup: FormGroup): void {
     Object.keys(formGroup.controls).forEach((field) => {
       const control = formGroup.get(field);
       if (control instanceof FormControl) {
-        control.markAsTouched({onlySelf: true});
+        control.markAsTouched({ onlySelf: true });
       } else if (control instanceof FormGroup) {
         this.validateAllFormFields(control);
       }
@@ -174,12 +176,12 @@ export class AppService {
    * To use EC2 services with the client you need to change the
    * request header because the origin for electron app is of type file
    */
-  public setFilteringForEc2Calls(): void {
+  setFilteringForEc2Calls(): void {
     // Modify the user agent for all requests to the following urls.
-    const filter = {urls: ['https://*.amazonaws.com/']};
+    const filter = { urls: ["https://*.amazonaws.com/"] };
     this.electronService.session.defaultSession.webRequest.onBeforeSendHeaders(filter, (details, callback) => {
-      details.requestHeaders['Origin'] = 'http://localhost:4200';
-      callback({cancel: false, requestHeaders: details.requestHeaders});
+      details.requestHeaders["Origin"] = "http://localhost:4200";
+      callback({ cancel: false, requestHeaders: details.requestHeaders });
     });
   }
 
@@ -189,7 +191,7 @@ export class AppService {
    * @param url - the url to point to launch the window with the protocol, it can also be a file://
    * @returns return a new browser window
    */
-  public newInvisibleWindow(url: string): void {
+  newInvisibleWindow(url: string): void {
     const win = new this.electronService.browserWindow({ width: 1, height: 1, show: false });
     win.loadURL(url);
     return win;
@@ -201,33 +203,37 @@ export class AppService {
    * @param token - a string token
    * @returns the json object decoded
    */
-  public parseJwt(token: string): any {
-    const base64Url = token.split('.')[1];
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    const jsonPayload = decodeURIComponent(atob(base64).split('')
-      .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+  parseJwt(token: string): any {
+    const base64Url = token.split(".")[1];
+    const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split("")
+        .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+        .join("")
+    );
     return JSON.parse(jsonPayload);
   }
 
-  public closeModal(): void {
+  closeModal(): void {
     (this.modalService as any).loaders.forEach((loader) => loader.instance.hide());
   }
 
-  public about(): void {
+  about(): void {
     const version = this.getApp().getVersion();
     this.windowService.getCurrentWindow().show();
     this.getDialog().showMessageBox({
       icon: __dirname + `/assets/images/Leapp.png`,
-      message: `Leapp\n` + `Version ${version} (${version})\n` + '© 2022 Noovolari',
-      buttons: ['Ok']
+      message: `Leapp\n` + `Version ${version} (${version})\n` + "© 2022 Noovolari",
+      buttons: ["Ok"],
     });
   }
 
-  public setMenuTrigger(trigger: MatMenuTrigger): void {
+  setMenuTrigger(trigger: MatMenuTrigger): void {
     this.triggers.push(trigger);
   }
 
-  public closeAllMenuTriggers(): void {
+  closeAllMenuTriggers(): void {
     this.triggers.forEach((t) => {
       t.closeMenu();
     });

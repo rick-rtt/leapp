@@ -1,4 +1,3 @@
-
 export interface Credentials {
   // eslint-disable-next-line @typescript-eslint/naming-convention
   aws_access_key_id: string;

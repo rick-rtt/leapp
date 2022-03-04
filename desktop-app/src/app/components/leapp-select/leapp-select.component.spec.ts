@@ -1,16 +1,15 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from "@angular/core/testing";
 
-import { LeappSelectComponent } from './leapp-select.component';
+import { LeappSelectComponent } from "./leapp-select.component";
 
-describe('LeappSelectComponent', () => {
+describe("LeappSelectComponent", () => {
   let component: LeappSelectComponent;
   let fixture: ComponentFixture<LeappSelectComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ LeappSelectComponent ]
-    })
-    .compileComponents();
+      declarations: [LeappSelectComponent],
+    }).compileComponents();
   });
 
   beforeEach(() => {
@@ -19,7 +18,7 @@ describe('LeappSelectComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it("should create", () => {
     expect(component).toBeTruthy();
   });
 });

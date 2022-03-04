@@ -1,4 +1,3 @@
-describe('aws-session-service', () => {
-  test('test', () => {
-  });
+describe("aws-session-service", () => {
+  test("test", () => {});
 });

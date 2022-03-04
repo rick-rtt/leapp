@@ -1,14 +1,13 @@
-import {Component, Input, OnInit, ViewChild} from '@angular/core';
-import {MatMenuTrigger} from '@angular/material/menu';
-import {FormGroup} from '@angular/forms';
+import { Component, Input, OnInit, ViewChild } from "@angular/core";
+import { MatMenuTrigger } from "@angular/material/menu";
+import { FormGroup } from "@angular/forms";
 
 @Component({
-  selector: 'app-filter-menu',
-  templateUrl: './filter-menu.component.html',
-  styleUrls: ['./filter-menu.component.scss']
+  selector: "app-filter-menu",
+  templateUrl: "./filter-menu.component.html",
+  styleUrls: ["./filter-menu.component.scss"],
 })
 export class FilterMenuComponent implements OnInit {
-
   @ViewChild(MatMenuTrigger)
   trigger: MatMenuTrigger;
 
@@ -54,13 +53,13 @@ export class FilterMenuComponent implements OnInit {
 
   searchContent(event: any) {
     this.data = this.data.map((o) => {
-      o.show = (o.name.toLowerCase().indexOf(event.target.value) > -1);
+      o.show = o.name.toLowerCase().indexOf(event.target.value) > -1;
       return o;
     });
   }
 
   applyCallback(event: MouseEvent, data: { id?: string; category?: string; name: string; value: boolean; show?: boolean }[], form: FormGroup) {
-    if(this.callback) {
+    if (this.callback) {
       this.callback(event, data, form);
     }
   }
@@ -71,7 +70,7 @@ export class FilterMenuComponent implements OnInit {
 
   dataLabel() {
     const result = this.data.filter((d) => d.value).map((d) => d.name);
-    return result.length > 0 ? (result.length > 2 ? `${this.name} · ${result.length}`: result.join(', ')) : this.name;
+    return result.length > 0 ? (result.length > 2 ? `${this.name} · ${result.length}` : result.join(", ")) : this.name;
   }
 
   resetData(event, form: FormGroup) {
