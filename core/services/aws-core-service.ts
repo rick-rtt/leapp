@@ -4,8 +4,6 @@ import { INativeService } from "../interfaces/i-native-service";
 import { LoggerLevel } from "./logging-service";
 
 export class AwsCoreService {
-  constructor(private nativeService: INativeService) {}
-
   static stsEndpointsPerRegion: Map<string, string> = new Map([
     ["af-south-1", "https://sts.af-south-1.amazonaws.com"],
     ["ap-east-1", "https://sts.ap-east-1.amazonaws.com"],
@@ -34,11 +32,13 @@ export class AwsCoreService {
     ["us-west-2", "https://sts.us-west-2.amazonaws.com"],
   ]);
 
-  awsCredentialPath() {
+  constructor(private nativeService: INativeService) {}
+
+  awsCredentialPath(): string {
     return this.nativeService.path.join(this.nativeService.os.homedir(), ".aws", "credentials");
   }
 
-  stsOptions(session: Session) {
+  stsOptions(session: Session): any {
     let options: any = {
       maxRetries: 0,
       httpOptions: { timeout: constants.timeout },
@@ -55,7 +55,7 @@ export class AwsCoreService {
     return options;
   }
 
-  cleanCredentialFile() {
+  cleanCredentialFile(): void {
     try {
       const awsCredentialsPath = this.awsCredentialPath();
       // Rewrite credential file

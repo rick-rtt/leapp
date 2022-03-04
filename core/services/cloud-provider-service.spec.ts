@@ -1,3 +1,4 @@
+import {jest, describe, test, expect} from '@jest/globals'
 import { AccessMethod } from "../models/access-method";
 import { CloudProviderType } from "../models/cloud-provider-type";
 import { SessionType } from "../models/session-type";
@@ -14,7 +15,7 @@ describe("CloudProviderService", () => {
   test("getSessionTypeMap", () => {
     const map = new Map([
       [
-        CloudProviderType.AWS,
+        CloudProviderType.aws,
         [new AccessMethod(SessionType.awsIamUser, "IAM User", [], true), new AccessMethod(SessionType.awsSsoRole, "SSO Role", [], false)],
       ],
     ]);
@@ -80,7 +81,7 @@ describe("CloudProviderService", () => {
       },
     ];
 
-    const accessMethods = service.creatableAccessMethods(CloudProviderType.AWS);
+    const accessMethods = service.creatableAccessMethods(CloudProviderType.aws);
     expect(accessMethods).toEqual([
       {
         accessMethodFields: [
@@ -231,7 +232,7 @@ describe("CloudProviderService", () => {
     const idpUrlProfileService: any = { getIdpUrls: () => [] };
     const service = new CloudProviderService(awsCoreService, azureCoreService, namedProfileService, idpUrlProfileService, repository);
 
-    expect(service.creatableAccessMethods(CloudProviderType.AZURE)).toEqual([
+    expect(service.creatableAccessMethods(CloudProviderType.azure)).toEqual([
       {
         accessMethodFields: [
           {

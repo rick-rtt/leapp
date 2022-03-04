@@ -124,7 +124,7 @@ export class Workspace {
     this._awsSsoIntegrations = value;
   }
 
-  get pinned() {
+  get pinned(): string[] {
     return this._pinned;
   }
 
@@ -132,7 +132,7 @@ export class Workspace {
     this._pinned = pinned;
   }
 
-  get folders() {
+  get folders(): Folder[] {
     return this._folders;
   }
 
@@ -140,7 +140,7 @@ export class Workspace {
     this._folders = folders;
   }
 
-  get segments() {
+  get segments(): Segment[] {
     return this._segments;
   }
 

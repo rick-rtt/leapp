@@ -6,56 +6,55 @@ export class CliAwsAuthenticationService implements IAwsAuthenticationService {
   private browser: puppeteer.Browser;
 
   async needAuthentication(idpUrl: string): Promise<boolean> {
-    return new Promise(async (resolve, reject) => {
-      const page = await this.getNavigationPage(true);
+    return new Promise((resolve, reject) => {
+      this.getNavigationPage(true)
+        .then((page) => {
+          page.on("request", async (request) => {
+            const requestUrl = request.url().toString();
+            if (request.isInterceptResolutionHandled()) {
+              reject("request unexpectedly already handled");
+              return;
+            }
 
-      page.on("request", async (request) => {
-        const requestUrl = request.url().toString();
-        if (request.isInterceptResolutionHandled()) {
-          reject("request unexpectedly already handled");
-          return;
-        }
+            if (this.isRequestToIntercept(requestUrl)) {
+              resolve(requestUrl.indexOf("https://signin.aws.amazon.com/saml") === -1);
+              return;
+            }
 
-        if (this.isRequestToIntercept(requestUrl)) {
-          resolve(requestUrl.indexOf("https://signin.aws.amazon.com/saml") === -1);
-          return;
-        }
-
-        await request.continue();
-      });
-
-      try {
-        await page.goto(idpUrl);
-      } catch (e) {}
+            await request.continue();
+          });
+          page.goto(idpUrl);
+        })
+        .catch((error) => {
+          reject(error);
+        });
     });
   }
 
   async awsSignIn(idpUrl: string, needToAuthenticate: boolean): Promise<any> {
-    return new Promise(async (resolve, reject) => {
-      const page = await this.getNavigationPage(!needToAuthenticate);
+    return new Promise((resolve, reject) => {
+      this.getNavigationPage(!needToAuthenticate).then((page) => {
+        page.on("request", async (request) => {
+          const requestUrl = request.url().toString();
+          if (request.isInterceptResolutionHandled()) {
+            reject("request unexpectedly already handled");
+            return;
+          }
 
-      page.on("request", async (request) => {
-        const requestUrl = request.url().toString();
-        if (request.isInterceptResolutionHandled()) {
-          reject("request unexpectedly already handled");
-          return;
-        }
+          if (requestUrl.indexOf("https://signin.aws.amazon.com/saml") !== -1) {
+            resolve({ uploadData: [{ bytes: { toString: () => request.postData() } }] });
+            return;
+          }
 
-        if (requestUrl.indexOf("https://signin.aws.amazon.com/saml") !== -1) {
-          resolve({ uploadData: [{ bytes: { toString: () => request.postData() } }] });
-          return;
-        }
+          await request.continue();
+        });
 
-        await request.continue();
+        page.on("close", () => {
+          reject(new LeappModalClosedError(this, "request window closed by user"));
+        });
+
+        page.goto(idpUrl);
       });
-
-      page.on("close", () => {
-        reject(new LeappModalClosedError(this, "request window closed by user"));
-      });
-
-      try {
-        await page.goto(idpUrl);
-      } catch (e) {}
     });
   }
 

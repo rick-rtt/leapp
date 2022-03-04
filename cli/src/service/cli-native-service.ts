@@ -40,13 +40,13 @@ export class CliNativeService implements INativeService {
     this.httpsProxyAgent = require("https-proxy-agent");
     this.log = {
       info: (msg: string) => {
-        console.info(msg);
+        global.console.info(msg);
       },
       warn: (msg: string) => {
-        console.warn(msg);
+        global.console.warn(msg);
       },
       error: (msg: string) => {
-        console.error(msg);
+        global.console.error(msg);
       },
     };
   }

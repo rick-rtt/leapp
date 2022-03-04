@@ -3,7 +3,7 @@ import { INativeService } from "../interfaces/i-native-service";
 //import * as CryptoJS from 'crypto-js';
 
 // TODO: when core will use tsconfig "moduleResolution": "ES2020", this require still generates warnings compiling the desktop app
-const CryptoJS = require("crypto-js");
+const cryptoJS = require("crypto-js");
 
 export class FileService {
   private readSubscription: Subscription;
@@ -72,7 +72,7 @@ export class FileService {
    * @param source - source directory
    * @param target - target directory
    */
-  copyDir(source: string, target: string) {
+  copyDir(source: string, target: string): void {
     this.nativeService.copydir.sync(source, target, { mode: true });
   }
 
@@ -92,7 +92,7 @@ export class FileService {
    * @returns - {any} - data
    * @param source - source of the directory
    */
-  getSubDirs(source: string) {
+  getSubDirs(source: string): string[] {
     return this.nativeService.fs
       .readdirSync(source, { withFileTypes: true })
       .filter((dirent: any) => dirent.isDirectory())
@@ -165,7 +165,7 @@ export class FileService {
    * @param filePath - the filepath to write to
    * @param content - the content to write
    */
-  iniWriteSync(filePath: string, content: any) {
+  iniWriteSync(filePath: string, content: any): any {
     Object.keys(content).forEach((key) => {
       Object.keys(content[key]).forEach((subKey) => {
         if (content[key][subKey] === null || content[key][subKey] === undefined || content[key][subKey] === "null" || content[key][subKey] === "") {
@@ -179,7 +179,7 @@ export class FileService {
     return this.writeFileSync(filePath, this.nativeService.ini.stringify(result));
   }
 
-  replaceWriteSync(filePath: string, content: any) {
+  replaceWriteSync(filePath: string, content: any): any {
     Object.keys(content).forEach((key) => {
       Object.keys(content[key]).forEach((subKey) => {
         if (content[key][subKey] === null || content[key][subKey] === undefined || content[key][subKey] === "null" || content[key][subKey] === "") {
@@ -225,7 +225,7 @@ export class FileService {
    * @returns - {any} - returns the parsed string
    * @param filePath - the filepath to read from
    */
-  iniParseSync(filePath: string) {
+  iniParseSync(filePath: string): any {
     return this.nativeService.ini.parse(this.readFileSync(filePath));
   }
 
@@ -234,13 +234,13 @@ export class FileService {
    * Encrypt Text
    */
   encryptText(text: string): string {
-    return CryptoJS.AES.encrypt(text.trim(), this.nativeService.machineId).toString();
+    return cryptoJS.AES.encrypt(text.trim(), this.nativeService.machineId).toString();
   }
 
   /**
    * Decrypt Text
    */
   decryptText(text: string): string {
-    return CryptoJS.AES.decrypt(text.trim(), this.nativeService.machineId).toString(CryptoJS.enc.Utf8);
+    return cryptoJS.AES.decrypt(text.trim(), this.nativeService.machineId).toString(cryptoJS.enc.Utf8);
   }
 }

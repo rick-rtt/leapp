@@ -60,7 +60,7 @@ export default class DeleteIdpUrl extends Command {
     return answer.confirmation;
   }
 
-  async deleteIdpUrl(id: string) {
+  async deleteIdpUrl(id: string): Promise<void> {
     await this.leappCliService.idpUrlsService.deleteIdpUrl(id);
     this.log("identity provider URL deleted");
   }

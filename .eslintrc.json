@@ -2,13 +2,14 @@
   "root": true,
   "ignorePatterns": [
     "*.spec.ts",
+    "cli/gushio",
+    "cli/dist/**/*",
     "core/dist/**/*",
     "core/gushio",
     "desktop-app/electron/**/*",
     "desktop-app/e2e/**/*",
     "desktop-app/dist/**/*",
     "desktop-app/gushio",
-    "cli/gushio",
     "desktop-app/scripts/notarize.js"
   ],
   "overrides": [

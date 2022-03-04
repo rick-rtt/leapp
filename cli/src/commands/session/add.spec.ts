@@ -8,7 +8,7 @@ describe("AddSession", () => {
   test("chooseCloudProvider", async () => {
     const leappCliService: any = {
       cloudProviderService: {
-        availableCloudProviders: () => [CloudProviderType.AWS],
+        availableCloudProviders: () => [CloudProviderType.aws],
       },
       inquirer: {
         prompt: async (params: any) => {
@@ -51,7 +51,7 @@ describe("AddSession", () => {
     };
 
     const command = new AddSession([], {} as any, leappCliService, null);
-    const accessMethod = await command.chooseAccessMethod(CloudProviderType.AWS);
+    const accessMethod = await command.chooseAccessMethod(CloudProviderType.aws);
     expect(accessMethod).toStrictEqual("Method");
   });
 

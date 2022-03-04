@@ -15,7 +15,7 @@ export class CliVerificationWindowService implements IVerificationWindowService 
   ): Promise<VerificationResponse> {
     const uriComplete = startDeviceAuthorizationResponse.verificationUriComplete;
     const page = await this.getNavigationPage();
-    await page.goto(uriComplete!);
+    await page.goto(uriComplete as string);
 
     return {
       clientId: registerClientResponse.clientId,

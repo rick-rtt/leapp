@@ -41,12 +41,12 @@ export class NamedProfilesService {
     return this.repository.getSessions().filter((session) => (session as any).profileId === id);
   }
 
-  createNamedProfile(name: string) {
+  createNamedProfile(name: string): void {
     const validName = this.validateNewProfileName(name);
     this.repository.addProfile(new AwsNamedProfile(this.getNewId(), validName));
   }
 
-  async editNamedProfile(id: string, newName: string) {
+  async editNamedProfile(id: string, newName: string): Promise<void> {
     const validName = this.validateNewProfileName(newName);
     const activeSessions = this.getSessionsWithNamedProfile(id).filter((session) => session.status === SessionStatus.active);
 
@@ -59,7 +59,7 @@ export class NamedProfilesService {
     }
   }
 
-  async deleteNamedProfile(id: string) {
+  async deleteNamedProfile(id: string): Promise<void> {
     const sessions = this.getSessionsWithNamedProfile(id);
     const defaultNamedProfileId = this.repository.getDefaultProfileId();
 
@@ -81,7 +81,7 @@ export class NamedProfilesService {
     this.repository.removeProfile(id);
   }
 
-  getNewId() {
+  getNewId(): string {
     return uuid.v4();
   }
 

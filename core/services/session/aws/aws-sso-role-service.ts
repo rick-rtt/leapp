@@ -58,6 +58,8 @@ export interface SsoRoleSession {
 }
 
 export class AwsSsoRoleService extends AwsSessionService implements BrowserWindowClosing {
+  private awsIntegrationDelegate: IAwsIntegrationDelegate;
+
   constructor(
     protected sessionNotifier: ISessionNotifier,
     protected repository: Repository,
@@ -70,8 +72,6 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
     super(sessionNotifier, repository);
     awsSsoOidcService.appendListener(this);
   }
-
-  private awsIntegrationDelegate: IAwsIntegrationDelegate;
 
   static sessionTokenFromGetSessionTokenResponse(getRoleCredentialResponse: SSO.GetRoleCredentialsResponse): { sessionToken: any } {
     return {
@@ -86,7 +86,7 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
     };
   }
 
-  setAwsIntegrationDelegate(delegate: IAwsIntegrationDelegate) {
+  setAwsIntegrationDelegate(delegate: IAwsIntegrationDelegate): void {
     this.awsIntegrationDelegate = delegate;
   }
 
@@ -150,9 +150,9 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
     return AwsSsoRoleService.sessionTokenFromGetSessionTokenResponse(credentials);
   }
 
-  sessionDeactivated(sessionId: string) {
+  sessionDeactivated(sessionId: string): void {
     super.sessionDeactivated(sessionId);
   }
 
-  removeSecrets(sessionId: string): void {}
+  removeSecrets(_: string): void {}
 }

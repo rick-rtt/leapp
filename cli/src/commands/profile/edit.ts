@@ -49,7 +49,7 @@ export default class EditNamedProfile extends Command {
     return answer.namedProfileName;
   }
 
-  async editNamedProfile(id: string, newName: string) {
+  async editNamedProfile(id: string, newName: string): Promise<void> {
     await this.leappCliService.namedProfilesService.editNamedProfile(id, newName);
     this.log("profile edited");
   }

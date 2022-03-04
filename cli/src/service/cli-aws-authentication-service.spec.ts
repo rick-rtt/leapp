@@ -4,6 +4,7 @@ import { of } from "rxjs";
 import { Page, HTTPRequest } from "puppeteer";
 
 describe("CliAwsAuthenticationService", () => {
+
   test("needAuthentication", async () => {
     const idpUrl = "https://idpUrl";
     const page = new PageStub(idpUrl, {

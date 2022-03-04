@@ -18,11 +18,11 @@ export class IdpUrlsService {
     return newIdpUrl;
   }
 
-  editIdpUrl(id: string, newIdpUrl: string) {
+  editIdpUrl(id: string, newIdpUrl: string): void {
     this.repository.updateIdpUrl(id, newIdpUrl.trim());
   }
 
-  async deleteIdpUrl(id: string) {
+  async deleteIdpUrl(id: string): Promise<void> {
     for (const sessionToDelete of this.getDependantSessions(id, false)) {
       const sessionService = this.sessionFactory.getSessionService(sessionToDelete.type);
       await sessionService.delete(sessionToDelete.sessionId);

@@ -1,7 +1,8 @@
+import {jest, describe, test, expect} from '@jest/globals'
 import { AwsCoreService } from "./aws-core-service";
 
 describe("awsCoreService", () => {
-  it("getRegions", function () {
+  test("getRegions", function () {
     const awsCoreService = new AwsCoreService(null);
 
     expect(awsCoreService.getRegions()).toEqual([

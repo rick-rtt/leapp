@@ -1,3 +1,4 @@
+import { jest, describe, test, expect } from '@jest/globals'
 import {
   DefaultIsNotAValidProfileNameError,
   EmptyProfileNameError,
@@ -11,50 +12,50 @@ import { AwsNamedProfile } from "../models/aws-named-profile";
 describe("NamedProfilesService", () => {
   test("getNamedProfiles", () => {
     const repository = {
-      getProfiles: () => [{ id: "profile1" }, { id: "defaultId" }],
+      getProfiles: () => [{id: "profile1"}, {id: "defaultId"}],
     };
     const namedProfileService = new NamedProfilesService(null, repository as any, null);
     const namedProfiles = namedProfileService.getNamedProfiles();
 
-    expect(namedProfiles).toEqual([{ id: "profile1" }, { id: "defaultId" }]);
+    expect(namedProfiles).toEqual([{id: "profile1"}, {id: "defaultId"}]);
   });
 
   test("getNamedProfiles, excludingDefault", () => {
     const repository = {
       getDefaultProfileId: () => "defaultId",
-      getProfiles: () => [{ id: "profile1" }, { id: "defaultId" }, { id: "profile2" }],
+      getProfiles: () => [{id: "profile1"}, {id: "defaultId"}, {id: "profile2"}],
     };
     const namedProfileService = new NamedProfilesService(null, repository as any, null);
     const namedProfiles = namedProfileService.getNamedProfiles(true);
 
-    expect(namedProfiles).toEqual([{ id: "profile1" }, { id: "profile2" }]);
+    expect(namedProfiles).toEqual([{id: "profile1"}, {id: "profile2"}]);
   });
 
   test("getNamedProfilesMap", () => {
     const namedProfileService = new NamedProfilesService(null, null, null);
     namedProfileService.getNamedProfiles = () => [
-      { id: "1", name: "profile1" },
-      { id: "2", name: "profile2" },
+      {id: "1", name: "profile1"},
+      {id: "2", name: "profile2"},
     ];
 
     const namedProfilesMap = namedProfileService.getNamedProfilesMap();
 
     expect(namedProfilesMap).toEqual(
       new Map([
-        ["1", { id: "1", name: "profile1" }],
-        ["2", { id: "2", name: "profile2" }],
+        ["1", {id: "1", name: "profile1"}],
+        ["2", {id: "2", name: "profile2"}],
       ])
     );
   });
 
   test("getSessionsWithNamedProfile", () => {
     const repository = {
-      getSessions: () => [{ profileId: "1" }, { profileId: "2" }],
+      getSessions: () => [{profileId: "1"}, {profileId: "2"}],
     };
     const namedProfileService = new NamedProfilesService(null, repository as any, null);
     const sessions = namedProfileService.getSessionsWithNamedProfile("2");
 
-    expect(sessions).toEqual([{ profileId: "2" }]);
+    expect(sessions).toEqual([{profileId: "2"}]);
   });
 
   test("createNamedProfile", () => {
@@ -88,9 +89,9 @@ describe("NamedProfilesService", () => {
     const namedProfileService = new NamedProfilesService(sessionFactory as any, repository as any, null);
     namedProfileService.validateNewProfileName = jest.fn(() => "validName");
     namedProfileService.getSessionsWithNamedProfile = jest.fn(() => [
-      { sessionId: "1", status: SessionStatus.pending, type: "type1" },
-      { sessionId: "2", status: SessionStatus.inactive, type: "type2" },
-      { sessionId: "3", status: SessionStatus.active, type: "type3" },
+      {sessionId: "1", status: SessionStatus.pending, type: "type1"},
+      {sessionId: "2", status: SessionStatus.inactive, type: "type2"},
+      {sessionId: "3", status: SessionStatus.active, type: "type3"},
     ]) as any;
 
     await namedProfileService.editNamedProfile("profileId", "newName");
@@ -116,14 +117,14 @@ describe("NamedProfilesService", () => {
     };
     const repository = {
       getDefaultProfileId: () => "defaultProfileId",
-      updateSession: jest.fn((sessionId, session) => {
+      updateSession: jest.fn((sessionId, session: any) => {
         expect(session.profileId).toBe("defaultProfileId");
         expect(sessionId === "3" && sessionIsRunning).toBe(false);
       }),
       removeProfile: jest.fn(),
     };
     const workspaceService = {
-      updateSession: jest.fn((sessionId, session) => {
+      updateSession: jest.fn((sessionId, session: any) => {
         expect(session.profileId).toBe("defaultProfileId");
         expect(sessionId === "3" && sessionIsRunning).toBe(false);
       }),
@@ -131,9 +132,9 @@ describe("NamedProfilesService", () => {
 
     const namedProfileService = new NamedProfilesService(sessionFactory as any, repository as any, workspaceService as any);
     const sessions = [
-      { sessionId: "1", status: SessionStatus.pending, type: "type1" },
-      { sessionId: "2", status: SessionStatus.inactive, type: "type2" },
-      { sessionId: "3", status: SessionStatus.active, type: "type3" },
+      {sessionId: "1", status: SessionStatus.pending, type: "type1"},
+      {sessionId: "2", status: SessionStatus.inactive, type: "type2"},
+      {sessionId: "3", status: SessionStatus.active, type: "type3"},
     ];
     namedProfileService.getSessionsWithNamedProfile = jest.fn(() => sessions) as any;
 
@@ -159,6 +160,7 @@ describe("NamedProfilesService", () => {
     const id1 = namedProfileService.getNewId();
     const id2 = namedProfileService.getNewId();
     expect(id1).not.toEqual(id2);
+    expect(typeof id1).toBe('string')
   });
 
   test("validateNewProfileName", () => {
@@ -180,7 +182,7 @@ describe("NamedProfilesService", () => {
 
   test("validateNewProfileName, existent name", () => {
     const namedProfileService = new NamedProfilesService(null, null, null);
-    namedProfileService.getNamedProfiles = () => [{ id: "1", name: "profile" }];
+    namedProfileService.getNamedProfiles = () => [{id: "1", name: "profile"}];
 
     expect(() => namedProfileService.validateNewProfileName("profile")).toThrow(new NamedProfileAlreadyExistsError());
   });

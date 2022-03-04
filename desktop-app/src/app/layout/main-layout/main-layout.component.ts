@@ -26,7 +26,7 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
     this.subscription.unsubscribe();
   }
 
-  clearOptionBarIds() {
+  clearOptionBarIds(): void {
     for (const prop of Object.getOwnPropertyNames(optionBarIds)) {
       optionBarIds[prop] = false;
     }
