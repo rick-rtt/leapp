@@ -1,0 +1,37 @@
+import { CliUx, Command } from "@oclif/core";
+import { LeappCliService } from "../../service/leapp-cli-service";
+import { Config } from "@oclif/core/lib/config/config";
+
+export default class ListProfiles extends Command {
+  static description = "Show profile list";
+  static examples = ["$leapp profile list"];
+
+  static flags = {
+    ...CliUx.ux.table.flags(),
+  };
+
+  constructor(argv: string[], config: Config, private leappCliService = new LeappCliService()) {
+    super(argv, config);
+  }
+
+  async run(): Promise<void> {
+    try {
+      await this.showProfiles();
+    } catch (error) {
+      this.error(error instanceof Error ? error.message : `Unknown error: ${error}`);
+    }
+  }
+
+  private async showProfiles(): Promise<void> {
+    const { flags } = await this.parse(ListProfiles);
+    const data = this.leappCliService.namedProfilesService.getNamedProfiles().map((profile: any) => ({
+      name: profile.name,
+    })) as any as Record<string, unknown>[];
+
+    const columns = {
+      name: { header: "Profile Name" },
+    };
+
+    CliUx.ux.table(data, columns, { ...flags });
+  }
+}
