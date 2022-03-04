@@ -1,16 +1,14 @@
-import { BehaviorSubject, Observable } from 'rxjs'
-import { Repository } from './repository'
-import { Session } from '../models/session'
-import Folder from '../models/folder'
-import Segment from '../models/Segment'
-import { SessionStatus } from '../models/session-status'
-import { SessionType } from '../models/session-type'
-import { AwsIamRoleChainedSession } from '../models/aws-iam-role-chained-session'
-import { ISessionNotifier } from '../interfaces/i-session-notifier'
+import { BehaviorSubject, Observable } from "rxjs";
+import { Repository } from "./repository";
+import { Session } from "../models/session";
+import { SessionStatus } from "../models/session-status";
+import { SessionType } from "../models/session-type";
+import { AwsIamRoleChainedSession } from "../models/aws-iam-role-chained-session";
+import { ISessionNotifier } from "../interfaces/i-session-notifier";
 
 export class WorkspaceService implements ISessionNotifier {
   // Expose the observable$ part of the _sessions subject (read only stream)
-  readonly sessions$: Observable<Session[]>
+  readonly sessions$: Observable<Session[]>;
 
   // - We set the initial state in BehaviorSubject's constructor
   // - Nobody outside the Store should have access to the BehaviorSubject
@@ -18,84 +16,81 @@ export class WorkspaceService implements ISessionNotifier {
   // - Writing to state should be handled by specialized Store methods
   // - Create one BehaviorSubject per store entity, for example if you have
   //   create a new BehaviorSubject for it, as well as the observable$, and getters/setters
-  private readonly _sessions
+  private readonly _sessions;
 
   constructor(private repository: Repository) {
-    this._sessions = new BehaviorSubject<Session[]>([])
-    this.sessions$ = this._sessions.asObservable()
-    this.sessions = this.repository.getSessions()
+    this._sessions = new BehaviorSubject<Session[]>([]);
+    this.sessions$ = this._sessions.asObservable();
+    this.sessions = this.repository.getSessions();
   }
 
   // the getter will return the last value emitted in _sessions subject
   get sessions(): Session[] {
-    return this._sessions.getValue()
+    return this._sessions.getValue();
   }
 
   // assigning a value to this.sessions will push it onto the observable
   // and down to all of its subscribers (ex: this.sessions = [])
   set sessions(sessions: Session[]) {
-    this._sessions.next(sessions)
+    this._sessions.next(sessions);
   }
 
   getSessions(): Session[] {
-    return this._sessions.getValue()
+    return this._sessions.getValue();
   }
 
   getSessionById(sessionId: string): Session {
-    const sessionFiltered = this.sessions.find(session => session.sessionId === sessionId)
-    return sessionFiltered ? sessionFiltered : null
+    const sessionFiltered = this.sessions.find((session) => session.sessionId === sessionId);
+    return sessionFiltered ? sessionFiltered : null;
   }
 
   setSessions(sessions: Session[]): void {
-    this._sessions.next(sessions)
+    this._sessions.next(sessions);
   }
 
-  addSession(session: Session) {
+  addSession(session: Session): void {
     // we assign a new copy of session by adding a new session to it
-    this.sessions = [
-      ...this.sessions,
-      session
-    ]
+    this.sessions = [...this.sessions, session];
   }
 
   deleteSession(sessionId: string): void {
-    this.sessions = this.sessions.filter(session => session.sessionId !== sessionId)
+    this.sessions = this.sessions.filter((session) => session.sessionId !== sessionId);
   }
 
   listPending(): Session[] {
-    return (this.sessions.length > 0) ? this.sessions.filter((session) => session.status === SessionStatus.pending) : []
+    return this.sessions.length > 0 ? this.sessions.filter((session) => session.status === SessionStatus.pending) : [];
   }
 
   listActive(): Session[] {
-    return (this.sessions.length > 0) ? this.sessions.filter((session) => session.status === SessionStatus.active) : []
+    return this.sessions.length > 0 ? this.sessions.filter((session) => session.status === SessionStatus.active) : [];
   }
 
-  listAwsSsoRoles() {
-    return (this.sessions.length > 0) ? this.sessions.filter((session) => session.type === SessionType.awsSsoRole) : []
+  listAwsSsoRoles(): Session[] {
+    return this.sessions.length > 0 ? this.sessions.filter((session) => session.type === SessionType.awsSsoRole) : [];
   }
 
   listIamRoleChained(parentSession?: Session): Session[] {
-    let childSession = (this.sessions.length > 0) ? this.sessions.filter((session) => session.type === SessionType.awsIamRoleChained) : []
+    let childSession = this.sessions.length > 0 ? this.sessions.filter((session) => session.type === SessionType.awsIamRoleChained) : [];
     if (parentSession) {
-      childSession = childSession.filter(session => (session as AwsIamRoleChainedSession).parentSessionId === parentSession.sessionId)
+      childSession = childSession.filter((session) => (session as AwsIamRoleChainedSession).parentSessionId === parentSession.sessionId);
     }
-    return childSession
+    return childSession;
   }
 
-  updateSession(sessionId: string, session: Session) {
-    const sessions = this.sessions
-    const index = sessions.findIndex(sess => sess.sessionId === sessionId)
+  updateSession(sessionId: string, session: Session): void {
+    const sessions = this.sessions;
+    const index = sessions.findIndex((sess) => sess.sessionId === sessionId);
     if (index > -1) {
-      this.sessions[index] = session
-      this.sessions = [...this.sessions]
+      this.sessions[index] = session;
+      this.sessions = [...this.sessions];
     }
   }
 
   listInActive(): Session[] {
-    return (this.sessions.length > 0) ? this.sessions.filter((session) => session.status === SessionStatus.inactive) : []
+    return this.sessions.length > 0 ? this.sessions.filter((session) => session.status === SessionStatus.inactive) : [];
   }
 
   listAssumable(): Session[] {
-    return (this.sessions.length > 0) ? this.sessions.filter((session) => session.type !== SessionType.azure) : []
+    return this.sessions.length > 0 ? this.sessions.filter((session) => session.type !== SessionType.azure) : [];
   }
 }

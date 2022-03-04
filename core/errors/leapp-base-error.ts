@@ -1,7 +1,6 @@
-import {LoggerLevel} from '../services/logging-service';
+import { LoggerLevel } from "../services/logging-service";
 
 export class LeappBaseError extends Error {
-
   private readonly _context: any;
   private readonly _severity: LoggerLevel;
 
@@ -13,11 +12,11 @@ export class LeappBaseError extends Error {
     Object.setPrototypeOf(this, new.target.prototype);
   }
 
-  get severity(): LoggerLevel {
+  public get severity(): LoggerLevel {
     return this._severity;
   }
 
-  get context(): any {
+  public get context(): any {
     return this._context;
   }
 }

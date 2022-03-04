@@ -1,4 +1,4 @@
-import {GetRoleCredentialsResponse} from 'aws-sdk/clients/sso'
+import { GetRoleCredentialsResponse } from "aws-sdk/clients/sso";
 
 export interface IAwsIntegrationDelegate {
   getAccessToken(configurationId: string, region: string, portalUrl: string): Promise<string>;

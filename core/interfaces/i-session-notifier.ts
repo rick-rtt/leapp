@@ -1,4 +1,4 @@
-import { Session } from '../models/session'
+import { Session } from "../models/session";
 
 export interface ISessionNotifier {
   getSessions(): Session[];

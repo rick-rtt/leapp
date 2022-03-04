@@ -1,9 +1,7 @@
-import {INativeService} from '../interfaces/i-native-service'
-
+import { INativeService } from "../interfaces/i-native-service";
 
 export class KeychainService {
-  constructor(private nativeService: INativeService) {
-  }
+  constructor(private nativeService: INativeService) {}
 
   /**
    * Save your secret in the keychain
@@ -13,7 +11,7 @@ export class KeychainService {
    * @param password - secret
    */
   async saveSecret(service: string, account: string, password: string): Promise<void> {
-    return await this.nativeService.keytar.setPassword(service, account, password)
+    return await this.nativeService.keytar.setPassword(service, account, password);
   }
 
   /**
@@ -24,7 +22,7 @@ export class KeychainService {
    * @returns the secret
    */
   async getSecret(service: string, account: string): Promise<string | null> {
-    return await this.nativeService.keytar.getPassword(service, account)
+    return await this.nativeService.keytar.getPassword(service, account);
   }
 
   /**
@@ -34,6 +32,6 @@ export class KeychainService {
    * @param account - unique identifier
    */
   async deletePassword(service: string, account: string): Promise<boolean> {
-    return await this.nativeService.keytar.deletePassword(service, account)
+    return await this.nativeService.keytar.deletePassword(service, account);
   }
 }

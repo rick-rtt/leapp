@@ -1,23 +1,22 @@
-import {Component, Input, OnDestroy, OnInit} from '@angular/core';
-import {BsModalRef} from 'ngx-bootstrap/modal';
-import {AppService} from '../../../services/app.service';
-import {FormControl, FormGroup} from '@angular/forms';
-import {compactMode, globalColumns, IGlobalColumns} from '../../command-bar/command-bar.component';
+import { Component, OnDestroy, OnInit } from "@angular/core";
+import { BsModalRef } from "ngx-bootstrap/modal";
+import { AppService } from "../../../services/app.service";
+import { FormControl, FormGroup } from "@angular/forms";
+import { compactMode, globalColumns, IGlobalColumns } from "../../command-bar/command-bar.component";
 
 @Component({
-  selector: 'app-column-dialog',
-  templateUrl: './column-dialog.component.html',
-  styleUrls: ['./column-dialog.component.scss']
+  selector: "app-column-dialog",
+  templateUrl: "./column-dialog.component.html",
+  styleUrls: ["./column-dialog.component.scss"],
 })
 export class ColumnDialogComponent implements OnInit, OnDestroy {
-
   eGlobalColumns: IGlobalColumns;
 
   columnForm = new FormGroup({
     role: new FormControl(),
     provider: new FormControl(),
     namedProfile: new FormControl(),
-    region: new FormControl()
+    region: new FormControl(),
   });
 
   showRegion;
@@ -38,7 +37,7 @@ export class ColumnDialogComponent implements OnInit, OnDestroy {
       this.values = values;
     });
 
-    this.subscription2 = compactMode.subscribe((value) => this.showRegion = !value);
+    this.subscription2 = compactMode.subscribe((value) => (this.showRegion = !value));
   }
 
   ngOnDestroy(): void {
@@ -46,11 +45,11 @@ export class ColumnDialogComponent implements OnInit, OnDestroy {
     this.subscription2.unsubscribe();
   }
 
-  closeModal() {
+  closeModal(): void {
     this.appService.closeModal();
   }
 
-  setColumns() {
+  setColumns(): void {
     globalColumns.next(this.values);
     this.appService.closeModal();
   }

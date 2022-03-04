@@ -1,16 +1,15 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from "@angular/core/testing";
 
-import { SegmentDialogComponent } from './segment-dialog.component';
+import { SegmentDialogComponent } from "./segment-dialog.component";
 
-describe('SegmentDialogComponent', () => {
+describe("SegmentDialogComponent", () => {
   let component: SegmentDialogComponent;
   let fixture: ComponentFixture<SegmentDialogComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ SegmentDialogComponent ]
-    })
-    .compileComponents();
+      declarations: [SegmentDialogComponent],
+    }).compileComponents();
   });
 
   beforeEach(() => {
@@ -19,7 +18,7 @@ describe('SegmentDialogComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it("should create", () => {
     expect(component).toBeTruthy();
   });
 });

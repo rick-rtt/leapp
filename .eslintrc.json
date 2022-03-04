@@ -1,7 +1,16 @@
 {
   "root": true,
   "ignorePatterns": [
-    "electron/**/*"
+    "*.spec.ts",
+    "cli/gushio",
+    "cli/dist/**/*",
+    "core/dist/**/*",
+    "core/gushio",
+    "desktop-app/electron/**/*",
+    "desktop-app/e2e/**/*",
+    "desktop-app/dist/**/*",
+    "desktop-app/gushio",
+    "desktop-app/scripts/notarize.js"
   ],
   "overrides": [
     {
@@ -9,26 +18,24 @@
         "*.ts"
       ],
       "parser": "@typescript-eslint/parser",
-      "plugins": [
-        "@typescript-eslint"
-      ],
+      "plugins": ["prettier"],
       "extends": [
         "eslint:recommended",
-        "plugin:@typescript-eslint/eslint-recommended",
         "plugin:@typescript-eslint/recommended",
         "plugin:@angular-eslint/ng-cli-compat",
         "plugin:@angular-eslint/ng-cli-compat--formatting-add-on",
-        "plugin:@angular-eslint/template/process-inline-templates"
+        "plugin:@angular-eslint/template/process-inline-templates",
+        "prettier"
       ],
       "rules": {
-        "arrow-parens": ["error", "always"],
+        "prettier/prettier": "error",
         "brace-style": ["error", "1tbs"],
         "id-blacklist": ["error"],
-        "max-len": ["warn", {"code": 121}],
         "no-trailing-spaces": "error",
-        "no-underscore-dangle": "error",
+        "no-underscore-dangle": "off",
         "no-case-declarations": "off",
         "no-dupe-else-if": "warn",
+        "no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
         "@typescript-eslint/prefer-for-of": "off",
         "@typescript-eslint/consistent-type-definitions": "error",
         "@typescript-eslint/dot-notation": "off",
@@ -37,8 +44,11 @@
           {
             "accessibility": "explicit",
             "overrides": {
+              "accessors": "explicit",
               "constructors": "no-public",
-              "properties": "off"
+              "methods": "no-public",
+              "properties": "off",
+              "parameterProperties": "off"
             }
           }
         ],

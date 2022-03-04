@@ -1,20 +1,18 @@
-import { Injectable } from '@angular/core';
-import { BsModalService } from 'ngx-bootstrap/modal';
-import { InputDialogComponent } from '../components/dialogs/input-dialog/input-dialog.component';
-import { ElectronService } from './electron.service';
-import { IMfaCodePrompter } from '@noovolari/leapp-core/interfaces/i-mfa-code-prompter';
+import { Injectable } from "@angular/core";
+import { BsModalService } from "ngx-bootstrap/modal";
+import { InputDialogComponent } from "../components/dialogs/input-dialog/input-dialog.component";
+import { ElectronService } from "./electron.service";
+import { IMfaCodePrompter } from "@noovolari/leapp-core/interfaces/i-mfa-code-prompter";
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root",
 })
 export class MfaCodePromptService implements IMfaCodePrompter {
-
   constructor(private modalService: BsModalService, private electronService: ElectronService) {}
 
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-  public promptForMFACode(sessionName: string, callback: any): void {
-    this.inputDialog('MFA Code insert', 'Insert MFA Code',
-      `please insert MFA code from your app or device for ${sessionName}`, callback);
+  promptForMFACode(sessionName: string, callback: any): void {
+    this.inputDialog("MFA Code insert", "Insert MFA Code", `please insert MFA code from your app or device for ${sessionName}`, callback);
   }
 
   /**
@@ -32,17 +30,16 @@ export class MfaCodePromptService implements IMfaCodePrompter {
     }
 
     this.electronService.currentWindow.show();
-    this.newNotification('MFA Token needed', message);
+    this.newNotification("MFA Token needed", message);
     this.modalService.show(InputDialogComponent, {
-      backdrop: 'static',
+      backdrop: "static",
       animated: false,
-      class: 'confirm-modal',
-      initialState: {title, placeholder, message, callback}
+      class: "confirm-modal",
+      initialState: { title, placeholder, message, callback },
     });
   }
 
   private newNotification(title: string, message: string): void {
-    new this.electronService.notification({title, body: message, icon: __dirname + `/assets/images/Leapp.png`}).show();
+    new this.electronService.notification({ title, body: message, icon: __dirname + `/assets/images/Leapp.png` }).show();
   }
-
 }

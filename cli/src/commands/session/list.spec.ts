@@ -1,47 +1,46 @@
-import ListSessions from './list'
-import {CliUx} from '@oclif/core'
-import {describe, expect, jest, test} from '@jest/globals'
-import {AwsIamUserSession} from '@noovolari/leapp-core/models/aws-iam-user-session'
-import {SessionType} from '@noovolari/leapp-core/models/session-type'
+import ListSessions from "./list";
+import { CliUx } from "@oclif/core";
+import { describe, expect, jest, test } from "@jest/globals";
+import { AwsIamUserSession } from "@noovolari/leapp-core/models/aws-iam-user-session";
+import { SessionType } from "@noovolari/leapp-core/models/session-type";
 
-describe('ListSessions', () => {
+describe("ListSessions", () => {
+  test("run", async () => {
+    const command = new ListSessions([], {} as any);
+    command.showSessions = jest.fn();
+    await command.run();
 
-  test('run', async () => {
-    const command = new ListSessions([], {} as any)
-    command.showSessions = jest.fn()
-    await command.run()
+    expect(command.showSessions).toHaveBeenCalled();
+  });
 
-    expect(command.showSessions).toHaveBeenCalled()
-  })
-
-  test('run - showSessions throw an error', async () => {
-    const command = new ListSessions([], {} as any, {} as any)
+  test("run - showSessions throw an error", async () => {
+    const command = new ListSessions([], {} as any, {} as any);
     command.showSessions = jest.fn(async () => {
-      throw Error('error')
-    })
+      throw Error("error");
+    });
     try {
-      await command.run()
+      await command.run();
     } catch (error) {
-      expect(error).toEqual(new Error('error'))
+      expect(error).toEqual(new Error("error"));
     }
-  })
+  });
 
-  test('run - showSessions throw an object', async () => {
-    const command = new ListSessions([], {} as any, {} as any)
+  test("run - showSessions throw an object", async () => {
+    const command = new ListSessions([], {} as any, {} as any);
     command.showSessions = jest.fn(async () => {
-      throw 'string'
-    })
+      throw "string";
+    });
     try {
-      await command.run()
+      await command.run();
     } catch (error) {
-      expect(error).toEqual(new Error('Unknown error: string'))
+      expect(error).toEqual(new Error("Unknown error: string"));
     }
-  })
+  });
 
-  test('showSessions', async () => {
-    const sessions = [new AwsIamUserSession('sessionName', 'region', 'profileId')]
-    const namedProfileMap = new Map([['profileId', {id: 'profileId', name: 'profileName'}]])
-    const sessionTypeMap = new Map([[SessionType.awsIamUser, 'sessionTypeLabel']])
+  test("showSessions", async () => {
+    const sessions = [new AwsIamUserSession("sessionName", "region", "profileId")];
+    const namedProfileMap = new Map([["profileId", { id: "profileId", name: "profileName" }]]);
+    const sessionTypeMap = new Map([[SessionType.awsIamUser, "sessionTypeLabel"]]);
     const leapCliService = {
       repository: {
         getSessions: () => sessions,
@@ -52,25 +51,27 @@ describe('ListSessions', () => {
       namedProfilesService: {
         getNamedProfilesMap: () => namedProfileMap,
       },
-    }
+    };
 
-    const command = new ListSessions([], {} as any, leapCliService as any)
-    const tableSpy = jest.spyOn(CliUx.ux, 'table').mockImplementation(() => null)
+    const command = new ListSessions([], {} as any, leapCliService as any);
+    const tableSpy = jest.spyOn(CliUx.ux, "table").mockImplementation(() => null);
 
-    await command.showSessions()
-    expect(tableSpy.mock.calls[0][0]).toEqual([{
-      profileId: 'profileName',
-      region: 'region',
-      sessionName: 'sessionName',
-      status: 'inactive',
-      type: 'sessionTypeLabel',
-    }])
+    await command.showSessions();
+    expect(tableSpy.mock.calls[0][0]).toEqual([
+      {
+        profileId: "profileName",
+        region: "region",
+        sessionName: "sessionName",
+        status: "inactive",
+        type: "sessionTypeLabel",
+      },
+    ]);
     expect(tableSpy.mock.calls[0][1]).toEqual({
-      sessionName: {header: 'Session Name'},
-      type: {header: 'Type'},
-      profileId: {header: 'Named Profile'},
-      region: {header: 'Region/Location'},
-      status: {header: 'Status'},
-    })
-  })
-})
+      sessionName: { header: "Session Name" },
+      type: { header: "Type" },
+      profileId: { header: "Named Profile" },
+      region: { header: "Region/Location" },
+      status: { header: "Status" },
+    });
+  });
+});

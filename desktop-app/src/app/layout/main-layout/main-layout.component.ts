@@ -1,15 +1,14 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
-import {compactMode} from '../../components/command-bar/command-bar.component';
-import {ElectronService} from '../../services/electron.service';
-import {optionBarIds} from '../../components/sessions/sessions.component';
+import { Component, OnDestroy, OnInit } from "@angular/core";
+import { compactMode } from "../../components/command-bar/command-bar.component";
+import { ElectronService } from "../../services/electron.service";
+import { optionBarIds } from "../../components/sessions/sessions.component";
 
 @Component({
-  selector: 'app-main-layout',
-  templateUrl: './main-layout.component.html',
-  styleUrls: ['./main-layout.component.scss']
+  selector: "app-main-layout",
+  templateUrl: "./main-layout.component.html",
+  styleUrls: ["./main-layout.component.scss"],
 })
 export class MainLayoutComponent implements OnInit, OnDestroy {
-
   compactMode: boolean;
 
   private subscription;
@@ -17,7 +16,7 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
   constructor(private electronService: ElectronService) {
     this.subscription = compactMode.subscribe((value) => {
       this.compactMode = value;
-      this.electronService.ipcRenderer.send('resize-window', { compactMode: this.compactMode });
+      this.electronService.ipcRenderer.send("resize-window", { compactMode: this.compactMode });
     });
   }
 
@@ -27,10 +26,10 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
     this.subscription.unsubscribe();
   }
 
-  clearOptionBarIds() {
+  clearOptionBarIds(): void {
     for (const prop of Object.getOwnPropertyNames(optionBarIds)) {
       optionBarIds[prop] = false;
     }
-    document.querySelector('.sessions').classList.remove('option-bar-opened');
+    document.querySelector(".sessions").classList.remove("option-bar-opened");
   }
 }

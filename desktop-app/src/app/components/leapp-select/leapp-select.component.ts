@@ -1,15 +1,14 @@
-import {AfterViewInit, Component, EventEmitter, Input, Output, ViewChild} from '@angular/core';
-import {NgSelectComponent} from '@ng-select/ng-select';
-import {FormGroup} from '@angular/forms';
+import { AfterViewInit, Component, EventEmitter, Input, Output, ViewChild } from "@angular/core";
+import { NgSelectComponent } from "@ng-select/ng-select";
+import { FormGroup } from "@angular/forms";
 
 @Component({
-  selector: 'app-leapp-select',
-  templateUrl: './leapp-select.component.html',
-  styleUrls: ['./leapp-select.component.scss']
+  selector: "app-leapp-select",
+  templateUrl: "./leapp-select.component.html",
+  styleUrls: ["./leapp-select.component.scss"],
 })
 export class LeappSelectComponent implements AfterViewInit {
-
-  @ViewChild('ngSelectComponent')
+  @ViewChild("ngSelectComponent")
   ngSelectComponent: NgSelectComponent;
 
   @Input()
@@ -48,7 +47,7 @@ export class LeappSelectComponent implements AfterViewInit {
   temporaryName: string;
 
   constructor() {
-    this.temporaryName = '';
+    this.temporaryName = "";
     this.uppercased = this.uppercased || true;
   }
 
@@ -60,12 +59,13 @@ export class LeappSelectComponent implements AfterViewInit {
     this.ngSelectComponent.handleClearClick();
   }
 
-  setTemporaryName($event: any) {
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+  setTemporaryName($event: any): void {
     this.temporaryName = $event.target.value;
   }
 
   checkNewElement(): boolean {
-    return this.temporaryName !== '' && this.items.filter(s => s[this.bindLabel].indexOf(this.temporaryName) > -1).length === 0;
+    return this.temporaryName !== "" && this.items.filter((s) => s[this.bindLabel].indexOf(this.temporaryName) > -1).length === 0;
   }
 
   addNewElement(): void {
@@ -75,16 +75,27 @@ export class LeappSelectComponent implements AfterViewInit {
 
     this.items.push(newElement);
     this.items = [...this.items];
+    this.ngSelectComponent.select(newElement);
     this.selected.emit({ items: this.items, item: newElement });
   }
 
-  change() {
-    if(this.ngSelectComponent.selectedItems[0]?.selected) {
-      this.selected.emit({ items: this.items, item: { label: this.ngSelectComponent.selectedItems[0].label, value: this.ngSelectComponent.selectedItems[0].value[this.bindValue] }});
+  change(): void {
+    if (this.ngSelectComponent.selectedItems[0]?.selected) {
+      // eslint-disable-next-line max-len
+      this.selected.emit({
+        items: this.items,
+        item: { label: this.ngSelectComponent.selectedItems[0].label, value: this.ngSelectComponent.selectedItems[0].value[this.bindValue] },
+      });
     } else {
       this.selected.emit({ items: this.items, item: null });
     }
   }
 
-  reset() {}
+  setByEnter(): void {
+    if (this.checkNewElement()) {
+      this.addNewElement();
+    }
+  }
+
+  reset(): void {}
 }

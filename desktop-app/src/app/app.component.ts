@@ -1,34 +1,33 @@
-import {Component, OnInit} from '@angular/core';
-import {environment} from '../environments/environment';
-import {AppService} from './services/app.service';
-import {Router} from '@angular/router';
-import {setTheme} from 'ngx-bootstrap/utils';
-import {UpdaterService} from './services/updater.service';
-import compareVersions from 'compare-versions';
-import {LoggerLevel, LoggingService} from '@noovolari/leapp-core/services/logging-service';
-import {Repository} from '@noovolari/leapp-core/services/repository';
-import {WorkspaceService} from '@noovolari/leapp-core/services/workspace-service';
-import {LeappParseError} from '@noovolari/leapp-core/errors/leapp-parse-error';
-import {TimerService} from '@noovolari/leapp-core/services/timer-service';
-import {constants} from '@noovolari/leapp-core/models/constants';
-import {FileService} from '@noovolari/leapp-core/services/file-service';
-import {AwsCoreService} from '@noovolari/leapp-core/services/aws-core-service';
-import {RetroCompatibilityService} from '@noovolari/leapp-core/services/retro-compatibility-service';
-import {LeappCoreService} from './services/leapp-core.service';
-import {SessionFactory} from '@noovolari/leapp-core/services/session-factory';
-import {RotationService} from '@noovolari/leapp-core/services/rotation-service';
-import {WindowService} from './services/window.service';
-import {ElectronService} from './services/electron.service';
-import {AwsSsoIntegrationService} from '@noovolari/leapp-core/services/aws-sso-integration-service';
-import {AwsSsoRoleService} from '@noovolari/leapp-core/services/session/aws/aws-sso-role-service';
+import { Component, OnInit } from "@angular/core";
+import { environment } from "../environments/environment";
+import { AppService } from "./services/app.service";
+import { Router } from "@angular/router";
+import { setTheme } from "ngx-bootstrap/utils";
+import { UpdaterService } from "./services/updater.service";
+import compareVersions from "compare-versions";
+import { LoggerLevel, LoggingService } from "@noovolari/leapp-core/services/logging-service";
+import { Repository } from "@noovolari/leapp-core/services/repository";
+import { WorkspaceService } from "@noovolari/leapp-core/services/workspace-service";
+import { LeappParseError } from "@noovolari/leapp-core/errors/leapp-parse-error";
+import { TimerService } from "@noovolari/leapp-core/services/timer-service";
+import { constants } from "@noovolari/leapp-core/models/constants";
+import { FileService } from "@noovolari/leapp-core/services/file-service";
+import { AwsCoreService } from "@noovolari/leapp-core/services/aws-core-service";
+import { RetroCompatibilityService } from "@noovolari/leapp-core/services/retro-compatibility-service";
+import { LeappCoreService } from "./services/leapp-core.service";
+import { SessionFactory } from "@noovolari/leapp-core/services/session-factory";
+import { RotationService } from "@noovolari/leapp-core/services/rotation-service";
+import { WindowService } from "./services/window.service";
+import { ElectronService } from "./services/electron.service";
+import { AwsSsoIntegrationService } from "@noovolari/leapp-core/services/aws-sso-integration-service";
+import { AwsSsoRoleService } from "@noovolari/leapp-core/services/session/aws/aws-sso-role-service";
 
 @Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss'],
+  selector: "app-root",
+  templateUrl: "./app.component.html",
+  styleUrls: ["./app.component.scss"],
 })
 export class AppComponent implements OnInit {
-
   private fileService: FileService;
   private repository: Repository;
   private awsCoreService: AwsCoreService;
@@ -42,12 +41,13 @@ export class AppComponent implements OnInit {
   private awsSsoRoleService: AwsSsoRoleService;
 
   /* Main app file: launches the Angular framework inside Electron app */
-  constructor(leappCoreService: LeappCoreService,
-              public appService: AppService,
-              private router: Router,
-              private updaterService: UpdaterService,
-              private windowService: WindowService,
-              private electronService: ElectronService,
+  constructor(
+    leappCoreService: LeappCoreService,
+    public appService: AppService,
+    private router: Router,
+    private updaterService: UpdaterService,
+    private windowService: WindowService,
+    private electronService: ElectronService
   ) {
     this.repository = leappCoreService.repository;
     this.fileService = leappCoreService.fileService;
@@ -62,26 +62,24 @@ export class AppComponent implements OnInit {
     this.awsSsoRoleService = leappCoreService.awsSsoRoleService;
   }
 
-  public async ngOnInit(): Promise<void> {
+  async ngOnInit(): Promise<void> {
     this.awsSsoRoleService.setAwsIntegrationDelegate(this.awsSsoIntegrationService);
 
     // We get the right moment to set an hook to app close
     const ipcRenderer = this.electronService.ipcRenderer;
-    ipcRenderer.on('app-close', () => {
-      this.loggingService.logger('Preparing for closing instruction...', LoggerLevel.info, this);
+    ipcRenderer.on("app-close", () => {
+      this.loggingService.logger("Preparing for closing instruction...", LoggerLevel.info, this);
       this.beforeCloseInstructions();
     });
 
     // Use ngx bootstrap 4
-    setTheme('bs4');
+    setTheme("bs4");
 
     if (environment.production) {
       // Clear both info and warn message in production
       // mode without removing them from code actually
-      console.warn = () => {
-      };
-      console.log = () => {
-      };
+      console.warn = () => {};
+      console.log = () => {};
     }
 
     // Prevent Dev Tool to show on production mode
@@ -105,7 +103,7 @@ export class AppComponent implements OnInit {
       workspace = this.repository.getWorkspace();
     } catch {
       // eslint-disable-next-line max-len
-      throw new LeappParseError(this, 'We had trouble parsing your Leapp-lock.json file. It is either corrupt, obsolete, or with an error.');
+      throw new LeappParseError(this, "We had trouble parsing your Leapp-lock.json file. It is either corrupt, obsolete, or with an error.");
     }
 
     // Check the existence of a pre-Leapp credential file and make a backup
@@ -130,11 +128,11 @@ export class AppComponent implements OnInit {
 
     // Go to initial page if no sessions are already created or
     // go to the list page if is your second visit
-    await this.router.navigate(['/dashboard']);
-    document.querySelector('#loader').classList.add('disable-loader');
+    await this.router.navigate(["/dashboard"]);
+    document.querySelector("#loader").classList.add("disable-loader");
   }
 
-  public closeAllRightClickMenus(): void {
+  closeAllRightClickMenus(): void {
     this.appService.closeAllMenuTriggers();
   }
 
@@ -143,14 +141,14 @@ export class AppComponent implements OnInit {
    */
   private beforeCloseInstructions() {
     // Check if we are here
-    this.loggingService.logger('Closing app with cleaning process...', LoggerLevel.info, this);
+    this.loggingService.logger("Closing app with cleaning process...", LoggerLevel.info, this);
 
     // We need the Try/Catch as we have a the possibility to call the method without sessions
     try {
       // Clean the config file
       this.awsCoreService.cleanCredentialFile();
     } catch (err) {
-      this.loggingService.logger('No sessions to stop, skipping...', LoggerLevel.error, this, err.stack);
+      this.loggingService.logger("No sessions to stop, skipping...", LoggerLevel.error, this, err.stack);
     }
 
     // Finally quit
@@ -162,9 +160,10 @@ export class AppComponent implements OnInit {
    */
   private showCredentialBackupMessageIfNeeded() {
     // TODO: move this logic inside a service
-    const oldAwsCredentialsPath = this.fileService.homeDir() + '/' + constants.credentialsDestination;
-    const newAwsCredentialsPath = oldAwsCredentialsPath + '.leapp.bkp';
-    const check = this.workspaceService.sessions.length === 0 &&
+    const oldAwsCredentialsPath = this.fileService.homeDir() + "/" + constants.credentialsDestination;
+    const newAwsCredentialsPath = oldAwsCredentialsPath + ".leapp.bkp";
+    const check =
+      this.workspaceService.sessions.length === 0 &&
       this.fileService.existsSync(oldAwsCredentialsPath) &&
       !this.fileService.existsSync(newAwsCredentialsPath);
 
@@ -172,15 +171,15 @@ export class AppComponent implements OnInit {
 
     if (check) {
       this.fileService.renameSync(oldAwsCredentialsPath, newAwsCredentialsPath);
-      this.fileService.writeFileSync(oldAwsCredentialsPath, '');
+      this.fileService.writeFileSync(oldAwsCredentialsPath, "");
       this.appService.getDialog().showMessageBox({
-        type: 'info',
-        icon: __dirname + '/assets/images/Leapp.png',
+        type: "info",
+        icon: __dirname + "/assets/images/Leapp.png",
         // eslint-disable-next-line max-len
-        message: 'You had a previous credential file. We made a backup of the old one in the same directory before starting.',
+        message: "You had a previous credential file. We made a backup of the old one in the same directory before starting.",
       });
     } else if (!this.fileService.existsSync(this.awsCoreService.awsCredentialPath())) {
-      this.fileService.writeFileSync(this.awsCoreService.awsCredentialPath(), '');
+      this.fileService.writeFileSync(this.awsCoreService.awsCredentialPath(), "");
     }
   }
 
@@ -208,7 +207,7 @@ export class AppComponent implements OnInit {
     }
 
     const ipc = this.electronService.ipcRenderer;
-    ipc.on('UPDATE_AVAILABLE', async (_, info) => {
+    ipc.on("UPDATE_AVAILABLE", async (_, info) => {
       const releaseNote = await this.updaterService.getReleaseNote();
       this.updaterService.setUpdateInfo(info.version, info.releaseName, info.releaseDate, releaseNote);
       if (this.updaterService.isUpdateNeeded()) {

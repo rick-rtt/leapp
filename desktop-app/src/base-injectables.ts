@@ -1,10 +1,10 @@
-import {ToastrService} from 'ngx-toastr';
-import {PositioningService} from 'ngx-bootstrap/positioning';
-import {ComponentLoaderFactory} from 'ngx-bootstrap/component-loader';
-import {BsModalRef, BsModalService} from 'ngx-bootstrap/modal';
-import 'jasmine';
+import { ToastrService } from "ngx-toastr";
+import { PositioningService } from "ngx-bootstrap/positioning";
+import { ComponentLoaderFactory } from "ngx-bootstrap/component-loader";
+import { BsModalRef, BsModalService } from "ngx-bootstrap/modal";
+import "jasmine";
 
-const spyToasterService = jasmine.createSpyObj('ToastrService', ['success', 'warning', 'error', 'info']);
+const spyToasterService = jasmine.createSpyObj("ToastrService", ["success", "warning", "error", "info"]);
 spyToasterService.success.and.callFake(() => {});
 spyToasterService.warning.and.callFake(() => {});
 spyToasterService.error.and.callFake(() => {});
@@ -16,6 +16,6 @@ const mustInjected = (): any[] => [
   ComponentLoaderFactory,
   BsModalRef,
   BsModalService,
-  { provide: ToastrService, useValue: spyToasterService }
+  { provide: ToastrService, useValue: spyToasterService },
 ];
-export { mustInjected};
+export { mustInjected };

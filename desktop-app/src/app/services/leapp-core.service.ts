@@ -1,35 +1,34 @@
-import {Injectable} from '@angular/core';
-import {AwsIamUserService} from '@noovolari/leapp-core/services/session/aws/aws-iam-user-service';
-import {FileService} from '@noovolari/leapp-core/services/file-service';
-import {KeychainService} from '@noovolari/leapp-core/services/keychain-service';
-import {AwsCoreService} from '@noovolari/leapp-core/services/aws-core-service';
-import {LoggingService} from '@noovolari/leapp-core/services/logging-service';
-import {TimerService} from '@noovolari/leapp-core/services/timer-service';
-import {AwsIamRoleFederatedService} from '@noovolari/leapp-core/services/session/aws/aws-iam-role-federated-service';
-import {AzureService} from '@noovolari/leapp-core/services/session/azure/azure-service';
-import {ElectronService} from './electron.service';
-import {MfaCodePromptService} from './mfa-code-prompt.service';
-import {ExecuteService} from '@noovolari/leapp-core/services/execute-service';
-import {RetroCompatibilityService} from '@noovolari/leapp-core/services/retro-compatibility-service';
-import {AwsAuthenticationService} from './session/aws/aws-authentication.service';
-import {AwsParentSessionFactory} from '@noovolari/leapp-core/services/session/aws/aws-parent-session.factory';
-import {AwsIamRoleChainedService} from '@noovolari/leapp-core/services/session/aws/aws-iam-role-chained-service';
-import {Repository} from '@noovolari/leapp-core/services/repository';
-import {AwsSsoRoleService} from '@noovolari/leapp-core/services/session/aws/aws-sso-role-service';
-import {AwsSsoOidcService} from '@noovolari/leapp-core/services/aws-sso-oidc.service';
-import {VerificationWindowService} from './verification-window.service';
-import {WorkspaceService} from '@noovolari/leapp-core/services/workspace-service';
-import {SessionFactory} from '@noovolari/leapp-core/services/session-factory';
-import {RotationService} from '@noovolari/leapp-core/services/rotation-service';
-import {AzureCoreService} from '@noovolari/leapp-core/services/azure-core-service';
-import {constants} from '@noovolari/leapp-core/models/constants';
-import {AwsSsoIntegrationService} from '@noovolari/leapp-core/services/aws-sso-integration-service';
+import { Injectable } from "@angular/core";
+import { AwsIamUserService } from "@noovolari/leapp-core/services/session/aws/aws-iam-user-service";
+import { FileService } from "@noovolari/leapp-core/services/file-service";
+import { KeychainService } from "@noovolari/leapp-core/services/keychain-service";
+import { AwsCoreService } from "@noovolari/leapp-core/services/aws-core-service";
+import { LoggingService } from "@noovolari/leapp-core/services/logging-service";
+import { TimerService } from "@noovolari/leapp-core/services/timer-service";
+import { AwsIamRoleFederatedService } from "@noovolari/leapp-core/services/session/aws/aws-iam-role-federated-service";
+import { AzureService } from "@noovolari/leapp-core/services/session/azure/azure-service";
+import { ElectronService } from "./electron.service";
+import { MfaCodePromptService } from "./mfa-code-prompt.service";
+import { ExecuteService } from "@noovolari/leapp-core/services/execute-service";
+import { RetroCompatibilityService } from "@noovolari/leapp-core/services/retro-compatibility-service";
+import { AwsAuthenticationService } from "./session/aws/aws-authentication.service";
+import { AwsParentSessionFactory } from "@noovolari/leapp-core/services/session/aws/aws-parent-session.factory";
+import { AwsIamRoleChainedService } from "@noovolari/leapp-core/services/session/aws/aws-iam-role-chained-service";
+import { Repository } from "@noovolari/leapp-core/services/repository";
+import { AwsSsoRoleService } from "@noovolari/leapp-core/services/session/aws/aws-sso-role-service";
+import { AwsSsoOidcService } from "@noovolari/leapp-core/services/aws-sso-oidc.service";
+import { VerificationWindowService } from "./verification-window.service";
+import { WorkspaceService } from "@noovolari/leapp-core/services/workspace-service";
+import { SessionFactory } from "@noovolari/leapp-core/services/session-factory";
+import { RotationService } from "@noovolari/leapp-core/services/rotation-service";
+import { AzureCoreService } from "@noovolari/leapp-core/services/azure-core-service";
+import { constants } from "@noovolari/leapp-core/models/constants";
+import { AwsSsoIntegrationService } from "@noovolari/leapp-core/services/aws-sso-integration-service";
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: "root",
 })
 export class LeappCoreService {
-
   private workspaceServiceInstance: WorkspaceService;
   private awsIamUserServiceInstance: AwsIamUserService;
   private awsIamRoleFederatedServiceInstance: AwsIamRoleFederatedService;
@@ -51,9 +50,12 @@ export class LeappCoreService {
   private retroCompatibilityServiceInstance: RetroCompatibilityService;
   private azureCoreServiceInstance: AzureCoreService;
 
-  constructor(private mfaCodePrompter: MfaCodePromptService, private awsAuthenticationService: AwsAuthenticationService,
-              private verificationWindowService: VerificationWindowService, private electronService: ElectronService) {
-  }
+  constructor(
+    private mfaCodePrompter: MfaCodePromptService,
+    private awsAuthenticationService: AwsAuthenticationService,
+    private verificationWindowService: VerificationWindowService,
+    private electronService: ElectronService
+  ) {}
 
   public get workspaceService(): WorkspaceService {
     if (!this.workspaceServiceInstance) {
@@ -64,40 +66,71 @@ export class LeappCoreService {
 
   public get awsIamUserService(): AwsIamUserService {
     if (!this.awsIamUserServiceInstance) {
-      this.awsIamUserServiceInstance = new AwsIamUserService(this.workspaceService, this.repository,
-        this.mfaCodePrompter, this.keyChainService, this.fileService, this.awsCoreService);
+      this.awsIamUserServiceInstance = new AwsIamUserService(
+        this.workspaceService,
+        this.repository,
+        this.mfaCodePrompter,
+        this.keyChainService,
+        this.fileService,
+        this.awsCoreService
+      );
     }
     return this.awsIamUserServiceInstance;
   }
 
   public get awsIamRoleFederatedService(): AwsIamRoleFederatedService {
     if (!this.awsIamRoleFederatedServiceInstance) {
-      this.awsIamRoleFederatedServiceInstance = new AwsIamRoleFederatedService(this.workspaceService, this.repository,
-        this.fileService, this.awsCoreService, this.awsAuthenticationService, constants.samlRoleSessionDuration);
+      this.awsIamRoleFederatedServiceInstance = new AwsIamRoleFederatedService(
+        this.workspaceService,
+        this.repository,
+        this.fileService,
+        this.awsCoreService,
+        this.awsAuthenticationService,
+        constants.samlRoleSessionDuration
+      );
     }
     return this.awsIamRoleFederatedServiceInstance;
   }
 
   public get awsIamRoleChainedService(): AwsIamRoleChainedService {
     if (!this.awsIamRoleChainedServiceInstance) {
-      this.awsIamRoleChainedServiceInstance = new AwsIamRoleChainedService(this.workspaceService, this.repository,
-        this.awsCoreService, this.fileService, this.awsIamUserService, this.awsParentSessionFactory);
+      this.awsIamRoleChainedServiceInstance = new AwsIamRoleChainedService(
+        this.workspaceService,
+        this.repository,
+        this.awsCoreService,
+        this.fileService,
+        this.awsIamUserService,
+        this.awsParentSessionFactory
+      );
     }
     return this.awsIamRoleChainedServiceInstance;
   }
 
   public get awsSsoIntegrationService(): AwsSsoIntegrationService {
     if (!this.awsSsoIntegrationServiceInstance) {
-      this.awsSsoIntegrationServiceInstance = new AwsSsoIntegrationService(this.repository, this.awsSsoOidcService,
-        this.awsSsoRoleService, this.keyChainService, this.workspaceService, this.electronService);
+      this.awsSsoIntegrationServiceInstance = new AwsSsoIntegrationService(
+        this.repository,
+        this.awsSsoOidcService,
+        this.awsSsoRoleService,
+        this.keyChainService,
+        this.workspaceService,
+        this.electronService
+      );
     }
     return this.awsSsoIntegrationServiceInstance;
   }
 
   public get awsSsoRoleService(): AwsSsoRoleService {
     if (!this.awsSsoRoleServiceInstance) {
-      this.awsSsoRoleServiceInstance = new AwsSsoRoleService(this.workspaceService, this.repository, this.fileService,
-        this.keyChainService, this.awsCoreService, this.electronService, this.awsSsoOidcService);
+      this.awsSsoRoleServiceInstance = new AwsSsoRoleService(
+        this.workspaceService,
+        this.repository,
+        this.fileService,
+        this.keyChainService,
+        this.awsCoreService,
+        this.electronService,
+        this.awsSsoOidcService
+      );
     }
     return this.awsSsoRoleServiceInstance;
   }
@@ -118,8 +151,13 @@ export class LeappCoreService {
 
   public get azureService(): AzureService {
     if (!this.azureServiceInstance) {
-      this.azureServiceInstance = new AzureService(this.workspaceService, this.repository, this.fileService,
-        this.executeService, constants.azureAccessTokens);
+      this.azureServiceInstance = new AzureService(
+        this.workspaceService,
+        this.repository,
+        this.fileService,
+        this.executeService,
+        constants.azureAccessTokens
+      );
     }
 
     return this.azureServiceInstance;
@@ -127,17 +165,24 @@ export class LeappCoreService {
 
   public get sessionFactory(): SessionFactory {
     if (!this.sessionFactoryInstance) {
-      this.sessionFactoryInstance = new SessionFactory(this.awsIamUserService,
-        this.awsIamRoleFederatedService, this.awsIamRoleChainedService, this.awsSsoRoleService,
-        this.azureService);
+      this.sessionFactoryInstance = new SessionFactory(
+        this.awsIamUserService,
+        this.awsIamRoleFederatedService,
+        this.awsIamRoleChainedService,
+        this.awsSsoRoleService,
+        this.azureService
+      );
     }
     return this.sessionFactoryInstance;
   }
 
   public get awsParentSessionFactory(): AwsParentSessionFactory {
     if (!this.awsParentSessionFactoryInstance) {
-      this.awsParentSessionFactoryInstance = new AwsParentSessionFactory(this.awsIamUserService,
-        this.awsIamRoleFederatedService, this.awsSsoRoleService);
+      this.awsParentSessionFactoryInstance = new AwsParentSessionFactory(
+        this.awsIamUserService,
+        this.awsIamRoleFederatedService,
+        this.awsSsoRoleService
+      );
     }
     return this.awsParentSessionFactoryInstance;
   }
@@ -193,8 +238,14 @@ export class LeappCoreService {
 
   public get retroCompatibilityService(): RetroCompatibilityService {
     if (!this.retroCompatibilityServiceInstance) {
-      this.retroCompatibilityServiceInstance = new RetroCompatibilityService(this.fileService, this.keyChainService,
-        this.repository, this.workspaceService, constants.appName, constants.lockFileDestination);
+      this.retroCompatibilityServiceInstance = new RetroCompatibilityService(
+        this.fileService,
+        this.keyChainService,
+        this.repository,
+        this.workspaceService,
+        constants.appName,
+        constants.lockFileDestination
+      );
     }
     return this.retroCompatibilityServiceInstance;
   }

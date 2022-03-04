@@ -16,5 +16,5 @@ export interface INativeService {
   followRedirects: any;
   httpProxyAgent: any;
   httpsProxyAgent: any;
-  process: any
+  process: any;
 }

@@ -1,196 +1,197 @@
-import { AzureCoreService } from './azure-core-service'
+import { jest, describe, test, expect } from '@jest/globals'
+import { AzureCoreService } from "./azure-core-service";
 
-describe('azureCoreService', () => {
-  it('getLocations', function () {
-    const azureCoreService = new AzureCoreService()
+describe("azureCoreService", () => {
+  test("getLocations", function () {
+    const azureCoreService = new AzureCoreService();
 
     expect(azureCoreService.getLocations()).toEqual([
       {
-        'location': 'eastus'
+        location: "eastus",
       },
       {
-        'location': 'eastus2'
+        location: "eastus2",
       },
       {
-        'location': 'southcentralus'
+        location: "southcentralus",
       },
       {
-        'location': 'australiaeast'
+        location: "australiaeast",
       },
       {
-        'location': 'southeastasia'
+        location: "southeastasia",
       },
       {
-        'location': 'northeurope'
+        location: "northeurope",
       },
       {
-        'location': 'uksouth'
+        location: "uksouth",
       },
       {
-        'location': 'westeurope'
+        location: "westeurope",
       },
       {
-        'location': 'centralus'
+        location: "centralus",
       },
       {
-        'location': 'northcentralus'
+        location: "northcentralus",
       },
       {
-        'location': 'southafricanorth'
+        location: "southafricanorth",
       },
       {
-        'location': 'centralindia'
+        location: "centralindia",
       },
       {
-        'location': 'eastasia'
+        location: "eastasia",
       },
       {
-        'location': 'japaneast'
+        location: "japaneast",
       },
       {
-        'location': 'koreacentral'
+        location: "koreacentral",
       },
       {
-        'location': 'canadacentral'
+        location: "canadacentral",
       },
       {
-        'location': 'francecentral'
+        location: "francecentral",
       },
       {
-        'location': 'germanywestcentral'
+        location: "germanywestcentral",
       },
       {
-        'location': 'norwayeast'
+        location: "norwayeast",
       },
       {
-        'location': 'switzerlandnorth'
+        location: "switzerlandnorth",
       },
       {
-        'location': 'uaenorth'
+        location: "uaenorth",
       },
       {
-        'location': 'brazilsouth'
+        location: "brazilsouth",
       },
       {
-        'location': 'centralusstage'
+        location: "centralusstage",
       },
       {
-        'location': 'eastusstage'
+        location: "eastusstage",
       },
       {
-        'location': 'eastus2stage'
+        location: "eastus2stage",
       },
       {
-        'location': 'northcentralusstage'
+        location: "northcentralusstage",
       },
       {
-        'location': 'southcentralusstage'
+        location: "southcentralusstage",
       },
       {
-        'location': 'westusstage'
+        location: "westusstage",
       },
       {
-        'location': 'westus2stage'
+        location: "westus2stage",
       },
       {
-        'location': 'asia'
+        location: "asia",
       },
       {
-        'location': 'asiapacific'
+        location: "asiapacific",
       },
       {
-        'location': 'australia'
+        location: "australia",
       },
       {
-        'location': 'brazil'
+        location: "brazil",
       },
       {
-        'location': 'canada'
+        location: "canada",
       },
       {
-        'location': 'europe'
+        location: "europe",
       },
       {
-        'location': 'global'
+        location: "global",
       },
       {
-        'location': 'india'
+        location: "india",
       },
       {
-        'location': 'japan'
+        location: "japan",
       },
       {
-        'location': 'uk'
+        location: "uk",
       },
       {
-        'location': 'unitedstates'
+        location: "unitedstates",
       },
       {
-        'location': 'eastasiastage'
+        location: "eastasiastage",
       },
       {
-        'location': 'southeastasiastage'
+        location: "southeastasiastage",
       },
       {
-        'location': 'centraluseuap'
+        location: "centraluseuap",
       },
       {
-        'location': 'eastus2euap'
+        location: "eastus2euap",
       },
       {
-        'location': 'westcentralus'
+        location: "westcentralus",
       },
       {
-        'location': 'westus3'
+        location: "westus3",
       },
       {
-        'location': 'southafricawest'
+        location: "southafricawest",
       },
       {
-        'location': 'australiacentral'
+        location: "australiacentral",
       },
       {
-        'location': 'australiacentral2'
+        location: "australiacentral2",
       },
       {
-        'location': 'australiasoutheast'
+        location: "australiasoutheast",
       },
       {
-        'location': 'japanwest'
+        location: "japanwest",
       },
       {
-        'location': 'koreasouth'
+        location: "koreasouth",
       },
       {
-        'location': 'southindia'
+        location: "southindia",
       },
       {
-        'location': 'westindia'
+        location: "westindia",
       },
       {
-        'location': 'canadaeast'
+        location: "canadaeast",
       },
       {
-        'location': 'francesouth'
+        location: "francesouth",
       },
       {
-        'location': 'germanynorth'
+        location: "germanynorth",
       },
       {
-        'location': 'norwaywest'
+        location: "norwaywest",
       },
       {
-        'location': 'switzerlandwest'
+        location: "switzerlandwest",
       },
       {
-        'location': 'ukwest'
+        location: "ukwest",
       },
       {
-        'location': 'uaecentral'
+        location: "uaecentral",
       },
       {
-        'location': 'brazilsoutheast'
-      }
-    ])
-  })
-})
+        location: "brazilsoutheast",
+      },
+    ]);
+  });
+});
