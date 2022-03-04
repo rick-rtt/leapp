@@ -54,7 +54,7 @@ describe('EditIdpUrl', () => {
         },
       },
       idpUrlsService: {
-        validateIdpUrl: jest.fn((url) => 'validationResult'),
+        validateIdpUrl: jest.fn(() => 'validationResult'),
       },
     }
 

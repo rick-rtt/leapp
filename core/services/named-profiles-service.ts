@@ -27,19 +27,17 @@ export class NamedProfilesService {
     }
 
     createNamedProfile(name: string) {
-        const validName = this.validateNewProfileName(name)
-        this.repository.addProfile(new AwsNamedProfile(this.getNewId(), validName))
+        this.repository.addProfile(new AwsNamedProfile(this.getNewId(), name.trim()))
     }
 
     async editNamedProfile(id: string, newName: string) {
-        const validName = this.validateNewProfileName(newName)
         const activeSessions = this.getSessionsWithNamedProfile(id)
             .filter(session => session.status == SessionStatus.active)
 
         for (const session of activeSessions) {
             await this.sessionFactory.getSessionService(session.type).stop(session.sessionId)
         }
-        this.repository.updateProfile(id, validName)
+        this.repository.updateProfile(id, newName.trim())
         for (const session of activeSessions) {
             await this.sessionFactory.getSessionService(session.type).start(session.sessionId)
         }
@@ -71,36 +69,18 @@ export class NamedProfilesService {
         return uuid.v4()
     }
 
-    validateNewProfileName(name: string) {
+    validateNewProfileName(name: string): boolean | string {
         const trimmedName = name.trim()
         if (trimmedName.length === 0) {
-            throw new EmptyProfileNameError()
+            return 'Empty profile name'
         }
         if (trimmedName === constants.defaultAwsProfileName) {
-            throw new DefaultIsNotAValidProfileNameError()
+            return '"default" is not a valid profile name'
         }
         const namedProfilesNames = this.getNamedProfiles().map(namedProfile => namedProfile.name)
         if (namedProfilesNames.includes(trimmedName)) {
-            throw new NamedProfileAlreadyExistsError()
+            return 'Profile already exists'
         }
-        return trimmedName
-    }
-}
-
-export class DefaultIsNotAValidProfileNameError extends Error {
-    constructor() {
-        super('"default" is not a valid profile name')
-    }
-}
-
-export class NamedProfileAlreadyExistsError extends Error {
-    constructor() {
-        super('Profile already exists')
-    }
-}
-
-export class EmptyProfileNameError extends Error {
-    constructor() {
-        super('Empty profile name')
+        return true
     }
 }
