@@ -46,11 +46,13 @@ export class FilterMenuComponent implements OnInit {
     });
   }
 
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types,max-len
   updateValue(event: any, data: { id?: string; category?: string; name: string; value: boolean; show?: boolean }[], form: FormGroup) {
     data = data.map((o) => ({ id: o.id, name: o.name, value: o.value, category: o.category }));
     form.get(this.control).setValue(data);
   }
 
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   searchContent(event: any) {
     this.data = this.data.map((o) => {
       o.show = o.name.toLowerCase().indexOf(event.target.value) > -1;
@@ -58,22 +60,24 @@ export class FilterMenuComponent implements OnInit {
     });
   }
 
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types,max-len
   applyCallback(event: MouseEvent, data: { id?: string; category?: string; name: string; value: boolean; show?: boolean }[], form: FormGroup) {
     if (this.callback) {
       this.callback(event, data, form);
     }
   }
 
-  dataActive() {
+  dataActive(): boolean {
     return this.data.filter((d) => d.value).length > 0;
   }
 
-  dataLabel() {
+  dataLabel(): string {
     const result = this.data.filter((d) => d.value).map((d) => d.name);
     return result.length > 0 ? (result.length > 2 ? `${this.name} · ${result.length}` : result.join(", ")) : this.name;
   }
 
-  resetData(event, form: FormGroup) {
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+  resetData(event: any, form: FormGroup): void {
     event.preventDefault();
     event.stopPropagation();
 

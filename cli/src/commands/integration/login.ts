@@ -23,7 +23,7 @@ export default class LoginIntegration extends Command {
 
   async login(integration: AwsSsoIntegration): Promise<void> {
     this.log("waiting for browser authorization using your AWS sign-in...");
-    const sessionsToSync = await this.leappCliService.awsSsoIntegrationService.loginAndGetOnlineSessions(integration.id);
+    const sessionsToSync = await this.leappCliService.awsSsoIntegrationService.loginAndProvisionSessions(integration.id);
     this.log(`login successful (${sessionsToSync.length} sessions ready to be synchronized)`);
     await this.leappCliService.cliVerificationWindowService.closeBrowser();
   }

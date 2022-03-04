@@ -59,7 +59,8 @@ export class LeappSelectComponent implements AfterViewInit {
     this.ngSelectComponent.handleClearClick();
   }
 
-  setTemporaryName($event: any) {
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+  setTemporaryName($event: any): void {
     this.temporaryName = $event.target.value;
   }
 
@@ -74,11 +75,13 @@ export class LeappSelectComponent implements AfterViewInit {
 
     this.items.push(newElement);
     this.items = [...this.items];
+    this.ngSelectComponent.select(newElement);
     this.selected.emit({ items: this.items, item: newElement });
   }
 
-  change() {
+  change(): void {
     if (this.ngSelectComponent.selectedItems[0]?.selected) {
+      // eslint-disable-next-line max-len
       this.selected.emit({
         items: this.items,
         item: { label: this.ngSelectComponent.selectedItems[0].label, value: this.ngSelectComponent.selectedItems[0].value[this.bindValue] },
@@ -88,5 +91,11 @@ export class LeappSelectComponent implements AfterViewInit {
     }
   }
 
-  reset() {}
+  setByEnter(): void {
+    if (this.checkNewElement()) {
+      this.addNewElement();
+    }
+  }
+
+  reset(): void {}
 }

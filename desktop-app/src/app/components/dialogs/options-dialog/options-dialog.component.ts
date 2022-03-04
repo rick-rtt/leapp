@@ -120,26 +120,36 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
   saveOptions(): void {
     if (this.form.valid) {
       this.leappCoreService.repository.getWorkspace().proxyConfiguration.proxyUrl = this.form.controls["proxyUrl"].value;
+      // eslint-disable-next-line max-len
       this.leappCoreService.repository.getWorkspace().proxyConfiguration.proxyProtocol = this.form.controls["proxyProtocol"].value;
+      // eslint-disable-next-line max-len
       this.leappCoreService.repository.getWorkspace().proxyConfiguration.proxyPort = this.form.controls["proxyPort"].value;
+      // eslint-disable-next-line max-len
       this.leappCoreService.repository.getWorkspace().proxyConfiguration.username = this.form.controls["proxyUsername"].value;
+      // eslint-disable-next-line max-len
       this.leappCoreService.repository.getWorkspace().proxyConfiguration.password = this.form.controls["proxyPassword"].value;
+      // eslint-disable-next-line max-len
       this.leappCoreService.repository.updateProxyConfiguration(this.leappCoreService.repository.getWorkspace().proxyConfiguration);
 
       this.leappCoreService.repository.getWorkspace().defaultRegion = this.selectedRegion;
+      // eslint-disable-next-line max-len
       this.leappCoreService.repository.updateDefaultRegion(this.leappCoreService.repository.getWorkspace().defaultRegion);
 
       this.leappCoreService.repository.getWorkspace().defaultLocation = this.selectedLocation;
+      // eslint-disable-next-line max-len
       this.leappCoreService.repository.updateDefaultLocation(this.leappCoreService.repository.getWorkspace().defaultLocation);
 
       this.leappCoreService.repository.getWorkspace().macOsTerminal = this.selectedTerminal;
+      // eslint-disable-next-line max-len
       this.leappCoreService.repository.updateMacOsTerminal(this.leappCoreService.repository.getWorkspace().macOsTerminal);
 
       if (this.checkIfNeedDialogBox()) {
+        // eslint-disable-next-line max-len
         this.windowService.confirmDialog(
           "You've set a proxy url: the app must be restarted to update the configuration.",
           (res) => {
             if (res !== constants.confirmClosed) {
+              // eslint-disable-next-line max-len
               this.leappCoreService.loggingService.logger(
                 "User have set a proxy url: the app must be restarted to update the configuration.",
                 LoggerLevel.info,

@@ -310,7 +310,7 @@ export class LeappCliService {
 
   get executeService(): ExecuteService {
     if (!this.executeServiceInstance) {
-      this.executeServiceInstance = new ExecuteService(this.cliNativeService);
+      this.executeServiceInstance = new ExecuteService(this.cliNativeService, this.repository);
     }
 
     return this.executeServiceInstance;

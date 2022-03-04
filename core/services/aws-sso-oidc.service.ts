@@ -13,7 +13,7 @@ import { BrowserWindowClosing } from "../interfaces/i-browser-window-closing";
 import SSOOIDC, { CreateTokenRequest, RegisterClientRequest, StartDeviceAuthorizationRequest } from "aws-sdk/clients/ssooidc";
 
 export class AwsSsoOidcService {
-  private readonly listeners: BrowserWindowClosing[];
+  public readonly listeners: BrowserWindowClosing[];
   private ssoOidc: SSOOIDC;
   private generateSSOTokenResponse: GenerateSSOTokenResponse;
   private setIntervalQueue: Array<any>;
@@ -25,7 +25,7 @@ export class AwsSsoOidcService {
   constructor(
     private verificationWindowService: IVerificationWindowService,
     private repository: Repository,
-    private disableInAppBrowser: boolean = false
+    private disableInAppBrowser: Boolean = false
   ) {
     this.listeners = [];
     this.ssoOidc = null;

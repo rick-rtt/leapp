@@ -42,7 +42,6 @@ export class SegmentDialogComponent implements OnInit, OnDestroy {
 
   addNewSegment(): void {
     const newSegment = { name: this.temporaryName, filterGroup: Object.assign({}, this.currentFilterGroup) };
-    console.log(newSegment);
 
     this.segments.push(newSegment);
     this.segments = [...this.segments];
@@ -57,7 +56,7 @@ export class SegmentDialogComponent implements OnInit, OnDestroy {
       segments[index].filterGroup = this.currentFilterGroup;
     }
     this.leappCoreService.repository.setSegments(segments);
-    segmentFilter.next(this.leappCoreService.repository.getWorkspace().segments);
+    segmentFilter.next(this.leappCoreService.repository.getSegments());
     this.appService.closeModal();
   }
 
@@ -69,7 +68,18 @@ export class SegmentDialogComponent implements OnInit, OnDestroy {
     return this.temporaryName !== "" && this.segments.filter((s) => s.name.indexOf(this.temporaryName) > -1).length === 0;
   }
 
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   setTemporaryName($event: any): void {
     this.temporaryName = $event.target.value;
+  }
+
+  formValid(): boolean {
+    return this.form.get("segmentName").valid;
+  }
+
+  setByEnter(): void {
+    if (this.checkNewSegment()) {
+      this.addNewSegment();
+    }
   }
 }

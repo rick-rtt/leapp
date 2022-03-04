@@ -28,6 +28,7 @@ import { AwsIamUserService } from "@noovolari/leapp-core/services/session/aws/aw
 import { MessageToasterService, ToastLevel } from "../../../services/message-toaster.service";
 import { AwsSessionService } from "@noovolari/leapp-core/services/session/aws/aws-session-service";
 import { LeappBaseError } from "@noovolari/leapp-core/errors/leapp-base-error";
+import { FormControl, FormGroup, Validators } from "@angular/forms";
 
 @Component({
   // eslint-disable-next-line @angular-eslint/component-selector
@@ -78,12 +79,16 @@ export class SessionCardComponent implements OnInit {
   duplicateInstances = [];
   placeholder;
   selectedProfile: any;
-  profiles: { id: string; name: string }[];
+  profiles: { value: string; label: string }[];
 
   menuX: number;
   menuY: number;
 
   repository: Repository;
+
+  form = new FormGroup({
+    awsProfile: new FormControl("", [Validators.required]),
+  });
 
   private loggingService: LoggingService;
   private sessionFactory: SessionFactory;
@@ -123,7 +128,7 @@ export class SessionCardComponent implements OnInit {
     const azureLocations = this.azureCoreService.getLocations();
 
     // Get profiles
-    this.profiles = this.repository.getProfiles();
+    this.profiles = this.repository.getProfiles().map((p) => ({ label: p.name, value: p.id }));
 
     // Array and labels for regions and locations
     this.regionOrLocations = this.session.type !== SessionType.azure ? this.awsRegions : azureLocations;
@@ -155,7 +160,9 @@ export class SessionCardComponent implements OnInit {
    * Start the selected sessions
    */
   startSession(): void {
-    this.sessionService.start(this.session.sessionId).then(() => {});
+    this.sessionService.start(this.session.sessionId).then(() => {
+      this.clearOptionIds();
+    });
     this.logSessionData(this.session, `Starting Session`);
     this.trigger.closeMenu();
   }
@@ -164,7 +171,9 @@ export class SessionCardComponent implements OnInit {
    * Stop sessions
    */
   stopSession(): void {
-    this.sessionService.stop(this.session.sessionId).then(() => {});
+    this.sessionService.stop(this.session.sessionId).then(() => {
+      this.clearOptionIds();
+    });
     this.logSessionData(this.session, `Stopped Session`);
     this.trigger.closeMenu();
   }
@@ -441,6 +450,7 @@ export class SessionCardComponent implements OnInit {
   changeProfileModalOpen(event: Event): void {
     event.preventDefault();
     event.stopPropagation();
+    this.profiles = this.repository.getProfiles().map((el) => ({ value: el.id, label: el.name }));
     this.trigger.closeMenu();
     this.selectedProfile = null;
     this.modalRef = this.modalService.show(this.defaultProfileModalTemplate, { class: "ssm-modal" });
@@ -524,6 +534,10 @@ export class SessionCardComponent implements OnInit {
     document.querySelector(".sessions").classList.remove("option-bar-opened");
   }
 
+  addNewUUID(): string {
+    return uuid.v4();
+  }
+
   private logSessionData(session: Session, message: string): void {
     this.loggingService.logger(
       message,
@@ -560,7 +574,7 @@ export class SessionCardComponent implements OnInit {
         "</ul><br>Removing the sessions will also remove the iamRoleChained sessions associated with it. Do you want to proceed?"
       );
     } else {
-      return "Do you really want to delete this session?";
+      return `Do you really want to delete the session '${session.sessionName}'?`;
     }
   }
 }

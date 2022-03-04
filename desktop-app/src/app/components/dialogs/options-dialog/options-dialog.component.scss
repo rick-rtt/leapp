@@ -84,6 +84,10 @@
   max-height: 200px;
 }
 
+.max-height-230 {
+  max-height: 230px;
+}
+
 @keyframes fadein {
   from {
     opacity:0;
@@ -91,4 +95,13 @@
   to {
     opacity:1;
   }
+}
+
+.proxy-settings-section {
+  display: none;
+}
+
+.join-community-button {
+  position: relative;
+  top: -15px;
 }

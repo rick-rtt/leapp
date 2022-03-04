@@ -1,4 +1,5 @@
 import { CredentialsInfo } from "../../../models/credentials-info";
+import { Session } from "../../../models/session";
 import { SessionStatus } from "../../../models/session-status";
 import { LeappBaseError } from "../../../errors/leapp-base-error";
 import { LoggerLevel } from "../../logging-service";
@@ -10,6 +11,10 @@ export abstract class AwsSessionService extends SessionService {
   /* This service manage the session manipulation as we need top generate credentials and maintain them for a specific duration */
   protected constructor(protected sessionNotifier: ISessionNotifier, protected repository: Repository) {
     super(sessionNotifier, repository);
+  }
+
+  getDependantSessions(sessionId: string): Session[] {
+    return this.repository.listIamRoleChained(this.sessionNotifier.getSessionById(sessionId));
   }
 
   async start(sessionId: string): Promise<void> {
@@ -52,7 +57,7 @@ export abstract class AwsSessionService extends SessionService {
       if (this.repository.getSessionById(sessionId).status === SessionStatus.active) {
         await this.stop(sessionId);
       }
-      for (const sess of this.repository.listIamRoleChained(this.sessionNotifier.getSessionById(sessionId))) {
+      for (const sess of this.getDependantSessions(sessionId)) {
         if (sess.status === SessionStatus.active) {
           await this.stop(sess.sessionId);
         }
@@ -96,7 +101,10 @@ export abstract class AwsSessionService extends SessionService {
   }
 
   abstract generateCredentials(sessionId: string): Promise<CredentialsInfo>;
+
   abstract applyCredentials(sessionId: string, credentialsInfo: CredentialsInfo): Promise<void>;
+
   abstract deApplyCredentials(sessionId: string): Promise<void>;
+
   abstract removeSecrets(sessionId: string): void;
 }

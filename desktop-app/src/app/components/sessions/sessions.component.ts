@@ -297,7 +297,7 @@ export class SessionsComponent implements OnInit, OnDestroy {
     }
   }
 
-  private resetArrowsExcept(c) {
+  private resetArrowsExcept(c): void {
     this.columnSettings.forEach((column, index) => {
       if (index !== c) {
         column.orderStyle = false;

@@ -96,4 +96,6 @@ export abstract class SessionService {
   abstract stop(sessionId: string): Promise<void>;
 
   abstract delete(sessionId: string): Promise<void>;
+
+  abstract getDependantSessions(sessionId: string): Session[];
 }

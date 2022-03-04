@@ -2,6 +2,7 @@ import { LeappExecuteError } from "../../../errors/leapp-execute-error";
 import { LeappParseError } from "../../../errors/leapp-parse-error";
 import { ISessionNotifier } from "../../../interfaces/i-session-notifier";
 import { AzureSession } from "../../../models/azure-session";
+import { Session } from "../../../models/session";
 import { ExecuteService } from "../../execute-service";
 import { FileService } from "../../file-service";
 import { Repository } from "../../repository";
@@ -31,6 +32,10 @@ export class AzureService extends SessionService {
     private azureAccessTokens: string
   ) {
     super(iSessionNotifier, repository);
+  }
+
+  getDependantSessions(sessionId: string): Session[] {
+    return [];
   }
 
   async create(sessionRequest: AzureSessionRequest): Promise<void> {

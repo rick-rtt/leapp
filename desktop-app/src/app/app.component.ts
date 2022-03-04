@@ -62,7 +62,7 @@ export class AppComponent implements OnInit {
     this.awsSsoRoleService = leappCoreService.awsSsoRoleService;
   }
 
-  async ngOnInit() {
+  async ngOnInit(): Promise<void> {
     this.awsSsoRoleService.setAwsIntegrationDelegate(this.awsSsoIntegrationService);
 
     // We get the right moment to set an hook to app close
@@ -102,6 +102,7 @@ export class AppComponent implements OnInit {
     try {
       workspace = this.repository.getWorkspace();
     } catch {
+      // eslint-disable-next-line max-len
       throw new LeappParseError(this, "We had trouble parsing your Leapp-lock.json file. It is either corrupt, obsolete, or with an error.");
     }
 
@@ -131,7 +132,7 @@ export class AppComponent implements OnInit {
     document.querySelector("#loader").classList.add("disable-loader");
   }
 
-  closeAllRightClickMenus() {
+  closeAllRightClickMenus(): void {
     this.appService.closeAllMenuTriggers();
   }
 
@@ -158,7 +159,7 @@ export class AppComponent implements OnInit {
    * Show that we created a copy of original credential file if present in the system
    */
   private showCredentialBackupMessageIfNeeded() {
-    //TODO: move this logic inside a service
+    // TODO: move this logic inside a service
     const oldAwsCredentialsPath = this.fileService.homeDir() + "/" + constants.credentialsDestination;
     const newAwsCredentialsPath = oldAwsCredentialsPath + ".leapp.bkp";
     const check =
@@ -174,6 +175,7 @@ export class AppComponent implements OnInit {
       this.appService.getDialog().showMessageBox({
         type: "info",
         icon: __dirname + "/assets/images/Leapp.png",
+        // eslint-disable-next-line max-len
         message: "You had a previous credential file. We made a backup of the old one in the same directory before starting.",
       });
     } else if (!this.fileService.existsSync(this.awsCoreService.awsCredentialPath())) {

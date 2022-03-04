@@ -14,6 +14,7 @@ import { syncAllEvent } from "../integration-bar/integration-bar.component";
 import { LeappCoreService } from "../../services/leapp-core.service";
 import { ElectronService } from "../../services/electron.service";
 import { AppService } from "../../services/app.service";
+import { AwsSsoRoleSession } from "@noovolari/leapp-core/models/aws-sso-role-session";
 
 export const compactMode = new BehaviorSubject<boolean>(false);
 export const globalFilteredSessions = new BehaviorSubject<Session[]>([]);
@@ -81,7 +82,7 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
     this.filterExtended = false;
     this.compactMode = false;
 
-    globalFilteredSessions.next(this.leappCoreService.workspaceService.sessions);
+    globalFilteredSessions.next(this.workspaceService.sessions);
 
     globalColumns.next({
       role: true,
@@ -107,7 +108,7 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
       this.filterExtended = value;
     });
 
-    this.subscription3 = globalResetFilter.subscribe((_) => {
+    this.subscription3 = globalResetFilter.subscribe(() => {
       this.setInitialArrayFilters();
 
       this.filterForm.get("searchFilter").setValue("");
@@ -164,15 +165,15 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
     }
   }
 
-  showOptionDialog() {
+  showOptionDialog(): void {
     this.bsModalService.show(OptionsDialogComponent, { animated: false, class: "option-modal" });
   }
 
-  showCreateDialog() {
+  showCreateDialog(): void {
     this.bsModalService.show(CreateDialogComponent, { animated: false, class: "create-modal" });
   }
 
-  toggleCompactMode() {
+  toggleCompactMode(): void {
     this.compactMode = !this.compactMode;
     this.filterExtended = false;
     compactMode.next(this.compactMode);
@@ -180,22 +181,22 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
     // this.saveTemporarySegmentAndApply();
   }
 
-  toggleFilters() {
+  toggleFilters(): void {
     this.filterExtended = !this.filterExtended;
     globalHasFilter.next(this.filterExtended);
     // this.saveTemporarySegmentAndApply();
     CommandBarComponent.changeSessionsTableHeight();
   }
 
-  toggleDateFilter() {
+  toggleDateFilter(): void {
     this.filterForm.get("dateFilter").setValue(!this.filterForm.get("dateFilter").value);
   }
 
-  openSaveSegmentDialog() {
+  openSaveSegmentDialog(): void {
     this.bsModalService.show(SegmentDialogComponent, { animated: false, class: "segment-modal" });
   }
 
-  checkFormIsDirty() {
+  checkFormIsDirty(): boolean {
     return (
       this.filterForm.get("dateFilter").value ||
       this.filterForm.get("providerFilter").value.length > 0 ||
@@ -206,7 +207,7 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
     );
   }
 
-  syncAll() {
+  syncAll(): void {
     syncAllEvent.next(true);
   }
 
@@ -283,15 +284,17 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
 
     if (this.filterForm.get("integrationFilter").value.filter((v) => v.value).length > 0) {
       filteredSessions = filteredSessions.filter((session) => {
+        let test = false;
         this.integrations.forEach((integration) => {
-          //TODO implement integration filter
+          if (integration.value) {
+            test ||= session.type === SessionType.awsSsoRole && (session as AwsSsoRoleSession).awsSsoConfigurationId.indexOf(integration.id) > -1;
+          }
         });
-        return true;
+        return test;
       });
     }
 
     if (this.filterForm.get("typeFilter").value.filter((v) => v.value).length > 0) {
-      console.log("present");
       filteredSessions = filteredSessions.filter((session) => {
         let test = false;
         this.types.forEach((type) => {
@@ -304,10 +307,8 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
     }
 
     filteredSessions = filteredSessions.sort((x, y) => {
-      if (
-        (this.leappCoreService.repository.getWorkspace().pinned.indexOf(x.sessionId) !== -1) ===
-        (this.leappCoreService.repository.getWorkspace().pinned.indexOf(y.sessionId) !== -1)
-      ) {
+      const pinnedList = this.leappCoreService.repository.getWorkspace().pinned;
+      if ((pinnedList.indexOf(x.sessionId) !== -1) === (pinnedList.indexOf(y.sessionId) !== -1)) {
         return 0;
       } else if (this.leappCoreService.repository.getWorkspace().pinned.indexOf(x.sessionId) !== -1) {
         return -1;
@@ -368,6 +369,7 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
     this.integrations = [];
 
     this.types = [
+      // eslint-disable-next-line max-len
       { show: true, id: SessionType.awsIamRoleFederated, category: "Amazon AWS", name: "IAM Role Federated", value: false },
       { show: true, id: SessionType.awsIamUser, category: "Amazon AWS", name: "IAM User", value: false },
       { show: true, id: SessionType.awsIamRoleChained, category: "Amazon AWS", name: "IAM Role Chained", value: false },

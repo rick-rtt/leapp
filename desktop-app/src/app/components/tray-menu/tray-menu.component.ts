@@ -47,7 +47,7 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
     this.workspaceService = leappCoreService.workspaceService;
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.subscribed = this.workspaceService.sessions$.subscribe(() => {
       this.generateMenu();
     });
@@ -62,11 +62,14 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
     }
   }
 
-  generateMenu() {
+  generateMenu(): void {
     let voices = [];
-    const actives = this.workspaceService.sessions.filter((s) => s.status === SessionStatus.active || s.status === SessionStatus.pending);
+    const actives = this.repository.getSessions().filter((s) => s.status === SessionStatus.active || s.status === SessionStatus.pending);
     const allSessions = actives.concat(
-      this.workspaceService.sessions.filter((s) => s.status === SessionStatus.inactive).filter((_, index) => index < 10 - actives.length)
+      this.repository
+        .getSessions()
+        .filter((s) => s.status === SessionStatus.inactive)
+        .filter((_, index) => index < 10 - actives.length)
     );
 
     allSessions.forEach((session: Session) => {
@@ -76,6 +79,7 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
       const iconValue = profile && profile.name === "default" ? "home" : "user";
       switch (session.type) {
         case SessionType.awsIamUser:
+          // eslint-disable-next-line max-len
           icon =
             session.status === SessionStatus.active
               ? __dirname + `/assets/images/${iconValue}-online.png`
@@ -84,6 +88,7 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
           break;
         case SessionType.awsIamRoleFederated:
         case SessionType.awsSsoRole:
+          // eslint-disable-next-line max-len
           icon =
             session.status === SessionStatus.active
               ? __dirname + `/assets/images/${iconValue}-online.png`
@@ -91,6 +96,7 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
           label = "  " + session.sessionName + " - " + (session as AwsIamRoleFederatedSession).roleArn.split("/")[1];
           break;
         case SessionType.awsIamRoleChained:
+          // eslint-disable-next-line max-len
           icon =
             session.status === SessionStatus.active
               ? __dirname + `/assets/images/${iconValue}-online.png`
@@ -98,6 +104,7 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
           label = "  " + session.sessionName + " - " + (session as AwsIamRoleChainedSession).roleArn.split("/")[1];
           break;
         case SessionType.azure:
+          // eslint-disable-next-line max-len
           icon =
             session.status === SessionStatus.active
               ? __dirname + `/assets/images/icon-online-azure.png`
@@ -140,7 +147,7 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
         label: "Quit",
         type: "normal",
         click: () => {
-          this.cleanBeforeExit().then((_) => {});
+          this.cleanBeforeExit().then(() => {});
         },
       },
     ];
@@ -172,7 +179,9 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
     }
     if (!this.currentTray) {
       this.currentTray = new this.electronService.tray(__dirname + `/assets/images/${normalIcon}.png`);
-      this.appService.getApp().dock.setBadge("");
+      if (this.appService.detectOs() !== constants.windows && this.appService.detectOs() !== constants.linux) {
+        this.appService.getApp().dock.setBadge("");
+      }
     }
     if (this.updaterService.getSavedVersionComparison() && this.updaterService.isReady()) {
       voices.push({ type: "separator" });
@@ -181,19 +190,21 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
     }
     voices = voices.concat(extraInfo);
     const contextMenu = this.appService.getMenu().buildFromTemplate(voices);
-    this.currentTray.setToolTip("Leapp");
+    if (this.appService.detectOs() !== constants.windows && this.appService.detectOs() !== constants.linux) {
+      this.currentTray.setToolTip("Leapp");
+    }
     this.currentTray.setContextMenu(contextMenu);
   }
   /**
    * Remove session and credential file before exiting program
    */
-  async cleanBeforeExit() {
+  async cleanBeforeExit(): Promise<void> {
     // Check if we are here
     this.loggingService.logger("Closing app with cleaning process...", LoggerLevel.info, this);
     // We need the Try/Catch as we have a the possibility to call the method without sessions
     try {
       // Stop the sessions...
-      const activeSessions = this.workspaceService.sessions.filter((s) => s.status === SessionStatus.active || s.status === SessionStatus.pending);
+      const activeSessions = this.repository.getSessions().filter((s) => s.status === SessionStatus.active || s.status === SessionStatus.pending);
       activeSessions.forEach((sess) => {
         const factorizedService = this.sessionServiceFactory.getSessionService(sess.type);
         factorizedService.stop(sess.sessionId);
@@ -206,6 +217,7 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
     // Finally quit
     this.appService.quit();
   }
+
   ngOnDestroy(): void {
     this.subscribed.unsubscribe();
   }

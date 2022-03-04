@@ -52,7 +52,7 @@ export class InputDialogComponent implements OnInit, AfterViewInit {
     this.bsModalRef.hide();
   }
 
-  checkAndConfirm(_: Event): void {
+  checkAndConfirm(): void {
     this.confirm();
   }
 }
