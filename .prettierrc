@@ -1,5 +1,3 @@
 {
-  "tabWidth": 2,
-  "arrow-parens": ["error", "always"],
-  "printWidth": 150
+  "arrow-parens": ["error", "always"]
 }
