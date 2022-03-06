@@ -50,7 +50,7 @@ export default class EditIdpUrl extends Command {
     return answer.newIdpUrl;
   }
 
-  async editIdpUrl(id: string, newIdpUrl: string) {
+  async editIdpUrl(id: string, newIdpUrl: string): Promise<void> {
     await this.leappCliService.idpUrlsService.editIdpUrl(id, newIdpUrl);
     this.log("IdP URL edited");
   }

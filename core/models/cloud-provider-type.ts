@@ -1,4 +1,4 @@
 export enum CloudProviderType {
-  AWS = "aws",
-  AZURE = "azure",
+  aws = "aws",
+  azure = "azure",
 }

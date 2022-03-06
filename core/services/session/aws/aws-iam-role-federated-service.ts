@@ -23,12 +23,12 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
     private fileService: FileService,
     private awsCoreService: AwsCoreService,
     private awsAuthenticationService: IAwsAuthenticationService,
-    private samlRoleSessionDuration
+    private samlRoleSessionDuration: number
   ) {
     super(iSessionNotifier, repository);
   }
 
-  static async extractSamlResponse(responseHookDetails: ResponseHookDetails) {
+  static async extractSamlResponse(responseHookDetails: ResponseHookDetails): Promise<string> {
     let rawData = responseHookDetails.uploadData[0].bytes.toString();
     const n = rawData.lastIndexOf("SAMLResponse=");
     const n2 = rawData.lastIndexOf("&RelayState=");
@@ -134,7 +134,7 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
       // eslint-disable-next-line @typescript-eslint/naming-convention
       SAMLAssertion: samlResponse,
       // eslint-disable-next-line @typescript-eslint/naming-convention
-      DurationSeconds: this.samlRoleSessionDuration,
+      durationSeconds: this.samlRoleSessionDuration,
     };
 
     // Invoke assumeRoleWithSAML
@@ -149,5 +149,5 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
     return AwsIamRoleFederatedService.sessionTokenFromGetSessionTokenResponse(assumeRoleWithSamlResponse);
   }
 
-  removeSecrets(sessionId: string): void {}
+  removeSecrets(_: string): void {}
 }

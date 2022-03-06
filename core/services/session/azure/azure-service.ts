@@ -34,7 +34,7 @@ export class AzureService extends SessionService {
     super(iSessionNotifier, repository);
   }
 
-  getDependantSessions(sessionId: string): Session[] {
+  getDependantSessions(_: string): Session[] {
     return [];
   }
 

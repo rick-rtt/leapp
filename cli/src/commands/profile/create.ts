@@ -25,13 +25,14 @@ export default class CreateNamedProfile extends Command {
       {
         name: "namedProfileName",
         message: `choose a name for the profile`,
+        validate: (profileName) => this.leappCliService.namedProfilesService.validateNewProfileName(profileName),
         type: "input",
       },
     ]);
     return answer.namedProfileName;
   }
 
-  createNamedProfile(profileName: string) {
+  createNamedProfile(profileName: string): void {
     this.leappCliService.namedProfilesService.createNamedProfile(profileName);
     this.log("profile created");
   }

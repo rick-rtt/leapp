@@ -53,7 +53,7 @@ export class Repository {
     }
   }
 
-  persistWorkspace(workspace: Workspace) {
+  persistWorkspace(workspace: Workspace): void {
     const path = this.nativeService.os.homedir() + "/" + constants.lockFileDestination;
     this.fileService.writeFileSync(path, this.fileService.encryptText(serialize(workspace)));
   }
@@ -82,7 +82,7 @@ export class Repository {
     this.persistWorkspace(workspace);
   }
 
-  updateSession(sessionId: string, session: Session) {
+  updateSession(sessionId: string, session: Session): void {
     const sessions: Session[] = this.getSessions();
     for (let i = 0; i < sessions.length; i++) {
       if (sessions[i].sessionId === sessionId) {
@@ -98,7 +98,7 @@ export class Repository {
     this.persistWorkspace(workspace);
   }
 
-  deleteSession(sessionId: string) {
+  deleteSession(sessionId: string): void {
     const workspace = this.getWorkspace();
     const index = workspace.sessions.findIndex((sess) => sess.sessionId === sessionId);
     if (index > -1) {
@@ -119,12 +119,12 @@ export class Repository {
     return workspace.sessions && workspace.sessions.length > 0 ? workspace.sessions.filter((session) => session.status === SessionStatus.active) : [];
   }
 
-  listAwsSsoRoles() {
+  listAwsSsoRoles(): Session[] {
     const workspace = this.getWorkspace();
     return workspace.sessions && workspace.sessions.length > 0 ? workspace.sessions.filter((session) => session.type === SessionType.awsSsoRole) : [];
   }
 
-  listAssumable() {
+  listAssumable(): Session[] {
     return this.getWorkspace().sessions.length > 0 ? this.getWorkspace().sessions.filter((session) => session.type !== SessionType.azure) : [];
   }
 
@@ -142,21 +142,21 @@ export class Repository {
 
   // REGION AND LOCATION
 
-  getDefaultRegion() {
+  getDefaultRegion(): string {
     return this.getWorkspace().defaultRegion;
   }
 
-  getDefaultLocation() {
+  getDefaultLocation(): string {
     return this.getWorkspace().defaultLocation;
   }
 
-  updateDefaultRegion(defaultRegion: string) {
+  updateDefaultRegion(defaultRegion: string): void {
     const workspace = this.getWorkspace();
     workspace.defaultRegion = defaultRegion;
     this.persistWorkspace(workspace);
   }
 
-  updateDefaultLocation(defaultLocation: string) {
+  updateDefaultLocation(defaultLocation: string): void {
     const workspace = this.getWorkspace();
     workspace.defaultLocation = defaultLocation;
     this.persistWorkspace(workspace);
@@ -179,7 +179,7 @@ export class Repository {
     this.persistWorkspace(workspace);
   }
 
-  updateIdpUrl(id: string, url: string) {
+  updateIdpUrl(id: string, url: string): void {
     const workspace = this.getWorkspace();
     const index = workspace.idpUrls.findIndex((u) => u.id === id);
     if (index > -1) {
@@ -188,7 +188,7 @@ export class Repository {
     }
   }
 
-  removeIdpUrl(id: string) {
+  removeIdpUrl(id: string): void {
     const workspace = this.getWorkspace();
     const index = workspace.idpUrls.findIndex((u) => u.id === id);
 
@@ -228,7 +228,7 @@ export class Repository {
     this.persistWorkspace(workspace);
   }
 
-  updateProfile(profileId: string, newName: string) {
+  updateProfile(profileId: string, newName: string): void {
     const workspace = this.getWorkspace();
     const profileIndex = workspace.profiles.findIndex((p) => p.id === profileId);
     if (profileIndex > -1) {
@@ -237,7 +237,7 @@ export class Repository {
     }
   }
 
-  removeProfile(profileId: string) {
+  removeProfile(profileId: string): void {
     const workspace = this.getWorkspace();
     const profileIndex = workspace.profiles.findIndex((p) => p.id === profileId);
     workspace.profiles.splice(profileIndex, 1);
@@ -246,7 +246,7 @@ export class Repository {
   }
 
   // AWS SSO INTEGRATION
-  listAwsSsoIntegrations() {
+  listAwsSsoIntegrations(): AwsSsoIntegration[] {
     const workspace = this.getWorkspace();
     return workspace.awsSsoIntegrations;
   }
@@ -259,9 +259,16 @@ export class Repository {
     return this.workspace.sessions.filter((sess) => (sess as any).awsSsoConfigurationId === id);
   }
 
-  addAwsSsoIntegration(portalUrl: string, alias: string, region: string, browserOpening: string) {
+  addAwsSsoIntegration(portalUrl: string, alias: string, region: string, browserOpening: string): void {
     const workspace = this.getWorkspace();
-    workspace.awsSsoIntegrations.push({ id: uuid.v4(), alias, portalUrl, region, accessTokenExpiration: undefined, browserOpening });
+    workspace.awsSsoIntegrations.push({
+      id: uuid.v4(),
+      alias,
+      portalUrl,
+      region,
+      accessTokenExpiration: undefined,
+      browserOpening,
+    });
     this.persistWorkspace(workspace);
   }
 
@@ -299,7 +306,7 @@ export class Repository {
   }
 
   // PROXY CONFIGURATION
-  getProxyConfiguration() {
+  getProxyConfiguration(): any {
     return this.getWorkspace().proxyConfiguration;
   }
 
@@ -309,30 +316,30 @@ export class Repository {
     proxyPort: string;
     username?: string;
     password?: string;
-  }) {
+  }): void {
     const workspace = this.getWorkspace();
     workspace.proxyConfiguration = proxyConfiguration;
     this.persistWorkspace(workspace);
   }
 
   // SEGMENTS
-  getSegments() {
+  getSegments(): Segment[] {
     const workspace = this.getWorkspace();
     return workspace.segments;
   }
 
-  getSegment(segmentName: string) {
+  getSegment(segmentName: string): Segment {
     const workspace = this.getWorkspace();
     return workspace.segments.find((s) => s.name === segmentName);
   }
 
-  setSegments(segments: Segment[]) {
+  setSegments(segments: Segment[]): void {
     const workspace = this.getWorkspace();
     workspace.segments = segments;
     this.persistWorkspace(workspace);
   }
 
-  removeSegment(segment: Segment) {
+  removeSegment(segment: Segment): void {
     const workspace = this.getWorkspace();
     const index = workspace.segments.findIndex((s) => s.name === segment.name);
     if (index > -1) {
@@ -342,19 +349,19 @@ export class Repository {
   }
 
   // FOLDERS
-  getFolders() {
+  getFolders(): Folder[] {
     const workspace = this.getWorkspace();
     return workspace.folders;
   }
 
-  setFolders(folders: Folder[]) {
+  setFolders(folders: Folder[]): void {
     const workspace = this.getWorkspace();
     workspace.folders = folders;
     this.persistWorkspace(workspace);
   }
 
   // PINS
-  pinSession(session: Session) {
+  pinSession(session: Session): void {
     const workspace = this.getWorkspace();
     if (workspace.pinned.indexOf(session.sessionId) === -1) {
       workspace.pinned.push(session.sessionId);
@@ -362,7 +369,7 @@ export class Repository {
     }
   }
 
-  unpinSession(session: Session) {
+  unpinSession(session: Session): void {
     const workspace = this.getWorkspace();
     const index = workspace.pinned.indexOf(session.sessionId);
     if (index > -1) {
@@ -372,7 +379,7 @@ export class Repository {
   }
 
   // MACOS TERMINAL
-  updateMacOsTerminal(macOsTerminal: string) {
+  updateMacOsTerminal(macOsTerminal: string): void {
     const workspace = this.getWorkspace();
     workspace.macOsTerminal = macOsTerminal;
     this.persistWorkspace(workspace);

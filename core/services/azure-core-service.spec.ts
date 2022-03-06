@@ -1,7 +1,8 @@
+import { jest, describe, test, expect } from '@jest/globals'
 import { AzureCoreService } from "./azure-core-service";
 
 describe("azureCoreService", () => {
-  it("getLocations", function () {
+  test("getLocations", function () {
     const azureCoreService = new AzureCoreService();
 
     expect(azureCoreService.getLocations()).toEqual([

@@ -12,7 +12,7 @@ export class TimerService {
     return this.timeOutTimer;
   }
 
-  start(callback: () => void) {
+  start(callback: () => void): void {
     if (!this.timer) {
       this.timer = setInterval(() => {
         callback();

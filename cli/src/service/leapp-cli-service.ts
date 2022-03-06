@@ -29,6 +29,7 @@ import { AwsSsoIntegrationService } from "@noovolari/leapp-core/services/aws-sso
 import CliInquirer from "inquirer";
 import { AwsSsoOidcService } from "@noovolari/leapp-core/services/aws-sso-oidc.service";
 
+/* eslint-disable */
 export class LeappCliService {
   private cliNativeServiceInstance: CliNativeService;
 
@@ -88,14 +89,8 @@ export class LeappCliService {
 
   public get awsIamUserService(): AwsIamUserService {
     if (!this.awsIamUserServiceInstance) {
-      this.awsIamUserServiceInstance = new AwsIamUserService(
-        this.workspaceService,
-        this.repository,
-        this.cliMfaCodePromptService,
-        this.keyChainService,
-        this.fileService,
-        this.awsCoreService
-      );
+      this.awsIamUserServiceInstance = new AwsIamUserService(this.workspaceService, this.repository, this.cliMfaCodePromptService,
+        this.keyChainService, this.fileService, this.awsCoreService);
     }
 
     return this.awsIamUserServiceInstance;
@@ -105,14 +100,8 @@ export class LeappCliService {
 
   get awsIamRoleFederatedService(): AwsIamRoleFederatedService {
     if (!this.awsIamRoleFederatedServiceInstance) {
-      this.awsIamRoleFederatedServiceInstance = new AwsIamRoleFederatedService(
-        this.workspaceService,
-        this.repository,
-        this.fileService,
-        this.awsCoreService,
-        this.cliAwsAuthenticationService,
-        constants.samlRoleSessionDuration
-      );
+      this.awsIamRoleFederatedServiceInstance = new AwsIamRoleFederatedService(this.workspaceService, this.repository,
+        this.fileService, this.awsCoreService, this.cliAwsAuthenticationService, constants.samlRoleSessionDuration);
     }
 
     return this.awsIamRoleFederatedServiceInstance;
@@ -122,14 +111,8 @@ export class LeappCliService {
 
   get awsIamRoleChainedService(): AwsIamRoleChainedService {
     if (!this.awsIamRoleChainedServiceInstance) {
-      this.awsIamRoleChainedServiceInstance = new AwsIamRoleChainedService(
-        this.workspaceService,
-        this.repository,
-        this.awsCoreService,
-        this.fileService,
-        this.awsIamUserService,
-        this.awsParentSessionFactory
-      );
+      this.awsIamRoleChainedServiceInstance = new AwsIamRoleChainedService(this.workspaceService, this.repository,
+        this.awsCoreService, this.fileService, this.awsIamUserService, this.awsParentSessionFactory);
     }
 
     return this.awsIamRoleChainedServiceInstance;
@@ -139,15 +122,8 @@ export class LeappCliService {
 
   get awsSsoRoleService(): AwsSsoRoleService {
     if (!this.awsSsoRoleServiceInstance) {
-      this.awsSsoRoleServiceInstance = new AwsSsoRoleService(
-        this.workspaceService,
-        this.repository,
-        this.fileService,
-        this.keyChainService,
-        this.awsCoreService,
-        this.cliNativeService,
-        this.awsSsoOidcService
-      );
+      this.awsSsoRoleServiceInstance = new AwsSsoRoleService(this.workspaceService, this.repository, this.fileService,
+        this.keyChainService, this.awsCoreService, this.cliNativeService, this.awsSsoOidcService);
     }
 
     return this.awsSsoRoleServiceInstance;
@@ -167,13 +143,8 @@ export class LeappCliService {
 
   get azureService(): AzureService {
     if (!this.azureServiceInstance) {
-      this.azureServiceInstance = new AzureService(
-        this.workspaceService,
-        this.repository,
-        this.fileService,
-        this.executeService,
-        constants.azureAccessTokens
-      );
+      this.azureServiceInstance = new AzureService(this.workspaceService, this.repository, this.fileService, this.executeService,
+        constants.azureAccessTokens);
     }
 
     return this.azureServiceInstance;
@@ -183,13 +154,8 @@ export class LeappCliService {
 
   get sessionFactory(): SessionFactory {
     if (!this.sessionFactoryInstance) {
-      this.sessionFactoryInstance = new SessionFactory(
-        this.awsIamUserService,
-        this.awsIamRoleFederatedService,
-        this.awsIamRoleChainedService,
-        this.awsSsoRoleService,
-        this.azureService
-      );
+      this.sessionFactoryInstance = new SessionFactory(this.awsIamUserService, this.awsIamRoleFederatedService,
+        this.awsIamRoleChainedService, this.awsSsoRoleService, this.azureService);
     }
 
     return this.sessionFactoryInstance;
@@ -199,11 +165,8 @@ export class LeappCliService {
 
   get awsParentSessionFactory(): AwsParentSessionFactory {
     if (!this.awsParentSessionFactoryInstance) {
-      this.awsParentSessionFactoryInstance = new AwsParentSessionFactory(
-        this.awsIamUserService,
-        this.awsIamRoleFederatedService,
-        this.awsSsoRoleService
-      );
+      this.awsParentSessionFactoryInstance = new AwsParentSessionFactory(this.awsIamUserService, this.awsIamRoleFederatedService,
+        this.awsSsoRoleService);
     }
 
     return this.awsParentSessionFactoryInstance;
@@ -263,14 +226,8 @@ export class LeappCliService {
 
   get awsSsoIntegrationService(): AwsSsoIntegrationService {
     if (!this.awsSsoIntegrationServiceInstance) {
-      this.awsSsoIntegrationServiceInstance = new AwsSsoIntegrationService(
-        this.repository,
-        this.awsSsoOidcService,
-        this.awsSsoRoleService,
-        this.keyChainService,
-        this.workspaceService,
-        this.cliNativeService
-      );
+      this.awsSsoIntegrationServiceInstance = new AwsSsoIntegrationService(this.repository, this.awsSsoOidcService,
+        this.awsSsoRoleService, this.keyChainService, this.workspaceService, this.cliNativeService);
     }
 
     return this.awsSsoIntegrationServiceInstance;
@@ -330,14 +287,8 @@ export class LeappCliService {
 
   get retroCompatibilityService(): RetroCompatibilityService {
     if (!this.retroCompatibilityServiceInstance) {
-      this.retroCompatibilityServiceInstance = new RetroCompatibilityService(
-        this.fileService,
-        this.keyChainService,
-        this.repository,
-        this.workspaceService,
-        constants.appName,
-        constants.lockFileDestination
-      );
+      this.retroCompatibilityServiceInstance = new RetroCompatibilityService(this.fileService, this.keyChainService,
+        this.repository, this.workspaceService, constants.appName, constants.lockFileDestination);
     }
 
     return this.retroCompatibilityServiceInstance;
@@ -347,13 +298,8 @@ export class LeappCliService {
 
   get cloudProviderService(): CloudProviderService {
     if (!this.cloudProviderServiceInstance) {
-      this.cloudProviderServiceInstance = new CloudProviderService(
-        this.awsCoreService,
-        this.azureCoreService,
-        this.namedProfilesService,
-        this.idpUrlsService,
-        this.repository
-      );
+      this.cloudProviderServiceInstance = new CloudProviderService(this.awsCoreService, this.azureCoreService,
+        this.namedProfilesService, this.idpUrlsService, this.repository);
     }
 
     return this.cloudProviderServiceInstance;

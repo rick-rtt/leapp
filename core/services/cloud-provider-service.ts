@@ -12,7 +12,7 @@ import { IdpUrlsService } from "./idp-urls-service";
 import { Repository } from "./repository";
 import { IdpUrlAccessMethodField } from "../models/idp-url-access-method-field";
 
-export const CreateNewIdpUrlFieldChoice = "CreateNewIdpUrlFieldChoice";
+export const createNewIdpUrlFieldChoice = "CreateNewIdpUrlFieldChoice";
 
 export class CloudProviderService {
   constructor(
@@ -24,7 +24,7 @@ export class CloudProviderService {
   ) {}
 
   availableCloudProviders(): CloudProviderType[] {
-    return [CloudProviderType.AWS, CloudProviderType.AZURE];
+    return [CloudProviderType.aws, CloudProviderType.azure];
   }
 
   creatableAccessMethods(cloudProviderType: CloudProviderType): AccessMethod[] {
@@ -32,7 +32,7 @@ export class CloudProviderService {
   }
 
   getSessionTypeMap(): Map<SessionType, string> {
-    const accessMethods = [...this.accessMethodMap.values()].flatMap((accessMethods) => accessMethods);
+    const accessMethods = [...this.accessMethodMap.values()].flatMap((method) => method);
     return new Map(accessMethods.map((accessMethod) => [accessMethod.sessionType, accessMethod.label] as [SessionType, string]));
   }
 
@@ -49,7 +49,7 @@ export class CloudProviderService {
 
     return new Map([
       [
-        CloudProviderType.AWS,
+        CloudProviderType.aws,
         [
           new AccessMethod(
             SessionType.awsIamUser,
@@ -94,7 +94,7 @@ export class CloudProviderService {
         ],
       ],
       [
-        CloudProviderType.AZURE,
+        CloudProviderType.azure,
         [
           new AccessMethod(
             SessionType.azure,
@@ -147,6 +147,6 @@ export class CloudProviderService {
 
   private getIdpUrls(): FieldChoice[] {
     const idpUrlsFieldChoices = this.idpUrlService.getIdpUrls().map((idpUrl) => new FieldChoice(idpUrl.url, idpUrl.id));
-    return idpUrlsFieldChoices.concat(new FieldChoice("Create new", CreateNewIdpUrlFieldChoice));
+    return idpUrlsFieldChoices.concat(new FieldChoice("Create new", createNewIdpUrlFieldChoice));
   }
 }

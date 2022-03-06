@@ -27,7 +27,7 @@ export class RegionsService {
     return this.repository.getDefaultRegion();
   }
 
-  changeDefaultAwsRegion(newDefaultRegion: string) {
+  changeDefaultAwsRegion(newDefaultRegion: string): void {
     this.repository.updateDefaultRegion(newDefaultRegion);
   }
 }

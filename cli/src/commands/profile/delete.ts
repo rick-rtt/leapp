@@ -60,7 +60,7 @@ export default class DeleteNamedProfile extends Command {
     return answer.confirmation;
   }
 
-  async deleteNamedProfile(id: string) {
+  async deleteNamedProfile(id: string): Promise<void> {
     await this.leappCliService.namedProfilesService.deleteNamedProfile(id);
     this.log("profile deleted");
   }

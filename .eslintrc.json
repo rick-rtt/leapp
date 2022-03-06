@@ -2,13 +2,17 @@
   "root": true,
   "ignorePatterns": [
     "*.spec.ts",
+    "cli/gushio",
+    "cli/coverage/**/*",
+    "cli/dist/**/*",
+    "core/coverage/**/*",
     "core/dist/**/*",
     "core/gushio",
+    "desktop-app/coverage/**/*",
+    "desktop-app/dist/**/*",
     "desktop-app/electron/**/*",
     "desktop-app/e2e/**/*",
-    "desktop-app/dist/**/*",
     "desktop-app/gushio",
-    "cli/gushio",
     "desktop-app/scripts/notarize.js"
   ],
   "overrides": [

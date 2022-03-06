@@ -25,7 +25,7 @@ export class AwsSsoOidcService {
   constructor(
     private verificationWindowService: IVerificationWindowService,
     private repository: Repository,
-    private disableInAppBrowser: Boolean = false
+    private disableInAppBrowser: boolean = false
   ) {
     this.listeners = [];
     this.ssoOidc = null;
@@ -108,7 +108,7 @@ export class AwsSsoOidcService {
     }
   }
 
-  closeVerificationWindow() {
+  closeVerificationWindow(): void {
     this.loginMutex = false;
 
     this.getListeners().forEach((listener) => {
@@ -116,14 +116,14 @@ export class AwsSsoOidcService {
     });
   }
 
-  private getAwsSsoOidcClient(): SSOOIDC {
-    return this.ssoOidc;
-  }
-
-  interrupt() {
+  interrupt(): void {
     clearInterval(this.mainIntervalId);
     this.interruptOccurred = true;
     this.loginMutex = false;
+  }
+
+  private getAwsSsoOidcClient(): SSOOIDC {
+    return this.ssoOidc;
   }
 
   private async registerSsoOidcClient(): Promise<RegisterClientResponse> {

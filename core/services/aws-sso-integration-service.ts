@@ -50,7 +50,7 @@ export class AwsSsoIntegrationService {
   }
 
   // TODO: understand if we want to use an object that contains params
-  createIntegration(creationParams: IntegrationCreationParams) {
+  createIntegration(creationParams: IntegrationCreationParams): void {
     this.repository.addAwsSsoIntegration(creationParams.portalUrl, creationParams.alias, creationParams.region, creationParams.browserOpening);
   }
 
@@ -226,7 +226,7 @@ export class AwsSsoIntegrationService {
     return !awsSsoAccessTokenInfo.expiration || awsSsoAccessTokenInfo.expiration < Date.now();
   }
 
-  async deleteIntegration(integrationId: string) {
+  async deleteIntegration(integrationId: string): Promise<void> {
     await this.logout(integrationId);
     this.repository.deleteAwsSsoIntegration(integrationId);
   }

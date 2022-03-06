@@ -48,7 +48,7 @@ export class WorkspaceService implements ISessionNotifier {
     this._sessions.next(sessions);
   }
 
-  addSession(session: Session) {
+  addSession(session: Session): void {
     // we assign a new copy of session by adding a new session to it
     this.sessions = [...this.sessions, session];
   }
@@ -77,7 +77,7 @@ export class WorkspaceService implements ISessionNotifier {
     return childSession;
   }
 
-  updateSession(sessionId: string, session: Session) {
+  updateSession(sessionId: string, session: Session): void {
     const sessions = this.sessions;
     const index = sessions.findIndex((sess) => sess.sessionId === sessionId);
     if (index > -1) {

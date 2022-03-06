@@ -19,7 +19,7 @@ export class LoggingService {
    * @param instance - The structured data of the message
    * @param stackTrace - Stack trace in case of error log
    */
-  logger(message: any, type: LoggerLevel, instance?: any, stackTrace?: string) {
+  logger(message: any, type: LoggerLevel, instance?: any, stackTrace?: string): void {
     if (typeof message !== "string") {
       message = JSON.stringify(message, null, 3);
     }
