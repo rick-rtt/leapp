@@ -47,7 +47,7 @@
           {
             "accessibility": "explicit",
             "overrides": {
-              "accessors": "explicit",
+              "accessors": "off",
               "constructors": "no-public",
               "methods": "no-public",
               "properties": "off",
