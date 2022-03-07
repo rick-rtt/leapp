@@ -419,7 +419,6 @@ export class AwsSsoIntegrationService {
     return protocol;
   }
 
-  // TODO: is it needed?
   private getDate(): Date {
     return new Date();
   }
