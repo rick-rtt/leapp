@@ -1,21 +1,15 @@
 import { AccessMethod } from "@noovolari/leapp-core/models/access-method";
 import { CloudProviderType } from "@noovolari/leapp-core/models/cloud-provider-type";
-import { Command } from "@oclif/core";
+import { LeappCommand } from "../../leappCommand";
 import { Config } from "@oclif/core/lib/config/config";
-import { LeappCliService } from "../../service/leapp-cli-service";
 import { IdpUrlAccessMethodField } from "@noovolari/leapp-core/models/idp-url-access-method-field";
 import CreateIdpUrl from "../idp-url/create";
 
-export default class AddSession extends Command {
+export default class AddSession extends LeappCommand {
   static description = "Add a new session";
   static examples = ["$leapp session add"];
 
-  constructor(
-    argv: string[],
-    config: Config,
-    private leappCliService = new LeappCliService(),
-    private createIdpUrlCommand: CreateIdpUrl = new CreateIdpUrl(argv, config, leappCliService)
-  ) {
+  constructor(argv: string[], config: Config, private createIdpUrlCommand: CreateIdpUrl = new CreateIdpUrl(argv, config)) {
     super(argv, config);
   }
 

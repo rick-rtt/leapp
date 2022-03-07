@@ -1,9 +1,9 @@
-import { Command, CliUx } from "@oclif/core";
-import { LeappCliService } from "../../service/leapp-cli-service";
+import { CliUx } from "@oclif/core";
 import { Config } from "@oclif/core/lib/config/config";
 import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
+import { LeappCommand } from "../../leappCommand";
 
-export default class ListSessions extends Command {
+export default class ListSessions extends LeappCommand {
   static description = "Show sessions list";
   static examples = [`$leapp session list`];
 
@@ -11,7 +11,7 @@ export default class ListSessions extends Command {
     ...CliUx.ux.table.flags(),
   };
 
-  constructor(argv: string[], config: Config, private leappCliService = new LeappCliService()) {
+  constructor(argv: string[], config: Config) {
     super(argv, config);
   }
 

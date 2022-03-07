@@ -1,14 +1,13 @@
-import { Command } from "@oclif/core";
-import { LeappCliService } from "../../service/leapp-cli-service";
+import { LeappCommand } from "../../leappCommand";
 import { Config } from "@oclif/core/lib/config/config";
 import { IdpUrl } from "@noovolari/leapp-core/models/IdpUrl";
 
-export default class CreateIdpUrl extends Command {
+export default class CreateIdpUrl extends LeappCommand {
   static description = "Create a new identity provider URL";
 
   static examples = [`$leapp idp-url create`];
 
-  constructor(argv: string[], config: Config, private leappCliService = new LeappCliService()) {
+  constructor(argv: string[], config: Config) {
     super(argv, config);
   }
 

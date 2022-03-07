@@ -1,14 +1,13 @@
-import { Command } from "@oclif/core";
-import { LeappCliService } from "../../service/leapp-cli-service";
+import { LeappCommand } from "../../leappCommand";
 import { Config } from "@oclif/core/lib/config/config";
 import { AwsSsoIntegration } from "@noovolari/leapp-core/models/aws-sso-integration";
 
-export default class LoginIntegration extends Command {
+export default class LoginIntegration extends LeappCommand {
   static description = "Login to synchronize integration sessions";
 
   static examples = ["$leapp integration login"];
 
-  constructor(argv: string[], config: Config, private leappCliService = new LeappCliService()) {
+  constructor(argv: string[], config: Config) {
     super(argv, config);
   }
 

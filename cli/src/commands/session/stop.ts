@@ -1,15 +1,14 @@
-import { Command } from "@oclif/core";
-import { LeappCliService } from "../../service/leapp-cli-service";
+import { LeappCommand } from "../../leappCommand";
 import { Config } from "@oclif/core/lib/config/config";
 import { Session } from "@noovolari/leapp-core/models/session";
 import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
 
-export default class StopSession extends Command {
+export default class StopSession extends LeappCommand {
   static description = "Stop a session";
 
   static examples = [`$leapp session stop`];
 
-  constructor(argv: string[], config: Config, private leappCliService = new LeappCliService()) {
+  constructor(argv: string[], config: Config) {
     super(argv, config);
   }
 

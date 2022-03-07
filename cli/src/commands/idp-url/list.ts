@@ -1,8 +1,8 @@
-import { CliUx, Command } from "@oclif/core";
-import { LeappCliService } from "../../service/leapp-cli-service";
+import { CliUx } from "@oclif/core";
 import { Config } from "@oclif/core/lib/config/config";
+import { LeappCommand } from "../../leappCommand";
 
-export default class ListIdpUrls extends Command {
+export default class ListIdpUrls extends LeappCommand {
   static description = "Show identity providers list";
   static examples = ["$leapp idp-url list"];
 
@@ -10,7 +10,7 @@ export default class ListIdpUrls extends Command {
     ...CliUx.ux.table.flags(),
   };
 
-  constructor(argv: string[], config: Config, private leappCliService = new LeappCliService()) {
+  constructor(argv: string[], config: Config) {
     super(argv, config);
   }
 

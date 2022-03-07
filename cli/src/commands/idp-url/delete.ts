@@ -1,15 +1,14 @@
-import { Command } from "@oclif/core";
-import { LeappCliService } from "../../service/leapp-cli-service";
+import { LeappCommand } from "../../leappCommand";
 import { Config } from "@oclif/core/lib/config/config";
 import { Session } from "@noovolari/leapp-core/models/session";
 import { IdpUrl } from "@noovolari/leapp-core/models/IdpUrl";
 
-export default class DeleteIdpUrl extends Command {
+export default class DeleteIdpUrl extends LeappCommand {
   static description = "Delete an identity provider URL";
 
   static examples = [`$leapp idp-url delete`];
 
-  constructor(argv: string[], config: Config, private leappCliService = new LeappCliService()) {
+  constructor(argv: string[], config: Config) {
     super(argv, config);
   }
 

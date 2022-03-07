@@ -1,14 +1,13 @@
-import { Command } from "@oclif/core";
-import { LeappCliService } from "../../service/leapp-cli-service";
+import { LeappCommand } from "../../leappCommand";
 import { Config } from "@oclif/core/lib/config/config";
 import { Session } from "@noovolari/leapp-core/models/session";
 
-export default class ChangeSessionRegion extends Command {
+export default class ChangeSessionRegion extends LeappCommand {
   static description = "Change a session region";
 
   static examples = [`$leapp session change-region`];
 
-  constructor(argv: string[], config: Config, private leappCliService = new LeappCliService()) {
+  constructor(argv: string[], config: Config) {
     super(argv, config);
   }
 

@@ -1,14 +1,13 @@
-import { Command } from "@oclif/core";
-import { LeappCliService } from "../../service/leapp-cli-service";
+import { LeappCommand } from "../../leappCommand";
 import { Config } from "@oclif/core/lib/config/config";
 import { AwsSsoIntegration } from "@noovolari/leapp-core/models/aws-sso-integration";
 
-export default class DeleteIntegration extends Command {
+export default class DeleteIntegration extends LeappCommand {
   static description = "Delete an integration";
 
   static examples = ["$leapp integration delete"];
 
-  constructor(argv: string[], config: Config, private leappCliService = new LeappCliService()) {
+  constructor(argv: string[], config: Config) {
     super(argv, config);
   }
 

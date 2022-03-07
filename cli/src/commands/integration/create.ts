@@ -1,15 +1,14 @@
-import { Command } from "@oclif/core";
+import { LeappCommand } from "../../leappCommand";
 import { Config } from "@oclif/core/lib/config/config";
-import { LeappCliService } from "../../service/leapp-cli-service";
 import { SessionType } from "@noovolari/leapp-core/models/session-type";
 import { constants } from "@noovolari/leapp-core/models/constants";
 import { AwsSsoIntegrationService, IntegrationCreationParams } from "@noovolari/leapp-core/services/aws-sso-integration-service";
 
-export default class CreateSsoIntegration extends Command {
+export default class CreateSsoIntegration extends LeappCommand {
   static description = "Create a new AWS SSO integration";
   static examples = ["$leapp integration create"];
 
-  constructor(argv: string[], config: Config, private leappCliService = new LeappCliService()) {
+  constructor(argv: string[], config: Config) {
     super(argv, config);
   }
 

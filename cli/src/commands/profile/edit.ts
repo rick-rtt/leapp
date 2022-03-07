@@ -1,14 +1,13 @@
-import { Command } from "@oclif/core";
-import { LeappCliService } from "../../service/leapp-cli-service";
+import { LeappCommand } from "../../leappCommand";
 import { Config } from "@oclif/core/lib/config/config";
 import { AwsNamedProfile } from "@noovolari/leapp-core/models/aws-named-profile";
 
-export default class EditNamedProfile extends Command {
+export default class EditNamedProfile extends LeappCommand {
   static description = "Rename an AWS named profile";
 
   static examples = [`$leapp profile edit`];
 
-  constructor(argv: string[], config: Config, private leappCliService = new LeappCliService()) {
+  constructor(argv: string[], config: Config) {
     super(argv, config);
   }
 

@@ -1,8 +1,8 @@
-import { CliUx, Command } from "@oclif/core";
-import { LeappCliService } from "../../service/leapp-cli-service";
+import { CliUx } from "@oclif/core";
 import { Config } from "@oclif/core/lib/config/config";
+import { LeappCommand } from "../../leappCommand";
 
-export default class ListIntegrations extends Command {
+export default class ListIntegrations extends LeappCommand {
   static description = "Show integrations list";
   static examples = ["$leapp integration list"];
 
@@ -10,7 +10,7 @@ export default class ListIntegrations extends Command {
     ...CliUx.ux.table.flags(),
   };
 
-  constructor(argv: string[], config: Config, private leappCliService = new LeappCliService()) {
+  constructor(argv: string[], config: Config) {
     super(argv, config);
   }
 
