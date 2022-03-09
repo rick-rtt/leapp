@@ -7,6 +7,25 @@ import { CreateSessionRequest } from "./create-session-request";
 export abstract class SessionService {
   protected constructor(protected sessionNotifier: ISessionNotifier, protected repository: Repository) {}
 
+  sessionDeactivated(sessionId: string): void {
+    const sessions = this.repository.getSessions();
+    const index = sessions.findIndex((s) => s.sessionId === sessionId);
+
+    if (index > -1) {
+      const currentSession: Session = sessions[index];
+      currentSession.status = SessionStatus.inactive;
+      currentSession.startDateTime = undefined;
+
+      sessions[index] = currentSession;
+
+      this.repository.updateSessions(sessions);
+
+      if (this.sessionNotifier) {
+        this.sessionNotifier.setSessions([...sessions]);
+      }
+    }
+  }
+
   protected sessionActivate(sessionId: string): void {
     const sessions = this.repository.getSessions();
     const index = sessions.findIndex((s) => s.sessionId === sessionId);
@@ -52,25 +71,6 @@ export abstract class SessionService {
       const currentSession: Session = sessions[index];
       currentSession.startDateTime = new Date().toISOString();
       currentSession.status = SessionStatus.active;
-
-      sessions[index] = currentSession;
-
-      this.repository.updateSessions(sessions);
-
-      if (this.sessionNotifier) {
-        this.sessionNotifier.setSessions([...sessions]);
-      }
-    }
-  }
-
-  protected sessionDeactivated(sessionId: string): void {
-    const sessions = this.repository.getSessions();
-    const index = sessions.findIndex((s) => s.sessionId === sessionId);
-
-    if (index > -1) {
-      const currentSession: Session = sessions[index];
-      currentSession.status = SessionStatus.inactive;
-      currentSession.startDateTime = undefined;
 
       sessions[index] = currentSession;
 

@@ -23,6 +23,10 @@ export default class StartSession extends LeappCommand {
 
   async startSession(session: Session): Promise<void> {
     const sessionService = this.leappCliService.sessionFactory.getSessionService(session.type);
+    process.on("SIGINT", () => {
+      sessionService.sessionDeactivated(session.sessionId);
+      process.exit(0);
+    });
     await sessionService.start(session.sessionId);
     this.log("session started");
   }
