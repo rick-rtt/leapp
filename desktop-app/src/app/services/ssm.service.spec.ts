@@ -4,11 +4,11 @@ import { SsmService } from "./ssm.service";
 import { mustInjected } from "../../base-injectables";
 
 describe("SsmService", () => {
-  beforeEach(() =>
+  beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [SsmService].concat(mustInjected()),
-    })
-  );
+      providers: [].concat(mustInjected()),
+    });
+  });
 
   it("should be created", () => {
     const service: SsmService = TestBed.get(SsmService);

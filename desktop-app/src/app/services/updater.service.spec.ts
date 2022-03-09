@@ -1,12 +1,15 @@
 import { TestBed } from "@angular/core/testing";
 
 import { UpdaterService } from "./updater.service";
+import { mustInjected } from "../../base-injectables";
 
 describe("UpdaterService", () => {
   let service: UpdaterService;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({});
+    TestBed.configureTestingModule({
+      providers: [].concat(mustInjected()),
+    });
     service = TestBed.inject(UpdaterService);
   });
 
