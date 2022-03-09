@@ -36,6 +36,6 @@
     "lint:fix": "npm run lint -- --fix"
   },
   "lint-staged": {
-    "*.{js,ts}": "eslint --fix"
+    "*.{ts,html}": "eslint --fix"
   }
 }
