@@ -1,6 +1,6 @@
 import { OrderingPipe } from "./ordering.pipe";
-import { Session } from "../../../models/session";
-import { AwsIamUserSession } from "../../../models/aws-iam-user-session";
+import { Session } from "@noovolari/leapp-core/models/session";
+import { AwsIamUserSession } from "@noovolari/leapp-core/models/aws-iam-user-session";
 
 let sessions: Session[] = [];
 
