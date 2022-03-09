@@ -134,7 +134,7 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
       // eslint-disable-next-line @typescript-eslint/naming-convention
       SAMLAssertion: samlResponse,
       // eslint-disable-next-line @typescript-eslint/naming-convention
-      durationSeconds: this.samlRoleSessionDuration,
+      DurationSeconds: this.samlRoleSessionDuration,
     };
 
     // Invoke assumeRoleWithSAML

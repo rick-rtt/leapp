@@ -2,6 +2,12 @@ import { jest, describe, test, expect } from "@jest/globals";
 import DeleteNamedProfile from "./delete";
 
 describe("DeleteNamedProfile", () => {
+  const getTestCommand = (leappCliService: any = null, argv: string[] = []): DeleteNamedProfile => {
+    const command = new DeleteNamedProfile(argv, {} as any);
+    (command as any).leappCliService = leappCliService;
+    return command;
+  };
+
   test("selectNamedProfile", async () => {
     const namedProfile = { name: "profileName" };
     const leappCliService: any = {
@@ -23,7 +29,7 @@ describe("DeleteNamedProfile", () => {
       },
     };
 
-    const command = new DeleteNamedProfile([], {} as any, leappCliService);
+    const command = getTestCommand(leappCliService);
     const selectedProfile = await command.selectNamedProfile();
 
     expect(leappCliService.namedProfilesService.getNamedProfiles).toHaveBeenCalledWith(true);
@@ -36,7 +42,7 @@ describe("DeleteNamedProfile", () => {
         getNamedProfiles: jest.fn(() => []),
       },
     };
-    const command = new DeleteNamedProfile([], {} as any, leappCliService);
+    const command = getTestCommand(leappCliService);
 
     await expect(command.selectNamedProfile()).rejects.toThrow(new Error("no profiles available"));
   });
@@ -47,7 +53,7 @@ describe("DeleteNamedProfile", () => {
         getSessionsWithNamedProfile: jest.fn(() => "sessions"),
       },
     };
-    const command = new DeleteNamedProfile([], {} as any, leappCliService);
+    const command = getTestCommand(leappCliService);
 
     const sessions = command.getAffectedSessions("profileId");
     expect(sessions).toBe("sessions");
@@ -69,7 +75,7 @@ describe("DeleteNamedProfile", () => {
         },
       },
     };
-    const command = new DeleteNamedProfile([], {} as any, leappCliService);
+    const command = getTestCommand(leappCliService);
 
     const affectedSessions = [{ sessionName: "sess1" }, { sessionName: "sess2" }] as any;
     const confirmation = await command.askForConfirmation(affectedSessions);
@@ -78,7 +84,7 @@ describe("DeleteNamedProfile", () => {
   });
 
   test("askForConfirmation, no affected sessions", async () => {
-    const command = new DeleteNamedProfile([], {} as any, null as any);
+    const command = getTestCommand();
 
     const confirmation = await command.askForConfirmation([]);
     expect(confirmation).toBe(true);
@@ -91,7 +97,7 @@ describe("DeleteNamedProfile", () => {
       },
     };
 
-    const command = new DeleteNamedProfile([], {} as any, leappCliService);
+    const command = getTestCommand(leappCliService);
     command.log = jest.fn();
     await command.deleteNamedProfile("profileId");
 
@@ -99,23 +105,11 @@ describe("DeleteNamedProfile", () => {
     expect(command.log).toHaveBeenCalledWith("profile deleted");
   });
 
-  test("run", async () => {
-    await runCommand(undefined, "");
-  });
-
-  test("run - deleteNamedProfile throws exception", async () => {
-    await runCommand(new Error("errorMessage"), "errorMessage");
-  });
-
-  test("run - deleteNamedProfile throws undefined object", async () => {
-    await runCommand({ hello: "randomObj" }, "Unknown error: [object Object]");
-  });
-
-  async function runCommand(errorToThrow: any, expectedErrorMessage: string) {
+  const runCommand = async (errorToThrow: any, expectedErrorMessage: string) => {
     const namedProfile = { id: "1" };
     const affectedSessions = [{ sessionId: "2" }] as any;
 
-    const command = new DeleteNamedProfile([], {} as any);
+    const command = getTestCommand();
     command.selectNamedProfile = jest.fn(async (): Promise<any> => namedProfile);
     command.getAffectedSessions = jest.fn(() => affectedSessions);
     command.askForConfirmation = jest.fn(async (): Promise<any> => true);
@@ -139,5 +133,17 @@ describe("DeleteNamedProfile", () => {
     if (errorToThrow) {
       expect(occurredError).toEqual(new Error(expectedErrorMessage));
     }
-  }
+  };
+
+  test("run", async () => {
+    await runCommand(undefined, "");
+  });
+
+  test("run - deleteNamedProfile throws exception", async () => {
+    await runCommand(new Error("errorMessage"), "errorMessage");
+  });
+
+  test("run - deleteNamedProfile throws undefined object", async () => {
+    await runCommand({ hello: "randomObj" }, "Unknown error: [object Object]");
+  });
 });

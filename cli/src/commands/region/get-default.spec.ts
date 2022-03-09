@@ -5,7 +5,8 @@ describe("GetDefaultRegion", () => {
   test("run", async () => {
     const leappCliService = { regionsService: { getDefaultAwsRegion: () => "defaultRegion" } } as any;
 
-    const command = new GetDefaultRegion([], {} as any, leappCliService);
+    const command = new GetDefaultRegion([], {} as any);
+    (command as any).leappCliService = leappCliService;
     command.log = jest.fn();
 
     await command.run();

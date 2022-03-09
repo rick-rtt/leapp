@@ -3,6 +3,12 @@ import StopSession from "./stop";
 import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
 
 describe("StopSession", () => {
+  const getTestCommand = (leappCliService: any = null): StopSession => {
+    const command = new StopSession([], {} as any);
+    (command as any).leappCliService = leappCliService;
+    return command;
+  };
+
   test("stopSession", async () => {
     const sessionService: any = {
       stop: jest.fn(async () => {}),
@@ -16,7 +22,7 @@ describe("StopSession", () => {
     };
 
     const session: any = { sessionId: "sessionId", type: "sessionType" };
-    const command = new StopSession([], {} as any, leappCliService);
+    const command = getTestCommand(leappCliService);
     command.log = jest.fn();
     await command.stopSession(session);
 
@@ -39,7 +45,7 @@ describe("StopSession", () => {
       },
     };
 
-    const command = new StopSession([], {} as any, leappCliService);
+    const command = getTestCommand(leappCliService);
     const selectedSession = await command.selectSession();
     expect(leappCliService.inquirer.prompt).toHaveBeenCalledWith([
       {
@@ -62,27 +68,13 @@ describe("StopSession", () => {
       },
     };
 
-    const command = new StopSession([], {} as any, leappCliService);
+    const command = getTestCommand(leappCliService);
     await expect(command.selectSession()).rejects.toThrow(new Error("no active sessions available"));
   });
 
-  test("run - all ok", async () => {
-    await runCommand(undefined, "");
-  });
-
-  test("run - createSession throws exception", async () => {
-    await runCommand(new Error("errorMessage"), "errorMessage");
-  });
-
-  test("run - createSession throws undefined object", async () => {
-    await runCommand({ hello: "randomObj" }, "Unknown error: [object Object]");
-  });
-
-  async function runCommand(errorToThrow: any, expectedErrorMessage: string) {
-    const command = new StopSession([], {} as any);
-
+  const runCommand = async (errorToThrow: any, expectedErrorMessage: string) => {
+    const command = getTestCommand();
     command.selectSession = jest.fn(async (): Promise<any> => "session");
-
     command.stopSession = jest.fn(async (): Promise<any> => {
       if (errorToThrow) {
         throw errorToThrow;
@@ -95,5 +87,17 @@ describe("StopSession", () => {
       expect(error).toEqual(new Error(expectedErrorMessage));
     }
     expect(command.stopSession).toHaveBeenCalledWith("session");
-  }
+  };
+
+  test("run - all ok", async () => {
+    await runCommand(undefined, "");
+  });
+
+  test("run - createSession throws exception", async () => {
+    await runCommand(new Error("errorMessage"), "errorMessage");
+  });
+
+  test("run - createSession throws undefined object", async () => {
+    await runCommand({ hello: "randomObj" }, "Unknown error: [object Object]");
+  });
 });

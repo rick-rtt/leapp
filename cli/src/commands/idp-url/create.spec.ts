@@ -2,8 +2,14 @@ import { jest, describe, test, expect } from "@jest/globals";
 import CreateIdpUrl from "./create";
 
 describe("CreateIdpUrl", () => {
+  const getTestCommand = (leappCliService: any = null, argv: string[] = []): CreateIdpUrl => {
+    const command = new CreateIdpUrl(argv, {} as any);
+    (command as any).leappCliService = leappCliService;
+    return command;
+  };
+
   test("promptAndCreateIdpUrl", async () => {
-    const command = new CreateIdpUrl([], {} as any, null);
+    const command = getTestCommand();
     command.getIdpUrl = jest.fn(async () => "idpUrl");
     command.createIdpUrl = jest.fn((): any => "newIdpUrl");
 
@@ -29,11 +35,11 @@ describe("CreateIdpUrl", () => {
         },
       },
       idpUrlsService: {
-        validateIdpUrl: jest.fn((url) => "validationResult"),
+        validateIdpUrl: jest.fn(() => "validationResult"),
       },
     };
 
-    const command = new CreateIdpUrl([], {} as any, leappCliService);
+    const command = getTestCommand(leappCliService);
     const idpUrl = await command.getIdpUrl();
     expect(idpUrl).toBe("idpUrl");
     expect(leappCliService.idpUrlsService.validateIdpUrl).toHaveBeenCalledWith("url");
@@ -46,7 +52,7 @@ describe("CreateIdpUrl", () => {
       },
     };
 
-    const command = new CreateIdpUrl([], {} as any, leappCliService);
+    const command = getTestCommand(leappCliService);
     command.log = jest.fn();
     const newIdpUrl = command.createIdpUrl("idpUrl");
 
@@ -55,20 +61,8 @@ describe("CreateIdpUrl", () => {
     expect(newIdpUrl).toBe("newIdpUrl");
   });
 
-  test("run", async () => {
-    await runCommand(undefined, "");
-  });
-
-  test("run - promptAndCreateIdpUrl throws exception", async () => {
-    await runCommand(new Error("errorMessage"), "errorMessage");
-  });
-
-  test("run - promptAndCreateIdpUrl throws undefined object", async () => {
-    await runCommand({ hello: "randomObj" }, "Unknown error: [object Object]");
-  });
-
-  async function runCommand(errorToThrow: any, expectedErrorMessage: string) {
-    const command = new CreateIdpUrl([], {} as any);
+  const runCommand = async (errorToThrow: any, expectedErrorMessage: string) => {
+    const command = getTestCommand();
     command.promptAndCreateIdpUrl = jest.fn((): any => {
       if (errorToThrow) {
         throw errorToThrow;
@@ -86,5 +80,17 @@ describe("CreateIdpUrl", () => {
     if (errorToThrow) {
       expect(occurredError).toEqual(new Error(expectedErrorMessage));
     }
-  }
+  };
+
+  test("run", async () => {
+    await runCommand(undefined, "");
+  });
+
+  test("run - promptAndCreateIdpUrl throws exception", async () => {
+    await runCommand(new Error("errorMessage"), "errorMessage");
+  });
+
+  test("run - promptAndCreateIdpUrl throws undefined object", async () => {
+    await runCommand({ hello: "randomObj" }, "Unknown error: [object Object]");
+  });
 });

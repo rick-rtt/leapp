@@ -19,9 +19,12 @@ import { AwsIamUserSessionRequest } from "./aws-iam-user-session-request";
 import { AwsSessionService } from "./aws-session-service";
 
 export interface GenerateSessionTokenCallingMfaParams {
-  durationSeconds: number;
-  serialNumber?: string;
-  tokenCode?: string;
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  DurationSeconds: number;
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  SerialNumber?: string;
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  TokenCode?: string;
 }
 
 export class AwsIamUserService extends AwsSessionService {
@@ -126,7 +129,8 @@ export class AwsIamUserService extends AwsSessionService {
       const sts = new AWS.STS(this.awsCoreService.stsOptions(session));
 
       // Configure sts get-session-token api call params
-      const params = { durationSeconds: constants.sessionTokenDuration };
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      const params = { DurationSeconds: constants.sessionTokenDuration };
 
       // Check if MFA is needed or not
       if ((session as AwsIamUserSession).mfaDevice) {
@@ -195,8 +199,8 @@ export class AwsIamUserService extends AwsSessionService {
       // TODO: convert promptForMFACode into an async function (without callback...)!
       this.mfaCodePrompter.promptForMFACode(session.sessionName, (value: string) => {
         if (value !== constants.confirmClosed) {
-          params.serialNumber = (session as AwsIamUserSession).mfaDevice;
-          params.tokenCode = value;
+          params.SerialNumber = (session as AwsIamUserSession).mfaDevice;
+          params.TokenCode = value;
           // Return session token in the form of CredentialsInfo
           resolve(this.generateSessionToken(session, sts, params));
         } else {

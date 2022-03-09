@@ -1,15 +1,15 @@
-import { jest, describe, test, expect } from '@jest/globals'
+import { jest, describe, test, expect } from "@jest/globals";
 import { SessionType } from "../models/session-type";
 import { SessionFactory } from "./session-factory";
 import { CreateSessionRequest } from "./session/create-session-request";
 
 describe("sessionFactory", () => {
-  test("getSessionService", function () {
-    const awsIamUserService: any = {name: "IamUser"};
-    const awsIamRoleFederatedService: any = {name: "IamRoleFederated"};
-    const awsIamRoleChainedService: any = {name: "IamRoleChained"};
-    const awsSsoRoleService: any = {name: "SsoRole"};
-    const azureService: any = {name: "Azure"};
+  test("getSessionService", () => {
+    const awsIamUserService: any = { name: "IamUser" };
+    const awsIamRoleFederatedService: any = { name: "IamRoleFederated" };
+    const awsIamRoleChainedService: any = { name: "IamRoleChained" };
+    const awsSsoRoleService: any = { name: "SsoRole" };
+    const azureService: any = { name: "Azure" };
     const sessionFactory = new SessionFactory(
       awsIamUserService,
       awsIamRoleFederatedService,
@@ -25,14 +25,14 @@ describe("sessionFactory", () => {
     expect((sessionFactory.getSessionService(SessionType.azure) as any).name).toEqual("Azure");
   });
 
-  test("createSession", async function () {
-    const fakeSessionService: any = {create: jest.fn()};
+  test("createSession", async () => {
+    const fakeSessionService: any = { create: jest.fn() };
     const sessionFactory = new SessionFactory(null, null, null, null, null);
     sessionFactory.getSessionService = (sessionType: SessionType) => {
       expect(sessionType).toEqual(SessionType.azure);
       return fakeSessionService;
     };
-    const createSessionRequest = {sessionName: "sessionName1"} as CreateSessionRequest;
+    const createSessionRequest = { sessionName: "sessionName1" } as CreateSessionRequest;
 
     await sessionFactory.createSession(SessionType.azure, createSessionRequest);
     expect(fakeSessionService.create).toHaveBeenCalledWith(createSessionRequest);

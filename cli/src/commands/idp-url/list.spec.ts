@@ -1,18 +1,24 @@
 import { CliUx } from "@oclif/core";
 import { describe, expect, jest, test } from "@jest/globals";
-import ListIdpUrls from './list'
+import ListIdpUrls from "./list";
 
 describe("ListIdpUrls", () => {
+  const getTestCommand = (leappCliService: any = null, argv: string[] = []): ListIdpUrls => {
+    const command = new ListIdpUrls(argv, {} as any);
+    (command as any).leappCliService = leappCliService;
+    return command;
+  };
+
   test("run", async () => {
-    const command = new ListIdpUrls([], {} as any) as any;
-    command.showIdpUrls= jest.fn();
+    const command = getTestCommand();
+    command.showIdpUrls = jest.fn();
     await command.run();
 
     expect(command.showIdpUrls).toHaveBeenCalled();
   });
 
   test("run - showIdpUrls throw an error", async () => {
-    const command = new ListIdpUrls([], {} as any, {} as any) as any;
+    const command = getTestCommand();
     command.showIdpUrls = jest.fn(async () => {
       throw new Error("error");
     });
@@ -24,9 +30,10 @@ describe("ListIdpUrls", () => {
   });
 
   test("run - showIdpUrls throw an object", async () => {
-    const command = new ListIdpUrls([], {} as any, {} as any) as any;
+    const command = getTestCommand();
+    const errorToThrow = "string";
     command.showIdpUrls = jest.fn(async () => {
-      throw "string";
+      throw errorToThrow;
     });
     try {
       await command.run();
@@ -38,16 +45,16 @@ describe("ListIdpUrls", () => {
   test("showIdpUrls", async () => {
     const idpUrls = [
       {
-        url: 'idpUrlsName',
+        url: "idpUrlsName",
       },
     ];
-    const leapCliService = {
+    const leappCliService = {
       idpUrlsService: {
         getIdpUrls: () => idpUrls,
       },
     };
 
-    const command = new ListIdpUrls([], {} as any, leapCliService as any) as any;
+    const command = getTestCommand(leappCliService);
     const tableSpy = jest.spyOn(CliUx.ux, "table").mockImplementation(() => null);
 
     await command.showIdpUrls();

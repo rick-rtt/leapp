@@ -1,15 +1,15 @@
-import { jest, describe, test, expect } from '@jest/globals'
+import { jest, describe, test, expect } from "@jest/globals";
 import { RegionsService } from "./regions-service";
 import { SessionStatus } from "../models/session-status";
 
 describe("RegionsService", () => {
   test("changeRegion, session not active", async () => {
-    const session = {sessionId: "sid1", type: "sessionType", status: SessionStatus.pending, region: "oldRegion"};
+    const session = { sessionId: "sid1", type: "sessionType", status: SessionStatus.pending, region: "oldRegion" };
     const sessionFactory = {
       getSessionService: jest.fn(),
     };
 
-    const repositorySessions = [{sessionId: "sid0"}, {sessionId: "sid1"}];
+    const repositorySessions = [{ sessionId: "sid0" }, { sessionId: "sid1" }];
     const repository = {
       getSessions: () => repositorySessions,
       updateSession: jest.fn(),
@@ -29,7 +29,7 @@ describe("RegionsService", () => {
   });
 
   test("changeRegion, session active", async () => {
-    const session = {sessionId: "sid1", type: "sessionType", status: SessionStatus.active, region: "oldRegion"};
+    const session = { sessionId: "sid1", type: "sessionType", status: SessionStatus.active, region: "oldRegion" };
 
     let isSessionActive = false;
     const sessionService = {
@@ -40,18 +40,18 @@ describe("RegionsService", () => {
       getSessionService: jest.fn(() => sessionService),
     };
 
-    const repositorySessions = [{sessionId: "sid0"}, {sessionId: "sid1"}];
+    const repositorySessions = [{ sessionId: "sid0" }, { sessionId: "sid1" }];
     const repository = {
       getSessions: () => repositorySessions,
-      updateSession: jest.fn((sessionId, session: any) => {
-        expect(session.region).toBe("newRegion");
+      updateSession: jest.fn((sessionId, sessionToUpdate: any) => {
+        expect(sessionToUpdate.region).toBe("newRegion");
         expect(isSessionActive).toBe(false);
       }),
     };
 
     const workspaceService = {
-      updateSession: jest.fn((sessionId, session: any) => {
-        expect(session.region).toBe("newRegion");
+      updateSession: jest.fn((sessionId, sessionToUpdate: any) => {
+        expect(sessionToUpdate.region).toBe("newRegion");
         expect(isSessionActive).toBe(false);
       }),
     };

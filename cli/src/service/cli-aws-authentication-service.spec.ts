@@ -3,20 +3,47 @@ import { CliAwsAuthenticationService } from "./cli-aws-authentication-service";
 import { of } from "rxjs";
 import { Page, HTTPRequest } from "puppeteer";
 
-describe("CliAwsAuthenticationService", () => {
+class PageStub {
+  public onPageCalled;
+  public gotoPageCalled;
+  public onEventCalledTimes;
+  private callback: Map<string, (request: HTTPRequest) => Promise<void>>;
 
+  constructor(public expectedIdpUrl: string, public requestStub: any) {
+    this.onPageCalled = false;
+    this.gotoPageCalled = false;
+    this.onEventCalledTimes = 0;
+    this.callback = new Map<string, (request: HTTPRequest) => Promise<void>>();
+  }
+
+  on(param: string, callback: any) {
+    this.onPageCalled = true;
+    if (this.onEventCalledTimes === 0) {
+      expect(param).toEqual("request");
+    } else {
+      expect(param).toEqual("close");
+    }
+
+    expect(callback).toBeDefined();
+    this.callback.set(param, callback);
+    this.onEventCalledTimes++;
+  }
+
+  async goto(url: string) {
+    this.gotoPageCalled = true;
+    expect(url).toEqual(this.expectedIdpUrl);
+    await this.callback.get("request")(this.requestStub);
+    return Promise.resolve();
+  }
+}
+
+describe("CliAwsAuthenticationService", () => {
   test("needAuthentication", async () => {
     const idpUrl = "https://idpUrl";
     const page = new PageStub(idpUrl, {
-      url() {
-        return idpUrl;
-      },
-      isInterceptResolutionHandled() {
-        return false;
-      },
-      async continue() {
-        return Promise.resolve();
-      },
+      url: () => idpUrl,
+      isInterceptResolutionHandled: () => false,
+      continue: async () => Promise.resolve(),
     });
 
     const cliAwsAuthenticationService = new CliAwsAuthenticationService();
@@ -36,18 +63,10 @@ describe("CliAwsAuthenticationService", () => {
     const idpUrl = "https://idpUrl";
     const needToAuthenticate = false;
     const page = new PageStub(idpUrl, {
-      url() {
-        return "https://signin.aws.amazon.com/saml";
-      },
-      isInterceptResolutionHandled() {
-        return false;
-      },
-      postData() {
-        return "postData";
-      },
-      async continue() {
-        return Promise.resolve();
-      },
+      url: () => "https://signin.aws.amazon.com/saml",
+      isInterceptResolutionHandled: () => false,
+      postData: () => "postData",
+      continue: async () => Promise.resolve(),
     });
 
     const cliAwsAuthenticationService = new CliAwsAuthenticationService();
@@ -87,38 +106,4 @@ describe("CliAwsAuthenticationService", () => {
     expect(cliAwsAuthenticationService.isRequestToIntercept("https://login.microsoftonline.com/")).toBeFalsy();
     expect(cliAwsAuthenticationService.isRequestToIntercept("https://login.oauth2/authorize/")).toBeFalsy();
   });
-
-  class PageStub {
-    public onPageCalled;
-    public gotoPageCalled;
-    public onEventCalledTimes;
-    private callback: Map<string, (request: HTTPRequest) => Promise<void>>;
-
-    constructor(public expectedIdpUrl: string, public requestStub: any) {
-      this.onPageCalled = false;
-      this.gotoPageCalled = false;
-      this.onEventCalledTimes = 0;
-      this.callback = new Map<string, (request: HTTPRequest) => Promise<void>>();
-    }
-
-    on(param: string, callback: any) {
-      this.onPageCalled = true;
-      if (this.onEventCalledTimes === 0) {
-        expect(param).toEqual("request");
-      } else {
-        expect(param).toEqual("close");
-      }
-
-      expect(callback).toBeDefined();
-      this.callback.set(param, callback);
-      this.onEventCalledTimes++;
-    }
-
-    async goto(url: string) {
-      this.gotoPageCalled = true;
-      expect(url).toEqual(this.expectedIdpUrl);
-      await this.callback.get("request")!(this.requestStub);
-      return Promise.resolve();
-    }
-  }
 });

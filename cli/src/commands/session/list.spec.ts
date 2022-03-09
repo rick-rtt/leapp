@@ -5,8 +5,14 @@ import { AwsIamUserSession } from "@noovolari/leapp-core/models/aws-iam-user-ses
 import { SessionType } from "@noovolari/leapp-core/models/session-type";
 
 describe("ListSessions", () => {
-  test("run", async () => {
+  const getTestCommand = (leappCliService: any = null): ListSessions => {
     const command = new ListSessions([], {} as any);
+    (command as any).leappCliService = leappCliService;
+    return command;
+  };
+
+  test("run", async () => {
+    const command = getTestCommand();
     command.showSessions = jest.fn();
     await command.run();
 
@@ -14,7 +20,7 @@ describe("ListSessions", () => {
   });
 
   test("run - showSessions throw an error", async () => {
-    const command = new ListSessions([], {} as any, {} as any);
+    const command = getTestCommand();
     command.showSessions = jest.fn(async () => {
       throw Error("error");
     });
@@ -26,9 +32,10 @@ describe("ListSessions", () => {
   });
 
   test("run - showSessions throw an object", async () => {
-    const command = new ListSessions([], {} as any, {} as any);
+    const command = getTestCommand();
+    const strError = "string";
     command.showSessions = jest.fn(async () => {
-      throw "string";
+      throw strError;
     });
     try {
       await command.run();
@@ -41,7 +48,7 @@ describe("ListSessions", () => {
     const sessions = [new AwsIamUserSession("sessionName", "region", "profileId")];
     const namedProfileMap = new Map([["profileId", { id: "profileId", name: "profileName" }]]);
     const sessionTypeMap = new Map([[SessionType.awsIamUser, "sessionTypeLabel"]]);
-    const leapCliService = {
+    const leappCliService = {
       repository: {
         getSessions: () => sessions,
       },
@@ -53,7 +60,7 @@ describe("ListSessions", () => {
       },
     };
 
-    const command = new ListSessions([], {} as any, leapCliService as any);
+    const command = getTestCommand(leappCliService);
     const tableSpy = jest.spyOn(CliUx.ux, "table").mockImplementation(() => null);
 
     await command.showSessions();

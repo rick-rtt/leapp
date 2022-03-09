@@ -49,6 +49,8 @@ USAGE
 * [`leapp session add`](#leapp-session-add)
 * [`leapp session change-region`](#leapp-session-change-region)
 * [`leapp session delete`](#leapp-session-delete)
+* [`leapp session generate SESSIONID`](#leapp-session-generate-sessionid)
+* [`leapp session get_id`](#leapp-session-get_id)
 * [`leapp session list`](#leapp-session-list)
 * [`leapp session start`](#leapp-session-start)
 * [`leapp session stop`](#leapp-session-stop)
@@ -392,6 +394,39 @@ DESCRIPTION
 
 EXAMPLES
   $leapp session delete
+```
+
+## `leapp session generate SESSIONID`
+
+Generate temporary credentials for the given AWS session id
+
+```
+USAGE
+  $ leapp session generate [SESSIONID]
+
+ARGUMENTS
+  SESSIONID  id of the session
+
+DESCRIPTION
+  Generate temporary credentials for the given AWS session id
+
+EXAMPLES
+  $leapp session generate 0a1b2c3d-4e5f-6a7b-8c9d-0e1f2a3b4c5d
+```
+
+## `leapp session get_id`
+
+Get session id
+
+```
+USAGE
+  $ leapp session get_id
+
+DESCRIPTION
+  Get session id
+
+EXAMPLES
+  $leapp session get_id
 ```
 
 ## `leapp session list`

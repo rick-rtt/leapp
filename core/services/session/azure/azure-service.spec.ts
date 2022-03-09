@@ -1,11 +1,10 @@
-import { AzureService } from './azure-service'
+import { AzureService } from "./azure-service";
 
-describe('AzureService', () => {
+describe("AzureService", () => {
+  test("getDependantSessions", () => {
+    const azureService = new AzureService(null, null, null, null, null);
+    const dependantSessions = azureService.getDependantSessions("sessionId");
 
-  test('getDependantSessions', () => {
-    const azureService = new AzureService(null, null, null, null, null)
-    const dependantSessions = azureService.getDependantSessions('sessionId')
-
-    expect(dependantSessions).toEqual([])
-  })
-})
+    expect(dependantSessions).toEqual([]);
+  });
+});

@@ -1,10 +1,10 @@
 {
   "root": true,
   "ignorePatterns": [
-    "*.spec.ts",
     "cli/gushio",
     "cli/coverage/**/*",
     "cli/dist/**/*",
+    "cli/tmp/**/*",
     "core/coverage/**/*",
     "core/dist/**/*",
     "core/gushio",

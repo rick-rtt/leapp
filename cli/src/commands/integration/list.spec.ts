@@ -3,8 +3,14 @@ import { CliUx } from "@oclif/core";
 import { describe, expect, jest, test } from "@jest/globals";
 
 describe("ListIntegrations", () => {
+  const getTestCommand = (leappCliService: any = null, argv: string[] = []): ListIntegrations => {
+    const command = new ListIntegrations(argv, {} as any);
+    (command as any).leappCliService = leappCliService;
+    return command;
+  };
+
   test("run", async () => {
-    const command = new ListIntegrations([], {} as any) as any;
+    const command = getTestCommand();
     command.showIntegrations = jest.fn();
     await command.run();
 
@@ -12,7 +18,7 @@ describe("ListIntegrations", () => {
   });
 
   test("run - showIntegrations throw an error", async () => {
-    const command = new ListIntegrations([], {} as any, {} as any) as any;
+    const command = getTestCommand();
     command.showIntegrations = jest.fn(async () => {
       throw new Error("error");
     });
@@ -24,9 +30,10 @@ describe("ListIntegrations", () => {
   });
 
   test("run - showIntegrations throw an object", async () => {
-    const command = new ListIntegrations([], {} as any, {} as any) as any;
+    const command = getTestCommand();
+    const errorToThrow = "string";
     command.showIntegrations = jest.fn(async () => {
-      throw "string";
+      throw errorToThrow;
     });
     try {
       await command.run();
@@ -44,7 +51,7 @@ describe("ListIntegrations", () => {
         accessTokenExpiration: "expiration",
       },
     ];
-    const leapCliService = {
+    const leappCliService = {
       awsSsoIntegrationService: {
         getIntegrations: () => integrations,
         isOnline: jest.fn(() => true),
@@ -52,7 +59,7 @@ describe("ListIntegrations", () => {
       },
     };
 
-    const command = new ListIntegrations([], {} as any, leapCliService as any) as any;
+    const command = getTestCommand(leappCliService);
     const tableSpy = jest.spyOn(CliUx.ux, "table").mockImplementation(() => null);
 
     await command.showIntegrations();
@@ -69,8 +76,8 @@ describe("ListIntegrations", () => {
 
     expect(tableSpy.mock.calls[0][0]).toEqual(expectedData);
 
-    expect(leapCliService.awsSsoIntegrationService.isOnline).toHaveBeenCalledWith(integrations[0]);
-    expect(leapCliService.awsSsoIntegrationService.remainingHours).toHaveBeenCalledWith(integrations[0]);
+    expect(leappCliService.awsSsoIntegrationService.isOnline).toHaveBeenCalledWith(integrations[0]);
+    expect(leappCliService.awsSsoIntegrationService.remainingHours).toHaveBeenCalledWith(integrations[0]);
 
     const expectedColumns = {
       integrationName: { header: "Integration Name" },
