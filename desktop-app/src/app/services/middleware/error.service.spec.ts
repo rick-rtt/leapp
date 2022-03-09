@@ -6,7 +6,7 @@ import { ToastrModule } from "ngx-toastr";
 import { LeappBaseError } from "@noovolari/leapp-core/errors/leapp-base-error";
 import { ErrorHandler } from "@angular/core";
 import { AppModule } from "../../app.module";
-import { LoggerLevel, LoggingService } from "@noovolari/leapp-core/services/logging-service";
+import { LoggerLevel } from "@noovolari/leapp-core/services/logging-service";
 import { LeappCoreService } from "../leapp-core.service";
 import { MessageToasterService } from "../message-toaster.service";
 

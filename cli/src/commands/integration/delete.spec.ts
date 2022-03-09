@@ -2,6 +2,12 @@ import { jest, describe, test, expect } from "@jest/globals";
 import DeleteIntegration from "./delete";
 
 describe("DeleteIntegration", () => {
+  const getTestCommand = (leappCliService: any = null, argv: string[] = []): DeleteIntegration => {
+    const command = new DeleteIntegration(argv, {} as any);
+    (command as any).leappCliService = leappCliService;
+    return command;
+  };
+
   test("selectIntegration", async () => {
     const integration = { alias: "integration1" };
     const leappCliService: any = {
@@ -23,7 +29,7 @@ describe("DeleteIntegration", () => {
       },
     };
 
-    const command = new DeleteIntegration([], {} as any, leappCliService);
+    const command = getTestCommand(leappCliService);
     const selectedIntegration = await command.selectIntegration();
 
     expect(leappCliService.awsSsoIntegrationService.getIntegrations).toHaveBeenCalled();
@@ -37,7 +43,7 @@ describe("DeleteIntegration", () => {
       },
     };
 
-    const command = new DeleteIntegration([], {} as any, leappCliService);
+    const command = getTestCommand(leappCliService);
     await expect(command.selectIntegration()).rejects.toThrow(new Error("no integrations available"));
   });
 
@@ -48,7 +54,7 @@ describe("DeleteIntegration", () => {
       },
     };
 
-    const command = new DeleteIntegration([], {} as any, leappCliService);
+    const command = getTestCommand(leappCliService);
     command.log = jest.fn();
 
     const integration = { id: "integration1" } as any;
@@ -58,22 +64,10 @@ describe("DeleteIntegration", () => {
     expect(command.log).toHaveBeenLastCalledWith("integration deleted");
   });
 
-  test("run", async () => {
-    await runCommand(undefined, "");
-  });
-
-  test("run - delete throws exception", async () => {
-    await runCommand(new Error("errorMessage"), "errorMessage");
-  });
-
-  test("run - delete throws undefined object", async () => {
-    await runCommand({ hello: "randomObj" }, "Unknown error: [object Object]");
-  });
-
-  async function runCommand(errorToThrow: any, expectedErrorMessage: string) {
+  const runCommand = async (errorToThrow: any, expectedErrorMessage: string) => {
     const selectedIntegration = { id: "1" };
 
-    const command = new DeleteIntegration([], {} as any, null);
+    const command = getTestCommand();
     command.selectIntegration = jest.fn(async (): Promise<any> => selectedIntegration);
     command.delete = jest.fn(async () => {
       if (errorToThrow) {
@@ -93,5 +87,17 @@ describe("DeleteIntegration", () => {
     if (errorToThrow) {
       expect(occurredError).toEqual(new Error(expectedErrorMessage));
     }
-  }
+  };
+
+  test("run", async () => {
+    await runCommand(undefined, "");
+  });
+
+  test("run - delete throws exception", async () => {
+    await runCommand(new Error("errorMessage"), "errorMessage");
+  });
+
+  test("run - delete throws undefined object", async () => {
+    await runCommand({ hello: "randomObj" }, "Unknown error: [object Object]");
+  });
 });

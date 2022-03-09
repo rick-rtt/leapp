@@ -1,11 +1,13 @@
+import { LeappBaseError } from "../../../errors/leapp-base-error";
+import { ISessionNotifier } from "../../../interfaces/i-session-notifier";
+import { AwsProcessCredentials } from "../../../models/aws-process-credential";
 import { CredentialsInfo } from "../../../models/credentials-info";
 import { Session } from "../../../models/session";
 import { SessionStatus } from "../../../models/session-status";
-import { LeappBaseError } from "../../../errors/leapp-base-error";
+import { SessionType } from "../../../models/session-type";
 import { LoggerLevel } from "../../logging-service";
-import { SessionService } from "../session-service";
-import { ISessionNotifier } from "../../../interfaces/i-session-notifier";
 import { Repository } from "../../repository";
+import { SessionService } from "../session-service";
 
 export abstract class AwsSessionService extends SessionService {
   /* This service manage the session manipulation as we need top generate credentials and maintain them for a specific duration */
@@ -69,6 +71,23 @@ export abstract class AwsSessionService extends SessionService {
       await this.removeSecrets(sessionId);
     } catch (error) {
       this.sessionError(sessionId, error);
+    }
+  }
+
+  async generateProcessCredentials(sessionId: string): Promise<AwsProcessCredentials> {
+    const session = this.repository.getSessionById(sessionId);
+    if (session.type === SessionType.awsIamUser) {
+      const credentials = await this.generateCredentials(sessionId);
+      const token = credentials.sessionToken;
+      return new AwsProcessCredentials(
+        1,
+        token.aws_access_key_id,
+        token.aws_secret_access_key,
+        token.aws_session_token,
+        (session as any).sessionTokenExpiration
+      );
+    } else {
+      throw new Error("only AWS Iam User session are supported");
     }
   }
 

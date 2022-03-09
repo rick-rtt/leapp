@@ -1,81 +1,87 @@
-import { jest, describe, test, expect } from '@jest/globals'
-import CreateNamedProfile from './create'
+import { jest, describe, test, expect } from "@jest/globals";
+import CreateNamedProfile from "./create";
 
-describe('CreateNamedProfile', () => {
+describe("CreateNamedProfile", () => {
+  const getTestCommand = (leappCliService: any = null, argv: string[] = []): CreateNamedProfile => {
+    const command = new CreateNamedProfile(argv, {} as any);
+    (command as any).leappCliService = leappCliService;
+    return command;
+  };
 
-  test('getProfileName', async () => {
+  test("getProfileName", async () => {
     const leappCliService: any = {
       inquirer: {
         prompt: async (params: any) => {
-          expect(params).toMatchObject([{
-            name: 'namedProfileName',
-            message: `choose a name for the profile`,
-            type: 'input'
-          }])
-          expect(params[0].validate('profileName')).toBe('validationResult')
-          return {namedProfileName: 'profileName'}
+          expect(params).toMatchObject([
+            {
+              name: "namedProfileName",
+              message: `choose a name for the profile`,
+              type: "input",
+            },
+          ]);
+          expect(params[0].validate("profileName")).toBe("validationResult");
+          return { namedProfileName: "profileName" };
         },
       },
       namedProfilesService: {
-        validateNewProfileName: jest.fn(() => 'validationResult'),
+        validateNewProfileName: jest.fn(() => "validationResult"),
       },
-    }
+    };
 
-    const command = new CreateNamedProfile([], {} as any, leappCliService)
-    const profileName = await command.getProfileName()
-    expect(profileName).toBe('profileName')
-    expect(leappCliService.namedProfilesService.validateNewProfileName).toHaveBeenCalledWith('profileName')
-  })
+    const command = getTestCommand(leappCliService);
+    const profileName = await command.getProfileName();
+    expect(profileName).toBe("profileName");
+    expect(leappCliService.namedProfilesService.validateNewProfileName).toHaveBeenCalledWith("profileName");
+  });
 
-  test('createNamedProfile', async () => {
+  test("createNamedProfile", async () => {
     const leappCliService: any = {
       namedProfilesService: {
-        createNamedProfile: jest.fn()
-      }
-    }
+        createNamedProfile: jest.fn(),
+      },
+    };
 
-    const command = new CreateNamedProfile([], {} as any, leappCliService)
-    command.log = jest.fn()
-    command.createNamedProfile('profileName')
+    const command = getTestCommand(leappCliService);
+    command.log = jest.fn();
+    command.createNamedProfile("profileName");
 
-    expect(leappCliService.namedProfilesService.createNamedProfile).toHaveBeenCalledWith('profileName')
-    expect(command.log).toHaveBeenCalledWith('profile created')
-  })
+    expect(leappCliService.namedProfilesService.createNamedProfile).toHaveBeenCalledWith("profileName");
+    expect(command.log).toHaveBeenCalledWith("profile created");
+  });
 
-  test('run', async () => {
-    await runCommand(undefined, '')
-  })
-
-  test('run - createNamedProfile throws exception', async () => {
-    await runCommand(new Error('errorMessage'), 'errorMessage')
-  })
-
-  test('run - createNamedProfile throws undefined object', async () => {
-    await runCommand({hello: 'randomObj'}, 'Unknown error: [object Object]')
-  })
-
-  async function runCommand(errorToThrow: any, expectedErrorMessage: string) {
-    const profileName = 'profile1'
-    const command = new CreateNamedProfile([], {} as any)
-    command.getProfileName = jest.fn(async (): Promise<any> => profileName)
+  const runCommand = async (errorToThrow: any, expectedErrorMessage: string) => {
+    const profileName = "profile1";
+    const command = getTestCommand();
+    command.getProfileName = jest.fn(async (): Promise<any> => profileName);
     command.createNamedProfile = jest.fn(() => {
       if (errorToThrow) {
-        throw errorToThrow
+        throw errorToThrow;
       }
-    })
+    });
 
-    let occurredError
+    let occurredError;
     try {
-      await command.run()
+      await command.run();
     } catch (error) {
-      occurredError = error
+      occurredError = error;
     }
 
-    expect(command.getProfileName).toHaveBeenCalled()
-    expect(command.createNamedProfile).toHaveBeenCalledWith(profileName)
+    expect(command.getProfileName).toHaveBeenCalled();
+    expect(command.createNamedProfile).toHaveBeenCalledWith(profileName);
     if (errorToThrow) {
-      expect(occurredError).toEqual(new Error(expectedErrorMessage))
+      expect(occurredError).toEqual(new Error(expectedErrorMessage));
     }
-  }
-})
+  };
 
+  test("run", async () => {
+    await runCommand(undefined, "");
+  });
+
+  test("run - createNamedProfile throws exception", async () => {
+    await runCommand(new Error("errorMessage"), "errorMessage");
+  });
+
+  test("run - createNamedProfile throws undefined object", async () => {
+    await runCommand({ hello: "randomObj" }, "Unknown error: [object Object]");
+  });
+});

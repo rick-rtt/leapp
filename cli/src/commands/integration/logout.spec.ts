@@ -2,6 +2,12 @@ import { jest, describe, test, expect } from "@jest/globals";
 import LogoutIntegration from "./logout";
 
 describe("LogoutIntegration", () => {
+  const getTestCommand = (leappCliService: any = null, argv: string[] = []): LogoutIntegration => {
+    const command = new LogoutIntegration(argv, {} as any);
+    (command as any).leappCliService = leappCliService;
+    return command;
+  };
+
   test("selectIntegration", async () => {
     const integration = { alias: "integration1" };
     const leappCliService: any = {
@@ -23,7 +29,7 @@ describe("LogoutIntegration", () => {
       },
     };
 
-    const command = new LogoutIntegration([], {} as any, leappCliService);
+    const command = getTestCommand(leappCliService);
     const selectedIntegration = await command.selectIntegration();
 
     expect(leappCliService.awsSsoIntegrationService.getOnlineIntegrations).toHaveBeenCalled();
@@ -37,7 +43,7 @@ describe("LogoutIntegration", () => {
       },
     };
 
-    const command = new LogoutIntegration([], {} as any, leappCliService);
+    const command = getTestCommand(leappCliService);
     await expect(command.selectIntegration()).rejects.toThrow(new Error("no online integrations available"));
   });
 
@@ -48,7 +54,7 @@ describe("LogoutIntegration", () => {
       },
     };
 
-    const command = new LogoutIntegration([], {} as any, leappCliService);
+    const command = getTestCommand(leappCliService);
     command.log = jest.fn();
 
     const integration = { id: "id1" } as any;
@@ -58,22 +64,10 @@ describe("LogoutIntegration", () => {
     expect(command.log).toHaveBeenLastCalledWith("logout successful");
   });
 
-  test("run", async () => {
-    await runCommand(undefined, "");
-  });
-
-  test("run - logout throws exception", async () => {
-    await runCommand(new Error("errorMessage"), "errorMessage");
-  });
-
-  test("run - logout throws undefined object", async () => {
-    await runCommand({ hello: "randomObj" }, "Unknown error: [object Object]");
-  });
-
-  async function runCommand(errorToThrow: any, expectedErrorMessage: string) {
+  const runCommand = async (errorToThrow: any, expectedErrorMessage: string) => {
     const selectedIntegration = { id: "1" };
 
-    const command = new LogoutIntegration([], {} as any, null);
+    const command = getTestCommand();
     command.selectIntegration = jest.fn(async (): Promise<any> => selectedIntegration);
     command.logout = jest.fn(async () => {
       if (errorToThrow) {
@@ -93,5 +87,17 @@ describe("LogoutIntegration", () => {
     if (errorToThrow) {
       expect(occurredError).toEqual(new Error(expectedErrorMessage));
     }
-  }
+  };
+
+  test("run", async () => {
+    await runCommand(undefined, "");
+  });
+
+  test("run - logout throws exception", async () => {
+    await runCommand(new Error("errorMessage"), "errorMessage");
+  });
+
+  test("run - logout throws undefined object", async () => {
+    await runCommand({ hello: "randomObj" }, "Unknown error: [object Object]");
+  });
 });

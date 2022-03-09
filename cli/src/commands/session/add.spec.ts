@@ -5,6 +5,12 @@ import { IdpUrlAccessMethodField } from "@noovolari/leapp-core/models/idp-url-ac
 import { AccessMethodFieldType } from "@noovolari/leapp-core/models/access-method-field-type";
 
 describe("AddSession", () => {
+  const getTestCommand = (leappCliService: any = null, createIdpUrlCommand: any = null): AddSession => {
+    const command = new AddSession([], {} as any, createIdpUrlCommand);
+    (command as any).leappCliService = leappCliService;
+    return command;
+  };
+
   test("chooseCloudProvider", async () => {
     const leappCliService: any = {
       cloudProviderService: {
@@ -25,7 +31,7 @@ describe("AddSession", () => {
       },
     };
 
-    const command = new AddSession([], {} as any, leappCliService, null);
+    const command = getTestCommand(leappCliService);
     const selectedCloudProvider = await command.chooseCloudProvider();
     expect(selectedCloudProvider).toBe("aws");
   });
@@ -50,13 +56,13 @@ describe("AddSession", () => {
       },
     };
 
-    const command = new AddSession([], {} as any, leappCliService, null);
+    const command = getTestCommand(leappCliService);
     const accessMethod = await command.chooseAccessMethod(CloudProviderType.aws);
     expect(accessMethod).toStrictEqual("Method");
   });
 
   test("chooseAccessMethodParams", async () => {
-    const expectedMap: any = new Map<string, {}>([["field", "choiceValue"]]);
+    const expectedMap: any = new Map<string, any>([["field", "choiceValue"]]);
     const selectedAccessMethod: any = {
       accessMethodFields: [
         {
@@ -83,13 +89,13 @@ describe("AddSession", () => {
       },
     };
 
-    const command = new AddSession([], {} as any, leappCliService, null);
+    const command = getTestCommand(leappCliService);
     const map = await command.chooseAccessMethodParams(selectedAccessMethod);
     expect(map).toEqual(expectedMap);
   });
 
   test("chooseAccessMethodParams - IdpUrlAccessMethodField", async () => {
-    const expectedMap: any = new Map<string, {}>([["field", "choiceValue"]]);
+    const expectedMap: any = new Map<string, any>([["field", "choiceValue"]]);
     const idpUrlAccessMethodField = new IdpUrlAccessMethodField("field", "message", AccessMethodFieldType.list, []);
     idpUrlAccessMethodField.isIdpUrlToCreate = jest.fn(() => false);
     const selectedAccessMethod: any = {
@@ -101,13 +107,13 @@ describe("AddSession", () => {
       },
     };
 
-    const command = new AddSession([], {} as any, leappCliService, null);
+    const command = getTestCommand(leappCliService);
     const map = await command.chooseAccessMethodParams(selectedAccessMethod);
     expect(map).toEqual(expectedMap);
   });
 
   test("chooseAccessMethodParams - IdpUrlAccessMethodField - idpUrl creation", async () => {
-    const expectedMap: any = new Map<string, {}>([["field", "newIdpUrlId"]]);
+    const expectedMap: any = new Map<string, any>([["field", "newIdpUrlId"]]);
     const idpUrlAccessMethodField = new IdpUrlAccessMethodField("field", "message", AccessMethodFieldType.list, []);
     idpUrlAccessMethodField.isIdpUrlToCreate = jest.fn(() => true);
     const selectedAccessMethod: any = {
@@ -122,7 +128,7 @@ describe("AddSession", () => {
       promptAndCreateIdpUrl: async () => ({ id: "newIdpUrlId" }),
     };
 
-    const command = new AddSession([], {} as any, leappCliService, createIdpUrlCommand as any);
+    const command = getTestCommand(leappCliService, createIdpUrlCommand);
     const map = await command.chooseAccessMethodParams(selectedAccessMethod);
     expect(map).toEqual(expectedMap);
   });
@@ -147,9 +153,9 @@ describe("AddSession", () => {
       },
     };
 
-    const command = new AddSession([], {} as any, leappCliService, null);
+    const command = getTestCommand(leappCliService);
     const map = await command.chooseAccessMethodParams(selectedAccessMethod);
-    expect(map).toEqual(new Map<string, {}>([["field", "inputValue"]]));
+    expect(map).toEqual(new Map<string, any>([["field", "inputValue"]]));
   });
 
   test("createSession", async () => {
@@ -163,7 +169,7 @@ describe("AddSession", () => {
     };
 
     const leappCliService: any = { sessionFactory: { createSession: jest.fn() } };
-    const command = new AddSession([], {} as any, leappCliService, null);
+    const command = getTestCommand(leappCliService);
     command.log = jest.fn();
 
     await command.createSession(accessMethod, selectedParams);
@@ -171,23 +177,11 @@ describe("AddSession", () => {
     expect(command.log).toHaveBeenCalledWith("session added");
   });
 
-  test("run", async () => {
-    await runCommand(undefined, "");
-  });
-
-  test("run - createSession throws exception", async () => {
-    await runCommand(new Error("errorMessage"), "errorMessage");
-  });
-
-  test("run - createSession throws undefined object", async () => {
-    await runCommand({ hello: "randomObj" }, "Unknown error: [object Object]");
-  });
-
-  async function runCommand(errorToThrow: any, expectedErrorMessage: string) {
+  const runCommand = async (errorToThrow: any, expectedErrorMessage: string) => {
     const cloudProvider = "cloudProvider";
     const accessMethod = "accessMethod";
     const params = "params";
-    const command = new AddSession([], {} as any, null, null);
+    const command = getTestCommand();
     command.chooseCloudProvider = jest.fn(async (): Promise<any> => cloudProvider);
     command.chooseAccessMethod = jest.fn(async (): Promise<any> => accessMethod);
     command.chooseAccessMethodParams = jest.fn(async (): Promise<any> => params);
@@ -211,5 +205,17 @@ describe("AddSession", () => {
     if (errorToThrow) {
       expect(occurredError).toEqual(new Error(expectedErrorMessage));
     }
-  }
+  };
+
+  test("run", async () => {
+    await runCommand(undefined, "");
+  });
+
+  test("run - createSession throws exception", async () => {
+    await runCommand(new Error("errorMessage"), "errorMessage");
+  });
+
+  test("run - createSession throws undefined object", async () => {
+    await runCommand({ hello: "randomObj" }, "Unknown error: [object Object]");
+  });
 });

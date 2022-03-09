@@ -3,6 +3,12 @@ import ChangeDefaultRegion from "./set-default";
 import { SessionType } from "@noovolari/leapp-core/models/session-type";
 
 describe("ChangeDefaultRegion", () => {
+  const getTestCommand = (leappCliService: any = null, argv: string[] = []): ChangeDefaultRegion => {
+    const command = new ChangeDefaultRegion(argv, {} as any);
+    (command as any).leappCliService = leappCliService;
+    return command;
+  };
+
   test("selectDefaultRegion", async () => {
     const leappCliService: any = {
       regionsService: {
@@ -26,7 +32,7 @@ describe("ChangeDefaultRegion", () => {
       },
     };
 
-    const command = new ChangeDefaultRegion([], {} as any, leappCliService);
+    const command = getTestCommand(leappCliService);
     const selectedRegion = await command.selectDefaultRegion();
     expect(selectedRegion).toBe("selectedRegion");
 
@@ -41,7 +47,7 @@ describe("ChangeDefaultRegion", () => {
       },
     };
 
-    const command = new ChangeDefaultRegion([], {} as any, leappCliService);
+    const command = getTestCommand(leappCliService);
     command.log = jest.fn();
 
     await command.changeDefaultRegion(newRegion);
@@ -49,21 +55,9 @@ describe("ChangeDefaultRegion", () => {
     expect(command.log).toHaveBeenCalledWith("default region changed");
   });
 
-  test("run", async () => {
-    await runCommand(undefined, "");
-  });
-
-  test("run - changeDefaultRegion throws exception", async () => {
-    await runCommand(new Error("errorMessage"), "errorMessage");
-  });
-
-  test("run - changeDefaultRegion throws undefined object", async () => {
-    await runCommand({ hello: "randomObj" }, "Unknown error: [object Object]");
-  });
-
-  async function runCommand(errorToThrow: any, expectedErrorMessage: string) {
+  const runCommand = async (errorToThrow: any, expectedErrorMessage: string) => {
     const region = "region";
-    const command = new ChangeDefaultRegion([], {} as any);
+    const command = getTestCommand();
 
     command.selectDefaultRegion = jest.fn(async (): Promise<any> => region);
     command.changeDefaultRegion = jest.fn(async (): Promise<void> => {
@@ -84,5 +78,17 @@ describe("ChangeDefaultRegion", () => {
     if (errorToThrow) {
       expect(occurredError).toEqual(new Error(expectedErrorMessage));
     }
-  }
+  };
+
+  test("run", async () => {
+    await runCommand(undefined, "");
+  });
+
+  test("run - changeDefaultRegion throws exception", async () => {
+    await runCommand(new Error("errorMessage"), "errorMessage");
+  });
+
+  test("run - changeDefaultRegion throws undefined object", async () => {
+    await runCommand({ hello: "randomObj" }, "Unknown error: [object Object]");
+  });
 });

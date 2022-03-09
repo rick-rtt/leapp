@@ -1,4 +1,4 @@
-import {jest, describe, test, expect} from '@jest/globals'
+import { jest, describe, test, expect } from "@jest/globals";
 import { AccessMethod } from "../models/access-method";
 import { CloudProviderType } from "../models/cloud-provider-type";
 import { SessionType } from "../models/session-type";

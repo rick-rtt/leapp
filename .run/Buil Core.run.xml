@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Buil Core" type="js.build_tools.npm">
+  <configuration default="false" name="Build Core" type="js.build_tools.npm">
     <package-json value="$PROJECT_DIR$/core/package.json" />
     <command value="run" />
     <scripts>

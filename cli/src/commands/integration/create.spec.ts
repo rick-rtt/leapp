@@ -5,6 +5,12 @@ import { constants } from "@noovolari/leapp-core/models/constants";
 import { SessionType } from "@noovolari/leapp-core/models/session-type";
 
 describe("CreateSsoIntegration", () => {
+  const getTestCommand = (leappCliService: any = null, argv: string[] = []): CreateSsoIntegration => {
+    const command = new CreateSsoIntegration(argv, {} as any);
+    (command as any).leappCliService = leappCliService;
+    return command;
+  };
+
   test("askConfigurationParameters", async () => {
     const leappCliService = {
       inquirer: {
@@ -27,7 +33,7 @@ describe("CreateSsoIntegration", () => {
         ]),
       },
     } as any;
-    const command = new CreateSsoIntegration(null, null, leappCliService);
+    const command = getTestCommand(leappCliService);
     const actualCreationParams = await command.askConfigurationParameters();
 
     expect(leappCliService.inquirer.prompt).toHaveBeenNthCalledWith(1, [
@@ -63,26 +69,19 @@ describe("CreateSsoIntegration", () => {
     ]);
 
     expect(leappCliService.inquirer.prompt).toHaveBeenCalledTimes(3);
-    expect(actualCreationParams).toEqual({ browserOpening: constants.inBrowser, alias: "alias", portalUrl: "portalUrl", region: "region" });
+    expect(actualCreationParams).toEqual({
+      browserOpening: constants.inBrowser,
+      alias: "alias",
+      portalUrl: "portalUrl",
+      region: "region",
+    });
     expect(leappCliService.cloudProviderService.availableRegions).toHaveBeenCalledWith(SessionType.aws);
   });
 
-  test("run", async () => {
-    await runCommand(undefined, "");
-  });
-
-  test("run - createIntegration throws exception", async () => {
-    await runCommand(new Error("errorMessage"), "errorMessage");
-  });
-
-  test("run - createIntegration throws undefined object", async () => {
-    await runCommand({ hello: "randomObj" }, "Unknown error: [object Object]");
-  });
-
-  async function runCommand(errorToThrow: any, expectedErrorMessage: string) {
+  const runCommand = async (errorToThrow: any, expectedErrorMessage: string) => {
     const configurationParams = { param1: "param1" };
 
-    const command = new CreateSsoIntegration([], {} as any, null);
+    const command = getTestCommand();
     command.askConfigurationParameters = jest.fn(async (): Promise<any> => configurationParams);
     command.createIntegration = jest.fn(async () => {
       if (errorToThrow) {
@@ -102,7 +101,19 @@ describe("CreateSsoIntegration", () => {
     if (errorToThrow) {
       expect(occurredError).toEqual(new Error(expectedErrorMessage));
     }
-  }
+  };
+
+  test("run", async () => {
+    await runCommand(undefined, "");
+  });
+
+  test("run - createIntegration throws exception", async () => {
+    await runCommand(new Error("errorMessage"), "errorMessage");
+  });
+
+  test("run - createIntegration throws undefined object", async () => {
+    await runCommand({ hello: "randomObj" }, "Unknown error: [object Object]");
+  });
 
   test("createIntegration", async () => {
     const leappCliService = {
@@ -111,7 +122,7 @@ describe("CreateSsoIntegration", () => {
       },
     } as any;
 
-    const command = new CreateSsoIntegration([], {} as any, leappCliService);
+    const command = getTestCommand(leappCliService);
     command.log = jest.fn();
     const creationParam: IntegrationCreationParams = {
       alias: "alias",

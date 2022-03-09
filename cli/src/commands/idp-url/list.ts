@@ -22,7 +22,7 @@ export default class ListIdpUrls extends LeappCommand {
     }
   }
 
-  private async showIdpUrls(): Promise<void> {
+  async showIdpUrls(): Promise<void> {
     const { flags } = await this.parse(ListIdpUrls);
     const data = this.leappCliService.idpUrlsService.getIdpUrls().map((idpUrl: any) => ({
       url: idpUrl.url,

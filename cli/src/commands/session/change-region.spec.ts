@@ -2,6 +2,12 @@ import { jest, describe, test, expect } from "@jest/globals";
 import ChangeSessionRegion from "./change-region";
 
 describe("ChangeRegion", () => {
+  const getTestCommand = (leappCliService: any = null): ChangeSessionRegion => {
+    const command = new ChangeSessionRegion([], {} as any);
+    (command as any).leappCliService = leappCliService;
+    return command;
+  };
+
   test("selectSession", async () => {
     const session1 = { sessionName: "sessionName" };
     const leappCliService: any = {
@@ -23,7 +29,7 @@ describe("ChangeRegion", () => {
       },
     };
 
-    const command = new ChangeSessionRegion([], {} as any, leappCliService);
+    const command = getTestCommand(leappCliService);
     const selectedSession = await command.selectSession();
     expect(selectedSession).toBe("selectedSession");
   });
@@ -49,7 +55,7 @@ describe("ChangeRegion", () => {
       },
     };
 
-    const command = new ChangeSessionRegion([], {} as any, leappCliService);
+    const command = getTestCommand(leappCliService);
 
     const session = { type: "type", region: "regionName1" } as any;
     const selectedRegion = await command.selectRegion(session);
@@ -68,7 +74,7 @@ describe("ChangeRegion", () => {
       },
     };
 
-    const command = new ChangeSessionRegion([], {} as any, leappCliService);
+    const command = getTestCommand(leappCliService);
     command.log = jest.fn();
 
     await command.changeSessionRegion(session, newRegion);
@@ -76,22 +82,10 @@ describe("ChangeRegion", () => {
     expect(command.log).toHaveBeenCalledWith("session region changed");
   });
 
-  test("run", async () => {
-    await runCommand(undefined, "");
-  });
-
-  test("run - changeSessionRegion throws exception", async () => {
-    await runCommand(new Error("errorMessage"), "errorMessage");
-  });
-
-  test("run - changeSessionRegion throws undefined object", async () => {
-    await runCommand({ hello: "randomObj" }, "Unknown error: [object Object]");
-  });
-
-  async function runCommand(errorToThrow: any, expectedErrorMessage: string) {
+  const runCommand = async (errorToThrow: any, expectedErrorMessage: string) => {
     const session = "session";
     const region = "region";
-    const command = new ChangeSessionRegion([], {} as any);
+    const command = getTestCommand();
     command.selectSession = jest.fn(async (): Promise<any> => session);
     command.selectRegion = jest.fn(async (): Promise<any> => region);
     command.changeSessionRegion = jest.fn(async (): Promise<void> => {
@@ -113,5 +107,17 @@ describe("ChangeRegion", () => {
     if (errorToThrow) {
       expect(occurredError).toEqual(new Error(expectedErrorMessage));
     }
-  }
+  };
+
+  test("run", async () => {
+    await runCommand(undefined, "");
+  });
+
+  test("run - changeSessionRegion throws exception", async () => {
+    await runCommand(new Error("errorMessage"), "errorMessage");
+  });
+
+  test("run - changeSessionRegion throws undefined object", async () => {
+    await runCommand({ hello: "randomObj" }, "Unknown error: [object Object]");
+  });
 });

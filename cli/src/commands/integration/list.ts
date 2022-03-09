@@ -22,7 +22,7 @@ export default class ListIntegrations extends LeappCommand {
     }
   }
 
-  private async showIntegrations(): Promise<void> {
+  async showIntegrations(): Promise<void> {
     const { flags } = await this.parse(ListIntegrations);
     const data = this.leappCliService.awsSsoIntegrationService.getIntegrations().map((integration: any) => {
       const isOnline = this.leappCliService.awsSsoIntegrationService.isOnline(integration);

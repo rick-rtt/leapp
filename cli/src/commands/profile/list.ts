@@ -22,7 +22,7 @@ export default class ListProfiles extends LeappCommand {
     }
   }
 
-  private async showProfiles(): Promise<void> {
+  async showProfiles(): Promise<void> {
     const { flags } = await this.parse(ListProfiles);
     const data = this.leappCliService.namedProfilesService.getNamedProfiles().map((profile: any) => ({
       name: profile.name,
