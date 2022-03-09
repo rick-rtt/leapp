@@ -101,20 +101,20 @@
     ],
     "topicSeparator": " ",
     "topics": {
-      "session": {
-        "description": "Sessions management"
+      "idp-url": {
+        "description": "Identity providers URL management"
+      },
+      "integration": {
+        "description": "AWS integrations management"
       },
       "profile": {
         "description": "AWS named profiles management"
       },
-      "idp-url": {
-        "description": "Identity providers URL management"
-      },
       "region": {
         "description": "AWS regions management"
       },
-      "integration": {
-        "description": "AWS integrations management"
+      "session": {
+        "description": "Sessions management"
       }
     },
     "macos": {
@@ -132,9 +132,7 @@
     "pack-win": "oclif pack:win",
     "postpack": "gushio gushio/target-post-pack.js",
     "version": "oclif readme && git add README.md",
-    "list-session": "./bin/dev session list",
-    "integration-sync": "./bin/dev integration sync",
-    "idp-url-edit": "bin\\dev.cmd idp-url edit"
+    "session-start": "./bin/dev session start"
   },
   "types": "dist/index.d.ts"
 }
