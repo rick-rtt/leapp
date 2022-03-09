@@ -54,15 +54,15 @@ describe("AwsSessionService", () => {
     expect(generateProcessCredentials.SessionToken).toBe("aws_session_token");
     expect(generateProcessCredentials.Expiration).toBe("aws_session_token_expiration");
   });
-});
 
-test("generateProcessCredentials - error", async () => {
-  const repository = {
-    getSessionById: jest.fn(() => ({ type: SessionType.awsIamRoleChained })),
-  };
+  test("generateProcessCredentials - error", async () => {
+    const repository = {
+      getSessionById: jest.fn(() => ({ type: SessionType.awsIamRoleChained })),
+    };
 
-  const awsSessionService = new (AwsSessionService as any)();
-  awsSessionService.repository = repository;
+    const awsSessionService = new (AwsSessionService as any)();
+    awsSessionService.repository = repository;
 
-  await expect(awsSessionService.generateProcessCredentials("sessionId")).rejects.toThrow(new Error("only AWS Iam User session are supported"));
+    await expect(awsSessionService.generateProcessCredentials("sessionId")).rejects.toThrow(new Error("only AWS Iam User session are supported"));
+  });
 });
