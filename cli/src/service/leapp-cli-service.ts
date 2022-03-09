@@ -284,7 +284,7 @@ export class LeappCliService {
 
   get rotationService(): RotationService {
     if (!this.rotationServiceInstance) {
-      this.rotationServiceInstance = new RotationService(this.sessionFactory, this.repository)
+      this.rotationServiceInstance = new RotationService(this.sessionFactory)
     }
 
     return this.rotationServiceInstance
