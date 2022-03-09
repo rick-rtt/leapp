@@ -37,7 +37,7 @@ export default class StartSession extends LeappCommand {
         name: "selectedSession",
         message: "select a session",
         type: "list",
-        choices: availableSessions.map((session) => ({ name: session.sessionName, value: session })),
+        choices: availableSessions.map((session: any) => ({ name: session.sessionName, value: session })),
       },
     ]);
     return answer.selectedSession;
