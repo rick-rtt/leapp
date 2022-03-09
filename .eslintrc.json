@@ -34,7 +34,6 @@
         "prettier/prettier": "error",
         "brace-style": ["error", "1tbs"],
         "id-blacklist": ["error"],
-        "no-trailing-spaces": "error",
         "no-underscore-dangle": "off",
         "no-case-declarations": "off",
         "no-dupe-else-if": "warn",

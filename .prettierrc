@@ -1,3 +1,4 @@
 {
-  "arrow-parens": ["error", "always"]
+  "arrow-parens": ["error", "always"],
+  "trailing-spaces": "off"
 }
