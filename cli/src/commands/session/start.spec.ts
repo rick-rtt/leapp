@@ -12,6 +12,7 @@ describe("StartSession", () => {
   test("startSession", async () => {
     const sessionService: any = {
       start: jest.fn(async () => {}),
+      sessionDeactivated: jest.fn(async () => {}),
     };
     const sessionFactory: any = {
       getSessionService: jest.fn(() => sessionService),
@@ -24,11 +25,19 @@ describe("StartSession", () => {
     const session: any = { sessionId: "sessionId", type: "sessionType" };
     const command = getTestCommand(leappCliService);
     command.log = jest.fn();
+    const processOn = jest.spyOn(process, "on").mockImplementation((event: any, callback: any): any => {
+      expect(event).toBe("SIGINT");
+      callback();
+    });
+    const processExit = jest.spyOn(process, "exit").mockImplementation((): any => {});
     await command.startSession(session);
 
     expect(sessionFactory.getSessionService).toHaveBeenCalledWith("sessionType");
     expect(sessionService.start).toHaveBeenCalledWith("sessionId");
     expect(command.log).toHaveBeenCalledWith("session started");
+    expect(processOn).toHaveBeenCalled();
+    expect(sessionService.sessionDeactivated).toHaveBeenCalledWith("sessionId");
+    expect(processExit).toHaveBeenCalledWith(0);
   });
 
   test("selectSession", async () => {

@@ -33,7 +33,7 @@ class PageStub {
     this.gotoPageCalled = true;
     expect(url).toEqual(this.expectedIdpUrl);
     await this.callback.get("request")(this.requestStub);
-    return Promise.resolve();
+    return Promise.reject(new Error("errors in goto must be handled"));
   }
 }
 

@@ -1,60 +1,63 @@
-import { IAwsAuthenticationService } from "@noovolari/leapp-core/interfaces/i-aws-authentication.service";
 import puppeteer from "puppeteer";
+import { IAwsAuthenticationService } from "@noovolari/leapp-core/interfaces/i-aws-authentication.service";
 import { LeappModalClosedError } from "@noovolari/leapp-core/errors/leapp-modal-closed-error";
 
 export class CliAwsAuthenticationService implements IAwsAuthenticationService {
   private browser: puppeteer.Browser;
 
   async needAuthentication(idpUrl: string): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      this.getNavigationPage(true)
-        .then((page) => {
-          page.on("request", async (request) => {
-            const requestUrl = request.url().toString();
-            if (request.isInterceptResolutionHandled()) {
-              reject("request unexpectedly already handled");
-              return;
-            }
+    // eslint-disable-next-line
+    return new Promise(async (resolve, reject) => {
+      const page = await this.getNavigationPage(true);
 
-            if (this.isRequestToIntercept(requestUrl)) {
-              resolve(requestUrl.indexOf("https://signin.aws.amazon.com/saml") === -1);
-              return;
-            }
+      page.on("request", async (request) => {
+        const requestUrl = request.url().toString();
+        if (request.isInterceptResolutionHandled()) {
+          reject("request unexpectedly already handled");
+          return;
+        }
 
-            await request.continue();
-          });
-          page.goto(idpUrl);
-        })
-        .catch((error) => {
-          reject(error);
-        });
+        if (this.isRequestToIntercept(requestUrl)) {
+          resolve(requestUrl.indexOf("https://signin.aws.amazon.com/saml") === -1);
+          return;
+        }
+
+        await request.continue();
+      });
+
+      try {
+        await page.goto(idpUrl);
+      } catch (e) {}
     });
   }
 
   async awsSignIn(idpUrl: string, needToAuthenticate: boolean): Promise<any> {
-    return new Promise((resolve, reject) => {
-      this.getNavigationPage(!needToAuthenticate).then((page) => {
-        page.on("request", async (request) => {
-          const requestUrl = request.url().toString();
-          if (request.isInterceptResolutionHandled()) {
-            reject("request unexpectedly already handled");
-            return;
-          }
+    // eslint-disable-next-line
+    return new Promise(async (resolve, reject) => {
+      const page = await this.getNavigationPage(!needToAuthenticate);
 
-          if (requestUrl.indexOf("https://signin.aws.amazon.com/saml") !== -1) {
-            resolve({ uploadData: [{ bytes: { toString: () => request.postData() } }] });
-            return;
-          }
+      page.on("request", async (request) => {
+        const requestUrl = request.url().toString();
+        if (request.isInterceptResolutionHandled()) {
+          reject("request unexpectedly already handled");
+          return;
+        }
 
-          await request.continue();
-        });
+        if (requestUrl.indexOf("https://signin.aws.amazon.com/saml") !== -1) {
+          resolve({ uploadData: [{ bytes: { toString: () => request.postData() } }] });
+          return;
+        }
 
-        page.on("close", () => {
-          reject(new LeappModalClosedError(this, "request window closed by user"));
-        });
-
-        page.goto(idpUrl);
+        await request.continue();
       });
+
+      page.on("close", () => {
+        reject(new LeappModalClosedError(this, "request window closed by user"));
+      });
+
+      try {
+        await page.goto(idpUrl);
+      } catch (e) {}
     });
   }
 
@@ -64,6 +67,7 @@ export class CliAwsAuthenticationService implements IAwsAuthenticationService {
         page.removeAllListeners();
         await page.close();
       }
+
       await this.browser.close();
     }
   }
