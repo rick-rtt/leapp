@@ -4,7 +4,6 @@ import { INativeService } from "../../../interfaces/i-native-service";
 import { ISessionNotifier } from "../../../interfaces/i-session-notifier";
 import { AwsSsoRoleSession } from "../../../models/aws-sso-role-session";
 import { CredentialsInfo } from "../../../models/credentials-info";
-import { Session } from "../../../models/session";
 import { AwsCoreService } from "../../aws-core-service";
 import { FileService } from "../../file-service";
 import { KeychainService } from "../../keychain-service";
@@ -14,6 +13,7 @@ import { AwsSessionService } from "./aws-session-service";
 import { AwsSsoOidcService } from "../../aws-sso-oidc.service";
 import { AwsSsoRoleSessionRequest } from "./aws-sso-role-session-request";
 import { IAwsIntegrationDelegate } from "../../../interfaces/i-aws-integration-delegate";
+import { SessionType } from "../../../models/session-type";
 
 export interface GenerateSSOTokenResponse {
   accessToken: string;
@@ -151,8 +151,8 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
     return AwsSsoRoleService.sessionTokenFromGetSessionTokenResponse(credentials);
   }
 
-  async getAccountNumberFromCallerIdentity(session: Session): Promise<string> {
-    if (session instanceof AwsSsoRoleSession) {
+  async getAccountNumberFromCallerIdentity(session: AwsSsoRoleSession): Promise<string> {
+    if (session.type === SessionType.awsSsoRole) {
       return `${session.roleArn.split("/")[0].substring(13, 25)}`;
     } else {
       throw new Error("AWS SSO Role Session required");

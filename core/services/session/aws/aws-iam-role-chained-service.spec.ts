@@ -1,11 +1,14 @@
 import { describe, test, expect } from "@jest/globals";
 import { AwsIamRoleChainedSession } from "../../../models/aws-iam-role-chained-session";
-import { Session } from "../../../models/session";
 import { AwsIamRoleChainedService } from "./aws-iam-role-chained-service";
+import { SessionType } from "../../../models/session-type";
 
 describe("AwsIamRoleChainedService", () => {
   test("getAccountNumberFromCallerIdentity", async () => {
-    const session = new AwsIamRoleChainedSession(null, null, "abcdefghijklmnopqrstuvwxyz/12345", null, null, null);
+    const session = {
+      type: SessionType.awsIamRoleChained,
+      roleArn: "abcdefghijklmnopqrstuvwxyz/12345",
+    } as any;
     const awsIamRoleChainedService = new AwsIamRoleChainedService(null, null, null, null, null, null);
     const accountNumber = await awsIamRoleChainedService.getAccountNumberFromCallerIdentity(session);
 
@@ -16,7 +19,7 @@ describe("AwsIamRoleChainedService", () => {
     const session = {};
     const awsIamRoleChainedService = new AwsIamRoleChainedService(null, null, null, null, null, null);
 
-    await expect(() => awsIamRoleChainedService.getAccountNumberFromCallerIdentity(session as Session)).rejects.toThrow(
+    await expect(() => awsIamRoleChainedService.getAccountNumberFromCallerIdentity(session as AwsIamRoleChainedSession)).rejects.toThrow(
       new Error("AWS IAM Role Chained Session required")
     );
   });

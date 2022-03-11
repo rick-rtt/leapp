@@ -7,13 +7,14 @@ import { LeappCommand } from "../../leappCommand";
 import { Config } from "@oclif/core/lib/config/config";
 import { Session } from "@noovolari/leapp-core/models/session";
 import { constants } from "@noovolari/leapp-core/models/constants";
+import { AzureService } from "@noovolari/leapp-core/services/session/azure/azure-service";
 
 const awsProvider = "aws";
 const azureProvider = "azure";
 
 export default class CurrentSession extends LeappCommand {
   static description = "Provides info about the current active session for a selected profile (if no profile is provided it uses default profile)";
-  static examples = [`$leapp session current`];
+  static examples = ['$leapp session current --format "alias accountNumber" --inline --provider aws'];
   static flags = {
     inline: Flags.boolean({
       char: "i",
@@ -95,17 +96,18 @@ export default class CurrentSession extends LeappCommand {
 
   async getSessionData(session: Session): Promise<any> {
     const sessionService = this.leappCliService.sessionFactory.getSessionService(session.type);
-
     if (sessionService instanceof AwsSessionService) {
       return {
         alias: session.sessionName,
         accountNumber: await sessionService.getAccountNumberFromCallerIdentity(session),
         roleArn: session.type === SessionType.awsIamUser ? "none" : (session as any).roleArn,
       };
-    } else if (session instanceof AzureSession) {
+    } else if (sessionService instanceof AzureService) {
+      const azureSession = session as AzureSession;
       return {
-        tenantId: session.tenantId,
-        subscriptionId: session.subscriptionId,
+        alias: azureSession.sessionName,
+        tenantId: azureSession.tenantId,
+        subscriptionId: azureSession.subscriptionId,
       };
     } else {
       throw new Error(`session type not supported: ${session.type}`);

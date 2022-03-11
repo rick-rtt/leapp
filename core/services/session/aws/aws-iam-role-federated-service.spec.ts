@@ -1,11 +1,14 @@
 import { describe, test, expect } from "@jest/globals";
 import { AwsIamRoleFederatedSession } from "../../../models/aws-iam-role-federated-session";
-import { Session } from "../../../models/session";
 import { AwsIamRoleFederatedService } from "./aws-iam-role-federated-service";
+import { SessionType } from "../../../models/session-type";
 
 describe("AwsIamRoleFederatedService", () => {
   test("getAccountNumberFromCallerIdentity", async () => {
-    const session = new AwsIamRoleFederatedSession(null, null, null, null, "abcdefghijklmnopqrstuvwxyz/12345", null);
+    const session = {
+      type: SessionType.awsIamRoleFederated,
+      roleArn: "abcdefghijklmnopqrstuvwxyz/12345",
+    } as any;
     const awsIamRoleFederatedService = new AwsIamRoleFederatedService(null, null, null, null, null, null);
     const accountNumber = await awsIamRoleFederatedService.getAccountNumberFromCallerIdentity(session);
 
@@ -16,7 +19,7 @@ describe("AwsIamRoleFederatedService", () => {
     const session = {};
     const awsIamRoleFederatedService = new AwsIamRoleFederatedService(null, null, null, null, null, null);
 
-    await expect(() => awsIamRoleFederatedService.getAccountNumberFromCallerIdentity(session as Session)).rejects.toThrow(
+    await expect(() => awsIamRoleFederatedService.getAccountNumberFromCallerIdentity(session as AwsIamRoleFederatedSession)).rejects.toThrow(
       new Error("AWS IAM Role Federated Session required")
     );
   });

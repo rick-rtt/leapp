@@ -13,6 +13,7 @@ import { AwsIamRoleChainedSessionRequest } from "./aws-iam-role-chained-session-
 import { AwsIamUserService } from "./aws-iam-user-service";
 import { AwsParentSessionFactory } from "./aws-parent-session.factory";
 import { AwsSessionService } from "./aws-session-service";
+import { SessionType } from "../../../models/session-type";
 
 export class AwsIamRoleChainedService extends AwsSessionService {
   constructor(
@@ -119,8 +120,8 @@ export class AwsIamRoleChainedService extends AwsSessionService {
 
   removeSecrets(_: string): void {}
 
-  async getAccountNumberFromCallerIdentity(session: Session): Promise<string> {
-    if (session instanceof AwsIamRoleChainedSession) {
+  async getAccountNumberFromCallerIdentity(session: AwsIamRoleChainedSession): Promise<string> {
+    if (session.type === SessionType.awsIamRoleChained) {
       return `${session.roleArn.split("/")[0].substring(13, 25)}`;
     } else {
       throw new Error("AWS IAM Role Chained Session required");

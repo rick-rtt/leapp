@@ -2,6 +2,7 @@ import { describe, expect, jest, test } from "@jest/globals";
 import { SessionType } from "@noovolari/leapp-core/models/session-type";
 import { AwsIamUserService } from "@noovolari/leapp-core/services/session/aws/aws-iam-user-service";
 import CurrentSession from "./current";
+import { AzureService } from "@noovolari/leapp-core/services/session/azure/azure-service";
 
 const awsProvider = "aws";
 const azureProvider = "azure";
@@ -210,7 +211,7 @@ describe("CurrentSession", () => {
     expect(fieldRequiredArray).toEqual(["field1", "field2"]);
   });
 
-  test("getSessionData", async () => {
+  test("getSessionData - aws iam user", async () => {
     const sessionService = new AwsIamUserService(null, null, null, null, null, null);
     sessionService.getAccountNumberFromCallerIdentity = jest.fn(async () => "000");
 
@@ -234,6 +235,57 @@ describe("CurrentSession", () => {
     });
     expect(leappCliService.sessionFactory.getSessionService).toHaveBeenCalledWith(session.type);
     expect(sessionService.getAccountNumberFromCallerIdentity).toHaveBeenCalledWith(session);
+  });
+
+  test("getSessionData - aws role federated", async () => {
+    const sessionService = new AwsIamUserService(null, null, null, null, null, null);
+    sessionService.getAccountNumberFromCallerIdentity = jest.fn(async () => "000");
+
+    const leappCliService: any = {
+      sessionFactory: {
+        getSessionService: jest.fn(() => sessionService),
+      },
+    };
+    const session = {
+      sessionName: "sessionName",
+      type: SessionType.awsIamRoleFederated,
+      roleArn: "role:arn",
+    };
+    const command = getTestCommand(leappCliService);
+
+    const sessionData = await command.getSessionData(session as any);
+
+    expect(sessionData).toEqual({
+      alias: session.sessionName,
+      accountNumber: "000",
+      roleArn: "role:arn",
+    });
+    expect(leappCliService.sessionFactory.getSessionService).toHaveBeenCalledWith(session.type);
+    expect(sessionService.getAccountNumberFromCallerIdentity).toHaveBeenCalledWith(session);
+  });
+
+  test("getSessionData - azure", async () => {
+    const leappCliService: any = {
+      sessionFactory: {
+        getSessionService: jest.fn(() => new AzureService(null, null, null, null, null)),
+      },
+    };
+    const session = {
+      sessionName: "sessionName",
+      tenantId: "tenantId",
+      subscriptionId: "subscriptionId",
+      type: SessionType.azure,
+    };
+    const command = getTestCommand(leappCliService);
+
+    const sessionData = await command.getSessionData(session as any);
+
+    expect(sessionData).toEqual({
+      alias: "sessionName",
+      tenantId: "tenantId",
+      subscriptionId: "subscriptionId",
+    });
+    expect(leappCliService.sessionFactory.getSessionService).toHaveBeenCalledWith(session.type);
   });
 
   test("getSessionData - error: session type not supported", async () => {

@@ -1,11 +1,14 @@
-import { describe, test, expect } from "@jest/globals";
+import { jest, describe, test, expect } from "@jest/globals";
 import { AwsSsoRoleSession } from "../../../models/aws-sso-role-session";
-import { Session } from "../../../models/session";
 import { AwsSsoRoleService } from "./aws-sso-role-service";
+import { SessionType } from "../../../models/session-type";
 
 describe("AwsSsoRoleService", () => {
   test("getAccountNumberFromCallerIdentity", async () => {
-    const session = new AwsSsoRoleSession(null, null, "abcdefghijklmnopqrstuvwxyz/12345", null, null, null);
+    const session = {
+      type: SessionType.awsSsoRole,
+      roleArn: "abcdefghijklmnopqrstuvwxyz/12345",
+    } as any;
     const awsSsoRoleService = new AwsSsoRoleService(null, null, null, null, null, null, { appendListener: jest.fn(() => {}) } as any);
     const accountNumber = await awsSsoRoleService.getAccountNumberFromCallerIdentity(session);
 
@@ -16,7 +19,7 @@ describe("AwsSsoRoleService", () => {
     const session = {};
     const awsSsoRoleService = new AwsSsoRoleService(null, null, null, null, null, null, { appendListener: jest.fn(() => {}) } as any);
 
-    await expect(() => awsSsoRoleService.getAccountNumberFromCallerIdentity(session as Session)).rejects.toThrow(
+    await expect(() => awsSsoRoleService.getAccountNumberFromCallerIdentity(session as AwsSsoRoleSession)).rejects.toThrow(
       new Error("AWS SSO Role Session required")
     );
   });

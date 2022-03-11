@@ -404,7 +404,7 @@ DESCRIPTION
   profile)
 
 EXAMPLES
-  $leapp session current
+  $leapp session current --format "alias accountNumber" --inline --provider aws
 ```
 
 ## `leapp session delete`

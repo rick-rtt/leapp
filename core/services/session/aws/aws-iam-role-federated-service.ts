@@ -6,12 +6,12 @@ import { IAwsAuthenticationService } from "../../../interfaces/i-aws-authenticat
 import { ISessionNotifier } from "../../../interfaces/i-session-notifier";
 import { AwsIamRoleFederatedSession } from "../../../models/aws-iam-role-federated-session";
 import { CredentialsInfo } from "../../../models/credentials-info";
-import { Session } from "../../../models/session";
 import { AwsCoreService } from "../../aws-core-service";
 import { FileService } from "../../file-service";
 import { Repository } from "../../repository";
 import { AwsIamRoleFederatedSessionRequest } from "./aws-iam-role-federated-session-request";
 import { AwsSessionService } from "./aws-session-service";
+import { SessionType } from "../../../models/session-type";
 
 export interface ResponseHookDetails {
   uploadData: { bytes: any[] }[];
@@ -150,8 +150,8 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
     return AwsIamRoleFederatedService.sessionTokenFromGetSessionTokenResponse(assumeRoleWithSamlResponse);
   }
 
-  async getAccountNumberFromCallerIdentity(session: Session): Promise<string> {
-    if (session instanceof AwsIamRoleFederatedSession) {
+  async getAccountNumberFromCallerIdentity(session: AwsIamRoleFederatedSession): Promise<string> {
+    if (session.type === SessionType.awsIamRoleFederated) {
       return `${session.roleArn.split("/")[0].substring(13, 25)}`;
     } else {
       throw new Error("AWS IAM Role Federated Session required");
