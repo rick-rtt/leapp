@@ -1,6 +1,7 @@
 import { async, ComponentFixture, TestBed } from "@angular/core/testing";
 
 import { SessionsComponent } from "./sessions.component";
+import { mustInjected } from "../../../base-injectables";
 
 describe("SessionComponent", () => {
   let component: SessionsComponent;
@@ -9,6 +10,8 @@ describe("SessionComponent", () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [SessionsComponent],
+      providers: [].concat(mustInjected()),
+      imports: [],
     }).compileComponents();
   }));
 

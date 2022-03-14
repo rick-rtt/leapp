@@ -1,6 +1,8 @@
 import { ComponentFixture, TestBed } from "@angular/core/testing";
 
 import { LeappSelectComponent } from "./leapp-select.component";
+import { mustInjected } from "../../../base-injectables";
+import { NgSelectComponent, NgSelectModule } from "@ng-select/ng-select";
 
 describe("LeappSelectComponent", () => {
   let component: LeappSelectComponent;
@@ -8,7 +10,9 @@ describe("LeappSelectComponent", () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [LeappSelectComponent],
+      declarations: [LeappSelectComponent, NgSelectComponent],
+      providers: [].concat(mustInjected()),
+      imports: [NgSelectModule],
     }).compileComponents();
   });
 

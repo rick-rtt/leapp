@@ -1,14 +1,27 @@
 import { ComponentFixture, TestBed } from "@angular/core/testing";
 
 import { SideBarComponent } from "./side-bar.component";
+import { mustInjected } from "../../../base-injectables";
+import { LeappCoreService } from "../../services/leapp-core.service";
 
 describe("SideBarComponent", () => {
   let component: SideBarComponent;
   let fixture: ComponentFixture<SideBarComponent>;
 
   beforeEach(async () => {
+    const spyRepositoryService = jasmine.createSpyObj("Repository", {
+      getProfiles: [],
+      getSessions: [],
+      getSegments: [],
+    });
+    const spyLeappCoreService = jasmine.createSpyObj("LeappCoreService", [], {
+      repository: spyRepositoryService,
+      awsCoreService: { getRegions: () => [] },
+    });
+
     await TestBed.configureTestingModule({
       declarations: [SideBarComponent],
+      providers: [].concat(mustInjected().concat({ provide: LeappCoreService, useValue: spyLeappCoreService })),
     }).compileComponents();
   });
 
