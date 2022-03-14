@@ -1,7 +1,9 @@
+import { expect } from "@jest/globals";
 import { NamedProfilesService } from "./named-profiles-service";
 import { SessionStatus } from "../models/session-status";
 import { constants } from "../models/constants";
 import { AwsNamedProfile } from "../models/aws-named-profile";
+import { AwsSessionService } from "./session/aws/aws-session-service";
 
 describe("NamedProfilesService", () => {
   test("getNamedProfiles", () => {
@@ -143,6 +145,100 @@ describe("NamedProfilesService", () => {
     expect(workspaceService.updateSession).toHaveBeenCalledWith("3", sessions[2]);
     expect(sessionService.start).toHaveBeenCalledWith("3");
     expect(repository.removeProfile).toHaveBeenCalledWith("profileId");
+  });
+
+  test("changeNamedProfile - AwsSessionService type, active", async () => {
+    const session = {
+      sessionId: "sessionId",
+      status: SessionStatus.active,
+      type: "type",
+      profileId: "profileId",
+    } as any;
+    const sessionService = new (AwsSessionService as any)(null, null);
+    sessionService.start = jest.fn();
+    sessionService.stop = jest.fn();
+    const sessionFactory = {
+      getSessionService: jest.fn(() => sessionService),
+    } as any;
+    const repository = {
+      updateSession: jest.fn(),
+    } as any;
+    const workspaceService = {
+      updateSession: jest.fn(),
+    } as any;
+
+    const namedProfileService = new NamedProfilesService(sessionFactory, repository, workspaceService);
+
+    await namedProfileService.changeNamedProfile(session, "newProfileId");
+
+    expect(sessionFactory.getSessionService).toHaveBeenCalledWith(session.type);
+    expect(sessionService.stop).toHaveBeenCalledWith(session.sessionId);
+    expect(repository.updateSession).toHaveBeenCalledWith(session.sessionId, session);
+    expect(workspaceService.updateSession).toHaveBeenCalledWith(session.sessionId, session);
+    expect(sessionService.start).toHaveBeenCalledWith(session.sessionId);
+  });
+
+  test("changeNamedProfile - AwsSessionService type, inactive", async () => {
+    const session = {
+      sessionId: "sessionId",
+      status: SessionStatus.inactive,
+      type: "type",
+      profileId: "profileId",
+    } as any;
+    const sessionService = new (AwsSessionService as any)(null, null);
+    sessionService.start = jest.fn();
+    sessionService.stop = jest.fn();
+    const sessionFactory = {
+      getSessionService: jest.fn(() => sessionService),
+    } as any;
+    const repository = {
+      updateSession: jest.fn(),
+    } as any;
+    const workspaceService = {
+      updateSession: jest.fn(),
+    } as any;
+
+    const namedProfileService = new NamedProfilesService(sessionFactory, repository, workspaceService);
+
+    await namedProfileService.changeNamedProfile(session, "newProfileId");
+
+    expect(sessionFactory.getSessionService).toHaveBeenCalledWith(session.type);
+    expect(sessionService.stop).toHaveBeenCalledTimes(0);
+    expect(repository.updateSession).toHaveBeenCalledWith(session.sessionId, session);
+    expect(workspaceService.updateSession).toHaveBeenCalledWith(session.sessionId, session);
+    expect(sessionService.start).toHaveBeenCalledTimes(0);
+  });
+
+  test("changeNamedProfile - not AwsSessionService type", async () => {
+    const session = {
+      sessionId: "sessionId",
+      status: SessionStatus.active,
+      type: "type",
+      profileId: "profileId",
+    } as any;
+    const sessionService = {
+      start: jest.fn(),
+      stop: jest.fn(),
+    };
+    const sessionFactory = {
+      getSessionService: jest.fn(() => sessionService),
+    } as any;
+    const repository = {
+      updateSession: jest.fn(),
+    } as any;
+    const workspaceService = {
+      updateSession: jest.fn(),
+    } as any;
+
+    const namedProfileService = new NamedProfilesService(sessionFactory, repository, workspaceService);
+
+    await namedProfileService.changeNamedProfile(session, "newProfileId");
+
+    expect(sessionFactory.getSessionService).toHaveBeenCalledWith(session.type);
+    expect(sessionService.stop).toHaveBeenCalledTimes(0);
+    expect(repository.updateSession).toHaveBeenCalledTimes(0);
+    expect(workspaceService.updateSession).toHaveBeenCalledTimes(0);
+    expect(sessionService.start).toHaveBeenCalledTimes(0);
   });
 
   test("getNewId", () => {

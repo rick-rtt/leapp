@@ -130,7 +130,9 @@
     "pack-linux": "oclif pack:deb",
     "pack-win": "oclif pack:win",
     "postpack": "gushio gushio/target-post-pack.js",
-    "version": "oclif readme && git add README.md"
+    "version": "oclif readme && git add README.md",
+    "session-change-profile": "bin\\run.cmd session change-profile",
+    "session-list": "bin\\run.cmd session list"
   },
   "types": "dist/index.d.ts"
 }

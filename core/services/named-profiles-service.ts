@@ -5,6 +5,7 @@ import { Repository } from "./repository";
 import { Session } from "../models/session";
 import { SessionFactory } from "./session-factory";
 import { SessionStatus } from "../models/session-status";
+import { AwsSessionService } from "./session/aws/aws-session-service";
 import { WorkspaceService } from "./workspace-service";
 
 export class NamedProfilesService {
@@ -59,6 +60,24 @@ export class NamedProfilesService {
       }
     }
     this.repository.removeProfile(id);
+  }
+
+  async changeNamedProfile(session: Session, newNamedProfileId: string): Promise<void> {
+    const sessionService = this.sessionFactory.getSessionService(session.type);
+    if (sessionService instanceof AwsSessionService) {
+      const wasActive = session.status === SessionStatus.active;
+      if (wasActive) {
+        await sessionService.stop(session.sessionId);
+      }
+
+      (session as any).profileId = newNamedProfileId;
+      this.repository.updateSession(session.sessionId, session);
+      this.workspaceService.updateSession(session.sessionId, session);
+
+      if (wasActive) {
+        await sessionService.start(session.sessionId);
+      }
+    }
   }
 
   getNewId(): string {
