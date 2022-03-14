@@ -2,6 +2,7 @@ import { AwsSessionService } from "@noovolari/leapp-core/services/session/aws/aw
 import { LeappCommand } from "../../leappCommand";
 import { Config } from "@oclif/core/lib/config/config";
 import { Session } from "@noovolari/leapp-core/models/session";
+import { SessionService } from "@noovolari/leapp-core/services/session/session-service";
 
 export default class GenerateSession extends LeappCommand {
   static description = "Generate temporary credentials for the given AWS session id";
@@ -24,7 +25,7 @@ export default class GenerateSession extends LeappCommand {
 
   async generateSession(session: Session): Promise<void> {
     const sessionService = this.leappCliService.sessionFactory.getSessionService(session.type);
-    if (this.isAwsSession(session)) {
+    if (this.isAwsSession(sessionService)) {
       const processCredential = await (sessionService as any).generateProcessCredentials(session.sessionId);
       this.log(JSON.stringify(processCredential));
     } else {
@@ -42,7 +43,7 @@ export default class GenerateSession extends LeappCommand {
     return selectedSessions[0];
   }
 
-  isAwsSession(session: Session): boolean {
-    return session instanceof AwsSessionService;
+  isAwsSession(sessionService: SessionService): boolean {
+    return sessionService instanceof AwsSessionService;
   }
 }
