@@ -215,7 +215,7 @@ export class Repository {
 
   getDefaultProfileId(): string {
     const workspace = this.getWorkspace();
-    const profileFiltered = workspace.profiles.find((profile) => profile.name === "default");
+    const profileFiltered = workspace.profiles.find((profile) => profile.name === constants.defaultAwsProfileName);
     if (profileFiltered === undefined) {
       throw new LeappNotFoundError(this, "no default named profile found.");
     }
