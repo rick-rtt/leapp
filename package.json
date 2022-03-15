@@ -32,6 +32,7 @@
     "gushio": "~0.5.0"
   },
   "scripts": {
+    "install": "npm install",
     "setup": "gushio gushio/setup.js",
     "prepare": "husky install",
     "lint": "eslint .",
