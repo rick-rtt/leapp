@@ -13,7 +13,8 @@
     "desktop-app/electron/**/*",
     "desktop-app/e2e/**/*",
     "desktop-app/gushio",
-    "desktop-app/scripts/notarize.js"
+    "desktop-app/scripts/notarize.js",
+    "gushio/**/*"
   ],
   "overrides": [
     {

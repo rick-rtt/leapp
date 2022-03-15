@@ -47,6 +47,7 @@ USAGE
 * [`leapp region get-default`](#leapp-region-get-default)
 * [`leapp region set-default`](#leapp-region-set-default)
 * [`leapp session add`](#leapp-session-add)
+* [`leapp session change-profile`](#leapp-session-change-profile)
 * [`leapp session change-region`](#leapp-session-change-region)
 * [`leapp session current`](#leapp-session-current)
 * [`leapp session delete`](#leapp-session-delete)
@@ -365,6 +366,21 @@ DESCRIPTION
 
 EXAMPLES
   $leapp session add
+```
+
+## `leapp session change-profile`
+
+Change a session profile
+
+```
+USAGE
+  $ leapp session change-profile
+
+DESCRIPTION
+  Change a session profile
+
+EXAMPLES
+  $leapp session change-profile
 ```
 
 ## `leapp session change-region`
