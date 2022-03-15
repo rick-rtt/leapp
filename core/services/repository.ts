@@ -384,4 +384,15 @@ export class Repository {
     workspace.macOsTerminal = macOsTerminal;
     this.persistWorkspace(workspace);
   }
+
+  updateColorTheme(colorTheme: string): void {
+    const workspace = this.getWorkspace();
+    workspace.colorTheme = colorTheme;
+    this.persistWorkspace(workspace);
+  }
+
+  getColorTheme(): string {
+    const workspace = this.getWorkspace();
+    return workspace.colorTheme;
+  }
 }

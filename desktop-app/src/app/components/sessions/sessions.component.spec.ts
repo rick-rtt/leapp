@@ -2,22 +2,46 @@ import { async, ComponentFixture, TestBed } from "@angular/core/testing";
 
 import { SessionsComponent } from "./sessions.component";
 import { mustInjected } from "../../../base-injectables";
+import { RouterTestingModule } from "@angular/router/testing";
+import { LeappCoreService } from "../../services/leapp-core.service";
 
 describe("SessionComponent", () => {
   let component: SessionsComponent;
   let fixture: ComponentFixture<SessionsComponent>;
 
   beforeEach(async(() => {
+    const spyWorkspaceService = jasmine.createSpyObj("WorkspaceService", [], {
+      sessions: [],
+      sessions$: { subscribe: () => {} },
+    });
+    const spyRepositoryService = jasmine.createSpyObj("Repository", {
+      getProfiles: [],
+    });
+    const spyLeappCoreService = jasmine.createSpyObj("LeappCoreService", [], {
+      workspaceService: spyWorkspaceService,
+      repository: spyRepositoryService,
+      awsCoreService: { getRegions: () => [] },
+    });
+
     TestBed.configureTestingModule({
       declarations: [SessionsComponent],
-      providers: [].concat(mustInjected()),
-      imports: [],
+      providers: [].concat(mustInjected().concat([{ provide: LeappCoreService, useValue: spyLeappCoreService }])),
+      imports: [RouterTestingModule.withRoutes([])],
     }).compileComponents();
   }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(SessionsComponent);
     component = fixture.componentInstance;
+    component.eGlobalFilterGroup = {
+      dateFilter: false,
+      integrationFilter: [],
+      profileFilter: [],
+      providerFilter: [],
+      regionFilter: [],
+      typeFilter: [],
+      searchFilter: "",
+    };
     fixture.detectChanges();
   });
 

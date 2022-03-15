@@ -60,6 +60,9 @@ export class AppComponent implements OnInit {
     this.rotationService = leappCoreService.rotationService;
     this.awsSsoIntegrationService = leappCoreService.awsSsoIntegrationService;
     this.awsSsoRoleService = leappCoreService.awsSsoRoleService;
+
+    this.setInitialColorSchema();
+    this.setColorSchemaChangeEventListener();
   }
 
   async ngOnInit(): Promise<void> {
@@ -214,6 +217,37 @@ export class AppComponent implements OnInit {
         this.updaterService.updateDialog();
         this.workspaceService.sessions = [...this.workspaceService.sessions];
         this.repository.updateSessions(this.workspaceService.sessions);
+      }
+    });
+  }
+
+  private setInitialColorSchema() {
+    const workspace = this.repository.getWorkspace();
+    if (workspace) {
+      const colorTheme = workspace.colorTheme || constants.colorTheme;
+      workspace.colorTheme = workspace.colorTheme || constants.colorTheme;
+      if (colorTheme === constants.darkTheme) {
+        document.querySelector("body").classList.add("dark-theme");
+      } else if (colorTheme === constants.lightTheme) {
+        document.querySelector("body").classList.remove("dark-theme");
+      } else if (colorTheme === constants.systemDefaultTheme) {
+        if (this.appService.isDarkMode()) {
+          document.querySelector("body").classList.add("dark-theme");
+        } else {
+          document.querySelector("body").classList.remove("dark-theme");
+        }
+      }
+    }
+  }
+
+  private setColorSchemaChangeEventListener() {
+    window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {
+      if (this.repository.getWorkspace().colorTheme === constants.systemDefaultTheme) {
+        if (this.appService.isDarkMode()) {
+          document.querySelector("body").classList.add("dark-theme");
+        } else {
+          document.querySelector("body").classList.remove("dark-theme");
+        }
       }
     });
   }

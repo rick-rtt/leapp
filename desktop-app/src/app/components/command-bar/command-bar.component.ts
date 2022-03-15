@@ -15,6 +15,8 @@ import { LeappCoreService } from "../../services/leapp-core.service";
 import { ElectronService } from "../../services/electron.service";
 import { AppService } from "../../services/app.service";
 import { AwsSsoRoleSession } from "@noovolari/leapp-core/models/aws-sso-role-session";
+import { Repository } from "@noovolari/leapp-core/services/repository";
+import { constants } from "@noovolari/leapp-core/models/constants";
 
 export const compactMode = new BehaviorSubject<boolean>(false);
 export const globalFilteredSessions = new BehaviorSubject<Session[]>([]);
@@ -60,6 +62,9 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
   filterExtended: boolean;
   compactMode: boolean;
 
+  eConstants = constants;
+  repository: Repository;
+
   private subscription;
   private subscription2;
   private subscription3;
@@ -68,7 +73,6 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
   private subscription6;
 
   private currentSegment: Segment;
-
   private workspaceService: WorkspaceService;
 
   constructor(
@@ -78,6 +82,7 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
     public electronService: ElectronService
   ) {
     this.workspaceService = leappCoreService.workspaceService;
+    this.repository = leappCoreService.repository;
 
     this.filterExtended = false;
     this.compactMode = false;

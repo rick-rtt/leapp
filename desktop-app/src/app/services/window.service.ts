@@ -4,11 +4,12 @@ import { environment } from "../../environments/environment";
 import { ConfirmationDialogComponent } from "../components/dialogs/confirmation-dialog/confirmation-dialog.component";
 import { BsModalService } from "ngx-bootstrap/modal";
 import { LoggerLevel } from "@noovolari/leapp-core/services/logging-service";
+import { IShellService } from "@noovolari/leapp-core/interfaces/i-shell-service";
 
 @Injectable({
   providedIn: "root",
 })
-export class WindowService {
+export class WindowService implements IShellService {
   private currentWindow: any;
 
   constructor(private modalService: BsModalService, private electronService: ElectronService) {}

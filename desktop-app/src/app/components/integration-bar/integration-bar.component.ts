@@ -67,14 +67,14 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
   menuX: number;
   menuY: number;
 
+  repository: Repository;
   private awsSsoRoleService: AwsSsoRoleService;
   private workspaceService: WorkspaceService;
   private awsSsoOidcService: AwsSsoOidcService;
   private loggingService: LoggingService;
-  private repository: Repository;
 
   constructor(
-    private appService: AppService,
+    public appService: AppService,
     private bsModalService: BsModalService,
     private router: Router,
     private windowService: WindowService,
@@ -282,8 +282,8 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
 
   save(): void {
     if (this.form.valid) {
-      const alias = this.form.get("alias").value;
-      const portalUrl = this.form.get("portalUrl").value;
+      const alias = this.form.get("alias").value.trim();
+      const portalUrl = this.form.get("portalUrl").value.trim();
       const region = this.form.get("awsRegion").value;
       const browserOpening = this.form.get("defaultBrowserOpening").value;
 

@@ -24,6 +24,8 @@ import { RotationService } from "@noovolari/leapp-core/services/rotation-service
 import { AzureCoreService } from "@noovolari/leapp-core/services/azure-core-service";
 import { constants } from "@noovolari/leapp-core/models/constants";
 import { AwsSsoIntegrationService } from "@noovolari/leapp-core/services/aws-sso-integration-service";
+import { WebConsoleService } from "@noovolari/leapp-core/services/web-console-service";
+import { WindowService } from "./window.service";
 
 @Injectable({
   providedIn: "root",
@@ -49,13 +51,22 @@ export class LeappCoreService {
   private rotationServiceInstance: RotationService;
   private retroCompatibilityServiceInstance: RetroCompatibilityService;
   private azureCoreServiceInstance: AzureCoreService;
+  private webConsoleServiceInstance: WebConsoleService;
 
   constructor(
     private mfaCodePrompter: MfaCodePromptService,
     private awsAuthenticationService: AwsAuthenticationService,
     private verificationWindowService: VerificationWindowService,
-    private electronService: ElectronService
+    private electronService: ElectronService,
+    private windowService: WindowService
   ) {}
+
+  public get webConsoleService(): WebConsoleService {
+    if (!this.webConsoleServiceInstance) {
+      this.webConsoleServiceInstance = new WebConsoleService(this.windowService, this.loggingService);
+    }
+    return this.webConsoleServiceInstance;
+  }
 
   public get workspaceService(): WorkspaceService {
     if (!this.workspaceServiceInstance) {

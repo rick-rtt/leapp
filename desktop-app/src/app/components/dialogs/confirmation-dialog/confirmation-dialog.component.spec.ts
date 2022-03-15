@@ -1,6 +1,7 @@
 import { async, ComponentFixture, TestBed } from "@angular/core/testing";
 
 import { ConfirmationDialogComponent } from "./confirmation-dialog.component";
+import { mustInjected } from "../../../../base-injectables";
 
 describe("ConfirmationDialogComponent", () => {
   let component: ConfirmationDialogComponent;
@@ -9,6 +10,7 @@ describe("ConfirmationDialogComponent", () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [ConfirmationDialogComponent],
+      providers: [].concat(mustInjected()),
     }).compileComponents();
   }));
 

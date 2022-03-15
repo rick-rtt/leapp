@@ -26,6 +26,8 @@ export class Workspace {
   private _folders: Folder[];
   private _segments: Segment[];
 
+  private _colorTheme: string;
+
   private _proxyConfiguration: {
     proxyProtocol: string;
     proxyUrl?: string;
@@ -146,5 +148,13 @@ export class Workspace {
 
   set segments(segments: Segment[]) {
     this._segments = segments;
+  }
+
+  get colorTheme(): string {
+    return this._colorTheme;
+  }
+
+  set colorTheme(value: string) {
+    this._colorTheme = value;
   }
 }

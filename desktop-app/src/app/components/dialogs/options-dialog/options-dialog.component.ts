@@ -48,6 +48,9 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
   selectedBrowserOpening = constants.inApp.toString();
   selectedTerminal;
 
+  colorTheme: string;
+  selectedColorTheme: string;
+
   form = new FormGroup({
     idpUrl: new FormControl(""),
     awsProfile: new FormControl(""),
@@ -61,6 +64,7 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
     locationsSelect: new FormControl(""),
     defaultBrowserOpening: new FormControl(""),
     terminalSelect: new FormControl(""),
+    colorThemeSelect: new FormControl(""),
   });
 
   /* Simple profile page: shows the Idp Url and the workspace json */
@@ -74,6 +78,9 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
     private router: Router
   ) {
     this.selectedTerminal = this.leappCoreService.repository.getWorkspace().macOsTerminal || constants.macOsTerminal;
+
+    this.colorTheme = this.leappCoreService.repository.getWorkspace().colorTheme || constants.colorTheme;
+    this.selectedColorTheme = this.colorTheme;
   }
 
   ngOnInit(): void {
@@ -111,6 +118,19 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
   ngAfterViewInit(): void {
     if (this.selectedIndex) {
       this.tabGroup.selectedIndex = this.selectedIndex;
+    }
+  }
+
+  setColorTheme(theme: string): void {
+    this.leappCoreService.repository.updateColorTheme(theme);
+    this.colorTheme = this.leappCoreService.repository.getWorkspace().colorTheme;
+    this.selectedColorTheme = this.colorTheme;
+    if (this.colorTheme === constants.darkTheme) {
+      document.querySelector("body").classList.add("dark-theme");
+    } else if (this.colorTheme === constants.lightTheme) {
+      document.querySelector("body").classList.remove("dark-theme");
+    } else if (this.colorTheme === constants.systemDefaultTheme) {
+      document.querySelector("body").classList.toggle("dark-theme", this.appService.isDarkMode());
     }
   }
 

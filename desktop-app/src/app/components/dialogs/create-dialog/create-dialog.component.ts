@@ -21,6 +21,7 @@ import { AzureSessionRequest } from "@noovolari/leapp-core/services/session/azur
 import { MessageToasterService, ToastLevel } from "../../../services/message-toaster.service";
 import { LeappParseError } from "@noovolari/leapp-core/errors/leapp-parse-error";
 import { AzureService } from "@noovolari/leapp-core/services/session/azure/azure-service";
+import { Repository } from "@noovolari/leapp-core/services/repository";
 
 @Component({
   selector: "app-create-dialog",
@@ -59,6 +60,7 @@ export class CreateDialogComponent implements OnInit {
   selectedLocation;
 
   eSessionType = SessionType;
+  eConstants = constants;
 
   public form = new FormGroup({
     idpArn: new FormControl("", [Validators.required]),
@@ -82,6 +84,7 @@ export class CreateDialogComponent implements OnInit {
     selectAccessStrategy: new FormControl(SessionType.awsIamRoleFederated, [Validators.required]),
   });
 
+  repository: Repository;
   private workspaceService: WorkspaceService;
   private awsIamRoleFederatedService: AwsIamRoleFederatedService;
   private awsIamUserService: AwsIamUserService;
@@ -91,7 +94,7 @@ export class CreateDialogComponent implements OnInit {
 
   /* Setup the first account for the application */
   constructor(
-    private appService: AppService,
+    public appService: AppService,
     private router: Router,
     private activatedRoute: ActivatedRoute,
     private bsModalService: BsModalService,
@@ -99,6 +102,7 @@ export class CreateDialogComponent implements OnInit {
     private windowService: WindowService,
     private messageToasterService: MessageToasterService
   ) {
+    this.repository = leappCoreService.repository;
     this.workspaceService = leappCoreService.workspaceService;
     this.awsIamRoleFederatedService = leappCoreService.awsIamRoleFederatedService;
     this.awsIamUserService = leappCoreService.awsIamUserService;
