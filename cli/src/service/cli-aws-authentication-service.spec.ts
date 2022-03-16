@@ -1,4 +1,4 @@
-import { describe, expect, test } from "@jest/globals";
+import { jest, describe, expect, test } from "@jest/globals";
 import { CliAwsAuthenticationService } from "./cli-aws-authentication-service";
 import { of } from "rxjs";
 import { Page, HTTPRequest } from "puppeteer";
@@ -53,8 +53,13 @@ describe("CliAwsAuthenticationService", () => {
     };
 
     cliAwsAuthenticationService.isRequestToIntercept = () => true;
+    cliAwsAuthenticationService.resolveIfNeeded = jest.fn((requestUrl, resolve) => {
+      expect(requestUrl).toBe(idpUrl);
+      resolve(true);
+    });
 
-    expect(await cliAwsAuthenticationService.needAuthentication(idpUrl)).toBeTruthy();
+    expect(await cliAwsAuthenticationService.needAuthentication(idpUrl)).toBe(true);
+    expect(cliAwsAuthenticationService.resolveIfNeeded).toHaveBeenCalled();
     expect(page.onPageCalled).toBeTruthy();
     expect(page.gotoPageCalled).toBeTruthy();
   });
@@ -98,12 +103,44 @@ describe("CliAwsAuthenticationService", () => {
   test("isRequestToIntercept", () => {
     const cliAwsAuthenticationService = new CliAwsAuthenticationService();
 
-    expect(cliAwsAuthenticationService.isRequestToIntercept(".onelogin.com/login")).toBeTruthy();
-    expect(cliAwsAuthenticationService.isRequestToIntercept(".okta.com/discovery/iframe.html")).toBeTruthy();
-    expect(cliAwsAuthenticationService.isRequestToIntercept("https://accounts.google.com/ServiceLogin")).toBeTruthy();
-    expect(cliAwsAuthenticationService.isRequestToIntercept("https://signin.aws.amazon.com/saml")).toBeTruthy();
-    expect(cliAwsAuthenticationService.isRequestToIntercept("https://login.microsoftonline.com/something/oauth2/authorize")).toBeTruthy();
-    expect(cliAwsAuthenticationService.isRequestToIntercept("https://login.microsoftonline.com/")).toBeFalsy();
-    expect(cliAwsAuthenticationService.isRequestToIntercept("https://login.oauth2/authorize/")).toBeFalsy();
+    expect(cliAwsAuthenticationService.isRequestToIntercept("https://XX.onelogin.com/XX")).toBe(true);
+    expect(cliAwsAuthenticationService.isRequestToIntercept("http://XX.onelogin.com/XX")).toBe(false);
+
+    expect(cliAwsAuthenticationService.isRequestToIntercept("https://XX/adfs/ls/idpinitiatedsignonXX")).toBe(true);
+    expect(cliAwsAuthenticationService.isRequestToIntercept("https://adfs/ls/idpinitiatedsignonXX")).toBe(false);
+
+    expect(cliAwsAuthenticationService.isRequestToIntercept("https://XX.okta.com/XX")).toBe(true);
+    expect(cliAwsAuthenticationService.isRequestToIntercept("https://XX.okta.com")).toBe(false);
+
+    expect(cliAwsAuthenticationService.isRequestToIntercept("https://accounts.google.com/ServiceLoginXX")).toBe(true);
+    expect(cliAwsAuthenticationService.isRequestToIntercept("https://accounts.google.com")).toBe(false);
+
+    expect(cliAwsAuthenticationService.isRequestToIntercept("https://login.microsoftonline.com/XX")).toBe(true);
+    expect(cliAwsAuthenticationService.isRequestToIntercept("https://login.microsoftonline.com")).toBe(false);
+
+    expect(cliAwsAuthenticationService.isRequestToIntercept("https://signin.aws.amazon.com/saml")).toBe(true);
+    expect(cliAwsAuthenticationService.isRequestToIntercept("https://signin.aws.amazon.com/saml?q=1")).toBe(false);
+  });
+
+  const resolveIfNeededCases = [
+    ["https://unmatched/url", false, null],
+    ["https://accounts.google.com/ServiceLogin?q=1", true, true],
+    [".onelogin.com/login", true, true],
+    ["adfs/ls/idpinitiatedsignon/loginToRp=urn:amazon:webservices", true, true],
+    [".okta.com/discovery/iframe.html", true, true],
+    ["https://login.microsoftonline.com£$$%%%&/oauth2/authorize", true, true],
+    ["https://signin.aws.amazon.com/saml?q=1", true, false],
+  ];
+  test.each(resolveIfNeededCases)("resolveIfNeeded %p", (idpUrl, resolved, returnValue) => {
+    const cliAwsAuthenticationService = new CliAwsAuthenticationService();
+
+    const resolve = jest.fn();
+    cliAwsAuthenticationService.resolveIfNeeded(idpUrl, resolve);
+
+    if (resolved) {
+      expect(resolve).toHaveBeenCalledWith(returnValue);
+    } else {
+      expect(resolve).not.toHaveBeenCalled();
+    }
   });
 });

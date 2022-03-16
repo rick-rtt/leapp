@@ -75,7 +75,7 @@ export default class CurrentSession extends LeappCommand {
     if (sessions.length === 0) {
       throw new Error("no active sessions available for the specified criteria");
     } else if (sessions.length > 1) {
-      throw new Error("more than one active session found for the specified criteria");
+      throw new Error("multiple active sessions found, please specify a provider with --provider");
     }
     return sessions[0];
   }

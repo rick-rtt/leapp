@@ -12,9 +12,11 @@ module.exports = {
       console.log('Performing cleanup... ')
       await deleteFunction(path, '../electron/dist')
       await deleteFunction(path, '../dist')
+      await deleteFunction(path, '../coverage')
       console.log('Cleanup completed successfully')
     } catch (e) {
-      console.error(e.message.red)
+      e.message = e.message.red
+      throw e
     }
   },
 }

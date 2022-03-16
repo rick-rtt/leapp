@@ -21,13 +21,14 @@ module.exports = {
 
       await makeDirFunction(path, '../dist/leapp-client')
       await copyFunction(path, '../src/assets/icons', '../dist/leapp-client')
-      await compileFunction(shellJs, args[0])
+      await compileFunction(path, shellJs, args[0])
       await makeDirFunction(path, '../electron/dist/electron/assets/images')
       await copyFunction(path, '../electron/assets/images', '../electron/dist/electron/assets/images')
 
       console.log('Build completed successfully')
     } catch (e) {
-      console.error(e.message.red)
+      e.message = e.message.red
+      throw e
     }
   },
 }
