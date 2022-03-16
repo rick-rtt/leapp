@@ -34,6 +34,7 @@
   "scripts": {
     "ext-install": "npm install",
     "setup": "gushio gushio/setup.js",
+    "release-core": "gushio gushio/target-release-core.js",
     "prepare": "husky install",
     "lint": "eslint .",
     "lint:fix": "npm run lint -- --fix"
