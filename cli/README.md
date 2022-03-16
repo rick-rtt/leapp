@@ -54,6 +54,7 @@ USAGE
 * [`leapp session generate SESSIONID`](#leapp-session-generate-sessionid)
 * [`leapp session get_id`](#leapp-session-get_id)
 * [`leapp session list`](#leapp-session-list)
+* [`leapp session open-web-console`](#leapp-session-open-web-console)
 * [`leapp session start`](#leapp-session-start)
 * [`leapp session stop`](#leapp-session-stop)
 
@@ -496,6 +497,21 @@ DESCRIPTION
 
 EXAMPLES
   $leapp session list
+```
+
+## `leapp session open-web-console`
+
+Open an AWS Web Console
+
+```
+USAGE
+  $ leapp session open-web-console
+
+DESCRIPTION
+  Open an AWS Web Console
+
+EXAMPLES
+  $leapp session open-web-console
 ```
 
 ## `leapp session start`

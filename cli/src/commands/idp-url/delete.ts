@@ -1,4 +1,4 @@
-import { LeappCommand } from "../../leappCommand";
+import { LeappCommand } from "../../leapp-command";
 import { Config } from "@oclif/core/lib/config/config";
 import { Session } from "@noovolari/leapp-core/models/session";
 import { IdpUrl } from "@noovolari/leapp-core/models/IdpUrl";

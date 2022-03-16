@@ -14,7 +14,7 @@
     "@angular-eslint/eslint-plugin-template": "~12.5.0",
     "@angular-eslint/schematics": "~12.5.0",
     "@angular-eslint/template-parser": "~12.5.0",
-    "@angular/compiler": "~12.2.7",
+    "@angular/compiler": "13.2.2",
     "@commitlint/cli": "^12.1.4",
     "@commitlint/config-conventional": "^12.1.4",
     "@typescript-eslint/eslint-plugin": "^4.33.0",

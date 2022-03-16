@@ -29,6 +29,9 @@ import { IdpUrlsService } from "@noovolari/leapp-core/services/idp-urls-service"
 import { AwsSsoIntegrationService } from "@noovolari/leapp-core/services/aws-sso-integration-service";
 import CliInquirer from "inquirer";
 import { AwsSsoOidcService } from "@noovolari/leapp-core/services/aws-sso-oidc.service";
+import { CliOpenWebConsoleService } from "./cli-open-web-console-service";
+import { WebConsoleService } from "@noovolari/leapp-core/services/web-console-service";
+import fetch from "node-fetch";
 
 /* eslint-disable */
 export class LeappCliService {
@@ -330,6 +333,26 @@ export class LeappCliService {
     }
 
     return this.azureCoreServiceInstance;
+  }
+
+  private cliOpenWebConsoleServiceInstance: CliOpenWebConsoleService;
+
+  get cliOpenWebConsoleService(): CliOpenWebConsoleService {
+    if (!this.cliOpenWebConsoleServiceInstance) {
+      this.cliOpenWebConsoleServiceInstance = new CliOpenWebConsoleService();
+    }
+
+    return this.cliOpenWebConsoleServiceInstance;
+  }
+
+  private webConsoleServiceInstance: WebConsoleService;
+
+  get webConsoleService(): WebConsoleService {
+    if (!this.webConsoleServiceInstance) {
+      this.webConsoleServiceInstance = new WebConsoleService(this.cliOpenWebConsoleService, this.loggingService, fetch);
+    }
+
+    return this.webConsoleServiceInstance;
   }
 
   get inquirer(): CliInquirer.Inquirer {

@@ -2,11 +2,12 @@ import { LeappCommand } from "../../leapp-command";
 import { Config } from "@oclif/core/lib/config/config";
 import { Session } from "@noovolari/leapp-core/models/session";
 import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
+import { AwsSessionService } from "@noovolari/leapp-core/services/session/aws/aws-session-service";
 
-export default class GetIdSession extends LeappCommand {
-  static description = "Get session id";
+export default class OpenWebConsole extends LeappCommand {
+  static description = "Open an AWS Web Console";
 
-  static examples = [`$leapp session get_id`];
+  static examples = [`$leapp session open-web-console`];
 
   constructor(argv: string[], config: Config) {
     super(argv, config);
@@ -15,14 +16,23 @@ export default class GetIdSession extends LeappCommand {
   async run(): Promise<void> {
     try {
       const selectedSession = await this.selectSession();
-      this.logSessionId(selectedSession);
+      await this.openWebConsole(selectedSession);
     } catch (error) {
       this.error(error instanceof Error ? error.message : `Unknown error: ${error}`);
     }
   }
 
-  logSessionId(session: Session): void {
-    this.log(session.sessionId);
+  async openWebConsole(session: Session): Promise<void> {
+    // TODO: check whether the session is an aws one
+    const sessionService = this.leappCliService.sessionFactory.getSessionService(session.type) as AwsSessionService;
+    const credentials = await sessionService.generateCredentials(session.sessionId);
+    try {
+      await this.leappCliService.webConsoleService.openWebConsole(credentials, session.region);
+    } catch (e) {
+      console.log(e);
+      throw e;
+    }
+    this.log("opened AWS Web Console for this session");
   }
 
   async selectSession(): Promise<Session> {
@@ -35,7 +45,7 @@ export default class GetIdSession extends LeappCommand {
         name: "selectedSession",
         message: "select a session",
         type: "list",
-        choices: availableSessions.map((session) => ({ name: session.sessionName, value: session })),
+        choices: availableSessions.map((session: any) => ({ name: session.sessionName, value: session })),
       },
     ]);
     return answer.selectedSession;

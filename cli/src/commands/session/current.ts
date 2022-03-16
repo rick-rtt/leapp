@@ -3,7 +3,7 @@ import { AzureSession } from "@noovolari/leapp-core/models/azure-session";
 import { SessionType } from "@noovolari/leapp-core/models/session-type";
 import { AwsSessionService } from "@noovolari/leapp-core/services/session/aws/aws-session-service";
 import { Flags } from "@oclif/core";
-import { LeappCommand } from "../../leappCommand";
+import { LeappCommand } from "../../leapp-command";
 import { Config } from "@oclif/core/lib/config/config";
 import { Session } from "@noovolari/leapp-core/models/session";
 import { constants } from "@noovolari/leapp-core/models/constants";
