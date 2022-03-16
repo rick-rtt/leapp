@@ -69,7 +69,7 @@ module.exports = {
       await deleteFunction(path, '../desktop-app/package-lock.json')
 
       shellJs.cd(path.join(__dirname, '../desktop-app'))
-      result = shellJs.exec('npm install --force')
+      result = shellJs.exec('npm install')
 
       if (result.code !== 0) {
         throw new Error(result.stderr)
