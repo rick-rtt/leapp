@@ -63,7 +63,7 @@ export class LeappCoreService {
 
   public get webConsoleService(): WebConsoleService {
     if (!this.webConsoleServiceInstance) {
-      this.webConsoleServiceInstance = new WebConsoleService(this.windowService, this.loggingService);
+      this.webConsoleServiceInstance = new WebConsoleService(this.windowService, this.loggingService, window.fetch);
     }
     return this.webConsoleServiceInstance;
   }
