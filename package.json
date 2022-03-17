@@ -33,6 +33,7 @@
   },
   "scripts": {
     "ext-install": "npm install",
+    "npm-install-all": "gushio gushio/npm-install-all.js",
     "setup": "gushio gushio/setup.js",
     "release-core": "gushio gushio/target-release-core.js",
     "prepare": "husky install",
