@@ -1,7 +1,7 @@
 import { CliUx } from "@oclif/core";
 import { Config } from "@oclif/core/lib/config/config";
 import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
-import { LeappCommand } from "../../leappCommand";
+import { LeappCommand } from "../../leapp-command";
 
 export default class ListSessions extends LeappCommand {
   static description = "Show sessions list";

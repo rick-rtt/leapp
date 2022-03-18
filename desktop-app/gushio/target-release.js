@@ -1,4 +1,3 @@
-const path = require('path')
 module.exports = {
   cli: {
     name: 'build',
@@ -12,8 +11,10 @@ module.exports = {
   run: async (args) => {
     const path = require('path')
     const shellJs = require('shelljs')
+
+    const currentPath = shellJs.pwd()
     try {
-      await gushio.run(path.join(__dirname, './target-build.js'), args[0].replace(' ', '\\ '))
+      await gushio.run(path.join(__dirname, './target-build.js'), args)
 
       console.log('Packaging leapp... ')
       const platformVersion = args[1] === 'mac'
@@ -24,6 +25,7 @@ module.exports = {
             ? '--linux'
             : '--mac --win --linux'
 
+      shellJs.cd(path.join(__dirname, '..'))
       const result = shellJs.exec(`electron-builder build ${platformVersion}`)
       if (result.code !== 0) {
         throw new Error(result.stderr)
@@ -31,7 +33,10 @@ module.exports = {
 
       console.log('Package generation completed successfully')
     } catch (e) {
-      console.error(e.message.red)
+      e.message = e.message.red
+      throw e
+    } finally {
+      shellJs.cd(currentPath)
     }
   },
 }

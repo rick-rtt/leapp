@@ -2,20 +2,31 @@
   "extends": "../tsconfig.json",
   "compileOnSave": false,
   "compilerOptions": {
-    "allowSyntheticDefaultImports" : true,
+    "allowSyntheticDefaultImports": true,
     "baseUrl": "./",
     "declaration": true,
     "experimentalDecorators": true,
-    "lib": ["ES2019", "DOM"],
+    "lib": [
+      "ES2019",
+      "DOM"
+    ],
     "module": "CommonJS",
     "moduleResolution": "Node",
     "sourceMap": true,
     "target": "ES2019",
-    "typeRoots": ["node_modules/@types"],
+    "typeRoots": [
+      "node_modules/@types"
+    ],
     "paths": {
-      "stream": ["node_modules/stream-browserify"],
-      "assert": ["node_modules/assert"],
-      "fs": ["node_modules/fs-web"]
+      "stream": [
+        "node_modules/stream-browserify"
+      ],
+      "assert": [
+        "node_modules/assert"
+      ],
+      "fs": [
+        "node_modules/fs-web"
+      ]
     },
     "esModuleInterop": true,
     "resolveJsonModule": true,
@@ -26,6 +37,7 @@
     "./package.json"
   ],
   "exclude": [
+    "./dist/**",
     "./gushio/**",
     "/**/*.test.ts",
     "/**/*.spec.ts"

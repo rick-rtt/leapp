@@ -9,12 +9,12 @@
   "category": "public.app-category.developer-tools",
   "homepage": "https://leapp.cloud",
   "devDependencies": {
-    "@angular-eslint/builder": "~12.5.0",
-    "@angular-eslint/eslint-plugin": "~12.5.0",
-    "@angular-eslint/eslint-plugin-template": "~12.5.0",
-    "@angular-eslint/schematics": "~12.5.0",
-    "@angular-eslint/template-parser": "~12.5.0",
-    "@angular/compiler": "~12.2.7",
+    "@angular-eslint/builder": "13.1.0",
+    "@angular-eslint/eslint-plugin": "13.1.0",
+    "@angular-eslint/eslint-plugin-template": "13.1.0",
+    "@angular-eslint/schematics": "13.1.0",
+    "@angular-eslint/template-parser": "13.1.0",
+    "@angular/compiler": "13.2.2",
     "@commitlint/cli": "^12.1.4",
     "@commitlint/config-conventional": "^12.1.4",
     "@typescript-eslint/eslint-plugin": "^4.33.0",
@@ -33,7 +33,9 @@
   },
   "scripts": {
     "ext-install": "npm install",
+    "npm-install-all": "gushio gushio/npm-install-all.js",
     "setup": "gushio gushio/setup.js",
+    "release-core": "gushio gushio/target-release-core.js",
     "prepare": "husky install",
     "lint": "eslint .",
     "lint:fix": "npm run lint -- --fix"

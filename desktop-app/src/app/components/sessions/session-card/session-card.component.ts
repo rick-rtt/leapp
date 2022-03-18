@@ -585,7 +585,7 @@ export class SessionCardComponent implements OnInit {
     this.trigger.closeMenu();
     const credentials = await (this.sessionService as AwsSessionService).generateCredentials(this.session.sessionId);
     const sessionRegion = this.session.region;
-    this.leappCoreService.webConsoleService.openingWebConsole(credentials, sessionRegion);
+    this.leappCoreService.webConsoleService.openWebConsole(credentials, sessionRegion);
   }
 
   private logSessionData(session: Session, message: string): void {

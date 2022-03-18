@@ -1,6 +1,6 @@
 import { CliUx } from "@oclif/core";
 import { Config } from "@oclif/core/lib/config/config";
-import { LeappCommand } from "../../leappCommand";
+import { LeappCommand } from "../../leapp-command";
 
 export default class ListProfiles extends LeappCommand {
   static description = "Show profile list";

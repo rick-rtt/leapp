@@ -120,18 +120,15 @@ describe("CurrentSession", () => {
     const provider = "provider";
 
     expect(() => command.getSessionFromProfile(profileName, provider)).toThrow(
-      new Error("more than one active session found for the specified criteria")
+      new Error("multiple active sessions found, please specify a provider with --provider")
     );
     expect(leappCliService.repository.getDefaultProfileId).toHaveBeenCalled();
     expect(leappCliService.repository.listActive).toHaveBeenCalled();
     expect(command.getProviderAssociatedSessionTypes).toHaveBeenCalledWith(provider);
   });
 
-  test("getSessionFromProfile - error: selected profile has more than one active session related", () => {
-    const sessions = [
-      { profileId: "profileId1", type: "type1" },
-      { profileId: "profileId1", type: "type2" },
-    ];
+  test("getSessionFromProfile - error: more than one active session from different providers", () => {
+    const sessions = [{ profileId: "profileId1", type: "type1" }, { type: "type2" }];
     const leappCliService: any = {
       repository: {
         getDefaultProfileId: jest.fn(() => "profileId1"),
@@ -144,7 +141,7 @@ describe("CurrentSession", () => {
     const provider = undefined;
 
     expect(() => command.getSessionFromProfile(profileName, provider)).toThrow(
-      new Error("more than one active session found for the specified criteria")
+      new Error("multiple active sessions found, please specify a provider with --provider")
     );
     expect(leappCliService.repository.getDefaultProfileId).toHaveBeenCalled();
     expect(leappCliService.repository.listActive).toHaveBeenCalled();

@@ -1,9 +1,12 @@
 import puppeteer from "puppeteer";
 import { IAwsAuthenticationService } from "@noovolari/leapp-core/interfaces/i-aws-authentication.service";
 import { LeappModalClosedError } from "@noovolari/leapp-core/errors/leapp-modal-closed-error";
+import { AuthenticationService } from "@noovolari/leapp-core/services/authentication-service";
+import { CloudProviderType } from "@noovolari/leapp-core/models/cloud-provider-type";
 
 export class CliAwsAuthenticationService implements IAwsAuthenticationService {
   private browser: puppeteer.Browser;
+  constructor(private authenticationService: AuthenticationService) {}
 
   async needAuthentication(idpUrl: string): Promise<boolean> {
     // eslint-disable-next-line
@@ -11,17 +14,18 @@ export class CliAwsAuthenticationService implements IAwsAuthenticationService {
       const page = await this.getNavigationPage(true);
 
       page.on("request", async (request) => {
-        const requestUrl = request.url().toString();
         if (request.isInterceptResolutionHandled()) {
           reject("request unexpectedly already handled");
           return;
         }
 
-        if (this.isRequestToIntercept(requestUrl)) {
-          resolve(requestUrl.indexOf("https://signin.aws.amazon.com/saml") === -1);
-          return;
+        const requestUrl = request.url().toString();
+        if (this.authenticationService.isAuthenticationUrl(CloudProviderType.aws, requestUrl)) {
+          resolve(true);
         }
-
+        if (this.authenticationService.isSamlAssertionUrl(CloudProviderType.aws, requestUrl)) {
+          resolve(false);
+        }
         await request.continue();
       });
 
@@ -37,13 +41,13 @@ export class CliAwsAuthenticationService implements IAwsAuthenticationService {
       const page = await this.getNavigationPage(!needToAuthenticate);
 
       page.on("request", async (request) => {
-        const requestUrl = request.url().toString();
         if (request.isInterceptResolutionHandled()) {
           reject("request unexpectedly already handled");
           return;
         }
 
-        if (requestUrl.indexOf("https://signin.aws.amazon.com/saml") !== -1) {
+        const requestUrl = request.url().toString();
+        if (this.authenticationService.isSamlAssertionUrl(CloudProviderType.aws, requestUrl)) {
           resolve({ uploadData: [{ bytes: { toString: () => request.postData() } }] });
           return;
         }
@@ -81,20 +85,5 @@ export class CliAwsAuthenticationService implements IAwsAuthenticationService {
     await page.setRequestInterception(true);
 
     return page;
-  }
-
-  isRequestToIntercept(requestUrl: string): boolean {
-    if (requestUrl.indexOf("https://login.microsoftonline.com") !== -1 && requestUrl.indexOf("/oauth2/authorize") !== -1) {
-      return true;
-    }
-
-    const otherFilters = [
-      ".onelogin.com/login",
-      ".okta.com/discovery/iframe.html",
-      "https://accounts.google.com/ServiceLogin",
-      "https://signin.aws.amazon.com/saml",
-    ];
-
-    return otherFilters.some((filter) => requestUrl.indexOf(filter) !== -1);
   }
 }

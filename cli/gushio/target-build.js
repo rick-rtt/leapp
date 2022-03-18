@@ -13,10 +13,11 @@ module.exports = {
       await gushio.run(path.join(__dirname, './target-clean.js'))
 
       console.log('Building leapp CLI... ')
-      await compileFunction(shellJs)
+      await compileFunction(path, shellJs)
       console.log('Build completed successfully')
     } catch (e) {
-      console.error(e.message.red)
+      e.message = e.message.red
+      throw e
     }
   },
 }

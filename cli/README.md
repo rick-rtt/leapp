@@ -16,11 +16,11 @@ Leapp's Command Line Interface.
 # Usage
 <!-- usage -->
 ```sh-session
-$ npm install -g leapp
+$ npm install -g @noovolari/leapp-cli
 $ leapp COMMAND
 running command...
 $ leapp (--version)
-leapp/0.1.0 darwin-x64 node-v14.17.0
+@noovolari/leapp-cli/0.1.1 darwin-x64 node-v16.14.0
 $ leapp --help [COMMAND]
 USAGE
   $ leapp COMMAND
@@ -54,6 +54,7 @@ USAGE
 * [`leapp session generate SESSIONID`](#leapp-session-generate-sessionid)
 * [`leapp session get_id`](#leapp-session-get_id)
 * [`leapp session list`](#leapp-session-list)
+* [`leapp session open-web-console`](#leapp-session-open-web-console)
 * [`leapp session start`](#leapp-session-start)
 * [`leapp session stop`](#leapp-session-stop)
 
@@ -496,6 +497,21 @@ DESCRIPTION
 
 EXAMPLES
   $leapp session list
+```
+
+## `leapp session open-web-console`
+
+Open an AWS Web Console
+
+```
+USAGE
+  $ leapp session open-web-console
+
+DESCRIPTION
+  Open an AWS Web Console
+
+EXAMPLES
+  $leapp session open-web-console
 ```
 
 ## `leapp session start`

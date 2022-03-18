@@ -1,7 +1,8 @@
-import { describe, expect, test } from "@jest/globals";
+import { jest, describe, expect, test } from "@jest/globals";
 import { CliAwsAuthenticationService } from "./cli-aws-authentication-service";
 import { of } from "rxjs";
 import { Page, HTTPRequest } from "puppeteer";
+import { CloudProviderType } from "@noovolari/leapp-core/models/cloud-provider-type";
 
 class PageStub {
   public onPageCalled;
@@ -38,51 +39,96 @@ class PageStub {
 }
 
 describe("CliAwsAuthenticationService", () => {
-  test("needAuthentication", async () => {
+  const cases = [true, false];
+  test.each(cases)("needAuthentication: %p", async (needAuthentication) => {
     const idpUrl = "https://idpUrl";
     const page = new PageStub(idpUrl, {
       url: () => idpUrl,
       isInterceptResolutionHandled: () => false,
       continue: async () => Promise.resolve(),
     });
+    const authenticationService = {
+      isAuthenticationUrl: jest.fn(() => needAuthentication),
+      isSamlAssertionUrl: jest.fn(() => !needAuthentication),
+    };
 
-    const cliAwsAuthenticationService = new CliAwsAuthenticationService();
+    const cliAwsAuthenticationService = new CliAwsAuthenticationService(authenticationService as any);
     cliAwsAuthenticationService.getNavigationPage = async (headlessMode: boolean) => {
       expect(headlessMode).toBeTruthy();
       return of(page as unknown as Page).toPromise();
     };
 
-    cliAwsAuthenticationService.isRequestToIntercept = () => true;
-
-    expect(await cliAwsAuthenticationService.needAuthentication(idpUrl)).toBeTruthy();
+    expect(await cliAwsAuthenticationService.needAuthentication(idpUrl)).toBe(needAuthentication);
+    expect(authenticationService.isAuthenticationUrl).toHaveBeenCalledWith(CloudProviderType.aws, idpUrl);
+    expect(authenticationService.isSamlAssertionUrl).toHaveBeenCalledWith(CloudProviderType.aws, idpUrl);
     expect(page.onPageCalled).toBeTruthy();
     expect(page.gotoPageCalled).toBeTruthy();
   });
 
-  test("awsSignIn", async () => {
+  test("awsSignIn - saml assertion true", async () => {
     const idpUrl = "https://idpUrl";
     const needToAuthenticate = false;
     const page = new PageStub(idpUrl, {
-      url: () => "https://signin.aws.amazon.com/saml",
+      url: () => "samlUrl",
       isInterceptResolutionHandled: () => false,
       postData: () => "postData",
       continue: async () => Promise.resolve(),
     });
 
-    const cliAwsAuthenticationService = new CliAwsAuthenticationService();
+    const authenticationService = {
+      isSamlAssertionUrl: jest.fn(() => true),
+    };
+    const cliAwsAuthenticationService = new CliAwsAuthenticationService(authenticationService as any);
     cliAwsAuthenticationService.getNavigationPage = async (headlessMode: boolean) => {
       expect(headlessMode).toEqual(!needToAuthenticate);
       return of(page as unknown as Page).toPromise();
     };
 
-    const newVar = await cliAwsAuthenticationService.awsSignIn(idpUrl, needToAuthenticate);
-    expect(newVar.uploadData[0].bytes.toString()).toBe("postData");
+    const result = await cliAwsAuthenticationService.awsSignIn(idpUrl, needToAuthenticate);
+    expect(result.uploadData[0].bytes.toString()).toBe("postData");
     expect(page.onPageCalled).toBeTruthy();
     expect(page.gotoPageCalled).toBeTruthy();
+    expect(authenticationService.isSamlAssertionUrl).toHaveBeenCalledWith(CloudProviderType.aws, "samlUrl");
+  });
+
+  test("awsSignIn - saml assertion false", async () => {
+    const idpUrl = "https://idpUrl";
+    const needToAuthenticate = false;
+    const page = new PageStub(idpUrl, {
+      url: () => "wrongSamlUrl",
+      isInterceptResolutionHandled: () => false,
+      postData: () => "postData",
+      continue: async () => Promise.resolve(),
+    });
+
+    let requestCounter = 0;
+    const authenticationService = {
+      isSamlAssertionUrl: jest.fn(() => {
+        requestCounter++;
+        if (requestCounter === 1) {
+          page.goto(idpUrl).catch(() => null);
+          return false;
+        } else {
+          return true;
+        }
+      }),
+    };
+    const cliAwsAuthenticationService = new CliAwsAuthenticationService(authenticationService as any);
+    cliAwsAuthenticationService.getNavigationPage = async (headlessMode: boolean) => {
+      expect(headlessMode).toEqual(!needToAuthenticate);
+      return of(page as unknown as Page).toPromise();
+    };
+
+    const result = await cliAwsAuthenticationService.awsSignIn(idpUrl, needToAuthenticate);
+    expect(result.uploadData[0].bytes.toString()).toBe("postData");
+    expect(page.onPageCalled).toBeTruthy();
+    expect(page.gotoPageCalled).toBeTruthy();
+    expect(authenticationService.isSamlAssertionUrl).toHaveBeenCalledWith(CloudProviderType.aws, "wrongSamlUrl");
+    expect(requestCounter).toBe(2);
   });
 
   test("getNavigationPage and closeAuthenticationWindow", async () => {
-    const cliAwsAuthenticationService = new CliAwsAuthenticationService();
+    const cliAwsAuthenticationService = new CliAwsAuthenticationService(null);
 
     const page = await cliAwsAuthenticationService.getNavigationPage(false);
     const process = page.browser().process();
@@ -93,17 +139,5 @@ describe("CliAwsAuthenticationService", () => {
     await cliAwsAuthenticationService.closeAuthenticationWindow();
     expect(process?.killed).toBeTruthy();
     expect(process?.signalCode).toEqual("SIGKILL");
-  });
-
-  test("isRequestToIntercept", () => {
-    const cliAwsAuthenticationService = new CliAwsAuthenticationService();
-
-    expect(cliAwsAuthenticationService.isRequestToIntercept(".onelogin.com/login")).toBeTruthy();
-    expect(cliAwsAuthenticationService.isRequestToIntercept(".okta.com/discovery/iframe.html")).toBeTruthy();
-    expect(cliAwsAuthenticationService.isRequestToIntercept("https://accounts.google.com/ServiceLogin")).toBeTruthy();
-    expect(cliAwsAuthenticationService.isRequestToIntercept("https://signin.aws.amazon.com/saml")).toBeTruthy();
-    expect(cliAwsAuthenticationService.isRequestToIntercept("https://login.microsoftonline.com/something/oauth2/authorize")).toBeTruthy();
-    expect(cliAwsAuthenticationService.isRequestToIntercept("https://login.microsoftonline.com/")).toBeFalsy();
-    expect(cliAwsAuthenticationService.isRequestToIntercept("https://login.oauth2/authorize/")).toBeFalsy();
   });
 });

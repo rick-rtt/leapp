@@ -10,16 +10,22 @@ module.exports = {
   run: async (args) => {
     const path = require('path')
     const shellJs = require('shelljs')
+
+    const currentPath = shellJs.pwd()
     try {
-      await gushio.run(path.join(__dirname, './target-build.js'), ...args)
+      await gushio.run(path.join(__dirname, './target-build.js'), args)
 
       console.log('Launching leapp... ')
+      shellJs.cd(path.join(__dirname, '..'))
       const result = shellJs.exec('electron --enable-accelerated-mjpeg-decode --enable-accelerated-video --ignore-gpu-blacklist --enable-native-gpu-memory-buffers --enable-gpu-rasterization --ignore-gpu-blacklist .')
       if (result.code !== 0) {
         throw new Error(result.stderr)
       }
     } catch (e) {
-      console.error(e.message.red)
+      e.message = e.message.red
+      throw e
+    } finally {
+      shellJs.cd(currentPath)
     }
   },
 }
