@@ -33,6 +33,7 @@ import { CliOpenWebConsoleService } from "./cli-open-web-console-service";
 import { WebConsoleService } from "@noovolari/leapp-core/services/web-console-service";
 import fetch from "node-fetch";
 import { AuthenticationService } from "@noovolari/leapp-core/services/authentication-service";
+import { SsmService } from "@noovolari/leapp-core/services/ssm-service";
 
 /* eslint-disable */
 export class LeappCliService {
@@ -364,6 +365,16 @@ export class LeappCliService {
     }
 
     return this.webConsoleServiceInstance;
+  }
+
+  private ssmServiceInstance: SsmService;
+
+  get ssmService(): SsmService {
+    if (!this.ssmServiceInstance) {
+      this.ssmServiceInstance = new SsmService(this.loggingService, this.executeService);
+    }
+
+    return this.ssmServiceInstance;
   }
 
   get inquirer(): CliInquirer.Inquirer {
