@@ -20,7 +20,7 @@ $ npm install -g @noovolari/leapp-cli
 $ leapp COMMAND
 running command...
 $ leapp (--version)
-@noovolari/leapp-cli/0.1.1 darwin-x64 node-v16.14.0
+@noovolari/leapp-cli/0.1.1 darwin-x64 node-v14.17.0
 $ leapp --help [COMMAND]
 USAGE
   $ leapp COMMAND
@@ -56,6 +56,7 @@ USAGE
 * [`leapp session list`](#leapp-session-list)
 * [`leapp session open-web-console`](#leapp-session-open-web-console)
 * [`leapp session start`](#leapp-session-start)
+* [`leapp session start-ssm-session`](#leapp-session-start-ssm-session)
 * [`leapp session stop`](#leapp-session-stop)
 
 ## `leapp help [COMMAND]`
@@ -527,6 +528,21 @@ DESCRIPTION
 
 EXAMPLES
   $leapp session start
+```
+
+## `leapp session start-ssm-session`
+
+Start an AWS SSM session
+
+```
+USAGE
+  $ leapp session start-ssm-session
+
+DESCRIPTION
+  Start an AWS SSM session
+
+EXAMPLES
+  $leapp session start-ssm-session
 ```
 
 ## `leapp session stop`
