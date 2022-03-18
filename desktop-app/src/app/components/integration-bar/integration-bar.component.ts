@@ -10,7 +10,7 @@ import { AwsSsoIntegration } from "@noovolari/leapp-core/models/aws-sso-integrat
 import { constants } from "@noovolari/leapp-core/models/constants";
 import { AppService } from "../../services/app.service";
 import { WorkspaceService } from "@noovolari/leapp-core/services/workspace-service";
-import { AwsSsoRoleService, SsoRoleSession } from "@noovolari/leapp-core/services/session/aws/aws-sso-role-service";
+import { AwsSsoRoleService } from "@noovolari/leapp-core/services/session/aws/aws-sso-role-service";
 import { LeappCoreService } from "../../services/leapp-core.service";
 import { AwsSsoOidcService } from "@noovolari/leapp-core/services/aws-sso-oidc.service";
 import { LoggerLevel, LoggingService } from "@noovolari/leapp-core/services/logging-service";
@@ -91,7 +91,10 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.subscription = integrationsFilter.subscribe(() => {
       this.setValues();
-      this.selectedIntegrations = this.awsSsoConfigurations.map((awsIntegration) => ({ id: awsIntegration.id, selected: false }));
+      this.selectedIntegrations = this.awsSsoConfigurations.map((awsIntegration) => ({
+        id: awsIntegration.id,
+        selected: false,
+      }));
     });
     integrationsFilter.next(this.repository.listAwsSsoIntegrations());
 
@@ -194,12 +197,7 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
           this.modalRef = this.bsModalService.show(this.ssoModalTemplate, { class: "sso-modal" });
         }
 
-        // eslint-disable-next-line max-len
-        const ssoRoleSessions: SsoRoleSession[] = await this.leappCoreService.awsSsoIntegrationService.loginAndProvisionSessions(integrationId);
-        ssoRoleSessions.forEach((ssoRoleSession: SsoRoleSession) => {
-          ssoRoleSession.awsSsoConfigurationId = integrationId;
-          this.awsSsoRoleService.create(ssoRoleSession);
-        });
+        await this.leappCoreService.awsSsoIntegrationService.syncSessions(integrationId);
 
         if (this.modalRef) {
           this.modalRef.hide();

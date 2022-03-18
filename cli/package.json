@@ -9,7 +9,7 @@
   "bugs": "https://github.com/Noovolari/leapp/issues",
   "dependencies": {
     "@babel/plugin-proposal-decorators": "^7.16.5",
-    "@noovolari/leapp-core": "^0.1.92",
+    "@noovolari/leapp-core": "0.1.93",
     "@oclif/core": "1.6.0",
     "@oclif/plugin-help": "^5.1.12",
     "@types/inquirer": "^8.2.0",
@@ -58,10 +58,10 @@
     "zlib": "~1.0.5"
   },
   "devDependencies": {
-    "@commitlint/cli": "16.2.1",
-    "@commitlint/config-conventional": "16.2.1",
     "@babel/preset-env": "^7.16.5",
     "@babel/preset-typescript": "^7.16.5",
+    "@commitlint/cli": "16.2.1",
+    "@commitlint/config-conventional": "16.2.1",
     "@types/jest": "^27.4.0",
     "eslint": "^7.32.0",
     "eslint-config-oclif": "^4",

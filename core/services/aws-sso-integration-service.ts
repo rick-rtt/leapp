@@ -19,6 +19,7 @@ import { SessionType } from "../models/session-type";
 import { AwsSsoRoleSession } from "../models/aws-sso-role-session";
 import { ISessionNotifier } from "../interfaces/i-session-notifier";
 import { AwsSsoIntegrationTokenInfo } from "../models/aws-sso-integration-token-info";
+import { SessionFactory } from "./session-factory";
 
 const portalUrlValidationRegex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&/=]*)/;
 
@@ -27,6 +28,11 @@ export interface IntegrationCreationParams {
   portalUrl: string;
   region: string;
   browserOpening: string;
+}
+
+export interface SsoSessionsDiff {
+  sessionsToDelete: AwsSsoRoleSession[];
+  sessionsToAdd: SsoRoleSession[];
 }
 
 export class AwsSsoIntegrationService {
@@ -38,7 +44,8 @@ export class AwsSsoIntegrationService {
     private awsSsoRoleService: AwsSsoRoleService,
     private keyChainService: KeychainService,
     private sessionNotifier: ISessionNotifier,
-    private nativeService: INativeService
+    private nativeService: INativeService,
+    private sessionFactory: SessionFactory
   ) {}
 
   static validateAlias(alias: string): boolean | string {
@@ -79,75 +86,58 @@ export class AwsSsoIntegrationService {
     return formatDistance(new Date(integration.accessTokenExpiration), this.getDate(), { addSuffix: true });
   }
 
-  async loginAndProvisionSessions(integrationId: string): Promise<SsoRoleSession[]> {
-    const region = this.repository.getAwsSsoIntegration(integrationId).region;
-    const portalUrl = this.repository.getAwsSsoIntegration(integrationId).portalUrl;
+  async loginAndGetSessionsDiff(integrationId: string): Promise<SsoSessionsDiff> {
+    const awsSsoIntegration = this.repository.getAwsSsoIntegration(integrationId);
+    const region = awsSsoIntegration.region;
+    const portalUrl = awsSsoIntegration.portalUrl;
     const accessToken = await this.getAccessToken(integrationId, region, portalUrl);
+
     const onlineSessions = await this.getSessions(integrationId, accessToken, region);
-
     const persistedSessions = this.repository.getAwsSsoIntegrationSessions(integrationId);
-    const sessionsToBeDeleted: SsoRoleSession[] = [];
 
-    for (let i = 0; i < persistedSessions.length; i++) {
-      const persistedSession = persistedSessions[i];
-      const shouldBeDeleted =
-        onlineSessions.filter(
-          (s) =>
-            (persistedSession as unknown as SsoRoleSession).sessionName === s.sessionName &&
-            (persistedSession as unknown as SsoRoleSession).roleArn === s.roleArn &&
-            (persistedSession as unknown as SsoRoleSession).email === s.email
-        ).length === 0;
-
+    const sessionsToDelete: AwsSsoRoleSession[] = [];
+    for (const persistedSession of persistedSessions) {
+      const shouldBeDeleted = !onlineSessions.find((s) => {
+        const ssoRoleSession = persistedSession as unknown as SsoRoleSession;
+        return ssoRoleSession.sessionName === s.sessionName && ssoRoleSession.roleArn === s.roleArn && ssoRoleSession.email === s.email;
+      });
       if (shouldBeDeleted) {
-        sessionsToBeDeleted.push(persistedSession as unknown as SsoRoleSession);
-
-        const iamRoleChainedSessions = this.repository.listIamRoleChained(persistedSession);
-
-        for (let j = 0; j < iamRoleChainedSessions.length; j++) {
-          await this.awsSsoRoleService.delete(iamRoleChainedSessions[j].sessionId);
-        }
-
-        await this.awsSsoRoleService.stop(persistedSession.sessionId);
-        this.repository.deleteSession(persistedSession.sessionId);
+        sessionsToDelete.push(persistedSession as AwsSsoRoleSession);
       }
     }
 
-    const finalSessions = [];
-
-    for (let j = 0; j < onlineSessions.length; j++) {
-      const session = onlineSessions[j];
-      let found = false;
-      for (let i = 0; i < persistedSessions.length; i++) {
-        const persistedSession = persistedSessions[i];
-        if (
-          (persistedSession as unknown as SsoRoleSession).sessionName === session.sessionName &&
-          (persistedSession as unknown as SsoRoleSession).roleArn === session.roleArn &&
-          (persistedSession as unknown as SsoRoleSession).email === session.email
-        ) {
-          found = true;
-          break;
-        }
-      }
-      if (!found) {
-        finalSessions.push(session);
+    const sessionsToAdd = [];
+    for (const onlineSession of onlineSessions) {
+      const shouldBeCreated = !persistedSessions.find((persistedSession) => {
+        const session = persistedSession as unknown as SsoRoleSession;
+        return (
+          onlineSession.sessionName === session.sessionName && onlineSession.roleArn === session.roleArn && onlineSession.email === session.email
+        );
+      });
+      if (shouldBeCreated) {
+        sessionsToAdd.push(onlineSession);
       }
     }
-
-    return finalSessions;
+    return { sessionsToDelete, sessionsToAdd };
   }
 
-  async syncSessions(integrationId: string): Promise<SsoRoleSession[]> {
-    const ssoRoleSessions: SsoRoleSession[] = await this.loginAndProvisionSessions(integrationId);
+  async syncSessions(integrationId: string): Promise<SsoSessionsDiff> {
+    const sessionsDiff = await this.loginAndGetSessionsDiff(integrationId);
 
-    ssoRoleSessions.forEach((ssoRoleSession: SsoRoleSession) => {
+    for (const ssoRoleSession of sessionsDiff.sessionsToAdd) {
       ssoRoleSession.awsSsoConfigurationId = integrationId;
-      this.awsSsoRoleService.create(ssoRoleSession);
-    });
+      await this.awsSsoRoleService.create(ssoRoleSession);
+    }
 
-    return ssoRoleSessions;
+    for (const ssoSession of sessionsDiff.sessionsToDelete) {
+      const sessionService = this.sessionFactory.getSessionService(ssoSession.type);
+      await sessionService.delete(ssoSession.sessionId);
+    }
+
+    return sessionsDiff;
   }
 
-  async logout(integrationId: string | number): Promise<void> {
+  async logout(integrationId: string): Promise<void> {
     // Obtain region and access token
     const integration: AwsSsoIntegration = this.repository.getAwsSsoIntegration(integrationId);
     const region = integration.region;
@@ -172,8 +162,8 @@ export class AwsSsoIntegrationService {
 
           // Delete access token and remove sso integration info from workspace
           await this.keyChainService.deletePassword(constants.appName, this.getIntegrationAccessTokenKey(integrationId));
-          this.repository.unsetAwsSsoIntegrationExpiration(integrationId.toString());
-          await this.removeSsoSessionsFromWorkspace();
+          this.repository.unsetAwsSsoIntegrationExpiration(integrationId);
+          await this.removeSsoSessionsFromWorkspace(integrationId);
         }
       );
   }
@@ -285,22 +275,11 @@ export class AwsSsoIntegrationService {
     };
   }
 
-  private async removeSsoSessionsFromWorkspace(): Promise<void> {
-    const sessions = this.repository.listAwsSsoRoles();
-
-    for (let i = 0; i < sessions.length; i++) {
-      const sess = sessions[i];
-
-      const iamRoleChainedSessions = this.repository.listIamRoleChained(sess);
-
-      for (let j = 0; j < iamRoleChainedSessions.length; j++) {
-        await this.awsSsoRoleService.delete(iamRoleChainedSessions[j].sessionId);
-      }
-
-      await this.awsSsoRoleService.stop(sess.sessionId);
-
-      this.repository.deleteSession(sess.sessionId);
-      this.sessionNotifier?.deleteSession(sess.sessionId);
+  private async removeSsoSessionsFromWorkspace(integrationId: string): Promise<void> {
+    const ssoSessions = this.repository.getAwsSsoIntegrationSessions(integrationId);
+    for (const ssoSession of ssoSessions) {
+      const sessionService = this.sessionFactory.getSessionService(ssoSession.type);
+      await sessionService.delete(ssoSession.sessionId);
     }
   }
 

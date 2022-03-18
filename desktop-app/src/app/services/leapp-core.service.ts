@@ -131,7 +131,8 @@ export class LeappCoreService {
         this.awsSsoRoleService,
         this.keyChainService,
         this.workspaceService,
-        this.electronService
+        this.electronService,
+        this.sessionFactory
       );
     }
     return this.awsSsoIntegrationServiceInstance;

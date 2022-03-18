@@ -1,11 +1,16 @@
 const updateCoreDependencyVersion = async (path, shellJs, coreName, coreVersion, modulePath) => {
   const packageJsonPath = path.join(__dirname, modulePath, 'package.json')
   const packageJson = await fs.readJson(packageJsonPath)
-  packageJson.dependencies[coreName] = `^${coreVersion}`
+  packageJson.dependencies[coreName] = `${coreVersion}`
   await fs.writeJson(packageJsonPath, packageJson, {spaces: 2})
 
   shellJs.cd(path.join(__dirname, modulePath))
-  const result = shellJs.exec('npm install')
+  let result = shellJs.exec('npm cache clean --force')
+  if (result.code !== 0) {
+    throw new Error(result.stderr)
+  }
+
+  result = shellJs.exec('npm install')
   if (result.code !== 0) {
     throw new Error(result.stderr)
   }

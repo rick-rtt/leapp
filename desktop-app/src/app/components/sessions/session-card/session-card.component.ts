@@ -222,7 +222,11 @@ export class SessionCardComponent implements OnInit {
     event.stopPropagation();
     this.trigger.closeMenu();
 
-    this.bsModalService.show(EditDialogComponent, { animated: false, class: "edit-modal", initialState: { selectedSessionId: session.sessionId } });
+    this.bsModalService.show(EditDialogComponent, {
+      animated: false,
+      class: "edit-modal",
+      initialState: { selectedSessionId: session.sessionId },
+    });
   }
 
   /**
@@ -551,13 +555,13 @@ export class SessionCardComponent implements OnInit {
     return uuid.v4();
   }
 
-  async openAwsWebConsole(event: MouseEvent) {
+  async openAwsWebConsole(event: MouseEvent): Promise<void> {
     event.preventDefault();
     event.stopPropagation();
     this.trigger.closeMenu();
     const credentials = await (this.sessionService as AwsSessionService).generateCredentials(this.session.sessionId);
     const sessionRegion = this.session.region;
-    this.leappCoreService.webConsoleService.openWebConsole(credentials, sessionRegion);
+    await this.leappCoreService.webConsoleService.openWebConsole(credentials, sessionRegion);
   }
 
   private logSessionData(session: Session, message: string): void {

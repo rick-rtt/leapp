@@ -48,10 +48,10 @@ describe("LoginIntegration", () => {
   });
 
   test("login", async () => {
-    const sessionsSynced = ["session1", "session2"];
+    const sessionsDiff = { sessionsToAdd: ["session1", "session2"] };
     const leappCliService: any = {
       awsSsoIntegrationService: {
-        loginAndProvisionSessions: jest.fn(async () => sessionsSynced),
+        loginAndGetSessionsDiff: jest.fn(async () => sessionsDiff),
       },
       cliVerificationWindowService: {
         closeBrowser: jest.fn(),
@@ -65,7 +65,7 @@ describe("LoginIntegration", () => {
     await command.login(integration);
 
     expect(command.log).toHaveBeenNthCalledWith(1, "waiting for browser authorization using your AWS sign-in...");
-    expect(leappCliService.awsSsoIntegrationService.loginAndProvisionSessions).toHaveBeenCalledWith(integration.id);
+    expect(leappCliService.awsSsoIntegrationService.loginAndGetSessionsDiff).toHaveBeenCalledWith(integration.id);
     expect(command.log).toHaveBeenLastCalledWith("login successful (2 sessions ready to be synchronized)");
     expect(leappCliService.cliVerificationWindowService.closeBrowser).toHaveBeenCalled();
   });

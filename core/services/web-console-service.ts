@@ -5,7 +5,7 @@ import { LoggerLevel, LoggingService } from "./logging-service";
 export class WebConsoleService {
   constructor(private shellService: IShellService, private loggingService: LoggingService, private fetch: any) {}
 
-  async openWebConsole(credentialsInfo: CredentialsInfo, sessionRegion: string, sessionDuration: number = 3200) {
+  async openWebConsole(credentialsInfo: CredentialsInfo, sessionRegion: string, sessionDuration: number = 3200): Promise<void> {
     const federationUrl = "https://signin.aws.amazon.com/federation";
     const consoleHomeURL = `https://${sessionRegion}.console.aws.amazon.com/console/home?region=${sessionRegion}`;
 

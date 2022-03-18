@@ -48,10 +48,10 @@ describe("SyncIntegration", () => {
   });
 
   test("sync", async () => {
-    const sessionsSynced = ["session1", "session2"];
+    const sessionsDiff = { sessionsToDelete: ["session3", "session4"], sessionsToAdd: ["session1", "session2"] };
     const leappCliService: any = {
       awsSsoIntegrationService: {
-        syncSessions: jest.fn(async () => sessionsSynced),
+        syncSessions: jest.fn(async () => sessionsDiff),
       },
     };
 
@@ -62,7 +62,8 @@ describe("SyncIntegration", () => {
     await command.sync(integration);
 
     expect(leappCliService.awsSsoIntegrationService.syncSessions).toHaveBeenCalledWith(integration.id);
-    expect(command.log).toHaveBeenCalledWith(`${sessionsSynced.length} sessions synchronized`);
+    expect(command.log).toHaveBeenNthCalledWith(1, `${sessionsDiff.sessionsToAdd.length} sessions added`);
+    expect(command.log).toHaveBeenNthCalledWith(2, `${sessionsDiff.sessionsToDelete.length} sessions removed`);
   });
 
   const runCommand = async (errorToThrow: any, expectedErrorMessage: string) => {
