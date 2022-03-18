@@ -38,4 +38,8 @@ export const constants = {
   lightTheme: "Light Theme",
   darkTheme: "Dark Theme",
   colorTheme: "System Default",
+
+  cliStartAwsFederatedSessionChannel: "aws-federated-session-start-channel",
+  cliLogoutAwsFederatedSessionChannel: "aws-federated-session-logout-channel",
+  cliRefreshSessionsChannel: "refresh-sessions-channel",
 };

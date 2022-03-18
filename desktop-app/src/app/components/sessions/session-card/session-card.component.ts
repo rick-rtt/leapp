@@ -30,6 +30,7 @@ import { AwsSessionService } from "@noovolari/leapp-core/services/session/aws/aw
 import { LeappBaseError } from "@noovolari/leapp-core/errors/leapp-base-error";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { ElectronService } from "../../../services/electron.service";
+import { AwsAuthenticationService } from "../../../services/session/aws/aws-authentication.service";
 
 @Component({
   // eslint-disable-next-line @angular-eslint/component-selector
@@ -110,7 +111,8 @@ export class SessionCardComponent implements OnInit {
     private windowService: WindowService,
     private electronService: ElectronService,
     private messageToasterService: MessageToasterService,
-    private leappCoreService: LeappCoreService
+    private leappCoreService: LeappCoreService,
+    private awsAuthenticationService: AwsAuthenticationService
   ) {
     this.loggingService = leappCoreService.loggingService;
     this.sessionFactory = leappCoreService.sessionFactory;
@@ -176,9 +178,9 @@ export class SessionCardComponent implements OnInit {
   stopSession(): void {
     this.sessionService.stop(this.session.sessionId).then(() => {
       this.clearOptionIds();
+      this.logSessionData(this.session, `Stopped Session`);
+      this.trigger.closeMenu();
     });
-    this.logSessionData(this.session, `Stopped Session`);
-    this.trigger.closeMenu();
   }
 
   /**
@@ -260,41 +262,11 @@ export class SessionCardComponent implements OnInit {
   }
 
   logoutFromFederatedSession(): void {
-    try {
-      // Clear all extra data
-      const url = this.repository.getIdpUrl((this.session as AwsIamRoleFederatedSession).idpUrlId);
-      const getAppPath = this.electronService.path.join(this.electronService.app.getPath("appData"), constants.appName);
-      this.electronService.rimraf.sync(getAppPath + `/Partitions/leapp-${btoa(url)}`);
-
-      this.stopSession();
-
-      this.messageToasterService.toast(
-        "Cache and configuration file cleaned. Stopping session and restarting Leapp to take effect.",
-        ToastLevel.info,
-        "Cleaning configuration file"
-      );
-
-      // Restart
-      setTimeout(() => {
-        // a bit of timeout to make everything reset as expected and give time to read message
-        this.appService.restart();
-      }, 3000);
-    } catch (err) {
-      this.loggingService.logger(`Leapp has an error re-creating your configuration file and cache.`, LoggerLevel.error, this, err.stack);
-      if (this.appService.detectOs() === constants.windows) {
-        this.messageToasterService.toast(
-          `Leapp needs Admin permissions to do this: please restart the application as an Administrator and retry.`,
-          ToastLevel.warn,
-          "Cleaning configuration file"
-        );
-      } else {
-        this.messageToasterService.toast(
-          `Leapp has an error re-creating your configuration file and cache.`,
-          ToastLevel.error,
-          "Cleaning configuration file"
-        );
-      }
-    }
+    this.awsAuthenticationService.logoutFromFederatedSession(this.session, () => {
+      this.clearOptionIds();
+      this.logSessionData(this.session, `Stopped Session`);
+      this.trigger.closeMenu();
+    });
   }
 
   // ============================== //
