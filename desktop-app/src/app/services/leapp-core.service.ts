@@ -1,4 +1,5 @@
 import { Injectable } from "@angular/core";
+import { AuthenticationService } from "@noovolari/leapp-core/services/authentication-service";
 import { AwsIamUserService } from "@noovolari/leapp-core/services/session/aws/aws-iam-user-service";
 import { FileService } from "@noovolari/leapp-core/services/file-service";
 import { KeychainService } from "@noovolari/leapp-core/services/keychain-service";
@@ -41,6 +42,7 @@ export class LeappCoreService {
   private awsSsoOidcServiceInstance: AwsSsoOidcService;
   private awsCoreServiceInstance: AwsCoreService;
   private azureServiceInstance: AzureService;
+  private authenticationServiceInstance: AuthenticationService;
   private sessionFactoryInstance: SessionFactory;
   private awsParentSessionFactoryInstance: AwsParentSessionFactory;
   private fileServiceInstance: FileService;
@@ -61,7 +63,9 @@ export class LeappCoreService {
     private verificationWindowService: VerificationWindowService,
     private electronService: ElectronService,
     private windowService: WindowService
-  ) {}
+  ) {
+    awsAuthenticationService.leappCoreService = this;
+  }
 
   public get webConsoleService(): WebConsoleService {
     if (!this.webConsoleServiceInstance) {
@@ -174,6 +178,13 @@ export class LeappCoreService {
     }
 
     return this.azureServiceInstance;
+  }
+
+  public get authenticationService(): AuthenticationService {
+    if (!this.authenticationServiceInstance) {
+      this.authenticationServiceInstance = new AuthenticationService();
+    }
+    return this.authenticationServiceInstance;
   }
 
   public get sessionFactory(): SessionFactory {

@@ -1,9 +1,13 @@
 import { Injectable } from "@angular/core";
 import { IAwsAuthenticationService } from "@noovolari/leapp-core/interfaces/i-aws-authentication.service";
+import { CloudProviderType } from "@noovolari/leapp-core/models/cloud-provider-type";
+import { LeappCoreService } from "../../leapp-core.service";
 import { WindowService } from "../../window.service";
 
 @Injectable({ providedIn: "root" })
 export class AwsAuthenticationService implements IAwsAuthenticationService {
+  leappCoreService: LeappCoreService;
+
   constructor(private windowService: WindowService) {}
 
   async needAuthentication(idpUrl: string): Promise<boolean> {
@@ -14,42 +18,17 @@ export class AwsAuthenticationService implements IAwsAuthenticationService {
       const nearY = 50;
       // Generate a new singleton browser window for the check
       let idpWindow = this.windowService.newWindow(idpUrl, false, "", activeWindowPosition[0] + nearX, activeWindowPosition[1] + nearY);
-      // This filter is used to listen to go to a specific callback url (or the generic one)
-      const filter = {
-        urls: [
-          "https://*.onelogin.com/*",
-          "https://*.okta.com/*",
-          "https://accounts.google.com/ServiceLogin*",
-          "https://login.microsoftonline.com/*",
-          "https://signin.aws.amazon.com/saml",
-        ],
-      };
+
+      //const filter = { urls: ["https://*.*/*"] };
 
       // Our request filter call the generic hook filter passing the idp response type
       // to construct the ideal method to deal with the construction of the response
-      idpWindow.webContents.session.webRequest.onBeforeRequest(filter, (details, callback) => {
-        // G Suite
-        if (details.url.indexOf("https://accounts.google.com/ServiceLogin") !== -1) {
+      idpWindow.webContents.session.webRequest.onBeforeRequest((details, callback) => {
+        if (this.leappCoreService.authenticationService.isAuthenticationUrl(CloudProviderType.aws, details.url)) {
           idpWindow = null;
           resolve(true);
         }
-        // One Login
-        if (details.url.indexOf(".onelogin.com/login") !== -1) {
-          idpWindow = null;
-          resolve(true);
-        }
-        // OKTA
-        if (details.url.indexOf(".okta.com/discovery/iframe.html") !== -1) {
-          idpWindow = null;
-          resolve(true);
-        }
-        // AzureAD
-        if (details.url.indexOf("https://login.microsoftonline.com") !== -1 && details.url.indexOf("/oauth2/authorize") !== -1) {
-          idpWindow = null;
-          resolve(true);
-        }
-        // Do not show window: already logged by means of session cookies
-        if (details.url.indexOf("https://signin.aws.amazon.com/saml") !== -1) {
+        if (this.leappCoreService.authenticationService.isSamlAssertionUrl(CloudProviderType.aws, details.url)) {
           idpWindow = null;
           resolve(false);
         }
@@ -77,25 +56,31 @@ export class AwsAuthenticationService implements IAwsAuthenticationService {
       activeWindowPosition[0] + nearX,
       activeWindowPosition[1] + nearY
     );
-    // 3. Prepare filters and configure callback
-    const filter = { urls: ["https://signin.aws.amazon.com/saml"] };
     // Catch filter url: extract SAML response
     // Our request filter call the generic hook filter passing the idp response type
     // to construct the ideal method to deal with the construction of the response
     return new Promise((resolve) => {
-      idpWindow.webContents.session.webRequest.onBeforeRequest(filter, (details, callback) => {
-        // it will throw an error as we have altered the original response
-        // Setting that everything is ok if we have arrived here
-        idpWindow.close();
-        idpWindow = null;
+      idpWindow.webContents.session.webRequest.onBeforeRequest((details, callback) => {
+        if (this.leappCoreService.authenticationService.isSamlAssertionUrl(CloudProviderType.aws, details.url)) {
+          // it will throw an error as we have altered the original response
+          // Setting that everything is ok if we have arrived here
+          idpWindow.close();
+          idpWindow = null;
 
-        // Shut down the filter action: we don't need it anymore
-        if (callback) {
-          callback({ cancel: true });
+          // Shut down the filter action: we don't need it anymore
+          if (callback) {
+            callback({ cancel: true });
+          }
+
+          // Return the details
+          resolve(details);
+        } else {
+          // Callback is used by filter to keep traversing calls until one of the filters apply
+          callback({
+            requestHeaders: details.requestHeaders,
+            url: details.url,
+          });
         }
-
-        // Return the details
-        resolve(details);
       });
       // 4. Navigate to idpUrl
       idpWindow.loadURL(idpUrl);
