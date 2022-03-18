@@ -1,28 +1,15 @@
-import { Injectable } from "@angular/core";
-import { AppService } from "./app.service";
-import { CredentialsInfo } from "@noovolari/leapp-core/models/credentials-info";
-import { LeappBaseError } from "@noovolari/leapp-core/errors/leapp-base-error";
-import { LoggerLevel, LoggingService } from "@noovolari/leapp-core/services/logging-service";
-import { ExecuteService } from "@noovolari/leapp-core/services/execute-service";
-import { LeappCoreService } from "./leapp-core.service";
+import { LoggerLevel, LoggingService } from "./logging-service";
+import { ExecuteService } from "./execute-service";
+import { CredentialsInfo } from "../models/credentials-info";
+import { LeappBaseError } from "../errors/leapp-base-error";
 
-const AWS = require("aws-sdk");
-
-@Injectable({
-  providedIn: "root",
-})
-
-//TODO: move into core module in near future
 export class SsmService {
+  aws;
   ssmClient;
   ec2Client;
 
-  private loggingService: LoggingService;
-  private executeService: ExecuteService;
-
-  constructor(private appService: AppService, private leappCoreService: LeappCoreService) {
-    this.loggingService = leappCoreService.loggingService;
-    this.executeService = leappCoreService.executeService;
+  constructor(private loggingService: LoggingService, private executeService: ExecuteService) {
+    this.aws = require("aws-sdk");
   }
 
   /**
@@ -48,15 +35,17 @@ export class SsmService {
    * @param region - pass the region where you want to make the request
    * @returns - {Observable<SsmResult>} - return the list of instances capable of SSM in the selected region
    */
-  async getSsmInstances(credentials: CredentialsInfo, region: string): Promise<any> {
+  async getSsmInstances(credentials: CredentialsInfo, region: string, setFilteringForEc2CallsCallback?: any): Promise<any> {
     // Set your SSM client and EC2 client
-    AWS.config.update(SsmService.setConfig(credentials, region));
-    this.ssmClient = new AWS.SSM();
-    this.ec2Client = new AWS.EC2();
+    this.aws.config.update(SsmService.setConfig(credentials, region));
+    this.ssmClient = new this.aws.SSM();
+    this.ec2Client = new this.aws.EC2();
 
     // Fix for Ec2 clients from electron app
     // TODO: find a way to inject the origin header without using setFilteringForEc2Calls
-    this.appService.setFilteringForEc2Calls();
+    if (setFilteringForEc2CallsCallback) {
+      setFilteringForEc2CallsCallback();
+    }
 
     // Get Ssm instances info data
     const instances = await this.requestSsmInstances();

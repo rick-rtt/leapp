@@ -1,6 +1,6 @@
 import { TestBed } from "@angular/core/testing";
 
-import { SsmService } from "./ssm.service";
+import { AppSsmService } from "./app-ssm.service";
 import { mustInjected } from "../../base-injectables";
 
 describe("SsmService", () => {
@@ -11,7 +11,7 @@ describe("SsmService", () => {
   });
 
   it("should be created", () => {
-    const service: SsmService = TestBed.get(SsmService);
+    const service: AppSsmService = TestBed.get(AppSsmService);
     expect(service).toBeTruthy();
   });
 });

@@ -13,7 +13,7 @@ import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
 import { LeappCoreService } from "../../../services/leapp-core.service";
 import { LoggerLevel, LoggingService } from "@noovolari/leapp-core/services/logging-service";
 import { SessionFactory } from "@noovolari/leapp-core/services/session-factory";
-import { SsmService } from "../../../services/ssm.service";
+import { AppSsmService } from "../../../services/app-ssm.service";
 import { FileService } from "@noovolari/leapp-core/services/file-service";
 import { KeychainService } from "@noovolari/leapp-core/services/keychain-service";
 import { WorkspaceService } from "@noovolari/leapp-core/services/workspace-service";
@@ -106,7 +106,7 @@ export class SessionCardComponent implements OnInit {
     private router: Router,
     private bsModalService: BsModalService,
     private modalService: BsModalService,
-    private ssmService: SsmService,
+    private ssmService: AppSsmService,
     private windowService: WindowService,
     private electronService: ElectronService,
     private messageToasterService: MessageToasterService,

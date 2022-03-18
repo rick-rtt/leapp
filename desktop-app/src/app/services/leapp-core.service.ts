@@ -26,6 +26,7 @@ import { constants } from "@noovolari/leapp-core/models/constants";
 import { AwsSsoIntegrationService } from "@noovolari/leapp-core/services/aws-sso-integration-service";
 import { WebConsoleService } from "@noovolari/leapp-core/services/web-console-service";
 import { WindowService } from "./window.service";
+import { SsmService } from "@noovolari/leapp-core/services/ssm-service";
 
 @Injectable({
   providedIn: "root",
@@ -52,6 +53,7 @@ export class LeappCoreService {
   private retroCompatibilityServiceInstance: RetroCompatibilityService;
   private azureCoreServiceInstance: AzureCoreService;
   private webConsoleServiceInstance: WebConsoleService;
+  private ssmServiceInstance: SsmService;
 
   constructor(
     private mfaCodePrompter: MfaCodePromptService,
@@ -185,6 +187,13 @@ export class LeappCoreService {
       );
     }
     return this.sessionFactoryInstance;
+  }
+
+  public get ssmService(): SsmService {
+    if (!this.ssmServiceInstance) {
+      this.ssmServiceInstance = new SsmService(this.loggingService, this.executeService);
+    }
+    return this.ssmServiceInstance;
   }
 
   public get awsParentSessionFactory(): AwsParentSessionFactory {

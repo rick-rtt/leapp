@@ -1,6 +1,6 @@
 {
   "name": "@noovolari/leapp-core",
-  "version": "0.1.89",
+  "version": "0.1.91",
   "author": "besharp <info@besharp.it>",
   "description": "Leapp's core module",
   "peerDependencies": {
