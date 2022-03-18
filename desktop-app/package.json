@@ -10,6 +10,7 @@
   "scripts": {
     "clean": "gushio gushio/target-clean.js",
     "postinstall": "electron-builder install-app-deps",
+    "postinstall-m1": "electron-builder install-app-deps --arch=arm64 --platform=darwin",
     "rebuild-keytar": "electron-rebuild -f -w keytar",
     "release": "standard-version",
     "ng": "ng",

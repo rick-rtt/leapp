@@ -21,6 +21,7 @@ import { WindowService } from "./services/window.service";
 import { ElectronService } from "./services/electron.service";
 import { AwsSsoIntegrationService } from "@noovolari/leapp-core/services/aws-sso-integration-service";
 import { AwsSsoRoleService } from "@noovolari/leapp-core/services/session/aws/aws-sso-role-service";
+import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
 
 @Component({
   selector: "app-root",
@@ -145,6 +146,13 @@ export class AppComponent implements OnInit {
   private beforeCloseInstructions() {
     // Check if we are here
     this.loggingService.logger("Closing app with cleaning process...", LoggerLevel.info, this);
+
+    // Stop all the sessions
+    const sessions = this.repository.getSessions();
+    sessions.forEach((s) => {
+      s.status = SessionStatus.inactive;
+    });
+    this.repository.updateSessions(sessions);
 
     // We need the Try/Catch as we have a the possibility to call the method without sessions
     try {
