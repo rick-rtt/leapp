@@ -5,7 +5,7 @@ import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
 import { AwsSessionService } from "@noovolari/leapp-core/services/session/aws/aws-session-service";
 import { CredentialsInfo } from "@noovolari/leapp-core/models/credentials-info";
 
-export default class OpenWebConsole extends LeappCommand {
+export default class StartSsmSession extends LeappCommand {
   static description = "Start an AWS SSM session";
 
   static examples = [`$leapp session start-ssm-session`];
@@ -23,7 +23,7 @@ export default class OpenWebConsole extends LeappCommand {
     }
   }
 
-  private async startSsmSession(session: Session): Promise<void> {
+  async startSsmSession(session: Session): Promise<void> {
     // TODO: check whether the session is an aws one
     const sessionService = this.leappCliService.sessionFactory.getSessionService(session.type) as AwsSessionService;
     try {
