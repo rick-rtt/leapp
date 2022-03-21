@@ -221,10 +221,10 @@ describe("AwsSsoIntegrationService", () => {
     const sessionFactory = {
       getSessionService: jest.fn(() => sessionService),
     };
-    const awsSsoIntegratinService = new AwsSsoIntegrationService(null, null, awsSsoRoleService as any, null, null, null, sessionFactory as any);
-    (awsSsoIntegratinService as any).loginAndGetSessionsDiff = loginAndGetSessionsDiff;
+    const awsSsoIntegrationService = new AwsSsoIntegrationService(null, null, awsSsoRoleService as any, null, null, null, sessionFactory as any);
+    (awsSsoIntegrationService as any).loginAndGetSessionsDiff = loginAndGetSessionsDiff;
 
-    const syncedSessions = await awsSsoIntegratinService.syncSessions(integrationId);
+    const syncedSessions = await awsSsoIntegrationService.syncSessions(integrationId);
 
     expect(syncedSessions).toEqual(sessionDiff);
     expect(loginAndGetSessionsDiff).toHaveBeenCalledWith(integrationId);
