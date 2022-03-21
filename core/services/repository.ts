@@ -19,10 +19,7 @@ export class Repository {
   // Private singleton workspace
   private _workspace: Workspace;
 
-  constructor(private nativeService: INativeService, private fileService: FileService) {
-    // TODO: check if it can be moved to a bootstrap phase
-    this.createWorkspace();
-  }
+  constructor(private nativeService: INativeService, private fileService: FileService) {}
 
   // WORKSPACE
 

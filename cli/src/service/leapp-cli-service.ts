@@ -22,7 +22,7 @@ import { CliMfaCodePromptService } from "./cli-mfa-code-prompt-service";
 import { CliAwsAuthenticationService } from "./cli-aws-authentication-service";
 import { CliVerificationWindowService } from "./cli-verification-window-service";
 import { CliNativeService } from "./cli-native-service";
-import { CliShellExecutionService } from "./cli-shell-execution-service";
+import { DesktopAppRemoteProcedures } from "./desktop-app-remote-procedures";
 import { constants } from "@noovolari/leapp-core/models/constants";
 import { NamedProfilesService } from "@noovolari/leapp-core/services/named-profiles-service";
 import { IdpUrlsService } from "@noovolari/leapp-core/services/idp-urls-service";
@@ -77,11 +77,11 @@ export class LeappCliService {
     return this.cliAwsAuthenticationServiceInstance;
   }
 
-  private cliShellExecutionServiceInstance: CliShellExecutionService;
+  private cliShellExecutionServiceInstance: DesktopAppRemoteProcedures;
 
-  public get cliShellExecutionService(): CliShellExecutionService {
+  public get cliShellExecutionService(): DesktopAppRemoteProcedures {
     if (!this.cliShellExecutionServiceInstance) {
-      this.cliShellExecutionServiceInstance = new CliShellExecutionService();
+      this.cliShellExecutionServiceInstance = new DesktopAppRemoteProcedures();
     }
 
     return this.cliShellExecutionServiceInstance;

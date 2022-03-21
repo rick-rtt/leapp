@@ -1,9 +1,9 @@
 import { jest, describe, test, expect } from "@jest/globals";
-import { CliShellExecutionService } from "./cli-shell-execution-service";
+import { DesktopAppRemoteProcedures } from "./desktop-app-remote-procedures";
 
 describe("CliShellExecutionService", () => {
   test("isDesktopAppRunning - on Windows, leap inactive", async () => {
-    const cliShellExecutionService = new CliShellExecutionService();
+    const cliShellExecutionService = new DesktopAppRemoteProcedures();
     cliShellExecutionService.getPlatform = jest.fn(() => "win32");
     (cliShellExecutionService.execCommand as any) = jest.fn((cmd, callback: any) => {
       expect(cmd).toBe("tasklist");
@@ -11,13 +11,13 @@ describe("CliShellExecutionService", () => {
     });
 
     const isRunning = await cliShellExecutionService.isDesktopAppRunning();
-    //console.log(await CliShellExecutionService.isDesktopAppRunning())
+    //console.log(await DesktopAppRemoteProcedures.isDesktopAppRunning())
     expect(cliShellExecutionService.execCommand).toHaveBeenCalled();
     expect(isRunning).toBe(false);
   });
 
   test("isDesktopAppRunning - on Windows, leap active", async () => {
-    const cliShellExecutionService = new CliShellExecutionService();
+    const cliShellExecutionService = new DesktopAppRemoteProcedures();
     cliShellExecutionService.getPlatform = jest.fn(() => "win32");
     (cliShellExecutionService.execCommand as any) = jest.fn((cmd, callback: any) => {
       expect(cmd).toBe("tasklist");
@@ -25,13 +25,13 @@ describe("CliShellExecutionService", () => {
     });
 
     const isRunning = await cliShellExecutionService.isDesktopAppRunning();
-    //console.log(await CliShellExecutionService.isDesktopAppRunning())
+    //console.log(await DesktopAppRemoteProcedures.isDesktopAppRunning())
     expect(cliShellExecutionService.execCommand).toHaveBeenCalled();
     expect(isRunning).toBe(true);
   });
 
   test("isDesktopAppRunning - on Windows, error", async () => {
-    const cliShellExecutionService = new CliShellExecutionService();
+    const cliShellExecutionService = new DesktopAppRemoteProcedures();
     cliShellExecutionService.getPlatform = jest.fn(() => "win32");
     (cliShellExecutionService.execCommand as any) = jest.fn((cmd, callback: any) => {
       callback(new Error("error"));
@@ -42,7 +42,7 @@ describe("CliShellExecutionService", () => {
   });
 
   test("isDesktopAppRunning - on other platforms, leap active", async () => {
-    const cliShellExecutionService = new CliShellExecutionService();
+    const cliShellExecutionService = new DesktopAppRemoteProcedures();
     cliShellExecutionService.getPlatform = jest.fn(() => "platform");
     (cliShellExecutionService.execCommand as any) = jest.fn((cmd, callback: any) => {
       expect(cmd).toBe("ps -Ac");

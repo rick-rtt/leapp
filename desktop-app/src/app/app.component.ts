@@ -3,6 +3,8 @@ import { environment } from "../environments/environment";
 import { AppService } from "./services/app.service";
 import { Router } from "@angular/router";
 import { setTheme } from "ngx-bootstrap/utils";
+import { MfaCodePromptService } from "./services/mfa-code-prompt.service";
+import { AwsAuthenticationService } from "./services/session/aws/aws-authentication.service";
 import { UpdaterService } from "./services/updater.service";
 import compareVersions from "compare-versions";
 import { LoggerLevel, LoggingService } from "@noovolari/leapp-core/services/logging-service";
@@ -17,6 +19,7 @@ import { RetroCompatibilityService } from "@noovolari/leapp-core/services/retro-
 import { LeappCoreService } from "./services/leapp-core.service";
 import { SessionFactory } from "@noovolari/leapp-core/services/session-factory";
 import { RotationService } from "@noovolari/leapp-core/services/rotation-service";
+import { VerificationWindowService } from "./services/verification-window.service";
 import { WindowService } from "./services/window.service";
 import { ElectronService } from "./services/electron.service";
 import { AwsSsoIntegrationService } from "@noovolari/leapp-core/services/aws-sso-integration-service";
@@ -44,12 +47,21 @@ export class AppComponent implements OnInit {
   /* Main app file: launches the Angular framework inside Electron app */
   constructor(
     leappCoreService: LeappCoreService,
+    mfaCodePrompter: MfaCodePromptService,
+    awsAuthenticationService: AwsAuthenticationService,
+    verificationWindowService: VerificationWindowService,
     public appService: AppService,
     private router: Router,
     private updaterService: UpdaterService,
     private windowService: WindowService,
     private electronService: ElectronService
   ) {
+    leappCoreService.mfaCodePrompter = mfaCodePrompter;
+    leappCoreService.awsAuthenticationService = awsAuthenticationService;
+    leappCoreService.verificationWindowService = verificationWindowService;
+    leappCoreService.windowService = windowService;
+    leappCoreService.repository.createWorkspace();
+
     this.repository = leappCoreService.repository;
     this.fileService = leappCoreService.fileService;
     this.awsCoreService = leappCoreService.awsCoreService;
@@ -134,6 +146,19 @@ export class AppComponent implements OnInit {
     // go to the list page if is your second visit
     await this.router.navigate(["/dashboard"]);
     document.querySelector("#loader").classList.add("disable-loader");
+
+    // server
+    const ipc = this.electronService.nodeIpc;
+    ipc.config.id = "leapp_da";
+    ipc.serve(() => {
+      ipc.server.on("message", (data, socket) => {
+        if (data.method === "isDesktopAppRunning") {
+          ipc.server.emit(socket, "message", "true");
+        }
+      });
+    });
+
+    ipc.server.start();
   }
 
   closeAllRightClickMenus(): void {
