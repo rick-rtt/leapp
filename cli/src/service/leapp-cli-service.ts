@@ -249,7 +249,7 @@ export class LeappCliService {
   get awsSsoIntegrationService(): AwsSsoIntegrationService {
     if (!this.awsSsoIntegrationServiceInstance) {
       this.awsSsoIntegrationServiceInstance = new AwsSsoIntegrationService(this.repository, this.awsSsoOidcService,
-        this.awsSsoRoleService, this.keyChainService, this.workspaceService, this.cliNativeService, this.sessionFactory);
+        this.awsSsoRoleService, this.keyChainService, this.workspaceService, this.cliNativeService);
     }
 
     return this.awsSsoIntegrationServiceInstance;
