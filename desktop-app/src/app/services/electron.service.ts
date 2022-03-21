@@ -32,6 +32,7 @@ export class ElectronService implements INativeService {
   httpsProxyAgent: any;
   nativeTheme: any;
   notification: any;
+  nodeIpc: any;
   process: any;
 
   constructor() {
@@ -64,6 +65,7 @@ export class ElectronService implements INativeService {
       this.ipcRenderer = window.require("electron").ipcRenderer;
       this.nativeTheme = window.require("@electron/remote").nativeTheme;
       this.notification = window.require("@electron/remote").Notification;
+      this.nodeIpc = window.require("node-ipc");
       this.process = (window as any).process;
     }
   }

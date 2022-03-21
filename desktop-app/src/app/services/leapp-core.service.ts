@@ -33,6 +33,12 @@ import { SsmService } from "@noovolari/leapp-core/services/ssm-service";
   providedIn: "root",
 })
 export class LeappCoreService {
+  // Injected by app.component
+  mfaCodePrompter: MfaCodePromptService;
+  awsAuthenticationService: AwsAuthenticationService;
+  verificationWindowService: VerificationWindowService;
+  windowService: WindowService;
+
   private workspaceServiceInstance: WorkspaceService;
   private awsIamUserServiceInstance: AwsIamUserService;
   private awsIamRoleFederatedServiceInstance: AwsIamRoleFederatedService;
@@ -57,15 +63,7 @@ export class LeappCoreService {
   private webConsoleServiceInstance: WebConsoleService;
   private ssmServiceInstance: SsmService;
 
-  constructor(
-    private mfaCodePrompter: MfaCodePromptService,
-    private awsAuthenticationService: AwsAuthenticationService,
-    private verificationWindowService: VerificationWindowService,
-    private electronService: ElectronService,
-    private windowService: WindowService
-  ) {
-    awsAuthenticationService.leappCoreService = this;
-  }
+  constructor(private electronService: ElectronService) {}
 
   public get webConsoleService(): WebConsoleService {
     if (!this.webConsoleServiceInstance) {

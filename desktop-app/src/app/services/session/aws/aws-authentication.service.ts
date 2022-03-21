@@ -13,9 +13,8 @@ import { Session } from "@noovolari/leapp-core/models/session";
 
 @Injectable({ providedIn: "root" })
 export class AwsAuthenticationService implements IAwsAuthenticationService {
-  leappCoreService: LeappCoreService;
-
   constructor(
+    private leappCoreService: LeappCoreService,
     private appService: AppService,
     private windowService: WindowService,
     private electronService: ElectronService,
@@ -30,8 +29,6 @@ export class AwsAuthenticationService implements IAwsAuthenticationService {
       const nearY = 50;
       // Generate a new singleton browser window for the check
       let idpWindow = this.windowService.newWindow(idpUrl, false, "", activeWindowPosition[0] + nearX, activeWindowPosition[1] + nearY);
-
-      //const filter = { urls: ["https://*.*/*"] };
 
       // Our request filter call the generic hook filter passing the idp response type
       // to construct the ideal method to deal with the construction of the response

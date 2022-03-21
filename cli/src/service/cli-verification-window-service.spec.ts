@@ -1,4 +1,4 @@
-import { expect, test } from "@jest/globals";
+import { describe, jest, expect, test } from "@jest/globals";
 import { CliVerificationWindowService } from "./cli-verification-window-service";
 
 describe("CliVerificationWindowService", () => {
