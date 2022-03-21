@@ -207,7 +207,8 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
         this.loadingInApp = false;
       } catch (err) {
         await this.logout(integrationId);
-        this.messageToasterService.toast(`Error during SSO Login. Invalid SSO URL`, ToastLevel.error);
+        this.loggingService.logger(`Error during SSO Login: ${err.toString()}`, LoggerLevel.error);
+        this.messageToasterService.toast(`Error during SSO Login: ${err.toString()}`, ToastLevel.error);
         this.modalRef.hide();
       }
     }
