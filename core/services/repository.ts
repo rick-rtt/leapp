@@ -24,7 +24,7 @@ export class Repository {
   // WORKSPACE
 
   get workspace(): Workspace {
-    return this._workspace;
+    return this.getWorkspace();
   }
 
   set workspace(value: Workspace) {
