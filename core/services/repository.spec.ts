@@ -6,6 +6,7 @@ import { constants } from "../models/constants";
 import { Session } from "../models/session";
 import { SessionType } from "../models/session-type";
 import { SessionStatus } from "../models/session-status";
+import { LeappNotFoundError } from "../errors/leapp-not-found-error";
 
 describe("Repository", () => {
   let mockedWorkspace;
@@ -295,5 +296,233 @@ describe("Repository", () => {
     workspace.sessions = [mockedSession];
 
     expect(repository.listIamRoleChained()).toStrictEqual([]);
+  });
+
+  test("getDefaultRegion() - default rigion property from workspace", () => {
+    const workspace = new Workspace();
+    mockedFileService.encryptText = jest.fn(() => JSON.stringify(workspace));
+
+    repository.workspace = workspace;
+    repository.persistWorkspace(workspace);
+
+    expect(repository.getDefaultRegion()).toStrictEqual(workspace.defaultRegion);
+  });
+
+  test("getDefaultLocation() - default location property from workspace", () => {
+    const workspace = new Workspace();
+    mockedFileService.encryptText = jest.fn(() => JSON.stringify(workspace));
+
+    repository.workspace = workspace;
+    repository.persistWorkspace(workspace);
+
+    expect(repository.getDefaultLocation()).toStrictEqual(workspace.defaultLocation);
+  });
+
+  test("updateDefaultRegion() - update default region property in workspace", () => {
+    const workspace = new Workspace();
+    mockedFileService.encryptText = jest.fn(() => JSON.stringify(workspace));
+
+    repository.workspace = workspace;
+    repository.persistWorkspace(workspace);
+    repository.updateDefaultRegion("mocked");
+    expect("mocked").toStrictEqual(workspace.defaultRegion);
+  });
+
+  test("updateDefaultLocation() - update default location property in workspace", () => {
+    const workspace = new Workspace();
+    mockedFileService.encryptText = jest.fn(() => JSON.stringify(workspace));
+
+    repository.workspace = workspace;
+    repository.persistWorkspace(workspace);
+    repository.updateDefaultLocation("mocked");
+    expect("mocked").toStrictEqual(workspace.defaultLocation);
+  });
+
+  test("getIdpUrl() - get saved idpUrl by id", () => {
+    const workspace = new Workspace();
+    mockedFileService.encryptText = jest.fn(() => JSON.stringify(workspace));
+
+    const mockedIdp = { id: "1234", url: "mocked-url" };
+    workspace.idpUrls.push(mockedIdp);
+    repository.workspace = workspace;
+    repository.persistWorkspace(workspace);
+    expect(repository.getIdpUrl("1234")).toStrictEqual(mockedIdp.url);
+  });
+
+  test("getIdpUrls() - get saved idpUrls", () => {
+    const workspace = new Workspace();
+    mockedFileService.encryptText = jest.fn(() => JSON.stringify(workspace));
+
+    const mockedIdp = { id: "1234", url: "mocked-url" };
+    workspace.idpUrls.push(mockedIdp);
+    repository.workspace = workspace;
+    repository.persistWorkspace(workspace);
+    expect(repository.getIdpUrls()).toStrictEqual([mockedIdp]);
+  });
+
+  test("addIdpUrl() - add a new IdpUrl", () => {
+    const workspace = new Workspace();
+    mockedFileService.encryptText = jest.fn(() => JSON.stringify(workspace));
+    repository.workspace = workspace;
+
+    const mockedIdp = { id: "1234", url: "mocked-url" };
+    repository.addIdpUrl(mockedIdp);
+
+    repository.persistWorkspace(workspace);
+    expect(repository.getIdpUrls()).toStrictEqual([mockedIdp]);
+  });
+
+  test("updateIdpUrl() - update a IdpUrl", () => {
+    const workspace = new Workspace();
+    mockedFileService.encryptText = jest.fn(() => JSON.stringify(workspace));
+
+    repository.workspace = workspace;
+
+    const mockedIdp = { id: "1234", url: "mocked-url" };
+    workspace.idpUrls.push(mockedIdp);
+
+    repository.updateIdpUrl("1234", "mocked-url-2");
+
+    repository.persistWorkspace(workspace);
+    expect(repository.getIdpUrl("1234")).toStrictEqual("mocked-url-2");
+  });
+
+  test("removeIdpUrl() - update a IdpUrl", () => {
+    const workspace = new Workspace();
+    mockedFileService.encryptText = jest.fn(() => JSON.stringify(workspace));
+
+    repository.workspace = workspace;
+
+    const mockedIdp = { id: "1234", url: "mocked-url" };
+    workspace.idpUrls.push(mockedIdp);
+
+    repository.removeIdpUrl("1234", "mocked-url-2");
+
+    repository.persistWorkspace(workspace);
+    expect(repository.getIdpUrl("1234")).toStrictEqual(null);
+  });
+
+  test("getProfiles() - get all profiles", () => {
+    const workspace = new Workspace();
+    mockedFileService.encryptText = jest.fn(() => JSON.stringify(workspace));
+
+    repository.workspace = workspace;
+
+    const mockedProfile = { id: "1234", name: "mocked-url" };
+    workspace.profiles.push(mockedProfile);
+
+    repository.persistWorkspace(workspace);
+    expect(repository.getProfiles()).toStrictEqual([workspace.profiles[0], mockedProfile]);
+  });
+
+  test("getProfileName() - get a profile's name", () => {
+    const workspace = new Workspace();
+    mockedFileService.encryptText = jest.fn(() => JSON.stringify(workspace));
+
+    repository.workspace = workspace;
+
+    const mockedProfile = { id: "1234", name: "mocked-url" };
+    workspace.profiles.push(mockedProfile);
+
+    repository.persistWorkspace(workspace);
+    expect(repository.getProfileName("1234")).toStrictEqual("mocked-url");
+  });
+
+  test("getProfileName() - get a profile's name", () => {
+    const workspace = new Workspace();
+    mockedFileService.encryptText = jest.fn(() => JSON.stringify(workspace));
+
+    repository.workspace = workspace;
+
+    const mockedProfile = { id: "1234", name: "mocked-url" };
+    workspace.profiles.push(mockedProfile);
+
+    repository.persistWorkspace(workspace);
+    expect(repository.getProfileName("1234")).toStrictEqual("mocked-url");
+  });
+
+  test("doesProfileExists() - check if a profile is in the workspace", () => {
+    const workspace = new Workspace();
+    mockedFileService.encryptText = jest.fn(() => JSON.stringify(workspace));
+
+    repository.workspace = workspace;
+
+    const mockedProfile = { id: "1234", name: "mocked-url" };
+    workspace.profiles.push(mockedProfile);
+
+    repository.persistWorkspace(workspace);
+    expect(repository.doesProfileExist("1234")).toStrictEqual(true);
+    expect(repository.doesProfileExist("4444")).toStrictEqual(false);
+  });
+
+  test("getDefaultProfileId() - get the standard default profile id", () => {
+    const workspace = new Workspace();
+    mockedFileService.encryptText = jest.fn(() => JSON.stringify(workspace));
+
+    repository.workspace = workspace;
+    repository.persistWorkspace(workspace);
+
+    expect(workspace.profiles.length).toBeGreaterThan(0);
+    expect(workspace.profiles.length).toBe(1);
+
+    const defaultProfile = workspace.profiles[0];
+    expect(repository.getDefaultProfileId()).toStrictEqual(defaultProfile.id);
+  });
+
+  test("addProfile() - add a new profile to the workspace", () => {
+    const workspace = new Workspace();
+    mockedFileService.encryptText = jest.fn(() => JSON.stringify(workspace));
+
+    repository.workspace = workspace;
+    repository.persistWorkspace(workspace);
+
+    expect(workspace.profiles.length).toBeGreaterThan(0);
+    expect(workspace.profiles.length).toBe(1);
+
+    repository.addProfile({ id: "2345", name: "test" });
+    expect(repository.getProfiles().length).toStrictEqual(2);
+    expect(repository.doesProfileExist("2345")).toBe(true);
+  });
+
+  test("updateProfile() - update a profile in the workspace", () => {
+    const workspace = new Workspace();
+    mockedFileService.encryptText = jest.fn(() => JSON.stringify(workspace));
+
+    repository.workspace = workspace;
+    repository.persistWorkspace(workspace);
+
+    expect(workspace.profiles.length).toBeGreaterThan(0);
+    expect(workspace.profiles.length).toBe(1);
+
+    repository.addProfile({ id: "2345", name: "test" });
+
+    expect(repository.getProfiles().length).toStrictEqual(2);
+    expect(repository.getProfileName("2345")).toBe("test");
+
+    repository.updateProfile("2345", "test2");
+
+    expect(repository.getProfiles().length).toStrictEqual(2);
+    expect(repository.getProfileName("2345")).toBe("test2");
+  });
+
+  test("deleteProfile() - delete a profile in the workspace", () => {
+    const workspace = new Workspace();
+    mockedFileService.encryptText = jest.fn(() => JSON.stringify(workspace));
+
+    repository.workspace = workspace;
+    repository.persistWorkspace(workspace);
+
+    expect(workspace.profiles.length).toBeGreaterThan(0);
+    expect(workspace.profiles.length).toBe(1);
+
+    repository.addProfile({ id: "2345", name: "test" });
+
+    expect(repository.getProfiles().length).toStrictEqual(2);
+    expect(repository.getProfileName("2345")).toBe("test");
+
+    repository.removeProfile("2345");
+
+    expect(repository.getProfiles().length).toStrictEqual(1);
+    expect(() => repository.getProfileName("2345")).toThrow(LeappNotFoundError);
   });
 });
