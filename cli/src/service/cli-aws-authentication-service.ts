@@ -6,6 +6,7 @@ import { CloudProviderType } from "@noovolari/leapp-core/models/cloud-provider-t
 
 export class CliAwsAuthenticationService implements IAwsAuthenticationService {
   private browser: puppeteer.Browser;
+
   constructor(private authenticationService: AuthenticationService) {}
 
   async needAuthentication(idpUrl: string): Promise<boolean> {
@@ -35,7 +36,7 @@ export class CliAwsAuthenticationService implements IAwsAuthenticationService {
     });
   }
 
-  async awsSignIn(idpUrl: string, needToAuthenticate: boolean): Promise<any> {
+  async awsSignIn(idpUrl: string, needToAuthenticate: boolean): Promise<string> {
     // eslint-disable-next-line
     return new Promise(async (resolve, reject) => {
       const page = await this.getNavigationPage(!needToAuthenticate);
@@ -48,7 +49,8 @@ export class CliAwsAuthenticationService implements IAwsAuthenticationService {
 
         const requestUrl = request.url().toString();
         if (this.authenticationService.isSamlAssertionUrl(CloudProviderType.aws, requestUrl)) {
-          resolve({ uploadData: [{ bytes: { toString: () => request.postData() } }] });
+          const responseHookDetails = { uploadData: [{ bytes: { toString: () => request.postData() } } as any] };
+          resolve(this.authenticationService.extractAwsSamlResponse(responseHookDetails));
           return;
         }
 

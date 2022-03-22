@@ -27,6 +27,7 @@ export default class AddSession extends LeappCommand {
   async createSession(accessMethod: AccessMethod, selectedParams: Map<string, string>): Promise<void> {
     const creationRequest = accessMethod.getSessionCreationRequest(selectedParams);
     await this.leappCliService.sessionFactory.createSession(accessMethod.sessionType, creationRequest);
+    await this.leappCliService.desktopAppRemoteProcedures.refreshSessions();
     this.log("session added");
   }
 
@@ -37,7 +38,7 @@ export default class AddSession extends LeappCommand {
         name: "selectedProvider",
         message: "select a provider",
         type: "list",
-        choices: availableCloudProviders.map((cloudProvider) => ({ name: cloudProvider })),
+        choices: availableCloudProviders.map((cloudProvider: any) => ({ name: cloudProvider })),
       },
     ]);
     return cloudProviderAnswer.selectedProvider;
@@ -50,7 +51,7 @@ export default class AddSession extends LeappCommand {
         name: "selectedMethod",
         message: "select an access method",
         type: "list",
-        choices: accessMethods.map((accessMethod) => ({ name: accessMethod.label, value: accessMethod })),
+        choices: accessMethods.map((accessMethod: any) => ({ name: accessMethod.label, value: accessMethod })),
       },
     ]);
     return accessMethodAnswer.selectedMethod;
@@ -64,7 +65,7 @@ export default class AddSession extends LeappCommand {
           name: field.creationRequestField,
           message: field.message,
           type: field.type,
-          choices: field.choices?.map((choice) => ({ name: choice.fieldName, value: choice.fieldValue })),
+          choices: field.choices?.map((choice: any) => ({ name: choice.fieldName, value: choice.fieldValue })),
         },
       ]);
       let fieldAnswerValue = fieldAnswer[field.creationRequestField];

@@ -59,6 +59,7 @@ export default class CreateSsoIntegration extends LeappCommand {
 
   async createIntegration(creationParams: IntegrationCreationParams): Promise<void> {
     await this.leappCliService.awsSsoIntegrationService.createIntegration(creationParams);
+    await this.leappCliService.desktopAppRemoteProcedures.refreshIntegrations();
     this.log("aws sso integration created");
   }
 }

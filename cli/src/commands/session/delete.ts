@@ -33,7 +33,7 @@ export default class DeleteSession extends LeappCommand {
         name: "selectedSession",
         message: "select a session",
         type: "list",
-        choices: availableSessions.map((session) => ({ name: session.sessionName, value: session })),
+        choices: availableSessions.map((session: any) => ({ name: session.sessionName, value: session })),
       },
     ]);
     return answer.selectedSession;
@@ -42,6 +42,7 @@ export default class DeleteSession extends LeappCommand {
   async deleteSession(session: Session): Promise<void> {
     const sessionService = this.leappCliService.sessionFactory.getSessionService(session.type);
     await sessionService.delete(session.sessionId);
+    await this.leappCliService.desktopAppRemoteProcedures.refreshSessions();
     this.log("session deleted");
   }
 

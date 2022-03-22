@@ -61,6 +61,7 @@ export default class DeleteIdpUrl extends LeappCommand {
 
   async deleteIdpUrl(id: string): Promise<void> {
     await this.leappCliService.idpUrlsService.deleteIdpUrl(id);
+    await this.leappCliService.desktopAppRemoteProcedures.refreshSessions();
     this.log("identity provider URL deleted");
   }
 }

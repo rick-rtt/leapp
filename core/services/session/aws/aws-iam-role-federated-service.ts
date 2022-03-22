@@ -1,6 +1,5 @@
 import * as Aws from "aws-sdk";
 import { LeappAwsStsError } from "../../../errors/leapp-aws-sts-error";
-import { LeappParseError } from "../../../errors/leapp-parse-error";
 import { LeappSamlError } from "../../../errors/leapp-saml-error";
 import { IAwsAuthenticationService } from "../../../interfaces/i-aws-authentication.service";
 import { ISessionNotifier } from "../../../interfaces/i-session-notifier";
@@ -13,10 +12,6 @@ import { AwsIamRoleFederatedSessionRequest } from "./aws-iam-role-federated-sess
 import { AwsSessionService } from "./aws-session-service";
 import { SessionType } from "../../../models/session-type";
 
-export interface ResponseHookDetails {
-  uploadData: { bytes: any[] }[];
-}
-
 export class AwsIamRoleFederatedService extends AwsSessionService {
   constructor(
     iSessionNotifier: ISessionNotifier,
@@ -27,14 +22,6 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
     private samlRoleSessionDuration: number
   ) {
     super(iSessionNotifier, repository);
-  }
-
-  static async extractSamlResponse(responseHookDetails: ResponseHookDetails): Promise<string> {
-    let rawData = responseHookDetails.uploadData[0].bytes.toString();
-    const n = rawData.lastIndexOf("SAMLResponse=");
-    const n2 = rawData.lastIndexOf("&RelayState=");
-    rawData = n2 !== -1 ? rawData.substring(n + 13, n2) : rawData.substring(n + 13);
-    return decodeURIComponent(rawData);
   }
 
   static sessionTokenFromGetSessionTokenResponse(assumeRoleResponse: Aws.STS.AssumeRoleWithSAMLResponse): { sessionToken: any } {
@@ -106,21 +93,11 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
     }
 
     // AwsSignIn: retrieve the response hook
-    let responseHookDetails;
-    try {
-      responseHookDetails = await this.awsAuthenticationService.awsSignIn(idpUrl, needToAuthenticate);
-    } catch (err) {
-      throw new LeappParseError(this, err.message);
-    } finally {
-      await this.awsAuthenticationService.closeAuthenticationWindow();
-    }
-
-    // Extract SAML response from responseHookDetails
     let samlResponse;
     try {
-      samlResponse = await AwsIamRoleFederatedService.extractSamlResponse(responseHookDetails);
-    } catch (err) {
-      throw new LeappParseError(this, err.message);
+      samlResponse = await this.awsAuthenticationService.awsSignIn(idpUrl, needToAuthenticate);
+    } finally {
+      await this.awsAuthenticationService.closeAuthenticationWindow();
     }
 
     // Setup STS to generate the credentials

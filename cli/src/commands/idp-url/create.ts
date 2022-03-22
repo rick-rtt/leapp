@@ -21,7 +21,7 @@ export default class CreateIdpUrl extends LeappCommand {
 
   async promptAndCreateIdpUrl(): Promise<IdpUrl> {
     const idpUrl = await this.getIdpUrl();
-    return this.createIdpUrl(idpUrl);
+    return await this.createIdpUrl(idpUrl);
   }
 
   async getIdpUrl(): Promise<string> {
@@ -36,8 +36,9 @@ export default class CreateIdpUrl extends LeappCommand {
     return answer.idpUrl;
   }
 
-  createIdpUrl(idpUrl: string): IdpUrl {
+  async createIdpUrl(idpUrl: string): Promise<IdpUrl> {
     const newIdpUrl = this.leappCliService.idpUrlsService.createIdpUrl(idpUrl);
+    await this.leappCliService.desktopAppRemoteProcedures.refreshSessions();
     this.log("identity provider URL created");
     return newIdpUrl;
   }

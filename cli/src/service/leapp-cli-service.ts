@@ -19,8 +19,6 @@ import { SessionFactory } from "@noovolari/leapp-core/services/session-factory";
 import { RotationService } from "@noovolari/leapp-core/services/rotation-service";
 import { AzureCoreService } from "@noovolari/leapp-core/services/azure-core-service";
 import { CliMfaCodePromptService } from "./cli-mfa-code-prompt-service";
-import { CliAwsAuthenticationService } from "./cli-aws-authentication-service";
-import { CliVerificationWindowService } from "./cli-verification-window-service";
 import { CliNativeService } from "./cli-native-service";
 import { DesktopAppRemoteProcedures } from "./desktop-app-remote-procedures";
 import { constants } from "@noovolari/leapp-core/models/constants";
@@ -34,6 +32,9 @@ import { WebConsoleService } from "@noovolari/leapp-core/services/web-console-se
 import fetch from "node-fetch";
 import { AuthenticationService } from "@noovolari/leapp-core/services/authentication-service";
 import { SsmService } from "@noovolari/leapp-core/services/ssm-service";
+import { CliRpcVerificationWindowService } from "./cli-rpc-verification-window-service";
+import { IVerificationWindowService } from "@noovolari/leapp-core/interfaces/i-verification-window.service";
+import { CliRpcAwsAuthenticationService } from "./cli-rpc-aws-authentication-service";
 
 /* eslint-disable */
 export class LeappCliService {
@@ -47,11 +48,11 @@ export class LeappCliService {
     return this.cliNativeServiceInstance;
   }
 
-  private cliVerificationWindowServiceInstance: CliVerificationWindowService;
+  private cliVerificationWindowServiceInstance: IVerificationWindowService;
 
-  public get cliVerificationWindowService(): CliVerificationWindowService {
+  public get cliVerificationWindowService(): IVerificationWindowService {
     if (!this.cliVerificationWindowServiceInstance) {
-      this.cliVerificationWindowServiceInstance = new CliVerificationWindowService();
+      this.cliVerificationWindowServiceInstance = new CliRpcVerificationWindowService(this.desktopAppRemoteProcedures);
     }
 
     return this.cliVerificationWindowServiceInstance;
@@ -67,24 +68,24 @@ export class LeappCliService {
     return this.authenticationServiceInstance;
   }
 
-  private cliAwsAuthenticationServiceInstance: CliAwsAuthenticationService;
+  private cliRpcAwsAuthenticationServiceInstance: CliRpcAwsAuthenticationService;
 
-  public get cliAwsAuthenticationService(): CliAwsAuthenticationService {
-    if (!this.cliAwsAuthenticationServiceInstance) {
-      this.cliAwsAuthenticationServiceInstance = new CliAwsAuthenticationService(this.authenticationService);
+  public get cliRpcAwsAuthenticationService(): CliRpcAwsAuthenticationService {
+    if (!this.cliRpcAwsAuthenticationServiceInstance) {
+      this.cliRpcAwsAuthenticationServiceInstance = new CliRpcAwsAuthenticationService(this.desktopAppRemoteProcedures);
     }
 
-    return this.cliAwsAuthenticationServiceInstance;
+    return this.cliRpcAwsAuthenticationServiceInstance;
   }
 
-  private cliShellExecutionServiceInstance: DesktopAppRemoteProcedures;
+  private desktopAppRemoteProceduresInstance: DesktopAppRemoteProcedures;
 
-  public get cliShellExecutionService(): DesktopAppRemoteProcedures {
-    if (!this.cliShellExecutionServiceInstance) {
-      this.cliShellExecutionServiceInstance = new DesktopAppRemoteProcedures();
+  public get desktopAppRemoteProcedures(): DesktopAppRemoteProcedures {
+    if (!this.desktopAppRemoteProceduresInstance) {
+      this.desktopAppRemoteProceduresInstance = new DesktopAppRemoteProcedures();
     }
 
-    return this.cliShellExecutionServiceInstance;
+    return this.desktopAppRemoteProceduresInstance;
   }
 
   private cliMfaCodePromptServiceInstance: CliMfaCodePromptService;
@@ -123,7 +124,7 @@ export class LeappCliService {
   get awsIamRoleFederatedService(): AwsIamRoleFederatedService {
     if (!this.awsIamRoleFederatedServiceInstance) {
       this.awsIamRoleFederatedServiceInstance = new AwsIamRoleFederatedService(this.workspaceService, this.repository,
-        this.fileService, this.awsCoreService, this.cliAwsAuthenticationService, constants.samlRoleSessionDuration);
+        this.fileService, this.awsCoreService, this.cliRpcAwsAuthenticationService, constants.samlRoleSessionDuration);
     }
 
     return this.awsIamRoleFederatedServiceInstance;

@@ -13,7 +13,7 @@ export default class CreateNamedProfile extends LeappCommand {
   async run(): Promise<void> {
     try {
       const profileName = await this.getProfileName();
-      this.createNamedProfile(profileName);
+      await this.createNamedProfile(profileName);
     } catch (error) {
       this.error(error instanceof Error ? error.message : `Unknown error: ${error}`);
     }
@@ -31,8 +31,9 @@ export default class CreateNamedProfile extends LeappCommand {
     return answer.namedProfileName;
   }
 
-  createNamedProfile(profileName: string): void {
+  async createNamedProfile(profileName: string): Promise<void> {
     this.leappCliService.namedProfilesService.createNamedProfile(profileName);
+    await this.leappCliService.desktopAppRemoteProcedures.refreshSessions();
     this.log("profile created");
   }
 }
