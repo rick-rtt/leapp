@@ -24,6 +24,7 @@ export default class StopSession extends LeappCommand {
   async stopSession(session: Session): Promise<void> {
     const sessionService = this.leappCliService.sessionFactory.getSessionService(session.type);
     await sessionService.stop(session.sessionId);
+    await this.leappCliService.desktopAppRemoteProcedures.refreshSessions();
     this.log("session stopped");
   }
 
@@ -39,7 +40,7 @@ export default class StopSession extends LeappCommand {
         name: "selectedSession",
         message: "select a session",
         type: "list",
-        choices: availableSessions.map((session) => ({ name: session.sessionName, value: session })),
+        choices: availableSessions.map((session: any) => ({ name: session.sessionName, value: session })),
       },
     ]);
     return answer.selectedSession;

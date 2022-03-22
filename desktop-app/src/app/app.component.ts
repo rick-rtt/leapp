@@ -25,6 +25,7 @@ import { ElectronService } from "./services/electron.service";
 import { AwsSsoIntegrationService } from "@noovolari/leapp-core/services/aws-sso-integration-service";
 import { AwsSsoRoleService } from "@noovolari/leapp-core/services/session/aws/aws-sso-role-service";
 import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
+import { CliCommunicationService } from "./services/cli-communication.service";
 
 @Component({
   selector: "app-root",
@@ -54,7 +55,8 @@ export class AppComponent implements OnInit {
     private router: Router,
     private updaterService: UpdaterService,
     private windowService: WindowService,
-    private electronService: ElectronService
+    private electronService: ElectronService,
+    private cliCommunicationService: CliCommunicationService
   ) {
     leappCoreService.mfaCodePrompter = mfaCodePrompter;
     leappCoreService.awsAuthenticationService = awsAuthenticationService;
@@ -147,18 +149,7 @@ export class AppComponent implements OnInit {
     await this.router.navigate(["/dashboard"]);
     document.querySelector("#loader").classList.add("disable-loader");
 
-    // server
-    const ipc = this.electronService.nodeIpc;
-    ipc.config.id = "leapp_da";
-    ipc.serve(() => {
-      ipc.server.on("message", (data, socket) => {
-        if (data.method === "isDesktopAppRunning") {
-          ipc.server.emit(socket, "message", "true");
-        }
-      });
-    });
-
-    ipc.server.start();
+    this.cliCommunicationService.startServer();
   }
 
   closeAllRightClickMenus(): void {

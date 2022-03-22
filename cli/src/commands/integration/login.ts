@@ -23,8 +23,10 @@ export default class LoginIntegration extends LeappCommand {
   async login(integration: AwsSsoIntegration): Promise<void> {
     this.log("waiting for browser authorization using your AWS sign-in...");
     const sessionsDiff = await this.leappCliService.awsSsoIntegrationService.loginAndGetSessionsDiff(integration.id);
+    await this.leappCliService.desktopAppRemoteProcedures.refreshIntegrations();
     this.log(`login successful (${sessionsDiff.sessionsToAdd.length} sessions ready to be synchronized)`);
-    await this.leappCliService.cliVerificationWindowService.closeBrowser();
+    // TODO: use with puppeteer
+    // await this.leappCliService.cliVerificationWindowService.closeBrowser();
   }
 
   async selectIntegration(): Promise<AwsSsoIntegration> {

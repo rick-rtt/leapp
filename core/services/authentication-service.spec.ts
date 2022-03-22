@@ -1,4 +1,5 @@
 import { describe, test, expect } from "@jest/globals";
+import { LeappParseError } from "../errors/leapp-parse-error";
 import { AuthenticationService } from "./authentication-service";
 import { CloudProviderType } from "../models/cloud-provider-type";
 
@@ -27,10 +28,37 @@ describe("AuthenticationService", () => {
   });
 
   test("isSamlAssertionUrl", () => {
-    const cliAwsAuthenticationService = new AuthenticationService();
+    const authenticationService = new AuthenticationService();
 
-    expect(cliAwsAuthenticationService.isSamlAssertionUrl(CloudProviderType.aws, "https://signin.aws.amazon.com/saml")).toBe(true);
-    expect(cliAwsAuthenticationService.isSamlAssertionUrl(CloudProviderType.aws, "https://signin.aws.amazon.com/saml?XX")).toBe(true);
-    expect(cliAwsAuthenticationService.isSamlAssertionUrl(CloudProviderType.aws, "http://signin.aws.amazon.com/saml")).toBe(false);
+    expect(authenticationService.isSamlAssertionUrl(CloudProviderType.aws, "https://signin.aws.amazon.com/saml")).toBe(true);
+    expect(authenticationService.isSamlAssertionUrl(CloudProviderType.aws, "https://signin.aws.amazon.com/saml?XX")).toBe(true);
+    expect(authenticationService.isSamlAssertionUrl(CloudProviderType.aws, "http://signin.aws.amazon.com/saml")).toBe(false);
+  });
+
+  test("extractAwsSamlResponse", () => {
+    const responseHookDetails = {
+      uploadData: [{ bytes: "SAMLResponse=ABCDEFGHIJKLMNOPQRSTUVWXYZ&RelayState=abcdefghijklmnopqrstuvwxyz" }],
+    };
+
+    const authenticationService = new AuthenticationService();
+    const awsSamlResponse = authenticationService.extractAwsSamlResponse(responseHookDetails as any);
+    expect(awsSamlResponse).toBe("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+  });
+
+  test("extractAwsSamlResponse - error", () => {
+    const responseHookDetails = {
+      uploadData: [
+        {
+          bytes: {
+            toString: jest.fn(() => {
+              throw new Error("");
+            }),
+          },
+        },
+      ],
+    };
+
+    const authenticationService = new AuthenticationService();
+    expect(() => authenticationService.extractAwsSamlResponse(responseHookDetails as any)).toThrow(new LeappParseError(authenticationService, ""));
   });
 });

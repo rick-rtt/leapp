@@ -1,9 +1,78 @@
 import ipc from "node-ipc";
+import {
+  RegisterClientResponse,
+  StartDeviceAuthorizationResponse,
+  VerificationResponse,
+} from "@noovolari/leapp-core/services/session/aws/aws-sso-role-service";
+
+const connectionError = "unable to connect with desktop app";
 
 export class DesktopAppRemoteProcedures {
+  constructor(private serverId = "leapp_da") {}
+
+  async isDesktopAppRunning(): Promise<boolean> {
+    return this.remoteProcedureCall(
+      { method: "isDesktopAppRunning" },
+      (data, resolve, _) => resolve(data.result),
+      () => null,
+      (resolve, _) => resolve(false)
+    );
+  }
+
+  async needAuthentication(idpUrl: string): Promise<boolean> {
+    return this.remoteProcedureCall(
+      { method: "needAuthentication", idpUrl },
+      (data, resolve, reject) => (data.error ? reject(data.error) : resolve(data.result)),
+      () => null,
+      (_, reject) => reject(connectionError)
+    );
+  }
+
+  async awsSignIn(idpUrl: string, needToAuthenticate: boolean): Promise<any> {
+    return this.remoteProcedureCall(
+      { method: "awsSignIn", idpUrl, needToAuthenticate },
+      (data, resolve, reject) => (data.error ? reject(data.error) : resolve(data.result)),
+      () => null,
+      (_, reject) => reject(connectionError)
+    );
+  }
+
+  async openVerificationWindow(
+    registerClientResponse: RegisterClientResponse,
+    startDeviceAuthorizationResponse: StartDeviceAuthorizationResponse,
+    windowModality: string,
+    onWindowClose: () => void
+  ): Promise<VerificationResponse> {
+    return this.remoteProcedureCall(
+      { method: "openVerificationWindow", registerClientResponse, startDeviceAuthorizationResponse, windowModality },
+      (data, resolve, reject) => (data.error ? reject(data.error) : resolve(data.result)),
+      (data, _, __) => (data.callbackId === "onWindowClose" ? onWindowClose() : null),
+      (_, reject) => reject(connectionError)
+    );
+  }
+
+  async refreshSessions(): Promise<void> {
+    return this.remoteProcedureCall(
+      { method: "refreshSessions" },
+      (data, resolve, reject) => (data.error ? reject(data.error) : resolve(data.result)),
+      () => null,
+      (_, reject) => reject(connectionError)
+    );
+  }
+
+  async refreshIntegrations(): Promise<void> {
+    return this.remoteProcedureCall(
+      { method: "refreshIntegrations" },
+      (data, resolve, reject) => (data.error ? reject(data.error) : resolve(data.result)),
+      () => null,
+      (_, reject) => reject(connectionError)
+    );
+  }
+
   async remoteProcedureCall(
     callMessage: any,
-    onMessage: (data: any, resolve: (value: unknown) => void, reject: (reason?: any) => void) => void,
+    onReturn: (data: any, resolve: (value: unknown) => void, reject: (reason?: any) => void) => void,
+    onCallback: (data: any, resolve: (value: unknown) => void, reject: (reason?: any) => void) => void,
     onDisconnect: (resolve: (value: unknown) => void, reject: (reason?: any) => void) => void
   ): Promise<any> {
     ipc.config.id = "leapp_cli";
@@ -11,8 +80,8 @@ export class DesktopAppRemoteProcedures {
     ipc.config.silent = true;
     ipc.config.encoding = "utf8";
     return new Promise((resolve, reject) => {
-      ipc.connectTo("leapp_da", () => {
-        const desktopAppServer = ipc.of.leapp_da;
+      ipc.connectTo(this.serverId, () => {
+        const desktopAppServer = ipc.of[this.serverId];
         desktopAppServer.on("connect", () => {
           desktopAppServer.emit("message", callMessage);
         });
@@ -20,52 +89,12 @@ export class DesktopAppRemoteProcedures {
           onDisconnect(resolve, reject);
         });
         desktopAppServer.on("message", (data) => {
-          onMessage(data, resolve, reject);
-          ipc.disconnect("leapp_da");
-        });
-      });
-    });
-  }
-
-  async isDesktopAppRunning(): Promise<boolean> {
-    ipc.config.id = "leapp_cli";
-    ipc.config.maxRetries = 2;
-    ipc.config.silent = true;
-    ipc.config.encoding = "utf8";
-    return new Promise((resolve, _) => {
-      ipc.connectTo("leapp_da", () => {
-        const desktopAppServer = ipc.of.leapp_da;
-        desktopAppServer.on("connect", () => {
-          desktopAppServer.emit("message", { method: "isDesktopAppRunning" });
-        });
-        desktopAppServer.on("disconnect", () => {
-          resolve(false);
-        });
-        desktopAppServer.on("message", (data) => {
-          resolve(data === "true");
-          ipc.disconnect("leapp_da");
-        });
-      });
-    });
-  }
-
-  async needAuthentication(idpUrl: string): Promise<boolean> {
-    ipc.config.id = "leapp_cli";
-    ipc.config.maxRetries = 2;
-    ipc.config.silent = true;
-    ipc.config.encoding = "utf8";
-    return new Promise((resolve, _) => {
-      ipc.connectTo("leapp_da", () => {
-        const desktopAppServer = ipc.of.leapp_da;
-        desktopAppServer.on("connect", () => {
-          desktopAppServer.emit("message", { method: "needAuthentication", idpUrl });
-        });
-        desktopAppServer.on("disconnect", () => {
-          resolve(false);
-        });
-        desktopAppServer.on("message", (data) => {
-          resolve(data === "true");
-          ipc.disconnect("leapp_da");
+          if (data.callbackId) {
+            onCallback(data, resolve, reject);
+          } else {
+            onReturn(data, resolve, reject);
+            ipc.disconnect(this.serverId);
+          }
         });
       });
     });

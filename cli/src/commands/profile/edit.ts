@@ -51,6 +51,7 @@ export default class EditNamedProfile extends LeappCommand {
 
   async editNamedProfile(id: string, newName: string): Promise<void> {
     await this.leappCliService.namedProfilesService.editNamedProfile(id, newName);
+    await this.leappCliService.desktopAppRemoteProcedures.refreshSessions();
     this.log("profile edited");
   }
 }

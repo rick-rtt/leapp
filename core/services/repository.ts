@@ -31,13 +31,16 @@ export class Repository {
     this._workspace = value;
   }
 
+  reloadWorkspace() {
+    const workspaceJSON = this.fileService.decryptText(
+      this.fileService.readFileSync(this.nativeService.os.homedir() + "/" + constants.lockFileDestination)
+    );
+    this._workspace = deserialize(Workspace, workspaceJSON);
+  }
+
   getWorkspace(): Workspace {
     if (!this._workspace) {
-      const workspaceJSON = this.fileService.decryptText(
-        this.fileService.readFileSync(this.nativeService.os.homedir() + "/" + constants.lockFileDestination)
-      );
-      this._workspace = deserialize(Workspace, workspaceJSON);
-      return this._workspace;
+      this.reloadWorkspace();
     }
     return this._workspace;
   }

@@ -45,7 +45,6 @@
     "open": "^8.4.0",
     "ps-list": "^8.1.0",
     "ps-node": "^0.1.6",
-    "puppeteer": "~13.2.0",
     "reflect-metadata": "^0.1.13",
     "rimraf": "~3.0.2",
     "rxjs": "~6.6.7",
@@ -71,6 +70,7 @@
     "globby": "^11",
     "gushio": "~0.5.0",
     "jest": "^27.4.5",
+    "puppeteer": "~13.2.0",
     "ts-node": "^10.2.1",
     "tslib": "^2.3.1",
     "typescript": "4.5.5"
@@ -135,7 +135,7 @@
     "postpack": "gushio gushio/target-post-pack.js",
     "release": "gushio gushio/target-release.js",
     "version": "oclif readme && git add README.md",
-    "run-command": "./bin/run session list"
+    "run-command": "./bin/run integration login"
   },
   "types": "dist/index.d.ts"
 }

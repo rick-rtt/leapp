@@ -52,7 +52,7 @@ export class AwsAuthenticationService implements IAwsAuthenticationService {
     });
   }
 
-  async awsSignIn(idpUrl: string, needToAuthenticate: boolean): Promise<any> {
+  async awsSignIn(idpUrl: string, needToAuthenticate: boolean): Promise<string> {
     // 1. Show or not browser window depending on needToAuthenticate
     const activeWindowPosition = this.windowService.getCurrentWindow().getPosition();
     const nearX = 200;
@@ -82,7 +82,7 @@ export class AwsAuthenticationService implements IAwsAuthenticationService {
           }
 
           // Return the details
-          resolve(details);
+          resolve(this.leappCoreService.authenticationService.extractAwsSamlResponse(details));
         } else {
           // Callback is used by filter to keep traversing calls until one of the filters apply
           callback({

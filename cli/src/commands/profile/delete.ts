@@ -61,6 +61,7 @@ export default class DeleteNamedProfile extends LeappCommand {
 
   async deleteNamedProfile(id: string): Promise<void> {
     await this.leappCliService.namedProfilesService.deleteNamedProfile(id);
+    await this.leappCliService.desktopAppRemoteProcedures.refreshSessions();
     this.log("profile deleted");
   }
 }
