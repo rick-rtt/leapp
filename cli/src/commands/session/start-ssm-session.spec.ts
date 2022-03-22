@@ -41,6 +41,7 @@ describe("StartSsmSession", () => {
     await command.startSsmSession(session);
 
     expect(sessionFactory.getSessionService).toHaveBeenCalledWith("sessionType");
+
     expect(sessionService.generateCredentials).toHaveBeenCalledWith("sessionId");
     expect(command.log).toHaveBeenCalledWith("started AWS SSM session");
     expect(ssmService.startSession).toHaveBeenCalled();

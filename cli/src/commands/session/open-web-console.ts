@@ -35,7 +35,7 @@ export default class OpenWebConsole extends LeappCommand {
     this.log("opened AWS Web Console for this session");
   }
 
-  async selectSession(): Promise<Session> {
+  private async selectSession(): Promise<Session> {
     const availableSessions = this.leappCliService.repository.getSessions().filter((session: Session) => session.status === SessionStatus.inactive);
     if (availableSessions.length === 0) {
       throw new Error("no sessions available");
