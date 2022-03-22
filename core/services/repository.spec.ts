@@ -224,4 +224,76 @@ describe("Repository", () => {
 
     expect(repository.listPending()).toStrictEqual([]);
   });
+
+  test("listActive() - list sessions in active state", () => {
+    mockedSession.status = SessionStatus.active;
+    const workspace = new Workspace();
+    workspace.sessions = [mockedSession];
+
+    mockedFileService.encryptText = jest.fn(() => JSON.stringify(workspace));
+
+    repository.workspace = workspace;
+    repository.persistWorkspace(workspace);
+
+    expect(repository.listActive()).toStrictEqual([mockedSession]);
+
+    mockedSession.status = SessionStatus.pending;
+    workspace.sessions = [mockedSession];
+
+    expect(repository.listActive()).toStrictEqual([]);
+  });
+
+  test("listAwsSsoRoles() - list sessions of type AwsSsoRole", () => {
+    mockedSession.type = SessionType.awsSsoRole;
+    const workspace = new Workspace();
+    workspace.sessions = [mockedSession];
+
+    mockedFileService.encryptText = jest.fn(() => JSON.stringify(workspace));
+
+    repository.workspace = workspace;
+    repository.persistWorkspace(workspace);
+
+    expect(repository.listAwsSsoRoles()).toStrictEqual([mockedSession]);
+
+    mockedSession.type = SessionType.awsIamRoleFederated;
+    workspace.sessions = [mockedSession];
+
+    expect(repository.listAwsSsoRoles()).toStrictEqual([]);
+  });
+
+  test("listAssumable() - list sessions of any type that can be assumed by AwsIamRoleChained", () => {
+    mockedSession.type = SessionType.awsIamRoleFederated;
+    const workspace = new Workspace();
+    workspace.sessions = [mockedSession];
+
+    mockedFileService.encryptText = jest.fn(() => JSON.stringify(workspace));
+
+    repository.workspace = workspace;
+    repository.persistWorkspace(workspace);
+
+    expect(repository.listAssumable()).toStrictEqual([mockedSession]);
+
+    mockedSession.type = SessionType.azure;
+    workspace.sessions = [mockedSession];
+
+    expect(repository.listAssumable()).toStrictEqual([]);
+  });
+
+  test("listIamRoleChained() - list sessions of type AwsIamRoleChained", () => {
+    mockedSession.type = SessionType.awsIamRoleChained;
+    const workspace = new Workspace();
+    workspace.sessions = [mockedSession];
+
+    mockedFileService.encryptText = jest.fn(() => JSON.stringify(workspace));
+
+    repository.workspace = workspace;
+    repository.persistWorkspace(workspace);
+
+    expect(repository.listIamRoleChained()).toStrictEqual([mockedSession]);
+
+    mockedSession.type = SessionType.azure;
+    workspace.sessions = [mockedSession];
+
+    expect(repository.listIamRoleChained()).toStrictEqual([]);
+  });
 });
