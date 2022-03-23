@@ -147,7 +147,6 @@ export class AppComponent implements OnInit {
     // Go to initial page if no sessions are already created or
     // go to the list page if is your second visit
     await this.router.navigate(["/dashboard"]);
-    document.querySelector("#loader").classList.add("disable-loader");
 
     this.cliCommunicationService.startServer();
   }
