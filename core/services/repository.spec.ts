@@ -7,6 +7,7 @@ import { Session } from "../models/session";
 import { SessionType } from "../models/session-type";
 import { SessionStatus } from "../models/session-status";
 import { LeappNotFoundError } from "../errors/leapp-not-found-error";
+import { AwsSsoRoleSession } from "../models/aws-sso-role-session";
 
 describe("Repository", () => {
   let mockedWorkspace;
@@ -524,5 +525,373 @@ describe("Repository", () => {
 
     expect(repository.getProfiles().length).toStrictEqual(1);
     expect(() => repository.getProfileName("2345")).toThrow(LeappNotFoundError);
+  });
+
+  test("listAwsSsoIntegrations() - get all the aws sso integration we have in the workspace", () => {
+    const workspace = new Workspace();
+    workspace.awsSsoIntegrations = [];
+    mockedFileService.encryptText = jest.fn(() => JSON.stringify(workspace));
+
+    repository.workspace = workspace;
+    repository.persistWorkspace(workspace);
+
+    expect(repository.listAwsSsoIntegrations().length).toBe(0);
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    workspace.awsSsoIntegrations = [{}, {}];
+    repository.workspace = workspace;
+    repository.persistWorkspace(workspace);
+
+    expect(repository.listAwsSsoIntegrations().length).toBe(2);
+  });
+
+  test("getAwsSsoIntegration() - get a specific integration given the id", () => {
+    const workspace = new Workspace();
+    mockedFileService.encryptText = jest.fn(() => JSON.stringify(workspace));
+
+    repository.workspace = workspace;
+    repository.persistWorkspace(workspace);
+
+    workspace.awsSsoIntegrations = [
+      { id: "1234", alias: "1", region: "a", accessTokenExpiration: "", browserOpening: "", portalUrl: "" },
+      { id: "4567", alias: "2", region: "a", accessTokenExpiration: "", browserOpening: "", portalUrl: "" },
+    ];
+    repository.workspace = workspace;
+    repository.persistWorkspace(workspace);
+
+    expect(repository.getAwsSsoIntegration("1234").alias).toBe("1");
+  });
+
+  test("getAwsSsoIntegrationSessions() - get a list of sessions for a specific integration given the id", () => {
+    const workspace = new Workspace();
+    mockedFileService.encryptText = jest.fn(() => JSON.stringify(workspace));
+
+    repository.workspace = workspace;
+    repository.persistWorkspace(workspace);
+
+    workspace.sessions = [
+      {
+        sessionId: "12",
+        sessionName: "session1",
+        type: SessionType.awsSsoRole,
+        status: SessionStatus.inactive,
+        region: "eu-west-1",
+        expired: () => false,
+        awsSsoConfigurationId: "1234",
+      } as AwsSsoRoleSession,
+      {
+        sessionId: "23",
+        sessionName: "session2",
+        type: SessionType.awsSsoRole,
+        status: SessionStatus.inactive,
+        region: "eu-west-1",
+        expired: () => false,
+      },
+      {
+        sessionId: "34",
+        sessionName: "session3",
+        type: SessionType.awsSsoRole,
+        status: SessionStatus.inactive,
+        region: "eu-west-1",
+        expired: () => false,
+      },
+    ];
+
+    workspace.awsSsoIntegrations = [
+      { id: "1234", alias: "1", region: "a", accessTokenExpiration: "", browserOpening: "", portalUrl: "" },
+      { id: "4567", alias: "2", region: "a", accessTokenExpiration: "", browserOpening: "", portalUrl: "" },
+    ];
+    repository.workspace = workspace;
+    repository.persistWorkspace(workspace);
+
+    expect(repository.getAwsSsoIntegrationSessions("1234")[0].sessionName).toBe("session1");
+  });
+
+  test("addAwsSsoIntegration() - add a specific integration to the workspace", () => {
+    const workspace = new Workspace();
+    mockedFileService.encryptText = jest.fn(() => JSON.stringify(workspace));
+
+    repository.workspace = workspace;
+    repository.persistWorkspace(workspace);
+
+    workspace.awsSsoIntegrations = [
+      { id: "1234", alias: "1", region: "a", accessTokenExpiration: "", browserOpening: "", portalUrl: "" },
+      { id: "4567", alias: "2", region: "a", accessTokenExpiration: "", browserOpening: "", portalUrl: "" },
+    ];
+    repository.workspace = workspace;
+    repository.persistWorkspace(workspace);
+
+    expect(repository.listAwsSsoIntegrations().length).toBe(2);
+
+    repository.addAwsSsoIntegration("url", "alias", "eu-west-1", "in-app");
+
+    expect(repository.listAwsSsoIntegrations().length).toBe(3);
+    expect(repository.listAwsSsoIntegrations()[2].alias).toBe("alias");
+  });
+
+  test("updateAwsSsoIntegration() - update a specific integration in the workspace", () => {
+    const workspace = new Workspace();
+    mockedFileService.encryptText = jest.fn(() => JSON.stringify(workspace));
+
+    repository.workspace = workspace;
+    repository.persistWorkspace(workspace);
+
+    workspace.awsSsoIntegrations = [
+      { id: "1234", alias: "1", region: "a", accessTokenExpiration: "", browserOpening: "", portalUrl: "" },
+      { id: "4567", alias: "2", region: "a", accessTokenExpiration: "", browserOpening: "", portalUrl: "" },
+    ];
+    repository.workspace = workspace;
+    repository.persistWorkspace(workspace);
+
+    expect(repository.listAwsSsoIntegrations().length).toBe(2);
+
+    repository.updateAwsSsoIntegration("1234", "alias", "b", "url", "in-app");
+
+    expect(repository.listAwsSsoIntegrations().length).toBe(2);
+    expect(repository.listAwsSsoIntegrations()[0].alias).toBe("alias");
+    expect(repository.listAwsSsoIntegrations()[0].portalUrl).toBe("url");
+    expect(repository.listAwsSsoIntegrations()[0].region).toBe("b");
+    expect(repository.listAwsSsoIntegrations()[0].browserOpening).toBe("in-app");
+  });
+
+  test("unsetAwsSsoIntegrationExpiration() - put accessTokenExpiration to undefined", () => {
+    const workspace = new Workspace();
+    mockedFileService.encryptText = jest.fn(() => JSON.stringify(workspace));
+
+    repository.workspace = workspace;
+    repository.persistWorkspace(workspace);
+
+    workspace.awsSsoIntegrations = [{ id: "1234", alias: "1", region: "a", accessTokenExpiration: "1000", browserOpening: "", portalUrl: "" }];
+    repository.workspace = workspace;
+    repository.persistWorkspace(workspace);
+
+    expect(repository.listAwsSsoIntegrations().length).toBe(1);
+
+    repository.unsetAwsSsoIntegrationExpiration("1234");
+
+    expect(repository.listAwsSsoIntegrations().length).toBe(1);
+    expect(repository.listAwsSsoIntegrations()[0].accessTokenExpiration).toBe(undefined);
+  });
+
+  test("deleteAwsSsoIntegration() - remove an integration from the workspace", () => {
+    const workspace = new Workspace();
+    mockedFileService.encryptText = jest.fn(() => JSON.stringify(workspace));
+
+    repository.workspace = workspace;
+    repository.persistWorkspace(workspace);
+
+    workspace.awsSsoIntegrations = [{ id: "1234", alias: "1", region: "a", accessTokenExpiration: "1000", browserOpening: "", portalUrl: "" }];
+    repository.workspace = workspace;
+    repository.persistWorkspace(workspace);
+
+    expect(repository.listAwsSsoIntegrations().length).toBe(1);
+
+    repository.deleteAwsSsoIntegration("1234");
+
+    expect(repository.listAwsSsoIntegrations().length).toBe(0);
+    expect(repository.listAwsSsoIntegrations()[0]).toBe(undefined);
+  });
+
+  test("getProxyConfiguration() - get the proxy config object from the workspace", () => {
+    const workspace = new Workspace();
+    mockedFileService.encryptText = jest.fn(() => JSON.stringify(workspace));
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    workspace.proxyConfiguration = { password: "test" };
+
+    repository.workspace = workspace;
+    repository.persistWorkspace(workspace);
+
+    expect(repository.getProxyConfiguration()).not.toBe(undefined);
+    expect(repository.getProxyConfiguration().password).toBe("test");
+  });
+
+  test("updateProxyConfiguration() - update the proxy config object from the workspace", () => {
+    const workspace = new Workspace();
+    mockedFileService.encryptText = jest.fn(() => JSON.stringify(workspace));
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    workspace.proxyConfiguration = { password: "test" };
+
+    repository.workspace = workspace;
+    repository.persistWorkspace(workspace);
+
+    expect(repository.getProxyConfiguration()).not.toBe(undefined);
+    expect(repository.getProxyConfiguration().password).toBe("test");
+    expect(repository.getProxyConfiguration().username).toBe(undefined);
+
+    repository.updateProxyConfiguration({ password: "new-test", username: "user", proxyProtocol: "https" });
+
+    expect(repository.getProxyConfiguration()).not.toBe(undefined);
+    expect(repository.getProxyConfiguration().password).toBe("new-test");
+    expect(repository.getProxyConfiguration().username).toBe("user");
+  });
+
+  test("getSegments() - get all the segments from the workspace", () => {
+    const workspace = new Workspace();
+    mockedFileService.encryptText = jest.fn(() => JSON.stringify(workspace));
+    workspace.segments = [
+      {
+        name: "segmentA",
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        filterGroup: {},
+      },
+      {
+        name: "segmentB",
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        filterGroup: {},
+      },
+    ];
+
+    repository.workspace = workspace;
+    repository.persistWorkspace(workspace);
+
+    expect(repository.getSegments()).not.toBe(undefined);
+    expect(repository.getSegments().length).toBe(2);
+    expect(repository.getSegments()[1].name).toBe("segmentB");
+  });
+
+  test("getSegment() - get a specific segment from the workspace", () => {
+    const workspace = new Workspace();
+    mockedFileService.encryptText = jest.fn(() => JSON.stringify(workspace));
+    workspace.segments = [
+      {
+        name: "segmentA",
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        filterGroup: {},
+      },
+      {
+        name: "segmentB",
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        filterGroup: {},
+      },
+    ];
+
+    repository.workspace = workspace;
+    repository.persistWorkspace(workspace);
+
+    expect(repository.getSegment("segmentA")).not.toBe(undefined);
+    expect(repository.getSegment("segmentA")).not.toBe(repository.getSegment("segmentB"));
+    expect(repository.getSegment("segmentA").name).toBe("segmentA");
+  });
+
+  test("setSegments() - set a new segment array of segments for the workspace", () => {
+    const workspace = new Workspace();
+    mockedFileService.encryptText = jest.fn(() => JSON.stringify(workspace));
+    workspace.segments = [
+      {
+        name: "segmentA",
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        filterGroup: {},
+      },
+      {
+        name: "segmentB",
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        filterGroup: {},
+      },
+    ];
+
+    repository.workspace = workspace;
+    repository.persistWorkspace(workspace);
+
+    const newSegments = workspace.segments;
+    newSegments.push({
+      name: "segmentC",
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      filterGroup: {},
+    });
+    repository.setSegments(newSegments);
+
+    expect(repository.getSegment("segmentC").name).toBe("segmentC");
+    expect(repository.getSegment("segmentA")).not.toBe(repository.getSegment("segmentC"));
+    expect(repository.getSegments().length).toBe(3);
+  });
+
+  test("removeSegment() - remove a segment  from segments of the workspace", () => {
+    const workspace = new Workspace();
+    mockedFileService.encryptText = jest.fn(() => JSON.stringify(workspace));
+    workspace.segments = [
+      {
+        name: "segmentA",
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        filterGroup: {},
+      },
+      {
+        name: "segmentB",
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        filterGroup: {},
+      },
+    ];
+
+    repository.workspace = workspace;
+    repository.persistWorkspace(workspace);
+
+    const newSegments = workspace.segments;
+    newSegments.push({
+      name: "segmentC",
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      filterGroup: {},
+    });
+    repository.setSegments(newSegments);
+
+    expect(repository.getSegment("segmentC").name).toBe("segmentC");
+    expect(repository.getSegment("segmentA")).not.toBe(repository.getSegment("segmentC"));
+    expect(repository.getSegments().length).toBe(3);
+
+    repository.removeSegment({ name: "segmentA", filterGroup: {} });
+
+    expect(repository.getSegment("segmentA")).toBe(undefined);
+    expect(repository.getSegments().length).toBe(2);
+  });
+
+  test("getFolders() - get the folders object from the workspace", () => {
+    const workspace = new Workspace();
+    mockedFileService.encryptText = jest.fn(() => JSON.stringify(workspace));
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    workspace.folders = [{ name: "test" }];
+
+    repository.workspace = workspace;
+    repository.persistWorkspace(workspace);
+
+    expect(repository.getFolders()).not.toBe(undefined);
+    expect(repository.getFolders().length).toBe(1);
+    expect(repository.getFolders()[0].name).toBe("test");
+  });
+
+  test("setFolders() - set the folder array object for the workspace", () => {
+    const workspace = new Workspace();
+    mockedFileService.encryptText = jest.fn(() => JSON.stringify(workspace));
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    workspace.folders = [{ name: "test" }];
+
+    repository.workspace = workspace;
+    repository.persistWorkspace(workspace);
+
+    expect(repository.getFolders()).not.toBe(undefined);
+    expect(repository.getFolders().length).toBe(1);
+    expect(repository.getFolders()[0].name).toBe("test");
+
+    const newFolders = workspace.folders;
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    newFolders.push({ name: "test2" });
+    repository.setFolders(newFolders);
+
+    expect(repository.getFolders()).not.toBe(undefined);
+    expect(repository.getFolders().length).toBe(2);
+    expect(repository.getFolders()[1].name).toBe("test2");
   });
 });
