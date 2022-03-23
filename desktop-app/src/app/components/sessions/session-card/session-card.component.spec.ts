@@ -12,6 +12,7 @@ import Segment from "@noovolari/leapp-core/models/Segment";
 import { Session } from "@noovolari/leapp-core/models/session";
 import Folder from "@noovolari/leapp-core/models/folder";
 import { AwsSsoIntegration } from "@noovolari/leapp-core/models/aws-sso-integration";
+import { constants } from "@noovolari/leapp-core/models/constants";
 
 describe("SessionCardComponent", () => {
   let component: SessionCardComponent;
@@ -163,6 +164,7 @@ describe("SessionCardComponent", () => {
       updateProxyConfiguration: (_: { proxyProtocol: string; proxyUrl?: string; proxyPort: string; username?: string; password?: string }) => void {},
       updateSession: (_: string, __: Session) => void {},
       updateSessions: (_: Session[]) => void {},
+      getColorTheme: () => constants.darkTheme,
     };
     fixture.detectChanges();
   });

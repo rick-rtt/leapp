@@ -35,6 +35,9 @@ describe("TrayMenuComponent", () => {
     fixture = TestBed.createComponent(TrayMenuComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
+    (component as any).subscribed = {
+      unsubscribe: () => {},
+    };
   });
 
   it("should create", () => {

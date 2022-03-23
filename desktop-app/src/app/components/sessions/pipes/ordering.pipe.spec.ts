@@ -51,10 +51,11 @@ describe("OrderingPipe", () => {
     sessions[4].startDateTime = new Date("2000-03-03").toISOString();
 
     sessions = pipe.transform(sessions);
+
     // Because [1], [2], [3] are set automatically their value is today which is always
     // greater than 2000 so we check the order of the last 2 elements
-    expect(sessions[3].sessionName).toBe("account5");
-    expect(sessions[4].sessionName).toBe("account1");
+    expect(sessions[0].sessionName).toBe("account5");
+    expect(sessions[1].sessionName).toBe("account1");
   });
 
   it("should invert the order when asc option is used", () => {
