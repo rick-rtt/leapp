@@ -104,16 +104,16 @@
     "topicSeparator": " ",
     "topics": {
       "idp-url": {
-        "description": "Identity providers URL management"
+        "description": "SAML 2.0 Identity providers URL management"
       },
       "integration": {
-        "description": "AWS integrations management"
+        "description": "Leapp Integrations management"
       },
       "profile": {
-        "description": "AWS named profiles management"
+        "description": "Leapp AWS Multi-profile management"
       },
       "region": {
-        "description": "AWS regions management"
+        "description": "Leapp regions management"
       },
       "session": {
         "description": "Sessions management"

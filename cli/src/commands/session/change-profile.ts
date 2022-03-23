@@ -4,7 +4,7 @@ import { Config } from "@oclif/core/lib/config/config";
 import { Session } from "@noovolari/leapp-core/models/session";
 
 export default class ChangeSessionProfile extends LeappCommand {
-  static description = "Change a session profile";
+  static description = "Change a session named-profile";
 
   static examples = [`$leapp session change-profile`];
 
