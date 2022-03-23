@@ -77,6 +77,11 @@ describe("CliAwsAuthenticationService", () => {
 
     const authenticationService = {
       isSamlAssertionUrl: jest.fn(() => true),
+      extractAwsSamlResponse: (responseHookDetails: any) => {
+        expect(responseHookDetails.uploadData[0].bytes.toString()).toBe("postData");
+
+        return "samlResponse";
+      },
     };
     const cliAwsAuthenticationService = new CliAwsAuthenticationService(authenticationService as any);
     cliAwsAuthenticationService.getNavigationPage = async (headlessMode: boolean) => {
@@ -85,7 +90,7 @@ describe("CliAwsAuthenticationService", () => {
     };
 
     const result = await cliAwsAuthenticationService.awsSignIn(idpUrl, needToAuthenticate);
-    expect(result.uploadData[0].bytes.toString()).toBe("postData");
+    expect(result).toBe("samlResponse");
     expect(page.onPageCalled).toBeTruthy();
     expect(page.gotoPageCalled).toBeTruthy();
     expect(authenticationService.isSamlAssertionUrl).toHaveBeenCalledWith(CloudProviderType.aws, "samlUrl");
@@ -112,7 +117,13 @@ describe("CliAwsAuthenticationService", () => {
           return true;
         }
       }),
+      extractAwsSamlResponse: (responseHookDetails: any) => {
+        expect(responseHookDetails.uploadData[0].bytes.toString()).toBe("postData");
+
+        return "samlResponse";
+      },
     };
+
     const cliAwsAuthenticationService = new CliAwsAuthenticationService(authenticationService as any);
     cliAwsAuthenticationService.getNavigationPage = async (headlessMode: boolean) => {
       expect(headlessMode).toEqual(!needToAuthenticate);
@@ -120,7 +131,7 @@ describe("CliAwsAuthenticationService", () => {
     };
 
     const result = await cliAwsAuthenticationService.awsSignIn(idpUrl, needToAuthenticate);
-    expect(result.uploadData[0].bytes.toString()).toBe("postData");
+    expect(result).toBe("samlResponse");
     expect(page.onPageCalled).toBeTruthy();
     expect(page.gotoPageCalled).toBeTruthy();
     expect(authenticationService.isSamlAssertionUrl).toHaveBeenCalledWith(CloudProviderType.aws, "wrongSamlUrl");

@@ -96,6 +96,7 @@ describe("DeleteIdpUrl", () => {
       idpUrlsService: {
         deleteIdpUrl: jest.fn(),
       },
+      desktopAppRemoteProcedures: { refreshSessions: jest.fn() },
     };
 
     const command = getTestCommand(leappCliService);
@@ -103,6 +104,7 @@ describe("DeleteIdpUrl", () => {
     await command.deleteIdpUrl("idpUrl");
 
     expect(leappCliService.idpUrlsService.deleteIdpUrl).toHaveBeenCalledWith("idpUrl");
+    expect(leappCliService.desktopAppRemoteProcedures.refreshSessions).toHaveBeenCalled();
     expect(command.log).toHaveBeenCalledWith("identity provider URL deleted");
   });
 
