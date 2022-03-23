@@ -95,6 +95,7 @@ describe("DeleteNamedProfile", () => {
       namedProfilesService: {
         deleteNamedProfile: jest.fn(),
       },
+      desktopAppRemoteProcedures: { refreshSessions: jest.fn() },
     };
 
     const command = getTestCommand(leappCliService);
@@ -103,6 +104,7 @@ describe("DeleteNamedProfile", () => {
 
     expect(leappCliService.namedProfilesService.deleteNamedProfile).toHaveBeenCalledWith("profileId");
     expect(command.log).toHaveBeenCalledWith("profile deleted");
+    expect(leappCliService.desktopAppRemoteProcedures.refreshSessions).toHaveBeenCalled();
   });
 
   const runCommand = async (errorToThrow: any, expectedErrorMessage: string) => {

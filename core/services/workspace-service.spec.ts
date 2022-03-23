@@ -169,3 +169,12 @@
   })
 })
 */
+
+import { describe, test, expect } from "@jest/globals";
+import { Workspace } from "../models/workspace";
+
+describe("WorkspaceService", () => {
+  test("Should exists when created", () => {
+    expect(new Workspace()).not.toBe(undefined);
+  });
+});
