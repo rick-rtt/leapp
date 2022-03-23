@@ -14,6 +14,9 @@ import { AwsSsoOidcService } from "../../aws-sso-oidc.service";
 import { AwsSsoRoleSessionRequest } from "./aws-sso-role-session-request";
 import { IAwsIntegrationDelegate } from "../../../interfaces/i-aws-integration-delegate";
 import { SessionType } from "../../../models/session-type";
+import { Session } from "../../../models/session";
+import * as AWS from "aws-sdk";
+import { AwsIamUserSession } from "../../../models/aws-iam-user-session";
 
 export interface GenerateSSOTokenResponse {
   accessToken: string;
@@ -149,6 +152,20 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
     const accessToken = await this.awsIntegrationDelegate.getAccessToken(session.awsSsoConfigurationId, region, portalUrl);
     const credentials = await this.awsIntegrationDelegate.getRoleCredentials(accessToken, region, roleArn);
 
+    const awsCredentials: AWS.STS.Credentials = {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      AccessKeyId: credentials.roleCredentials.accessKeyId,
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      SecretAccessKey: credentials.roleCredentials.secretAccessKey,
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      SessionToken: credentials.roleCredentials.sessionToken,
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      Expiration: new Date(credentials.roleCredentials.expiration),
+    };
+
+    // Save session token expiration
+    this.saveSessionTokenExpirationInTheSession(session, awsCredentials);
+
     return AwsSsoRoleService.sessionTokenFromGetSessionTokenResponse(credentials);
   }
 
@@ -165,4 +182,19 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
   }
 
   removeSecrets(_: string): void {}
+
+  private saveSessionTokenExpirationInTheSession(session: Session, credentials: AWS.STS.Credentials): void {
+    const sessions = this.repository.getSessions();
+    const index = sessions.indexOf(session);
+    const currentSession: Session = sessions[index];
+
+    if (credentials !== undefined) {
+      (currentSession as AwsIamUserSession).sessionTokenExpiration = credentials.Expiration.toISOString();
+    }
+
+    sessions[index] = currentSession;
+
+    this.repository.updateSessions(sessions);
+    this.sessionNotifier.setSessions([...sessions]);
+  }
 }

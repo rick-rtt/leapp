@@ -76,7 +76,7 @@ export abstract class AwsSessionService extends SessionService {
 
   async generateProcessCredentials(sessionId: string): Promise<AwsProcessCredentials> {
     const session = this.repository.getSessionById(sessionId);
-    if (session.type === SessionType.awsIamUser) {
+    if (session.type !== SessionType.aws) {
       const credentials = await this.generateCredentials(sessionId);
       const token = credentials.sessionToken;
       return new AwsProcessCredentials(
@@ -87,7 +87,7 @@ export abstract class AwsSessionService extends SessionService {
         (session as any).sessionTokenExpiration
       );
     } else {
-      throw new Error("only AWS Iam User session are supported");
+      throw new Error("only AWS sessions are supported");
     }
   }
 

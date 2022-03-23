@@ -14,6 +14,7 @@ import { AwsIamUserService } from "./aws-iam-user-service";
 import { AwsParentSessionFactory } from "./aws-parent-session.factory";
 import { AwsSessionService } from "./aws-session-service";
 import { SessionType } from "../../../models/session-type";
+import { AwsIamUserSession } from "../../../models/aws-iam-user-session";
 
 export class AwsIamRoleChainedService extends AwsSessionService {
   constructor(
@@ -115,7 +116,7 @@ export class AwsIamRoleChainedService extends AwsSessionService {
     };
 
     // Generate Session token
-    return this.generateSessionToken(sts, params);
+    return this.generateSessionToken(session, sts, params);
   }
 
   removeSecrets(_: string): void {}
@@ -128,14 +129,33 @@ export class AwsIamRoleChainedService extends AwsSessionService {
     }
   }
 
-  private async generateSessionToken(sts, params): Promise<CredentialsInfo> {
+  private async generateSessionToken(session, sts, params): Promise<CredentialsInfo> {
     try {
       // Assume Role
       const assumeRoleResponse: AssumeRoleResponse = await sts.assumeRole(params).promise();
+
+      // Save session token expiration
+      this.saveSessionTokenExpirationInTheSession(session, assumeRoleResponse.Credentials);
+
       // Generate correct object from session token response and return
       return AwsIamRoleChainedService.sessionTokenFromAssumeRoleResponse(assumeRoleResponse);
     } catch (err) {
       throw new LeappAwsStsError(this, err.message);
     }
+  }
+
+  private saveSessionTokenExpirationInTheSession(session: Session, credentials: AWS.STS.Credentials): void {
+    const sessions = this.repository.getSessions();
+    const index = sessions.indexOf(session);
+    const currentSession: Session = sessions[index];
+
+    if (credentials !== undefined) {
+      (currentSession as AwsIamUserSession).sessionTokenExpiration = credentials.Expiration.toISOString();
+    }
+
+    sessions[index] = currentSession;
+
+    this.repository.updateSessions(sessions);
+    this.sessionNotifier.setSessions([...sessions]);
   }
 }
