@@ -14,6 +14,15 @@ export class OrderingPipe implements PipeTransform {
         b = a;
         a = c;
       }
+
+      if (!a.startDateTime) {
+        a.startDateTime = new Date("1970-01-01T00:00:00+0000").toISOString();
+      }
+
+      if (!b.startDateTime) {
+        b.startDateTime = new Date("1970-01-01T00:00:00+0000").toISOString();
+      }
+
       return new Date(b.startDateTime).getTime() - new Date(a.startDateTime).getTime();
     });
   }

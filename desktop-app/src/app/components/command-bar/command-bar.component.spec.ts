@@ -3,6 +3,7 @@ import { ComponentFixture, TestBed } from "@angular/core/testing";
 import { CommandBarComponent } from "./command-bar.component";
 import { mustInjected } from "../../../base-injectables";
 import { LeappCoreService } from "../../services/leapp-core.service";
+import { constants } from "@noovolari/leapp-core/models/constants";
 
 describe("CommandBarComponent", () => {
   let component: CommandBarComponent;
@@ -15,6 +16,7 @@ describe("CommandBarComponent", () => {
     });
     const spyRepositoryService = jasmine.createSpyObj("Repository", {
       getProfiles: [],
+      getColorTheme: () => constants.darkTheme,
     });
     const spyLeappCoreService = jasmine.createSpyObj("LeappCoreService", [], {
       workspaceService: spyWorkspaceService,
@@ -31,6 +33,25 @@ describe("CommandBarComponent", () => {
     fixture = TestBed.createComponent(CommandBarComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
+
+    (component as any).subscription = {
+      unsubscribe: () => {},
+    };
+    (component as any).subscription2 = {
+      unsubscribe: () => {},
+    };
+    (component as any).subscription3 = {
+      unsubscribe: () => {},
+    };
+    (component as any).subscription4 = {
+      unsubscribe: () => {},
+    };
+    (component as any).subscription5 = {
+      unsubscribe: () => {},
+    };
+    (component as any).subscription6 = {
+      unsubscribe: () => {},
+    };
   });
 
   it("should create", () => {
