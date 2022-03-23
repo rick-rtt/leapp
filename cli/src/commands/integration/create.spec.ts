@@ -120,6 +120,7 @@ describe("CreateSsoIntegration", () => {
       awsSsoIntegrationService: {
         createIntegration: jest.fn(),
       },
+      desktopAppRemoteProcedures: { refreshIntegrations: jest.fn() },
     } as any;
 
     const command = getTestCommand(leappCliService);
@@ -134,5 +135,6 @@ describe("CreateSsoIntegration", () => {
 
     expect(leappCliService.awsSsoIntegrationService.createIntegration).toBeCalledWith(creationParam);
     expect(command.log).toHaveBeenCalledWith("aws sso integration created");
+    expect(leappCliService.desktopAppRemoteProcedures.refreshIntegrations).toHaveBeenCalled();
   });
 });

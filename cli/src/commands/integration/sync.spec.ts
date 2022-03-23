@@ -53,6 +53,7 @@ describe("SyncIntegration", () => {
       awsSsoIntegrationService: {
         syncSessions: jest.fn(async () => sessionsDiff),
       },
+      desktopAppRemoteProcedures: { refreshSessions: jest.fn() },
     };
 
     const command = getTestCommand(leappCliService);
@@ -64,6 +65,7 @@ describe("SyncIntegration", () => {
     expect(leappCliService.awsSsoIntegrationService.syncSessions).toHaveBeenCalledWith(integration.id);
     expect(command.log).toHaveBeenNthCalledWith(1, `${sessionsDiff.sessionsToAdd.length} sessions added`);
     expect(command.log).toHaveBeenNthCalledWith(2, `${sessionsDiff.sessionsToDelete.length} sessions removed`);
+    expect(leappCliService.desktopAppRemoteProcedures.refreshSessions).toHaveBeenCalled();
   });
 
   const runCommand = async (errorToThrow: any, expectedErrorMessage: string) => {
