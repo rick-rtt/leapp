@@ -52,13 +52,12 @@ export class CliCommunicationService {
     private electronService: ElectronService,
     private leappCoreService: LeappCoreService,
     private verificationWindowService: VerificationWindowService,
-    private awsAuthenticationService: AwsAuthenticationService,
-    private serverId: string = "leapp_da"
+    private awsAuthenticationService: AwsAuthenticationService
   ) {}
 
   startServer(): void {
     const ipc = this.electronService.nodeIpc;
-    ipc.config.id = this.serverId;
+    ipc.config.id = "leapp_da";
     ipc.serve(() => {
       ipc.server.on("message", (data, socket) => {
         const emitFunction = (...params) => ipc.server.emit(...params);
