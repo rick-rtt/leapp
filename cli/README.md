@@ -372,14 +372,14 @@ EXAMPLES
 
 ## `leapp session change-profile`
 
-Change a session profile
+Change a session named-profile
 
 ```
 USAGE
   $ leapp session change-profile
 
 DESCRIPTION
-  Change a session profile
+  Change a session named-profile
 
 EXAMPLES
   $leapp session change-profile
