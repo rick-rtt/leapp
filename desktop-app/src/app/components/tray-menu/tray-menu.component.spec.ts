@@ -23,6 +23,8 @@ describe("TrayMenuComponent", () => {
       awsCoreService: { getRegions: () => [] },
     });
 
+    window.__dirname = "";
+
     TestBed.configureTestingModule({
       declarations: [TrayMenuComponent],
       providers: [].concat(mustInjected().concat({ provide: LeappCoreService, useValue: spyLeappCoreService })),
@@ -33,6 +35,9 @@ describe("TrayMenuComponent", () => {
     fixture = TestBed.createComponent(TrayMenuComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
+    (component as any).subscribed = {
+      unsubscribe: () => {},
+    };
   });
 
   it("should create", () => {
