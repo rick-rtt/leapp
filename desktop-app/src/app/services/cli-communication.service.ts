@@ -31,6 +31,7 @@ export class CliCommunicationService {
       try {
         this.leappCoreService.repository.reloadWorkspace();
         integrationsFilter.next(this.leappCoreService.repository.listAwsSsoIntegrations());
+        this.forceRefresh();
         emitFunction(socket, "message", {});
       } catch (error) {
         emitFunction(socket, "message", { error });
@@ -41,6 +42,7 @@ export class CliCommunicationService {
         this.leappCoreService.repository.reloadWorkspace();
         const sessions = this.leappCoreService.repository.getSessions();
         this.leappCoreService.workspaceService.setSessions(sessions);
+        this.forceRefresh();
         emitFunction(socket, "message", {});
       } catch (error) {
         emitFunction(socket, "message", { error });
@@ -71,5 +73,12 @@ export class CliCommunicationService {
     });
 
     ipc.server.start();
+  }
+
+  private forceRefresh() {
+    const element = document.querySelector("table") as HTMLElement;
+    if (element) {
+      element.click();
+    }
   }
 }
