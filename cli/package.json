@@ -126,16 +126,9 @@
   "repository": "noovolari/leapp",
   "scripts": {
     "clean": "gushio gushio/target-clean.js",
-    "build": "gushio gushio/target-build.js",
     "test": "jest",
-    "prepack": "npm run build && oclif manifest && oclif readme",
-    "pack-mac": "oclif pack:macos",
-    "pack-linux": "oclif pack:deb",
-    "pack-win": "oclif pack:win",
-    "postpack": "gushio gushio/target-post-pack.js",
-    "release": "gushio gushio/target-release.js",
-    "version": "oclif readme && git add README.md",
-    "run-command": "./bin/run integration login"
+    "prepack": "gushio gushio/target-build.js && oclif manifest && oclif readme",
+    "release": "gushio gushio/target-release.js"
   },
   "types": "dist/index.d.ts"
 }
