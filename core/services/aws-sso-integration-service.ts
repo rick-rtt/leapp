@@ -61,17 +61,14 @@ export class AwsSsoIntegrationService {
     this.repository.addAwsSsoIntegration(creationParams.portalUrl, creationParams.alias, creationParams.region, creationParams.browserOpening);
   }
 
-  // TODO: to be moved in repository
   getIntegrations(): AwsSsoIntegration[] {
     return this.repository.listAwsSsoIntegrations();
   }
 
-  // TODO: to be moved in repository
   getOnlineIntegrations(): AwsSsoIntegration[] {
     return this.getIntegrations().filter((integration) => this.isOnline(integration));
   }
 
-  // TODO: to be moved in repository
   getOfflineIntegrations(): AwsSsoIntegration[] {
     return this.getIntegrations().filter((integration) => !this.isOnline(integration));
   }
