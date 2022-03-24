@@ -1,4 +1,4 @@
-import { Injectable } from "@angular/core";
+import { Injectable, NgZone } from "@angular/core";
 import { ElectronService } from "./electron.service";
 import { LeappCoreService } from "./leapp-core.service";
 import { AwsAuthenticationService } from "./session/aws/aws-authentication.service";
@@ -30,8 +30,9 @@ export class CliCommunicationService {
     refreshIntegrations: (emitFunction, socket) => {
       try {
         this.leappCoreService.repository.reloadWorkspace();
-        integrationsFilter.next(this.leappCoreService.repository.listAwsSsoIntegrations());
-        this.forceRefresh();
+        this.ngZone.run(() => {
+          integrationsFilter.next(this.leappCoreService.repository.listAwsSsoIntegrations());
+        });
         emitFunction(socket, "message", {});
       } catch (error) {
         emitFunction(socket, "message", { error });
@@ -41,8 +42,9 @@ export class CliCommunicationService {
       try {
         this.leappCoreService.repository.reloadWorkspace();
         const sessions = this.leappCoreService.repository.getSessions();
-        this.leappCoreService.workspaceService.setSessions(sessions);
-        this.forceRefresh();
+        this.ngZone.run(() => {
+          this.leappCoreService.workspaceService.setSessions(sessions);
+        });
         emitFunction(socket, "message", {});
       } catch (error) {
         emitFunction(socket, "message", { error });
@@ -54,7 +56,8 @@ export class CliCommunicationService {
     private electronService: ElectronService,
     private leappCoreService: LeappCoreService,
     private verificationWindowService: VerificationWindowService,
-    private awsAuthenticationService: AwsAuthenticationService
+    private awsAuthenticationService: AwsAuthenticationService,
+    private ngZone: NgZone
   ) {}
 
   startServer(): void {
@@ -73,12 +76,5 @@ export class CliCommunicationService {
     });
 
     ipc.server.start();
-  }
-
-  private forceRefresh() {
-    const element = document.querySelector("table") as HTMLElement;
-    if (element) {
-      element.click();
-    }
   }
 }
