@@ -11,7 +11,7 @@ import { integrationsFilter } from "../components/integration-bar/integration-ba
 export class CliCommunicationService {
   rpcMethods = {
     isDesktopAppRunning: (emitFunction, socket) => emitFunction(socket, "message", { result: true }),
-    needAuthentication: (emitFunction, data, socket) =>
+    needAuthentication: (emitFunction, socket, data) =>
       this.awsAuthenticationService.needAuthentication(data.idpUrl).then((result: boolean) => {
         emitFunction(socket, "message", { result });
       }),
