@@ -51,7 +51,7 @@ export default class EditIdpUrl extends LeappCommand {
 
   async editIdpUrl(id: string, newIdpUrl: string): Promise<void> {
     await this.leappCliService.idpUrlsService.editIdpUrl(id, newIdpUrl);
-    await this.leappCliService.desktopAppRemoteProcedures.refreshSessions();
+    await this.leappCliService.remoteProceduresClient.refreshSessions();
     this.log("IdP URL edited");
   }
 }

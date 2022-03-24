@@ -52,7 +52,7 @@ describe("LogoutIntegration", () => {
       awsSsoIntegrationService: {
         logout: jest.fn(),
       },
-      desktopAppRemoteProcedures: { refreshIntegrations: jest.fn(), refreshSessions: jest.fn() },
+      remoteProceduresClient: { refreshIntegrations: jest.fn(), refreshSessions: jest.fn() },
     };
 
     const command = getTestCommand(leappCliService);
@@ -63,8 +63,8 @@ describe("LogoutIntegration", () => {
 
     expect(leappCliService.awsSsoIntegrationService.logout).toHaveBeenCalledWith(integration.id);
     expect(command.log).toHaveBeenLastCalledWith("logout successful");
-    expect(leappCliService.desktopAppRemoteProcedures.refreshSessions).toHaveBeenCalled();
-    expect(leappCliService.desktopAppRemoteProcedures.refreshSessions).toHaveBeenCalled();
+    expect(leappCliService.remoteProceduresClient.refreshSessions).toHaveBeenCalled();
+    expect(leappCliService.remoteProceduresClient.refreshSessions).toHaveBeenCalled();
   });
 
   const runCommand = async (errorToThrow: any, expectedErrorMessage: string) => {

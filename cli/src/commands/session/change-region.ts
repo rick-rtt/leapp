@@ -51,7 +51,7 @@ export default class ChangeSessionRegion extends LeappCommand {
 
   async changeSessionRegion(session: Session, newRegion: string): Promise<void> {
     this.leappCliService.regionsService.changeRegion(session, newRegion);
-    await this.leappCliService.desktopAppRemoteProcedures.refreshSessions();
+    await this.leappCliService.remoteProceduresClient.refreshSessions();
     this.log("session region changed");
   }
 }

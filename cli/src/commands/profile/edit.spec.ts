@@ -78,7 +78,7 @@ describe("EditNamedProfile", () => {
       namedProfilesService: {
         editNamedProfile: jest.fn(),
       },
-      desktopAppRemoteProcedures: { refreshSessions: jest.fn() },
+      remoteProceduresClient: { refreshSessions: jest.fn() },
     };
 
     const command = getTestCommand(leappCliService);
@@ -87,7 +87,7 @@ describe("EditNamedProfile", () => {
 
     expect(leappCliService.namedProfilesService.editNamedProfile).toHaveBeenCalledWith("profileId", "profileName");
     expect(command.log).toHaveBeenCalledWith("profile edited");
-    expect(leappCliService.desktopAppRemoteProcedures.refreshSessions).toHaveBeenCalled();
+    expect(leappCliService.remoteProceduresClient.refreshSessions).toHaveBeenCalled();
   });
 
   const runCommand = async (errorToThrow: any, expectedErrorMessage: string) => {

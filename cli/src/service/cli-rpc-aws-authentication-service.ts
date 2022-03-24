@@ -1,15 +1,15 @@
 import { IAwsAuthenticationService } from "@noovolari/leapp-core/interfaces/i-aws-authentication.service";
-import { DesktopAppRemoteProcedures } from "./desktop-app-remote-procedures";
+import { RemoteProceduresClient } from "@noovolari/leapp-core/services/remote-procedures-client";
 
 export class CliRpcAwsAuthenticationService implements IAwsAuthenticationService {
-  constructor(private desktopAppRemoteProcedures: DesktopAppRemoteProcedures) {}
+  constructor(private remoteProceduresClient: RemoteProceduresClient) {}
 
   async needAuthentication(idpUrl: string): Promise<boolean> {
-    return this.desktopAppRemoteProcedures.needAuthentication(idpUrl);
+    return this.remoteProceduresClient.needAuthentication(idpUrl);
   }
 
   async awsSignIn(idpUrl: string, needToAuthenticate: boolean): Promise<string> {
-    return this.desktopAppRemoteProcedures.awsSignIn(idpUrl, needToAuthenticate);
+    return this.remoteProceduresClient.awsSignIn(idpUrl, needToAuthenticate);
   }
 
   async closeAuthenticationWindow(): Promise<void> {

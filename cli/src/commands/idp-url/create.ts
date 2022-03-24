@@ -38,7 +38,7 @@ export default class CreateIdpUrl extends LeappCommand {
 
   async createIdpUrl(idpUrl: string): Promise<IdpUrl> {
     const newIdpUrl = this.leappCliService.idpUrlsService.createIdpUrl(idpUrl);
-    await this.leappCliService.desktopAppRemoteProcedures.refreshSessions();
+    await this.leappCliService.remoteProceduresClient.refreshSessions();
     this.log("identity provider URL created");
     return newIdpUrl;
   }

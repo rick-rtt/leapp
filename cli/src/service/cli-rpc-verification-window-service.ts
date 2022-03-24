@@ -4,10 +4,10 @@ import {
   StartDeviceAuthorizationResponse,
   VerificationResponse,
 } from "@noovolari/leapp-core/services/session/aws/aws-sso-role-service";
-import { DesktopAppRemoteProcedures } from "./desktop-app-remote-procedures";
+import { RemoteProceduresClient } from "@noovolari/leapp-core/services/remote-procedures-client";
 
 export class CliRpcVerificationWindowService implements IVerificationWindowService {
-  constructor(private desktopAppRemoteProcedures: DesktopAppRemoteProcedures) {}
+  constructor(private remoteProceduresClient: RemoteProceduresClient) {}
 
   async openVerificationWindow(
     registerClientResponse: RegisterClientResponse,
@@ -15,7 +15,7 @@ export class CliRpcVerificationWindowService implements IVerificationWindowServi
     windowModality: string,
     onWindowClose: () => void
   ): Promise<VerificationResponse> {
-    return this.desktopAppRemoteProcedures.openVerificationWindow(
+    return this.remoteProceduresClient.openVerificationWindow(
       registerClientResponse,
       startDeviceAuthorizationResponse,
       windowModality,

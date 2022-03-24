@@ -1,3 +1,5 @@
+import * as ipc from "node-ipc";
+
 export interface INativeService {
   log: any;
   url: any;
@@ -17,4 +19,5 @@ export interface INativeService {
   httpProxyAgent: any;
   httpsProxyAgent: any;
   process: any;
+  nodeIpc: typeof ipc;
 }

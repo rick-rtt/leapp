@@ -1,18 +1,16 @@
-import ipc from "node-ipc";
-import {
-  RegisterClientResponse,
-  StartDeviceAuthorizationResponse,
-  VerificationResponse,
-} from "@noovolari/leapp-core/services/session/aws/aws-sso-role-service";
+import { RegisterClientResponse, StartDeviceAuthorizationResponse, VerificationResponse } from "./session/aws/aws-sso-role-service";
+import { constants } from "../models/constants";
+import { INativeService } from "../interfaces/i-native-service";
+import { RpcRequest, RpcResponse } from "./remote-procedures-server";
 
 const connectionError = "unable to connect with desktop app";
 
-export class DesktopAppRemoteProcedures {
-  constructor(private serverId = "leapp_da") {}
+export class RemoteProceduresClient {
+  constructor(private nativeService: INativeService, private serverId = constants.ipcServerId) {}
 
   async isDesktopAppRunning(): Promise<boolean> {
     return this.remoteProcedureCall(
-      { method: "isDesktopAppRunning" },
+      { method: "isDesktopAppRunning", params: {} },
       (data, resolve, _) => resolve(data.result),
       () => null,
       (resolve, _) => resolve(false)
@@ -21,7 +19,7 @@ export class DesktopAppRemoteProcedures {
 
   async needAuthentication(idpUrl: string): Promise<boolean> {
     return this.remoteProcedureCall(
-      { method: "needAuthentication", idpUrl },
+      { method: "needAuthentication", params: { idpUrl } },
       (data, resolve, reject) => (data.error ? reject(data.error) : resolve(data.result)),
       () => null,
       (_, reject) => reject(connectionError)
@@ -30,7 +28,7 @@ export class DesktopAppRemoteProcedures {
 
   async awsSignIn(idpUrl: string, needToAuthenticate: boolean): Promise<any> {
     return this.remoteProcedureCall(
-      { method: "awsSignIn", idpUrl, needToAuthenticate },
+      { method: "awsSignIn", params: { idpUrl, needToAuthenticate } },
       (data, resolve, reject) => (data.error ? reject(data.error) : resolve(data.result)),
       () => null,
       (_, reject) => reject(connectionError)
@@ -44,7 +42,10 @@ export class DesktopAppRemoteProcedures {
     onWindowClose: () => void
   ): Promise<VerificationResponse> {
     return this.remoteProcedureCall(
-      { method: "openVerificationWindow", registerClientResponse, startDeviceAuthorizationResponse, windowModality },
+      {
+        method: "openVerificationWindow",
+        params: { registerClientResponse, startDeviceAuthorizationResponse, windowModality },
+      },
       (data, resolve, reject) => (data.error ? reject(data.error) : resolve(data.result)),
       (data, _, __) => (data.callbackId === "onWindowClose" ? onWindowClose() : null),
       (_, reject) => reject(connectionError)
@@ -53,7 +54,7 @@ export class DesktopAppRemoteProcedures {
 
   async refreshSessions(): Promise<void> {
     return this.remoteProcedureCall(
-      { method: "refreshSessions" },
+      { method: "refreshSessions", params: {} },
       (data, resolve, reject) => (data.error ? reject(data.error) : resolve(data.result)),
       () => null,
       (_, reject) => reject(connectionError)
@@ -62,7 +63,7 @@ export class DesktopAppRemoteProcedures {
 
   async refreshIntegrations(): Promise<void> {
     return this.remoteProcedureCall(
-      { method: "refreshIntegrations" },
+      { method: "refreshIntegrations", params: {} },
       (data, resolve, reject) => (data.error ? reject(data.error) : resolve(data.result)),
       () => null,
       (_, reject) => reject(connectionError)
@@ -70,11 +71,12 @@ export class DesktopAppRemoteProcedures {
   }
 
   async remoteProcedureCall(
-    callMessage: any,
-    onReturn: (data: any, resolve: (value: unknown) => void, reject: (reason?: any) => void) => void,
-    onCallback: (data: any, resolve: (value: unknown) => void, reject: (reason?: any) => void) => void,
+    rpcRequest: RpcRequest,
+    onReturn: (data: RpcResponse, resolve: (value: unknown) => void, reject: (reason?: any) => void) => void,
+    onCallback: (data: RpcResponse, resolve: (value: unknown) => void, reject: (reason?: any) => void) => void,
     onDisconnect: (resolve: (value: unknown) => void, reject: (reason?: any) => void) => void
   ): Promise<any> {
+    const ipc = this.nativeService.nodeIpc;
     ipc.config.id = "leapp_cli";
     ipc.config.maxRetries = 2;
     ipc.config.silent = true;
@@ -83,12 +85,12 @@ export class DesktopAppRemoteProcedures {
       ipc.connectTo(this.serverId, () => {
         const desktopAppServer = ipc.of[this.serverId];
         desktopAppServer.on("connect", () => {
-          desktopAppServer.emit("message", callMessage);
+          desktopAppServer.emit("message", rpcRequest);
         });
         desktopAppServer.on("disconnect", () => {
           onDisconnect(resolve, reject);
         });
-        desktopAppServer.on("message", (data) => {
+        desktopAppServer.on("message", (data: RpcResponse) => {
           if (data.callbackId) {
             onCallback(data, resolve, reject);
           } else {

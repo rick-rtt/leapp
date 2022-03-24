@@ -22,8 +22,8 @@ export default class LogoutIntegration extends LeappCommand {
 
   async logout(integration: AwsSsoIntegration): Promise<void> {
     await this.leappCliService.awsSsoIntegrationService.logout(integration.id);
-    await this.leappCliService.desktopAppRemoteProcedures.refreshIntegrations();
-    await this.leappCliService.desktopAppRemoteProcedures.refreshSessions();
+    await this.leappCliService.remoteProceduresClient.refreshIntegrations();
+    await this.leappCliService.remoteProceduresClient.refreshSessions();
     this.log("logout successful");
   }
 
