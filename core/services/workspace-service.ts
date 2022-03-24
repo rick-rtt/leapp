@@ -68,6 +68,16 @@ export class WorkspaceService implements ISessionNotifier {
     return childSession;
   }
 
+  listInActive(): Session[] {
+    return this.sessions.length > 0 ? this.sessions.filter((session) => session.status === SessionStatus.inactive) : [];
+  }
+
+  listAssumable(): Session[] {
+    return this.sessions.length > 0
+      ? this.sessions.filter((session) => session.type !== SessionType.azure && session.type !== SessionType.awsIamRoleChained)
+      : [];
+  }
+
   updateSession(sessionId: string, session: Session): void {
     const sessions = this.sessions;
     const index = sessions.findIndex((sess) => sess.sessionId === sessionId);
@@ -75,13 +85,5 @@ export class WorkspaceService implements ISessionNotifier {
       this.sessions[index] = session;
       this.sessions = [...this.sessions];
     }
-  }
-
-  listInActive(): Session[] {
-    return this.sessions.length > 0 ? this.sessions.filter((session) => session.status === SessionStatus.inactive) : [];
-  }
-
-  listAssumable(): Session[] {
-    return this.sessions.length > 0 ? this.sessions.filter((session) => session.type !== SessionType.azure) : [];
   }
 }

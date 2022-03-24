@@ -1,180 +1,329 @@
-/*describe('WorkspaceService', () => {
-  let repository: Repository
-  let workspaceService: WorkspaceService
-  let workspace
-  let mockedSession
-  let spyAppService: SpyObj<AppService>
-  let spyFileService
-
-  beforeEach(() => {
-
-    spyAppService = jasmine.createSpyObj('AppService', ['getOS'])
-    spyAppService.getOS.and.returnValue({homedir: () => '~/testing'})
-
-    spyFileService = jasmine.createSpyObj('FileService', ['encryptText', 'decryptText', 'writeFileSync', 'readFileSync', 'exists', 'newDir'])
-    spyFileService.exists.and.returnValue(true)
-    spyFileService.newDir.and.returnValue(true)
-    spyFileService.encryptText.and.callFake((text: string) => text)
-    spyFileService.decryptText.and.callFake((text: string) => text)
-    spyFileService.writeFileSync.and.callFake((_: string, __: string) => {
-    })
-    spyFileService.readFileSync.and.callFake((_: string) => serialize(new Workspace()))
-
-    TestBed.configureTestingModule({
-      providers: [
-        Repository,
-        WorkspaceService,
-        {provide: AppService, useValue: spyAppService},
-        {provide: FileService, useValue: spyFileService}
-      ].concat(mustInjected())
-    })
-
-    repository = TestBed.inject(Repository) as Repository
-    repository.create()
-    workspaceService = TestBed.inject(WorkspaceService) as WorkspaceService
-
-    mockedSession = new AwsIamUserSession('a', 'eu-west-1', 'profile', '')
-  })
-
-  it('should be created', () => {
-    expect(workspaceService).toBeTruthy()
-  })
-
-  describe('create()', () => {
-    it('should persist code in the .Leapp-lock.json file the first time is called', () => {
-      spyOn<any>(workspaceService, 'persist').and.callThrough()
-      // Mock first time access
-      spyFileService.exists.and.returnValue(false)
-      spyFileService.newDir.and.returnValue(false)
-      // Call create
-      repository.create()
-      expect((workspaceService as any).persist).toHaveBeenCalled()
-    })
-
-    it('should not create a second instance of Workspace after first one', () => {
-      spyFileService.readFileSync.and.callFake((_: string) => serialize(new Workspace()))
-      repository.create()
-      const workspace1 = repository.get()
-      workspace1.sessions.push(mockedSession)
-      spyFileService.readFileSync.and.callFake((_: string) => serialize(workspace1));
-      (workspaceService as any).updatePersistedSessions(workspace1.sessions)
-
-      repository.create()
-      const workspace2 = repository.get()
-      expect(serialize(workspace1)).toEqual(serialize(workspace2))
-    })
-  })
-
-  describe('get()', () => {
-    it('should return a workspace object', () => {
-      workspace = repository.get()
-
-      expect(workspace).toBeDefined()
-      expect(workspace).toBeInstanceOf(Workspace)
-    })
-  })
-
-  describe('getPersistedSessions()', () => {
-    it('should return a Session array: Session[]', () => {
-      workspace = new Workspace()
-
-      spyFileService.readFileSync.and.callFake((_: string) => serialize(workspace))
-      repository.get()
-
-      workspace.sessions.push(mockedSession)
-
-      expect((workspaceService as any).getPersistedSessions()).toBeInstanceOf(Array)
-      expect((workspaceService as any).getPersistedSessions()[0]).toBeInstanceOf(Session)
-    })
-  })
-
-  describe('get sessions()', () => {
-    it('should return an array of sessions', () => {
-      workspace = new Workspace()
-      workspace.sessions.push(mockedSession)
-      workspaceService.sessions = [...workspace.sessions]
-
-      expect(workspaceService.sessions).toBeInstanceOf(Array)
-      expect(workspaceService.sessions[0]).toBeInstanceOf(Session)
-    })
-  })
-
-  describe('set sessions()', () => {
-    it('should set sessions to an array of session', () => {
-      workspace = new Workspace()
-      workspace.sessions.push(mockedSession)
-
-      workspaceService.sessions = [...workspace.sessions]
-
-      expect(workspaceService.sessions).toBeInstanceOf(Array)
-      expect(workspaceService.sessions[0]).toBeInstanceOf(Session)
-    })
-
-    it('should call next to notify observers', () => {
-      workspace = new Workspace()
-      workspace.sessions.push(mockedSession)
-
-      spyOn((workspaceService as any)._sessions, 'next').and.callThrough()
-
-      workspaceService.sessions = [...workspace.sessions]
-
-      expect((workspaceService as any)._sessions.next).toHaveBeenCalled()
-    })
-  })
-
-  describe('getProfileName()', () => {
-    it('should return a profile name when an id matches', () => {
-      workspace = new Workspace()
-      spyFileService.readFileSync.and.callFake((_: string) => serialize(workspace))
-      expect(repository.getProfileName(repository.get().profiles[0].id)).toEqual('default')
-    })
-
-    it('should return null  when an id NOT matches', () => {
-      expect(repository.getProfileName('fakeid')).toEqual(null)
-    })
-  })
-
-  describe('addSession()', () => {
-    it('should add a session to the session array of workspace service', () => {
-      const oldLength = workspaceService.sessions.length
-      workspaceService.addSession(mockedSession)
-      expect(workspaceService.sessions.length).toEqual(oldLength + 1)
-      expect(serialize(workspaceService.sessions[oldLength])).toEqual(serialize(mockedSession))
-    })
-
-    it('should invoke next and persist data', () => {
-
-      spyOn((workspaceService as any)._sessions, 'next').and.callThrough()
-      spyOn<any>(workspaceService, 'persist').and.callThrough()
-
-      workspaceService.addSession(mockedSession)
-
-      expect((workspaceService as any)._sessions.next).toHaveBeenCalled()
-      expect((workspaceService as any).persist).toHaveBeenCalled()
-    })
-  })
-
-  describe('removeSession()', () => {
-    it('should remove a session from the workspace sessions', () => {
-
-      workspaceService.addSession(mockedSession)
-
-      const sessionId = mockedSession.sessionId
-      const oldLength = workspaceService.sessions.length
-      workspaceService.removeSessionById(sessionId)
-
-      expect(workspaceService.sessions.length).toEqual(oldLength - 1)
-      expect(workspaceService.sessions.find(s => s.sessionId === sessionId)).toBeUndefined()
-    })
-  })
-})
-*/
-
-import { describe, test, expect } from "@jest/globals";
-import { Workspace } from "../models/workspace";
+import { describe, expect, test } from "@jest/globals";
+import { Session } from "../models/session";
+import { Repository } from "./repository";
+import { SessionStatus } from "../models/session-status";
+import { SessionType } from "../models/session-type";
+import { WorkspaceService } from "./workspace-service";
 
 describe("WorkspaceService", () => {
+  let repositoryMock: Repository;
+  let mockedSession1: Session;
+  let mockedSession2: Session;
+  let mockedSession3: Session;
+  let workspaceService: WorkspaceService;
+
+  beforeEach(() => {
+    mockedSession1 = {
+      region: "eu-west-1",
+      sessionId: "session-id-1",
+      sessionName: "session1",
+      status: SessionStatus.active,
+      type: SessionType.awsSsoRole,
+      expired: (): boolean => false,
+    };
+    mockedSession2 = {
+      region: "eu-west-2",
+      sessionId: "session-id-2",
+      sessionName: "session2",
+      status: SessionStatus.inactive,
+      type: SessionType.awsSsoRole,
+      expired: (): boolean => false,
+    };
+    mockedSession3 = {
+      region: "eu-west-3",
+      sessionId: "session-id-3",
+      sessionName: "session3",
+      status: SessionStatus.inactive,
+      type: SessionType.azure,
+      expired: (): boolean => false,
+    };
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    repositoryMock = {
+      getSessions: jest.fn((): Session[] => [mockedSession1, mockedSession2, mockedSession3]),
+    };
+
+    workspaceService = new WorkspaceService(repositoryMock);
+  });
+
   test("Should exists when created", () => {
-    expect(new Workspace()).not.toBe(undefined);
+    expect(workspaceService).not.toBe(undefined);
+  });
+
+  test("get sessions() - retrieve sessions as Values from Behavioural Subject", () => {
+    expect(workspaceService.sessions).toStrictEqual(repositoryMock.getSessions());
+    expect(workspaceService.sessions.length).toBe(3);
+  });
+
+  test("getSessions() - retrieve sessions as Values from Behavioural Subject", () => {
+    expect(workspaceService.getSessions()).toStrictEqual(repositoryMock.getSessions());
+    expect(workspaceService.getSessions().length).toBe(3);
+  });
+
+  test("set sessions() - set sessions as Values to Behavioural Subject", () => {
+    const newSessionArray = repositoryMock.getSessions();
+    newSessionArray.push({
+      region: "eu-west-2",
+      sessionId: "session-id-4",
+      sessionName: "session4",
+      status: SessionStatus.pending,
+      type: SessionType.azure,
+      expired: (): boolean => false,
+    });
+    workspaceService.sessions = [...newSessionArray];
+
+    expect(workspaceService.sessions).toStrictEqual(newSessionArray);
+    expect(workspaceService.sessions.length).toBe(4);
+  });
+
+  test("setSessions() - set sessions as Values to Behavioural Subject", () => {
+    const newSessionArray = repositoryMock.getSessions();
+    newSessionArray.push({
+      region: "eu-west-2",
+      sessionId: "session-id-4",
+      sessionName: "session4",
+      status: SessionStatus.pending,
+      type: SessionType.azure,
+      expired: (): boolean => false,
+    });
+    workspaceService.sessions = [...newSessionArray];
+
+    expect(workspaceService.getSessions()).toStrictEqual(newSessionArray);
+    expect(workspaceService.getSessions().length).toBe(4);
+  });
+
+  test("getSessionById() - retrieve a session given its id", () => {
+    expect(workspaceService.getSessionById("session-id-3")).toStrictEqual(mockedSession3);
+  });
+
+  test("addSession() - set a new session into the Behavioural Subject array", () => {
+    const newSession: Session = {
+      region: "eu-west-2",
+      sessionId: "session-id-4",
+      sessionName: "session4",
+      status: SessionStatus.pending,
+      type: SessionType.azure,
+      expired: (): boolean => false,
+    };
+    workspaceService.addSession(newSession);
+
+    expect(workspaceService.getSessionById("session-id-4")).toStrictEqual(newSession);
+    expect(workspaceService.getSessions().length).toBe(4);
+  });
+
+  test("deleteSession() - remove a session from the Behavioural Subject array", () => {
+    const newSession: Session = {
+      region: "eu-west-2",
+      sessionId: "session-id-4",
+      sessionName: "session4",
+      status: SessionStatus.pending,
+      type: SessionType.azure,
+      expired: (): boolean => false,
+    };
+    workspaceService.addSession(newSession);
+
+    expect(workspaceService.getSessionById("session-id-4")).toStrictEqual(newSession);
+    expect(workspaceService.getSessions().length).toBe(4);
+
+    workspaceService.deleteSession("session-id-4");
+
+    expect(workspaceService.getSessionById("session-id-4")).toBe(null);
+    expect(workspaceService.getSessions().length).toBe(3);
+  });
+
+  test("listPending() - list of sessions filtered by pending state", () => {
+    const newSession: Session = {
+      region: "eu-west-2",
+      sessionId: "session-id-4",
+      sessionName: "session4",
+      status: SessionStatus.pending,
+      type: SessionType.azure,
+      expired: (): boolean => false,
+    };
+    workspaceService.addSession(newSession);
+
+    expect(workspaceService.getSessionById("session-id-4")).toStrictEqual(newSession);
+    expect(workspaceService.getSessions().length).toBe(4);
+    expect(workspaceService.listPending()).toStrictEqual([newSession]);
+    expect(workspaceService.listPending().length).toBe(1);
+  });
+
+  test("listActive() - list of sessions filtered by active state", () => {
+    const newSession: Session = {
+      region: "eu-west-2",
+      sessionId: "session-id-4",
+      sessionName: "session4",
+      status: SessionStatus.active,
+      type: SessionType.azure,
+      expired: (): boolean => false,
+    };
+    workspaceService.addSession(newSession);
+
+    expect(workspaceService.getSessionById("session-id-4")).toStrictEqual(newSession);
+    expect(workspaceService.getSessions().length).toBe(4);
+    expect(workspaceService.listActive()).toStrictEqual([mockedSession1, newSession]);
+    expect(workspaceService.listActive().length).toBe(2);
+  });
+
+  test("listInActive() - list of sessions filtered by inactive state", () => {
+    const newSession: Session = {
+      region: "eu-west-2",
+      sessionId: "session-id-4",
+      sessionName: "session4",
+      status: SessionStatus.active,
+      type: SessionType.azure,
+      expired: (): boolean => false,
+    };
+    workspaceService.addSession(newSession);
+
+    expect(workspaceService.getSessionById("session-id-4")).toStrictEqual(newSession);
+    expect(workspaceService.getSessions().length).toBe(4);
+    expect(workspaceService.listInActive()).toStrictEqual([mockedSession2, mockedSession3]);
+    expect(workspaceService.listInActive().length).toBe(2);
+  });
+
+  test("listAwsSsoRoles() - list of sessions filtered by aws sso role type", () => {
+    const newSession: Session = {
+      region: "eu-west-2",
+      sessionId: "session-id-4",
+      sessionName: "session4",
+      status: SessionStatus.active,
+      type: SessionType.azure,
+      expired: (): boolean => false,
+    };
+    workspaceService.addSession(newSession);
+
+    expect(workspaceService.getSessionById("session-id-4")).toStrictEqual(newSession);
+    expect(workspaceService.getSessions().length).toBe(4);
+    expect(workspaceService.listAwsSsoRoles()).toStrictEqual([mockedSession1, mockedSession2]);
+    expect(workspaceService.listAwsSsoRoles().length).toBe(2);
+  });
+
+  test("listIamRoleChained() - list of sessions filtered by iam role chained type", () => {
+    const newSession: Session = {
+      region: "eu-west-2",
+      sessionId: "session-id-4",
+      sessionName: "session4",
+      status: SessionStatus.active,
+      type: SessionType.awsIamRoleChained,
+      expired: (): boolean => false,
+    };
+    workspaceService.addSession(newSession);
+
+    expect(workspaceService.getSessionById("session-id-4")).toStrictEqual(newSession);
+    expect(workspaceService.getSessions().length).toBe(4);
+    expect(workspaceService.listIamRoleChained()).toStrictEqual([newSession]);
+    expect(workspaceService.listIamRoleChained().length).toBe(1);
+  });
+
+  test("listIamRoleChained(parentSession) - list of sessions filtered by iam role chained type with a specific parent session", () => {
+    const newSession: Session = {
+      region: "eu-west-2",
+      sessionId: "session-id-4",
+      sessionName: "session4",
+      status: SessionStatus.active,
+      type: SessionType.awsIamRoleChained,
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      parentSessionId: "session-id-1",
+      expired: (): boolean => false,
+    };
+
+    const newSession2: Session = {
+      region: "eu-west-2",
+      sessionId: "session-id-5",
+      sessionName: "session5",
+      status: SessionStatus.active,
+      type: SessionType.awsIamRoleChained,
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      parentSessionId: "session-id-3",
+      expired: (): boolean => false,
+    };
+
+    workspaceService.addSession(newSession);
+    workspaceService.addSession(newSession2);
+
+    expect(workspaceService.getSessionById("session-id-4")).toStrictEqual(newSession);
+    expect(workspaceService.getSessionById("session-id-5")).toStrictEqual(newSession2);
+    expect(workspaceService.getSessions().length).toBe(5);
+    expect(workspaceService.listIamRoleChained(mockedSession1)).toStrictEqual([newSession]);
+    expect(workspaceService.listIamRoleChained(mockedSession1).length).toBe(1);
+    expect(workspaceService.listIamRoleChained(mockedSession3)).toStrictEqual([newSession2]);
+    expect(workspaceService.listIamRoleChained(mockedSession1).length).toBe(1);
+  });
+
+  test("listAssumable() - list of sessions filtered by any type except for azure and another chained", () => {
+    const newSession: Session = {
+      region: "eu-west-2",
+      sessionId: "session-id-4",
+      sessionName: "session4",
+      status: SessionStatus.active,
+      type: SessionType.awsIamRoleChained,
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      parentSessionId: "session-id-1",
+      expired: (): boolean => false,
+    };
+
+    const newSession2: Session = {
+      region: "eu-west-2",
+      sessionId: "session-id-5",
+      sessionName: "session5",
+      status: SessionStatus.active,
+      type: SessionType.awsIamRoleChained,
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      parentSessionId: "session-id-3",
+      expired: (): boolean => false,
+    };
+
+    workspaceService.addSession(newSession);
+    workspaceService.addSession(newSession2);
+
+    expect(workspaceService.getSessionById("session-id-4")).toStrictEqual(newSession);
+    expect(workspaceService.getSessionById("session-id-5")).toStrictEqual(newSession2);
+    expect(workspaceService.getSessions().length).toBe(5);
+
+    expect(workspaceService.listAssumable()).toStrictEqual([mockedSession1, mockedSession2]);
+    expect(workspaceService.listAssumable().length).toBe(2);
+  });
+
+  test("updateSession() - check that a session is updated correctly after property are changed", () => {
+    const newSession: Session = {
+      region: "eu-west-2",
+      sessionId: "session-id-4",
+      sessionName: "session4",
+      status: SessionStatus.active,
+      type: SessionType.awsIamRoleChained,
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      parentSessionId: "session-id-1",
+      expired: (): boolean => false,
+    };
+
+    const updatedSession: Session = {
+      region: "eu-west-1",
+      sessionId: "session-id-4",
+      sessionName: "session4b",
+      status: SessionStatus.pending,
+      type: SessionType.awsIamRoleChained,
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      parentSessionId: "session-id-1",
+      expired: (): boolean => false,
+    };
+
+    workspaceService.addSession(newSession);
+
+    expect(workspaceService.getSessionById("session-id-4")).toStrictEqual(newSession);
+    expect(workspaceService.getSessions().length).toBe(4);
+    expect(newSession).not.toStrictEqual(updatedSession);
+
+    // Apply update
+    workspaceService.updateSession("session-id-4", updatedSession);
+    expect(workspaceService.getSessionById("session-id-4")).toStrictEqual(updatedSession);
+    expect(workspaceService.getSessionById("session-id-4")).not.toStrictEqual(newSession);
   });
 });
