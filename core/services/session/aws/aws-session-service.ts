@@ -76,7 +76,7 @@ export abstract class AwsSessionService extends SessionService {
 
   async generateProcessCredentials(sessionId: string): Promise<AwsProcessCredentials> {
     const session = this.repository.getSessionById(sessionId);
-    if (session.type !== SessionType.aws) {
+    if (session.type !== SessionType.azure) {
       const credentials = await this.generateCredentials(sessionId);
       const token = credentials.sessionToken;
       return new AwsProcessCredentials(
