@@ -62,7 +62,18 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
     }
   }
 
-  generateMenu(): void {
+  async generateMenu(): Promise<void> {
+    const awsCliVersion = await this.leappCoreService.executeService.execute("aws --version");
+    const awsSsmPluginVersion = await this.leappCoreService.executeService.execute("session-manager-plugin --version");
+    const issueBody = `### Description:
+> Please include a detailed description of the issue (and an image or screen recording, if applicable)
+
+
+### Details:
+|Leapp Version | Awscli | SsmPluginVersion |
+| - | - | - |
+|${this.electronService.app.getVersion()}|${awsCliVersion}|${awsSsmPluginVersion}|`;
+    console.log("AWS SSM Plugin version: " + awsSsmPluginVersion);
     let voices = [];
     const actives = this.repository.getSessions().filter((s) => s.status === SessionStatus.active || s.status === SessionStatus.pending);
     const allSessions = actives.concat(
@@ -140,6 +151,28 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
         type: "normal",
         click: () => {
           this.appService.about();
+        },
+      },
+      { type: "separator" },
+      {
+        label: "Open documentation",
+        type: "normal",
+        click: () => {
+          this.windowService.openExternalUrl("https://docs.leapp.cloud/");
+        },
+      },
+      {
+        label: "Join Community Slack",
+        type: "normal",
+        click: () => {
+          this.windowService.openExternalUrl("https://join.slack.com/t/noovolari/shared_invite/zt-opn8q98k-HDZfpJ2_2U3RdTnN~u_B~Q");
+        },
+      },
+      {
+        label: "Open Issue",
+        type: "normal",
+        click: () => {
+          this.windowService.openExternalUrl(`https://github.com/noovolari/leapp/issues/new?labels=bug&body=${encodeURIComponent(issueBody)}`);
         },
       },
       { type: "separator" },
