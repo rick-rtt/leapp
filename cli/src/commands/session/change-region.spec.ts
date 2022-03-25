@@ -72,6 +72,7 @@ describe("ChangeRegion", () => {
       regionsService: {
         changeRegion: jest.fn(),
       },
+      remoteProceduresClient: { refreshSessions: jest.fn() },
     };
 
     const command = getTestCommand(leappCliService);
@@ -80,6 +81,7 @@ describe("ChangeRegion", () => {
     await command.changeSessionRegion(session, newRegion);
     expect(leappCliService.regionsService.changeRegion).toHaveBeenCalledWith(session, newRegion);
     expect(command.log).toHaveBeenCalledWith("session region changed");
+    expect(leappCliService.remoteProceduresClient.refreshSessions).toHaveBeenCalled();
   });
 
   const runCommand = async (errorToThrow: any, expectedErrorMessage: string) => {

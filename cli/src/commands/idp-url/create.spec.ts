@@ -50,15 +50,17 @@ describe("CreateIdpUrl", () => {
       idpUrlsService: {
         createIdpUrl: jest.fn(() => "newIdpUrl"),
       },
+      remoteProceduresClient: { refreshSessions: jest.fn() },
     };
 
     const command = getTestCommand(leappCliService);
     command.log = jest.fn();
-    const newIdpUrl = command.createIdpUrl("idpUrl");
+    const newIdpUrl = await command.createIdpUrl("idpUrl");
 
     expect(leappCliService.idpUrlsService.createIdpUrl).toHaveBeenCalledWith("idpUrl");
     expect(command.log).toHaveBeenCalledWith("identity provider URL created");
     expect(newIdpUrl).toBe("newIdpUrl");
+    expect(leappCliService.remoteProceduresClient.refreshSessions).toHaveBeenCalled();
   });
 
   const runCommand = async (errorToThrow: any, expectedErrorMessage: string) => {

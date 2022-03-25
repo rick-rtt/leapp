@@ -1,4 +1,5 @@
 import { Component, OnInit } from "@angular/core";
+import { RemoteProceduresServer } from "@noovolari/leapp-core/services/remote-procedures-server";
 import { environment } from "../environments/environment";
 import { AppService } from "./services/app.service";
 import { Router } from "@angular/router";
@@ -25,7 +26,6 @@ import { ElectronService } from "./services/electron.service";
 import { AwsSsoIntegrationService } from "@noovolari/leapp-core/services/aws-sso-integration-service";
 import { AwsSsoRoleService } from "@noovolari/leapp-core/services/session/aws/aws-sso-role-service";
 import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
-import { CliCommunicationService } from "./services/cli-communication.service";
 
 @Component({
   selector: "app-root",
@@ -44,6 +44,7 @@ export class AppComponent implements OnInit {
   private rotationService: RotationService;
   private awsSsoIntegrationService: AwsSsoIntegrationService;
   private awsSsoRoleService: AwsSsoRoleService;
+  private remoteProceduresServer: RemoteProceduresServer;
 
   /* Main app file: launches the Angular framework inside Electron app */
   constructor(
@@ -55,8 +56,7 @@ export class AppComponent implements OnInit {
     private router: Router,
     private updaterService: UpdaterService,
     private windowService: WindowService,
-    private electronService: ElectronService,
-    private cliCommunicationService: CliCommunicationService
+    private electronService: ElectronService
   ) {
     leappCoreService.mfaCodePrompter = mfaCodePrompter;
     leappCoreService.awsAuthenticationService = awsAuthenticationService;
@@ -75,6 +75,7 @@ export class AppComponent implements OnInit {
     this.rotationService = leappCoreService.rotationService;
     this.awsSsoIntegrationService = leappCoreService.awsSsoIntegrationService;
     this.awsSsoRoleService = leappCoreService.awsSsoRoleService;
+    this.remoteProceduresServer = leappCoreService.remoteProceduresServer;
 
     this.setInitialColorSchema();
     this.setColorSchemaChangeEventListener();
@@ -147,9 +148,8 @@ export class AppComponent implements OnInit {
     // Go to initial page if no sessions are already created or
     // go to the list page if is your second visit
     await this.router.navigate(["/dashboard"]);
-    document.querySelector("#loader").classList.add("disable-loader");
 
-    this.cliCommunicationService.startServer();
+    this.remoteProceduresServer.startServer();
   }
 
   closeAllRightClickMenus(): void {
@@ -162,6 +162,8 @@ export class AppComponent implements OnInit {
   private beforeCloseInstructions() {
     // Check if we are here
     this.loggingService.logger("Closing app with cleaning process...", LoggerLevel.info, this);
+
+    this.remoteProceduresServer.stopServer();
 
     // Stop all the sessions
     const sessions = this.repository.getSessions();

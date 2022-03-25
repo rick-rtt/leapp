@@ -260,3 +260,20 @@ describe('RetrocompatibilityService', () => {
   });
 });
 */
+
+import { describe, test, expect } from "@jest/globals";
+import { RetroCompatibilityService } from "./retro-compatibility-service";
+
+describe("RetroCompatibilityService", () => {
+  test("Should exists when created", () => {
+    const fileService = {};
+    const keychainService = {};
+    const repository = {};
+    const workspaceService = {};
+    const appName = "test";
+    const lockPath = "";
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    expect(new RetroCompatibilityService(fileService, keychainService, repository, workspaceService, appName, lockPath)).not.toBe(undefined);
+  });
+});

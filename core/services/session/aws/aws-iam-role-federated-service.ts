@@ -11,6 +11,9 @@ import { Repository } from "../../repository";
 import { AwsIamRoleFederatedSessionRequest } from "./aws-iam-role-federated-session-request";
 import { AwsSessionService } from "./aws-session-service";
 import { SessionType } from "../../../models/session-type";
+import { Session } from "../../../models/session";
+import * as AWS from "aws-sdk";
+import { AwsIamUserSession } from "../../../models/aws-iam-user-session";
 
 export class AwsIamRoleFederatedService extends AwsSessionService {
   constructor(
@@ -123,6 +126,9 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
       throw new LeappAwsStsError(this, err.message);
     }
 
+    // Save session token expiration
+    this.saveSessionTokenExpirationInTheSession(session, assumeRoleWithSamlResponse.Credentials);
+
     // Generate credentials
     return AwsIamRoleFederatedService.sessionTokenFromGetSessionTokenResponse(assumeRoleWithSamlResponse);
   }
@@ -136,4 +142,19 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
   }
 
   removeSecrets(_: string): void {}
+
+  private saveSessionTokenExpirationInTheSession(session: Session, credentials: AWS.STS.Credentials): void {
+    const sessions = this.repository.getSessions();
+    const index = sessions.indexOf(session);
+    const currentSession: Session = sessions[index];
+
+    if (credentials !== undefined) {
+      (currentSession as AwsIamUserSession).sessionTokenExpiration = credentials.Expiration.toISOString();
+    }
+
+    sessions[index] = currentSession;
+
+    this.repository.updateSessions(sessions);
+    this.sessionNotifier.setSessions([...sessions]);
+  }
 }

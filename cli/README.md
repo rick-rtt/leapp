@@ -20,7 +20,7 @@ $ npm install -g @noovolari/leapp-cli
 $ leapp COMMAND
 running command...
 $ leapp (--version)
-@noovolari/leapp-cli/0.1.1 darwin-x64 node-v16.14.0
+@noovolari/leapp-cli/0.1.2 darwin-x64 node-v16.14.0
 $ leapp --help [COMMAND]
 USAGE
   $ leapp COMMAND
@@ -372,14 +372,14 @@ EXAMPLES
 
 ## `leapp session change-profile`
 
-Change a session profile
+Change a session named-profile
 
 ```
 USAGE
   $ leapp session change-profile
 
 DESCRIPTION
-  Change a session profile
+  Change a session named-profile
 
 EXAMPLES
   $leapp session change-profile

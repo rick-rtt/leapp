@@ -33,13 +33,12 @@
   },
   "scripts": {
     "ext-install": "npm install",
-    "clean-all": "gushio gushio/clean-all.js",
-    "npm-install-all": "gushio gushio/npm-install-all.js",
     "setup": "gushio gushio/setup.js",
     "release-core": "gushio gushio/target-release-core.js",
-    "prepare": "husky install",
+    "npm-install-all": "gushio gushio/npm-install-all.js",
     "lint": "eslint .",
-    "lint:fix": "npm run lint -- --fix"
+    "lint:fix": "npm run lint -- --fix",
+    "check-core-dependency": "gushio gushio/check-core-dependency.js"
   },
   "lint-staged": {
     "*.{ts,html}": "eslint --fix"

@@ -24,7 +24,7 @@ export default class StopSession extends LeappCommand {
   async stopSession(session: Session): Promise<void> {
     const sessionService = this.leappCliService.sessionFactory.getSessionService(session.type);
     await sessionService.stop(session.sessionId);
-    await this.leappCliService.desktopAppRemoteProcedures.refreshSessions();
+    await this.leappCliService.remoteProceduresClient.refreshSessions();
     this.log("session stopped");
   }
 

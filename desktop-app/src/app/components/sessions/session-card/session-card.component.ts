@@ -429,35 +429,18 @@ export class SessionCardComponent implements OnInit {
     return profileName;
   }
 
+  // TODO: we have to call changeNamedProfile
   async changeProfile(): Promise<void> {
     if (this.selectedProfile) {
-      let wasActive = false;
-
+      console.log("", this.selectedProfile);
       try {
-        this.repository.getProfileName(this.selectedProfile.id);
+        this.repository.getProfileName(this.selectedProfile.value);
       } catch (e) {
-        this.repository.addProfile(this.selectedProfile);
+        this.selectedProfile.value = this.leappCoreService.namedProfileService.createNamedProfile(this.selectedProfile.label).id;
       }
 
-      if (this.session.status === SessionStatus.active) {
-        await this.sessionService.stop(this.session.sessionId);
-        wasActive = true;
-      }
-
-      const sessions: Session[] = this.repository.getSessions();
-      for (let i = 0; i < sessions.length; i++) {
-        if (sessions[i].sessionId === this.session.sessionId) {
-          (sessions[i] as any).profileId = this.selectedProfile.id;
-        }
-      }
-      this.repository.updateSessions(sessions);
-
-      (this.session as any).profileId = this.selectedProfile.id;
-      this.workspaceService.updateSession(this.session.sessionId, this.session);
-
-      if (wasActive) {
-        this.startSession();
-      }
+      console.log("", this.selectedProfile);
+      this.leappCoreService.namedProfileService.changeNamedProfile(this.session, this.selectedProfile.value);
 
       this.messageToasterService.toast("Profile has been changed!", ToastLevel.success, "Profile changed!");
       this.modalRef.hide();

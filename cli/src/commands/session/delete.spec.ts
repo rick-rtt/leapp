@@ -16,9 +16,11 @@ describe("DeleteSession", () => {
     const sessionFactory: any = {
       getSessionService: jest.fn(() => sessionService),
     };
+    const remoteProceduresClient = { refreshSessions: jest.fn() };
 
     const leappCliService: any = {
       sessionFactory,
+      remoteProceduresClient,
     };
 
     const session: any = { sessionId: "sessionId", type: "sessionType" };
@@ -29,6 +31,7 @@ describe("DeleteSession", () => {
     expect(sessionFactory.getSessionService).toHaveBeenCalledWith("sessionType");
     expect(sessionService.delete).toHaveBeenCalledWith("sessionId");
     expect(command.log).toHaveBeenCalledWith("session deleted");
+    expect(remoteProceduresClient.refreshSessions).toHaveBeenCalled();
   });
 
   test("selectSession", async () => {

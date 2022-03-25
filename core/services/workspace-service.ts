@@ -1,4 +1,5 @@
-import { BehaviorSubject, Observable } from "rxjs";
+import { BehaviorSubject } from "rxjs";
+import { AwsSsoIntegration } from "../models/aws-sso-integration";
 import { Repository } from "./repository";
 import { Session } from "../models/session";
 import { SessionStatus } from "../models/session-status";
@@ -7,36 +8,28 @@ import { AwsIamRoleChainedSession } from "../models/aws-iam-role-chained-session
 import { ISessionNotifier } from "../interfaces/i-session-notifier";
 
 export class WorkspaceService implements ISessionNotifier {
-  // Expose the observable$ part of the _sessions subject (read only stream)
-  readonly sessions$: Observable<Session[]>;
-
-  // - We set the initial state in BehaviorSubject's constructor
-  // - Nobody outside the Store should have access to the BehaviorSubject
-  //   because it has the write rights
-  // - Writing to state should be handled by specialized Store methods
-  // - Create one BehaviorSubject per store entity, for example if you have
-  //   create a new BehaviorSubject for it, as well as the observable$, and getters/setters
-  private readonly _sessions;
+  readonly sessions$: BehaviorSubject<Session[]>;
+  readonly integrations$: BehaviorSubject<AwsSsoIntegration[]>;
 
   constructor(private repository: Repository) {
-    this._sessions = new BehaviorSubject<Session[]>([]);
-    this.sessions$ = this._sessions.asObservable();
+    this.sessions$ = new BehaviorSubject<Session[]>([]);
+    this.integrations$ = new BehaviorSubject<AwsSsoIntegration[]>([]);
     this.sessions = this.repository.getSessions();
   }
 
   // the getter will return the last value emitted in _sessions subject
   get sessions(): Session[] {
-    return this._sessions.getValue();
+    return this.sessions$.getValue();
   }
 
   // assigning a value to this.sessions will push it onto the observable
   // and down to all of its subscribers (ex: this.sessions = [])
   set sessions(sessions: Session[]) {
-    this._sessions.next(sessions);
+    this.sessions$.next(sessions);
   }
 
   getSessions(): Session[] {
-    return this._sessions.getValue();
+    return this.sessions$.getValue();
   }
 
   getSessionById(sessionId: string): Session {
@@ -45,7 +38,7 @@ export class WorkspaceService implements ISessionNotifier {
   }
 
   setSessions(sessions: Session[]): void {
-    this._sessions.next(sessions);
+    this.sessions$.next(sessions);
   }
 
   addSession(session: Session): void {
@@ -55,6 +48,14 @@ export class WorkspaceService implements ISessionNotifier {
 
   deleteSession(sessionId: string): void {
     this.sessions = this.sessions.filter((session) => session.sessionId !== sessionId);
+  }
+
+  getIntegrations(): AwsSsoIntegration[] {
+    return this.integrations$.getValue();
+  }
+
+  setIntegrations(integrations: AwsSsoIntegration[]): void {
+    this.integrations$.next(integrations);
   }
 
   listPending(): Session[] {
@@ -77,6 +78,16 @@ export class WorkspaceService implements ISessionNotifier {
     return childSession;
   }
 
+  listInActive(): Session[] {
+    return this.sessions.length > 0 ? this.sessions.filter((session) => session.status === SessionStatus.inactive) : [];
+  }
+
+  listAssumable(): Session[] {
+    return this.sessions.length > 0
+      ? this.sessions.filter((session) => session.type !== SessionType.azure && session.type !== SessionType.awsIamRoleChained)
+      : [];
+  }
+
   updateSession(sessionId: string, session: Session): void {
     const sessions = this.sessions;
     const index = sessions.findIndex((sess) => sess.sessionId === sessionId);
@@ -84,13 +95,5 @@ export class WorkspaceService implements ISessionNotifier {
       this.sessions[index] = session;
       this.sessions = [...this.sessions];
     }
-  }
-
-  listInActive(): Session[] {
-    return this.sessions.length > 0 ? this.sessions.filter((session) => session.status === SessionStatus.inactive) : [];
-  }
-
-  listAssumable(): Session[] {
-    return this.sessions.length > 0 ? this.sessions.filter((session) => session.type !== SessionType.azure) : [];
   }
 }

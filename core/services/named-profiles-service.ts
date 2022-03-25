@@ -24,8 +24,10 @@ export class NamedProfilesService {
     return this.repository.getSessions().filter((session) => (session as any).profileId === id);
   }
 
-  createNamedProfile(name: string): void {
-    this.repository.addProfile(new AwsNamedProfile(this.getNewId(), name.trim()));
+  createNamedProfile(name: string): AwsNamedProfile {
+    const namedProfile = new AwsNamedProfile(this.getNewId(), name.trim());
+    this.repository.addProfile(namedProfile);
+    return namedProfile;
   }
 
   async editNamedProfile(id: string, newName: string): Promise<void> {

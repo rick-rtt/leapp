@@ -236,7 +236,7 @@ export class AwsIamUserService extends AwsSessionService {
       const getSessionTokenResponse: GetSessionTokenResponse = await sts.getSessionToken(params).promise();
 
       // Save session token expiration
-      this.saveSessionTokenResponseInTheSession(session, getSessionTokenResponse);
+      this.saveSessionTokenExpirationInTheSession(session, getSessionTokenResponse.Credentials);
 
       // Generate correct object from session token response
       const sessionToken = AwsIamUserService.sessionTokenFromGetSessionTokenResponse(getSessionTokenResponse);
@@ -251,13 +251,13 @@ export class AwsIamUserService extends AwsSessionService {
     }
   }
 
-  private saveSessionTokenResponseInTheSession(session: Session, getSessionTokenResponse: AWS.STS.GetSessionTokenResponse): void {
+  private saveSessionTokenExpirationInTheSession(session: Session, credentials: AWS.STS.Credentials): void {
     const sessions = this.repository.getSessions();
     const index = sessions.indexOf(session);
     const currentSession: Session = sessions[index];
 
-    if (getSessionTokenResponse.Credentials !== undefined) {
-      (currentSession as AwsIamUserSession).sessionTokenExpiration = getSessionTokenResponse.Credentials.Expiration.toISOString();
+    if (credentials !== undefined) {
+      (currentSession as AwsIamUserSession).sessionTokenExpiration = credentials.Expiration.toISOString();
     }
 
     sessions[index] = currentSession;

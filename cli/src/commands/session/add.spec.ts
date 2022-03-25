@@ -168,12 +168,13 @@ describe("AddSession", () => {
       sessionType: "sessionType",
     };
 
-    const leappCliService: any = { sessionFactory: { createSession: jest.fn() } };
+    const leappCliService: any = { sessionFactory: { createSession: jest.fn() }, remoteProceduresClient: { refreshSessions: jest.fn() } };
     const command = getTestCommand(leappCliService);
     command.log = jest.fn();
 
     await command.createSession(accessMethod, selectedParams);
     expect(leappCliService.sessionFactory.createSession).toHaveBeenCalledWith("sessionType", "creationRequest");
+    expect(leappCliService.remoteProceduresClient.refreshSessions).toHaveBeenCalled();
     expect(command.log).toHaveBeenCalledWith("session added");
   });
 

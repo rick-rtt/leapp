@@ -20,7 +20,7 @@ import { RotationService } from "@noovolari/leapp-core/services/rotation-service
 import { AzureCoreService } from "@noovolari/leapp-core/services/azure-core-service";
 import { CliMfaCodePromptService } from "./cli-mfa-code-prompt-service";
 import { CliNativeService } from "./cli-native-service";
-import { DesktopAppRemoteProcedures } from "./desktop-app-remote-procedures";
+import { RemoteProceduresClient } from "@noovolari/leapp-core/services/remote-procedures-client";
 import { constants } from "@noovolari/leapp-core/models/constants";
 import { NamedProfilesService } from "@noovolari/leapp-core/services/named-profiles-service";
 import { IdpUrlsService } from "@noovolari/leapp-core/services/idp-urls-service";
@@ -44,7 +44,6 @@ export class LeappCliService {
     if (!this.cliNativeServiceInstance) {
       this.cliNativeServiceInstance = new CliNativeService();
     }
-
     return this.cliNativeServiceInstance;
   }
 
@@ -52,9 +51,8 @@ export class LeappCliService {
 
   public get cliVerificationWindowService(): IVerificationWindowService {
     if (!this.cliVerificationWindowServiceInstance) {
-      this.cliVerificationWindowServiceInstance = new CliRpcVerificationWindowService(this.desktopAppRemoteProcedures);
+      this.cliVerificationWindowServiceInstance = new CliRpcVerificationWindowService(this.remoteProceduresClient);
     }
-
     return this.cliVerificationWindowServiceInstance;
   }
 
@@ -64,7 +62,6 @@ export class LeappCliService {
     if (!this.authenticationServiceInstance) {
       this.authenticationServiceInstance = new AuthenticationService();
     }
-
     return this.authenticationServiceInstance;
   }
 
@@ -72,20 +69,18 @@ export class LeappCliService {
 
   public get cliRpcAwsAuthenticationService(): CliRpcAwsAuthenticationService {
     if (!this.cliRpcAwsAuthenticationServiceInstance) {
-      this.cliRpcAwsAuthenticationServiceInstance = new CliRpcAwsAuthenticationService(this.desktopAppRemoteProcedures);
+      this.cliRpcAwsAuthenticationServiceInstance = new CliRpcAwsAuthenticationService(this.remoteProceduresClient);
     }
-
     return this.cliRpcAwsAuthenticationServiceInstance;
   }
 
-  private desktopAppRemoteProceduresInstance: DesktopAppRemoteProcedures;
+  private remoteProceduresClientInstance: RemoteProceduresClient;
 
-  public get desktopAppRemoteProcedures(): DesktopAppRemoteProcedures {
-    if (!this.desktopAppRemoteProceduresInstance) {
-      this.desktopAppRemoteProceduresInstance = new DesktopAppRemoteProcedures();
+  public get remoteProceduresClient(): RemoteProceduresClient {
+    if (!this.remoteProceduresClientInstance) {
+      this.remoteProceduresClientInstance = new RemoteProceduresClient(this.cliNativeService);
     }
-
-    return this.desktopAppRemoteProceduresInstance;
+    return this.remoteProceduresClientInstance;
   }
 
   private cliMfaCodePromptServiceInstance: CliMfaCodePromptService;
@@ -94,7 +89,6 @@ export class LeappCliService {
     if (!this.cliMfaCodePromptServiceInstance) {
       this.cliMfaCodePromptServiceInstance = new CliMfaCodePromptService(this.inquirer);
     }
-
     return this.cliMfaCodePromptServiceInstance;
   }
 
@@ -104,7 +98,6 @@ export class LeappCliService {
     if (!this.workspaceServiceInstance) {
       this.workspaceServiceInstance = new WorkspaceService(this.repository);
     }
-
     return this.workspaceServiceInstance;
   }
 
@@ -115,7 +108,6 @@ export class LeappCliService {
       this.awsIamUserServiceInstance = new AwsIamUserService(this.workspaceService, this.repository, this.cliMfaCodePromptService,
         this.keyChainService, this.fileService, this.awsCoreService);
     }
-
     return this.awsIamUserServiceInstance;
   }
 
@@ -126,7 +118,6 @@ export class LeappCliService {
       this.awsIamRoleFederatedServiceInstance = new AwsIamRoleFederatedService(this.workspaceService, this.repository,
         this.fileService, this.awsCoreService, this.cliRpcAwsAuthenticationService, constants.samlRoleSessionDuration);
     }
-
     return this.awsIamRoleFederatedServiceInstance;
   }
 
@@ -137,7 +128,6 @@ export class LeappCliService {
       this.awsIamRoleChainedServiceInstance = new AwsIamRoleChainedService(this.workspaceService, this.repository,
         this.awsCoreService, this.fileService, this.awsIamUserService, this.awsParentSessionFactory);
     }
-
     return this.awsIamRoleChainedServiceInstance;
   }
 
@@ -148,7 +138,6 @@ export class LeappCliService {
       this.awsSsoRoleServiceInstance = new AwsSsoRoleService(this.workspaceService, this.repository, this.fileService,
         this.keyChainService, this.awsCoreService, this.cliNativeService, this.awsSsoOidcService);
     }
-
     return this.awsSsoRoleServiceInstance;
   }
 
@@ -158,7 +147,6 @@ export class LeappCliService {
     if (!this.awsSsoOidcServiceInstance) {
       this.awsSsoOidcServiceInstance = new AwsSsoOidcService(this.cliVerificationWindowService, this.repository, true);
     }
-
     return this.awsSsoOidcServiceInstance;
   }
 
@@ -169,7 +157,6 @@ export class LeappCliService {
       this.azureServiceInstance = new AzureService(this.workspaceService, this.repository, this.fileService, this.executeService,
         constants.azureAccessTokens);
     }
-
     return this.azureServiceInstance;
   }
 
@@ -180,7 +167,6 @@ export class LeappCliService {
       this.sessionFactoryInstance = new SessionFactory(this.awsIamUserService, this.awsIamRoleFederatedService,
         this.awsIamRoleChainedService, this.awsSsoRoleService, this.azureService);
     }
-
     return this.sessionFactoryInstance;
   }
 
@@ -191,7 +177,6 @@ export class LeappCliService {
       this.awsParentSessionFactoryInstance = new AwsParentSessionFactory(this.awsIamUserService, this.awsIamRoleFederatedService,
         this.awsSsoRoleService);
     }
-
     return this.awsParentSessionFactoryInstance;
   }
 
@@ -201,7 +186,6 @@ export class LeappCliService {
     if (!this.fileServiceInstance) {
       this.fileServiceInstance = new FileService(this.cliNativeService);
     }
-
     return this.fileServiceInstance;
   }
 
@@ -211,7 +195,6 @@ export class LeappCliService {
     if (!this.repositoryInstance) {
       this.repositoryInstance = new Repository(this.cliNativeService, this.fileService);
     }
-
     return this.repositoryInstance;
   }
 
@@ -221,7 +204,6 @@ export class LeappCliService {
     if (!this.regionsServiceInstance) {
       this.regionsServiceInstance = new RegionsService(this.sessionFactory, this.repository, this.workspaceService);
     }
-
     return this.regionsServiceInstance;
   }
 
@@ -231,7 +213,6 @@ export class LeappCliService {
     if (!this.namedProfilesServiceInstance) {
       this.namedProfilesServiceInstance = new NamedProfilesService(this.sessionFactory, this.repository, this.workspaceService);
     }
-
     return this.namedProfilesServiceInstance;
   }
 
@@ -241,7 +222,6 @@ export class LeappCliService {
     if (!this.idpUrlsServiceInstance) {
       this.idpUrlsServiceInstance = new IdpUrlsService(this.sessionFactory, this.repository);
     }
-
     return this.idpUrlsServiceInstance;
   }
 
@@ -252,7 +232,6 @@ export class LeappCliService {
       this.awsSsoIntegrationServiceInstance = new AwsSsoIntegrationService(this.repository, this.awsSsoOidcService,
         this.awsSsoRoleService, this.keyChainService, this.workspaceService, this.cliNativeService, this.sessionFactory);
     }
-
     return this.awsSsoIntegrationServiceInstance;
   }
 
@@ -262,7 +241,6 @@ export class LeappCliService {
     if (!this.keyChainServiceInstance) {
       this.keyChainServiceInstance = new KeychainService(this.cliNativeService);
     }
-
     return this.keyChainServiceInstance;
   }
 
@@ -272,7 +250,6 @@ export class LeappCliService {
     if (!this.loggingServiceInstance) {
       this.loggingServiceInstance = new LoggingService(this.cliNativeService);
     }
-
     return this.loggingServiceInstance;
   }
 
@@ -282,7 +259,6 @@ export class LeappCliService {
     if (!this.timerServiceInstance) {
       this.timerServiceInstance = new TimerService();
     }
-
     return this.timerServiceInstance;
   }
 
@@ -292,7 +268,6 @@ export class LeappCliService {
     if (!this.executeServiceInstance) {
       this.executeServiceInstance = new ExecuteService(this.cliNativeService, this.repository);
     }
-
     return this.executeServiceInstance;
   }
 
@@ -302,7 +277,6 @@ export class LeappCliService {
     if (!this.rotationServiceInstance) {
       this.rotationServiceInstance = new RotationService(this.sessionFactory, this.repository);
     }
-
     return this.rotationServiceInstance;
   }
 
@@ -313,7 +287,6 @@ export class LeappCliService {
       this.retroCompatibilityServiceInstance = new RetroCompatibilityService(this.fileService, this.keyChainService,
         this.repository, this.workspaceService, constants.appName, constants.lockFileDestination);
     }
-
     return this.retroCompatibilityServiceInstance;
   }
 
@@ -324,7 +297,6 @@ export class LeappCliService {
       this.cloudProviderServiceInstance = new CloudProviderService(this.awsCoreService, this.azureCoreService,
         this.namedProfilesService, this.idpUrlsService, this.repository);
     }
-
     return this.cloudProviderServiceInstance;
   }
 
@@ -334,7 +306,6 @@ export class LeappCliService {
     if (!this.awsCoreServiceInstance) {
       this.awsCoreServiceInstance = new AwsCoreService(this.cliNativeService);
     }
-
     return this.awsCoreServiceInstance;
   }
 
@@ -344,7 +315,6 @@ export class LeappCliService {
     if (!this.azureCoreServiceInstance) {
       this.azureCoreServiceInstance = new AzureCoreService();
     }
-
     return this.azureCoreServiceInstance;
   }
 
@@ -354,7 +324,6 @@ export class LeappCliService {
     if (!this.cliOpenWebConsoleServiceInstance) {
       this.cliOpenWebConsoleServiceInstance = new CliOpenWebConsoleService();
     }
-
     return this.cliOpenWebConsoleServiceInstance;
   }
 
@@ -364,7 +333,6 @@ export class LeappCliService {
     if (!this.webConsoleServiceInstance) {
       this.webConsoleServiceInstance = new WebConsoleService(this.cliOpenWebConsoleService, this.loggingService, fetch);
     }
-
     return this.webConsoleServiceInstance;
   }
 
@@ -374,7 +342,6 @@ export class LeappCliService {
     if (!this.ssmServiceInstance) {
       this.ssmServiceInstance = new SsmService(this.loggingService, this.executeService);
     }
-
     return this.ssmServiceInstance;
   }
 

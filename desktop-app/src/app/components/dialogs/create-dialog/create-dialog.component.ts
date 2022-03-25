@@ -383,13 +383,14 @@ export class CreateDialogComponent implements OnInit {
    */
   private addIpdUrlToWorkspace() {
     if (this.sessionType === SessionType.awsIamRoleFederated) {
-      try {
-        const ipdUrl = { id: this.selectedIdpUrl.value, url: this.selectedIdpUrl.label };
-        if (!this.leappCoreService.repository.getIdpUrl(ipdUrl.id)) {
-          this.leappCoreService.repository.addIdpUrl(ipdUrl);
+      const validate = this.leappCoreService.idpUrlService.validateIdpUrl(this.selectedIdpUrl.label);
+      if (validate === true) {
+        const idpUrl = this.leappCoreService.idpUrlService.createIdpUrl(this.selectedIdpUrl.label);
+        this.selectedIdpUrl.value = idpUrl.id;
+      } else {
+        if (validate.toString() !== "IdP URL already exists") {
+          throw new LeappParseError(this, validate.toString());
         }
-      } catch (err) {
-        throw new LeappParseError(this, err.message);
       }
     }
   }
@@ -400,15 +401,14 @@ export class CreateDialogComponent implements OnInit {
    * @private
    */
   private addProfileToWorkspace() {
-    try {
-      const profile = { id: this.selectedProfile.value, name: this.selectedProfile.label };
-      try {
-        this.leappCoreService.repository.getProfileName(profile.id);
-      } catch (e) {
-        this.leappCoreService.repository.addProfile(profile);
+    const validate = this.leappCoreService.namedProfileService.validateNewProfileName(this.selectedProfile.label);
+    if (validate === true) {
+      const profile = this.leappCoreService.namedProfileService.createNamedProfile(this.selectedProfile.label);
+      this.selectedProfile.value = profile.id;
+    } else {
+      if (validate.toString() !== "Profile already exists") {
+        throw new LeappParseError(this, validate.toString());
       }
-    } catch (err) {
-      throw new LeappParseError(this, err.message);
     }
   }
 }

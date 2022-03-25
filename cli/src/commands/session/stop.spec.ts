@@ -16,9 +16,11 @@ describe("StopSession", () => {
     const sessionFactory: any = {
       getSessionService: jest.fn(() => sessionService),
     };
+    const remoteProceduresClient = { refreshSessions: jest.fn() };
 
     const leappCliService: any = {
       sessionFactory,
+      remoteProceduresClient,
     };
 
     const session: any = { sessionId: "sessionId", type: "sessionType" };
@@ -29,6 +31,7 @@ describe("StopSession", () => {
     expect(sessionFactory.getSessionService).toHaveBeenCalledWith("sessionType");
     expect(sessionService.stop).toHaveBeenCalledWith("sessionId");
     expect(command.log).toHaveBeenCalledWith("session stopped");
+    expect(leappCliService.remoteProceduresClient.refreshSessions).toHaveBeenCalled();
   });
 
   test("selectSession", async () => {

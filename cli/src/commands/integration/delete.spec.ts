@@ -52,6 +52,10 @@ describe("DeleteIntegration", () => {
       awsSsoIntegrationService: {
         deleteIntegration: jest.fn(),
       },
+      remoteProceduresClient: {
+        refreshIntegrations: jest.fn(),
+        refreshSessions: jest.fn(),
+      },
     };
 
     const command = getTestCommand(leappCliService);
@@ -62,6 +66,8 @@ describe("DeleteIntegration", () => {
 
     expect(leappCliService.awsSsoIntegrationService.deleteIntegration).toHaveBeenCalledWith(integration.id);
     expect(command.log).toHaveBeenLastCalledWith("integration deleted");
+    expect(leappCliService.remoteProceduresClient.refreshIntegrations).toHaveBeenCalled();
+    expect(leappCliService.remoteProceduresClient.refreshSessions).toHaveBeenCalled();
   });
 
   const runCommand = async (errorToThrow: any, expectedErrorMessage: string) => {

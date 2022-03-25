@@ -39,21 +39,23 @@ describe("CreateNamedProfile", () => {
       namedProfilesService: {
         createNamedProfile: jest.fn(),
       },
+      remoteProceduresClient: { refreshSessions: jest.fn() },
     };
 
     const command = getTestCommand(leappCliService);
     command.log = jest.fn();
-    command.createNamedProfile("profileName");
+    await command.createNamedProfile("profileName");
 
     expect(leappCliService.namedProfilesService.createNamedProfile).toHaveBeenCalledWith("profileName");
     expect(command.log).toHaveBeenCalledWith("profile created");
+    expect(leappCliService.remoteProceduresClient.refreshSessions).toHaveBeenCalled();
   });
 
   const runCommand = async (errorToThrow: any, expectedErrorMessage: string) => {
     const profileName = "profile1";
     const command = getTestCommand();
     command.getProfileName = jest.fn(async (): Promise<any> => profileName);
-    command.createNamedProfile = jest.fn(() => {
+    command.createNamedProfile = jest.fn(async () => {
       if (errorToThrow) {
         throw errorToThrow;
       }

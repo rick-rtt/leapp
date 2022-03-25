@@ -48,13 +48,17 @@ describe("LoginIntegration", () => {
   });
 
   test("login", async () => {
-    const sessionsDiff = { sessionsToAdd: ["session1", "session2"] };
+    const sessionsDiff = { sessionsToAdd: ["session1", "session2"], sessionsToDelete: ["session3"] };
     const leappCliService: any = {
       awsSsoIntegrationService: {
-        loginAndGetSessionsDiff: jest.fn(async () => sessionsDiff),
+        syncSessions: jest.fn(async () => sessionsDiff),
       },
       cliVerificationWindowService: {
         closeBrowser: jest.fn(),
+      },
+      remoteProceduresClient: {
+        refreshIntegrations: jest.fn(),
+        refreshSessions: jest.fn(),
       },
     };
 
@@ -65,8 +69,11 @@ describe("LoginIntegration", () => {
     await command.login(integration);
 
     expect(command.log).toHaveBeenNthCalledWith(1, "waiting for browser authorization using your AWS sign-in...");
-    expect(leappCliService.awsSsoIntegrationService.loginAndGetSessionsDiff).toHaveBeenCalledWith(integration.id);
-    expect(command.log).toHaveBeenLastCalledWith("login successful (2 sessions ready to be synchronized)");
+    expect(leappCliService.awsSsoIntegrationService.syncSessions).toHaveBeenCalledWith(integration.id);
+    expect(command.log).toHaveBeenNthCalledWith(2, `${sessionsDiff.sessionsToAdd.length} sessions added`);
+    expect(command.log).toHaveBeenNthCalledWith(3, `${sessionsDiff.sessionsToDelete.length} sessions removed`);
+    expect(leappCliService.remoteProceduresClient.refreshIntegrations).toHaveBeenCalled();
+    expect(leappCliService.remoteProceduresClient.refreshSessions).toHaveBeenCalled();
     //expect(leappCliService.cliVerificationWindowService.closeBrowser).toHaveBeenCalled();
   });
 

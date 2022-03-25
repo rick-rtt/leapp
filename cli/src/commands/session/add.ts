@@ -27,7 +27,7 @@ export default class AddSession extends LeappCommand {
   async createSession(accessMethod: AccessMethod, selectedParams: Map<string, string>): Promise<void> {
     const creationRequest = accessMethod.getSessionCreationRequest(selectedParams);
     await this.leappCliService.sessionFactory.createSession(accessMethod.sessionType, creationRequest);
-    await this.leappCliService.desktopAppRemoteProcedures.refreshSessions();
+    await this.leappCliService.remoteProceduresClient.refreshSessions();
     this.log("session added");
   }
 

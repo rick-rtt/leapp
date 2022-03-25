@@ -61,17 +61,14 @@ export class AwsSsoIntegrationService {
     this.repository.addAwsSsoIntegration(creationParams.portalUrl, creationParams.alias, creationParams.region, creationParams.browserOpening);
   }
 
-  // TODO: to be moved in repository
   getIntegrations(): AwsSsoIntegration[] {
     return this.repository.listAwsSsoIntegrations();
   }
 
-  // TODO: to be moved in repository
   getOnlineIntegrations(): AwsSsoIntegration[] {
     return this.getIntegrations().filter((integration) => this.isOnline(integration));
   }
 
-  // TODO: to be moved in repository
   getOfflineIntegrations(): AwsSsoIntegration[] {
     return this.getIntegrations().filter((integration) => !this.isOnline(integration));
   }
@@ -149,23 +146,19 @@ export class AwsSsoIntegrationService {
     // Make a logout request to Sso
     const logoutRequest: LogoutRequest = { accessToken: savedAccessToken };
 
-    this.ssoPortal
-      .logout(logoutRequest)
-      .promise()
-      .then(
-        (_) => {},
-        async (_) => {
-          // logout request has to be handled in reject Promise by design
+    try {
+      await this.ssoPortal.logout(logoutRequest).promise();
+    } catch (_) {
+      // logout request has to be handled in reject Promise by design
 
-          // Clean clients
-          this.ssoPortal = null;
+      // Clean clients
+      this.ssoPortal = null;
 
-          // Delete access token and remove sso integration info from workspace
-          await this.keyChainService.deletePassword(constants.appName, this.getIntegrationAccessTokenKey(integrationId));
-          this.repository.unsetAwsSsoIntegrationExpiration(integrationId);
-          await this.removeSsoSessionsFromWorkspace(integrationId);
-        }
-      );
+      // Delete access token and remove sso integration info from workspace
+      await this.keyChainService.deletePassword(constants.appName, this.getIntegrationAccessTokenKey(integrationId));
+      this.repository.unsetAwsSsoIntegrationExpiration(integrationId);
+      await this.removeSsoSessionsFromWorkspace(integrationId);
+    }
   }
 
   async getAccessToken(integrationId: string, region: string, portalUrl: string): Promise<string> {

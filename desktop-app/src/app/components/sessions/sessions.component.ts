@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewChild } from "@angular/core";
+import { ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
 import { AppService } from "../../services/app.service";
 import { HttpClient } from "@angular/common/http";
@@ -67,6 +67,7 @@ export class SessionsComponent implements OnInit, OnDestroy {
   private workspaceService: WorkspaceService;
 
   constructor(
+    private ref: ChangeDetectorRef,
     private router: Router,
     private route: ActivatedRoute,
     private httpClient: HttpClient,

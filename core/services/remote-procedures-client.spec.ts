@@ -1,13 +1,16 @@
 import { describe, test, expect } from "@jest/globals";
-import ipc from "node-ipc";
-import { DesktopAppRemoteProcedures } from "./desktop-app-remote-procedures";
+import * as ipc from "node-ipc";
+import { RemoteProceduresClient } from "./remote-procedures-client";
 
-describe("DesktopAppRemoteProcedures", () => {
+describe("RemoteProceduresClient", () => {
   test("isDesktopAppRunning", async () => {
+    const nativeService = {
+      nodeIpc: ipc,
+    } as any;
     const testId = `rpc_test${Math.random() * 10000}`;
-    const desktopAppRemoteProcedures = new DesktopAppRemoteProcedures(testId);
+    const client = new RemoteProceduresClient(nativeService, testId);
 
-    expect(await desktopAppRemoteProcedures.isDesktopAppRunning()).toBe(false);
+    expect(await client.isDesktopAppRunning()).toBe(false);
 
     ipc.config.id = testId;
     ipc.serve(() => {
@@ -21,15 +24,19 @@ describe("DesktopAppRemoteProcedures", () => {
 
     await new Promise((resolve, reject) => {
       let retries = 0;
-      setInterval(async () => {
-        const actualResult = await desktopAppRemoteProcedures.isDesktopAppRunning();
+      const handle = setInterval(async () => {
+        const actualResult = await client.isDesktopAppRunning();
         if (actualResult) {
+          clearInterval(handle);
           resolve(undefined);
         } else if (retries++ > 10) {
+          clearInterval(handle);
           reject("result is still false");
         }
       }, 100);
     });
+
+    ipc.server.stop();
   });
 
   test("needAuthentication", async () => {});

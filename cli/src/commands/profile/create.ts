@@ -33,7 +33,7 @@ export default class CreateNamedProfile extends LeappCommand {
 
   async createNamedProfile(profileName: string): Promise<void> {
     this.leappCliService.namedProfilesService.createNamedProfile(profileName);
-    await this.leappCliService.desktopAppRemoteProcedures.refreshSessions();
+    await this.leappCliService.remoteProceduresClient.refreshSessions();
     this.log("profile created");
   }
 }

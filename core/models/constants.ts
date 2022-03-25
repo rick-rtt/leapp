@@ -42,4 +42,5 @@ export const constants = {
   cliStartAwsFederatedSessionChannel: "aws-federated-session-start-channel",
   cliLogoutAwsFederatedSessionChannel: "aws-federated-session-logout-channel",
   cliRefreshSessionsChannel: "refresh-sessions-channel",
+  ipcServerId: "leapp_da",
 };

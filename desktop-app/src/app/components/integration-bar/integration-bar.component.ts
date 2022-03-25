@@ -2,7 +2,6 @@ import { Component, OnDestroy, OnInit, QueryList, TemplateRef, ViewChild, ViewCh
 import { globalFilteredSessions } from "../command-bar/command-bar.component";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { Router } from "@angular/router";
-import { formatDistance, isPast } from "date-fns";
 import { BsModalRef, BsModalService } from "ngx-bootstrap/modal";
 import { BehaviorSubject } from "rxjs";
 import { MatMenuTrigger } from "@angular/material/menu";
@@ -25,7 +24,6 @@ export interface SelectedIntegration {
   selected: boolean;
 }
 
-export const integrationsFilter = new BehaviorSubject<AwsSsoIntegration[]>([]);
 export const openIntegrationEvent = new BehaviorSubject<boolean>(false);
 export const syncAllEvent = new BehaviorSubject<boolean>(false);
 export const integrationHighlight = new BehaviorSubject<number>(-1);
@@ -89,14 +87,14 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.subscription = integrationsFilter.subscribe(() => {
+    this.subscription = this.workspaceService.integrations$.subscribe(() => {
       this.setValues();
       this.selectedIntegrations = this.awsSsoConfigurations.map((awsIntegration) => ({
         id: awsIntegration.id,
         selected: false,
       }));
     });
-    integrationsFilter.next(this.repository.listAwsSsoIntegrations());
+    this.workspaceService.setIntegrations(this.repository.listAwsSsoIntegrations());
 
     this.subscription2 = openIntegrationEvent.subscribe((value) => {
       if (value) {
@@ -294,7 +292,7 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
         // eslint-disable-next-line max-len
         this.repository.updateAwsSsoIntegration(this.selectedAwsSsoConfiguration.id, alias, region, portalUrl, browserOpening);
       }
-      integrationsFilter.next(this.repository.listAwsSsoIntegrations());
+      this.workspaceService.setIntegrations(this.repository.listAwsSsoIntegrations());
       this.modalRef.hide();
     } else {
       this.messageToasterService.toast("Form is not valid", ToastLevel.warn, "Form validation");
@@ -321,16 +319,11 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
   }
 
   isOnline(awsSsoConfiguration: AwsSsoIntegration): boolean {
-    return (
-      awsSsoConfiguration.accessTokenExpiration !== null &&
-      awsSsoConfiguration.accessTokenExpiration !== undefined &&
-      awsSsoConfiguration.accessTokenExpiration !== "" &&
-      !isPast(new Date(awsSsoConfiguration.accessTokenExpiration))
-    );
+    return this.leappCoreService.awsSsoIntegrationService.isOnline(awsSsoConfiguration);
   }
 
   remainingHours(awsSsoConfiguration: AwsSsoIntegration): string {
-    return formatDistance(new Date(awsSsoConfiguration.accessTokenExpiration), new Date(), { addSuffix: true });
+    return this.leappCoreService.awsSsoIntegrationService.remainingHours(awsSsoConfiguration);
   }
 
   formValid(): boolean {

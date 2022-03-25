@@ -1,7 +1,7 @@
 {
   "name": "@noovolari/leapp-cli",
   "description": "Leapp's Command Line Interface",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "author": "besharp <info@besharp.it>",
   "bin": {
     "leapp": "./bin/run"
@@ -9,11 +9,12 @@
   "bugs": "https://github.com/Noovolari/leapp/issues",
   "dependencies": {
     "@babel/plugin-proposal-decorators": "^7.16.5",
-    "@noovolari/leapp-core": "file:../core/dist",
+    "@noovolari/leapp-core": "0.1.96",
     "@oclif/core": "1.6.0",
     "@oclif/plugin-help": "^5.1.12",
     "@types/inquirer": "^8.2.0",
     "@types/node": "^16.9.4",
+    "@types/node-ipc": "9.2.0",
     "@types/uuid": "^8.3.0",
     "assert": "2.0.0",
     "aws-sdk": "2.928.0",
@@ -62,7 +63,6 @@
     "@babel/preset-typescript": "^7.16.5",
     "@commitlint/cli": "16.2.1",
     "@commitlint/config-conventional": "16.2.1",
-    "@types/node-ipc": "9.2.0",
     "@types/jest": "^27.4.0",
     "eslint": "^7.32.0",
     "eslint-config-oclif": "^4",
@@ -126,16 +126,9 @@
   "repository": "noovolari/leapp",
   "scripts": {
     "clean": "gushio gushio/target-clean.js",
-    "build": "gushio gushio/target-build.js",
     "test": "jest",
-    "prepack": "npm run build && oclif manifest && oclif readme",
-    "pack-mac": "oclif pack:macos",
-    "pack-linux": "oclif pack:deb",
-    "pack-win": "oclif pack:win",
-    "postpack": "gushio gushio/target-post-pack.js",
-    "release": "gushio gushio/target-release.js",
-    "version": "oclif readme && git add README.md",
-    "run-command": "./bin/run integration login"
+    "prepack": "gushio gushio/target-build.js && oclif manifest && oclif readme",
+    "release": "gushio gushio/target-release.js"
   },
   "types": "dist/index.d.ts"
 }

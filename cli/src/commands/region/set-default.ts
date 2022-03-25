@@ -37,6 +37,7 @@ export default class ChangeDefaultRegion extends LeappCommand {
 
   async changeDefaultRegion(newDefaultRegion: string): Promise<void> {
     this.leappCliService.regionsService.changeDefaultAwsRegion(newDefaultRegion);
+    await this.leappCliService.remoteProceduresClient.refreshSessions();
     this.log("default region changed");
   }
 }
