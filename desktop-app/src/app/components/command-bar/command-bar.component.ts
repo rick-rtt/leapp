@@ -17,6 +17,7 @@ import { AppService } from "../../services/app.service";
 import { AwsSsoRoleSession } from "@noovolari/leapp-core/models/aws-sso-role-session";
 import { Repository } from "@noovolari/leapp-core/services/repository";
 import { constants } from "@noovolari/leapp-core/models/constants";
+import { WindowService } from "../../services/window.service";
 
 export const compactMode = new BehaviorSubject<boolean>(false);
 export const globalFilteredSessions = new BehaviorSubject<Session[]>([]);
@@ -79,7 +80,8 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
     private bsModalService: BsModalService,
     private leappCoreService: LeappCoreService,
     public appService: AppService,
-    public electronService: ElectronService
+    public electronService: ElectronService,
+    private windowService: WindowService
   ) {
     this.workspaceService = leappCoreService.workspaceService;
     this.repository = leappCoreService.repository;
@@ -181,6 +183,15 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
   toggleCompactMode(): void {
     this.compactMode = !this.compactMode;
     this.filterExtended = false;
+
+    this.windowService.getCurrentWindow().unmaximize();
+    this.windowService.getCurrentWindow().restore();
+
+    if (this.appService.detectOs() === constants.mac && this.windowService.getCurrentWindow().isFullScreen()) {
+      this.windowService.getCurrentWindow().setFullScreen(false);
+      this.windowService.getCurrentWindow().setMaximizable(false);
+    }
+
     compactMode.next(this.compactMode);
     globalHasFilter.next(this.filterExtended);
     document.querySelector(".sessions").classList.remove("filtered");

@@ -76,6 +76,7 @@
     "typescript": "4.5.5"
   },
   "jest": {
+    "testTimeout": 10000,
     "collectCoverageFrom": [
       "src/**/{!(cli-native-service|leapp-cli-service),}.ts"
     ]
