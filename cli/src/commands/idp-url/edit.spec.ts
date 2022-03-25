@@ -78,7 +78,7 @@ describe("EditIdpUrl", () => {
       idpUrlsService: {
         editIdpUrl: jest.fn(),
       },
-      desktopAppRemoteProcedures: { refreshSessions: jest.fn() },
+      remoteProceduresClient: { refreshSessions: jest.fn() },
     };
 
     const command = getTestCommand(leappCliService);
@@ -87,7 +87,7 @@ describe("EditIdpUrl", () => {
 
     expect(leappCliService.idpUrlsService.editIdpUrl).toHaveBeenCalledWith("idpUrlId", "url");
     expect(command.log).toHaveBeenCalledWith("IdP URL edited");
-    expect(leappCliService.desktopAppRemoteProcedures.refreshSessions).toHaveBeenCalled();
+    expect(leappCliService.remoteProceduresClient.refreshSessions).toHaveBeenCalled();
   });
 
   const runCommand = async (errorToThrow: any, expectedErrorMessage: string) => {

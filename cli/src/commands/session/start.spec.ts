@@ -17,11 +17,11 @@ describe("StartSession", () => {
     const sessionFactory: any = {
       getSessionService: jest.fn(() => sessionService),
     };
-    const desktopAppRemoteProcedures: any = { refreshSessions: jest.fn() };
+    const remoteProceduresClient: any = { refreshSessions: jest.fn() };
 
     const leappCliService: any = {
       sessionFactory,
-      desktopAppRemoteProcedures,
+      remoteProceduresClient,
     };
 
     const session: any = { sessionId: "sessionId", type: "sessionType" };
@@ -40,7 +40,7 @@ describe("StartSession", () => {
     expect(processOn).toHaveBeenCalled();
     expect(sessionService.sessionDeactivated).toHaveBeenCalledWith("sessionId");
     expect(processExit).toHaveBeenCalledWith(0);
-    expect(desktopAppRemoteProcedures.refreshSessions).toHaveBeenCalled();
+    expect(remoteProceduresClient.refreshSessions).toHaveBeenCalled();
   });
 
   test("selectSession", async () => {

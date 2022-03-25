@@ -1,4 +1,5 @@
 import { BehaviorSubject } from "rxjs";
+import { AwsSsoIntegration } from "../models/aws-sso-integration";
 import { Repository } from "./repository";
 import { Session } from "../models/session";
 import { SessionStatus } from "../models/session-status";
@@ -7,11 +8,12 @@ import { AwsIamRoleChainedSession } from "../models/aws-iam-role-chained-session
 import { ISessionNotifier } from "../interfaces/i-session-notifier";
 
 export class WorkspaceService implements ISessionNotifier {
-  // Expose the observable$ part of the _sessions subject (read only stream)
   readonly sessions$: BehaviorSubject<Session[]>;
+  readonly integrations$: BehaviorSubject<AwsSsoIntegration[]>;
 
   constructor(private repository: Repository) {
     this.sessions$ = new BehaviorSubject<Session[]>([]);
+    this.integrations$ = new BehaviorSubject<AwsSsoIntegration[]>([]);
     this.sessions = this.repository.getSessions();
   }
 
@@ -46,6 +48,14 @@ export class WorkspaceService implements ISessionNotifier {
 
   deleteSession(sessionId: string): void {
     this.sessions = this.sessions.filter((session) => session.sessionId !== sessionId);
+  }
+
+  getIntegrations(): AwsSsoIntegration[] {
+    return this.integrations$.getValue();
+  }
+
+  setIntegrations(integrations: AwsSsoIntegration[]): void {
+    this.integrations$.next(integrations);
   }
 
   listPending(): Session[] {

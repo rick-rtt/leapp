@@ -28,7 +28,7 @@ export default class StartSession extends LeappCommand {
       process.exit(0);
     });
     await sessionService.start(session.sessionId);
-    await this.leappCliService.desktopAppRemoteProcedures.refreshSessions();
+    await this.leappCliService.remoteProceduresClient.refreshSessions();
     this.log("session started");
   }
 

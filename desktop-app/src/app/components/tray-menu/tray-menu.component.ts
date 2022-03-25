@@ -204,7 +204,7 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
     // We need the Try/Catch as we have a the possibility to call the method without sessions
     try {
       // Stop the sessions...
-      const activeSessions = this.repository.getSessions().filter((s) => s.status === SessionStatus.active || s.status === SessionStatus.pending);
+      const activeSessions = this.repository.listActiveAndPending();
       activeSessions.forEach((sess) => {
         const factorizedService = this.sessionServiceFactory.getSessionService(sess.type);
         factorizedService.stop(sess.sessionId);

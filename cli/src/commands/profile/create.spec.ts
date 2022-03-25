@@ -39,7 +39,7 @@ describe("CreateNamedProfile", () => {
       namedProfilesService: {
         createNamedProfile: jest.fn(),
       },
-      desktopAppRemoteProcedures: { refreshSessions: jest.fn() },
+      remoteProceduresClient: { refreshSessions: jest.fn() },
     };
 
     const command = getTestCommand(leappCliService);
@@ -48,7 +48,7 @@ describe("CreateNamedProfile", () => {
 
     expect(leappCliService.namedProfilesService.createNamedProfile).toHaveBeenCalledWith("profileName");
     expect(command.log).toHaveBeenCalledWith("profile created");
-    expect(leappCliService.desktopAppRemoteProcedures.refreshSessions).toHaveBeenCalled();
+    expect(leappCliService.remoteProceduresClient.refreshSessions).toHaveBeenCalled();
   });
 
   const runCommand = async (errorToThrow: any, expectedErrorMessage: string) => {

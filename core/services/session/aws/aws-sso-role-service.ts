@@ -95,7 +95,6 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
   }
 
   async catchClosingBrowserWindow(): Promise<void> {
-    console.log("session stoppate!");
     const sessions = this.sessionNotifier.listAwsSsoRoles();
     for (let i = 0; i < sessions.length; i++) {
       // Stop session

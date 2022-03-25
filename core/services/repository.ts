@@ -119,6 +119,13 @@ export class Repository {
     return workspace.sessions && workspace.sessions.length > 0 ? workspace.sessions.filter((session) => session.status === SessionStatus.active) : [];
   }
 
+  listActiveAndPending(): Session[] {
+    const workspace = this.getWorkspace();
+    return workspace.sessions && workspace.sessions.length > 0
+      ? workspace.sessions.filter((s) => s.status === SessionStatus.active || s.status === SessionStatus.pending)
+      : [];
+  }
+
   listAwsSsoRoles(): Session[] {
     const workspace = this.getWorkspace();
     return workspace.sessions && workspace.sessions.length > 0 ? workspace.sessions.filter((session) => session.type === SessionType.awsSsoRole) : [];

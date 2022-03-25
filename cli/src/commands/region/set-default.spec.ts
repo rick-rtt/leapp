@@ -45,6 +45,9 @@ describe("ChangeDefaultRegion", () => {
       regionsService: {
         changeDefaultAwsRegion: jest.fn(),
       },
+      remoteProceduresClient: {
+        refreshSessions: jest.fn(),
+      },
     };
 
     const command = getTestCommand(leappCliService);
@@ -52,6 +55,7 @@ describe("ChangeDefaultRegion", () => {
 
     await command.changeDefaultRegion(newRegion);
     expect(leappCliService.regionsService.changeDefaultAwsRegion).toHaveBeenCalledWith(newRegion);
+    expect(leappCliService.remoteProceduresClient.refreshSessions).toHaveBeenCalled();
     expect(command.log).toHaveBeenCalledWith("default region changed");
   });
 

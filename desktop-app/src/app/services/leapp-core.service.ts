@@ -1,5 +1,6 @@
-import { Injectable } from "@angular/core";
+import { Injectable, NgZone } from "@angular/core";
 import { AuthenticationService } from "@noovolari/leapp-core/services/authentication-service";
+import { RemoteProceduresServer } from "@noovolari/leapp-core/services/remote-procedures-server";
 import { AwsIamUserService } from "@noovolari/leapp-core/services/session/aws/aws-iam-user-service";
 import { FileService } from "@noovolari/leapp-core/services/file-service";
 import { KeychainService } from "@noovolari/leapp-core/services/keychain-service";
@@ -66,8 +67,9 @@ export class LeappCoreService {
   private ssmServiceInstance: SsmService;
   private idpUrlServiceInstance: IdpUrlsService;
   private namedProfileInstance: NamedProfilesService;
+  private remoteProceduresServerInstance: RemoteProceduresServer;
 
-  constructor(private electronService: ElectronService) {}
+  constructor(private electronService: ElectronService, private ngZone: NgZone) {}
 
   public get idpUrlService(): IdpUrlsService {
     if (!this.idpUrlServiceInstance) {
@@ -303,5 +305,19 @@ export class LeappCoreService {
       this.azureCoreServiceInstance = new AzureCoreService();
     }
     return this.azureCoreServiceInstance;
+  }
+
+  public get remoteProceduresServer(): RemoteProceduresServer {
+    if (!this.remoteProceduresServerInstance) {
+      this.remoteProceduresServerInstance = new RemoteProceduresServer(
+        this.electronService,
+        this.verificationWindowService,
+        this.awsAuthenticationService,
+        this.repository,
+        this.workspaceService,
+        (uiSafeBlock) => this.ngZone.run(() => uiSafeBlock())
+      );
+    }
+    return this.remoteProceduresServerInstance;
   }
 }
