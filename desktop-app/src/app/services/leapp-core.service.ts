@@ -28,6 +28,8 @@ import { AwsSsoIntegrationService } from "@noovolari/leapp-core/services/aws-sso
 import { WebConsoleService } from "@noovolari/leapp-core/services/web-console-service";
 import { WindowService } from "./window.service";
 import { SsmService } from "@noovolari/leapp-core/services/ssm-service";
+import { IdpUrlsService } from "@noovolari/leapp-core/services/idp-urls-service";
+import { NamedProfilesService } from "@noovolari/leapp-core/services/named-profiles-service";
 
 @Injectable({
   providedIn: "root",
@@ -62,8 +64,24 @@ export class LeappCoreService {
   private azureCoreServiceInstance: AzureCoreService;
   private webConsoleServiceInstance: WebConsoleService;
   private ssmServiceInstance: SsmService;
+  private idpUrlServiceInstance: IdpUrlsService;
+  private namedProfileInstance: NamedProfilesService;
 
   constructor(private electronService: ElectronService) {}
+
+  public get idpUrlService(): IdpUrlsService {
+    if (!this.idpUrlServiceInstance) {
+      this.idpUrlServiceInstance = new IdpUrlsService(this.sessionFactory, this.repository);
+    }
+    return this.idpUrlServiceInstance;
+  }
+
+  public get namedProfileService(): NamedProfilesService {
+    if (!this.namedProfileInstance) {
+      this.namedProfileInstance = new NamedProfilesService(this.sessionFactory, this.repository, this.workspaceService);
+    }
+    return this.namedProfileInstance;
+  }
 
   public get webConsoleService(): WebConsoleService {
     if (!this.webConsoleServiceInstance) {

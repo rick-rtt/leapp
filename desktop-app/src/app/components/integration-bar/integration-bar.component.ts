@@ -2,7 +2,6 @@ import { Component, OnDestroy, OnInit, QueryList, TemplateRef, ViewChild, ViewCh
 import { globalFilteredSessions } from "../command-bar/command-bar.component";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { Router } from "@angular/router";
-import { formatDistance, isPast } from "date-fns";
 import { BsModalRef, BsModalService } from "ngx-bootstrap/modal";
 import { BehaviorSubject } from "rxjs";
 import { MatMenuTrigger } from "@angular/material/menu";
@@ -321,16 +320,11 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
   }
 
   isOnline(awsSsoConfiguration: AwsSsoIntegration): boolean {
-    return (
-      awsSsoConfiguration.accessTokenExpiration !== null &&
-      awsSsoConfiguration.accessTokenExpiration !== undefined &&
-      awsSsoConfiguration.accessTokenExpiration !== "" &&
-      !isPast(new Date(awsSsoConfiguration.accessTokenExpiration))
-    );
+    return this.leappCoreService.awsSsoIntegrationService.isOnline(awsSsoConfiguration);
   }
 
   remainingHours(awsSsoConfiguration: AwsSsoIntegration): string {
-    return formatDistance(new Date(awsSsoConfiguration.accessTokenExpiration), new Date(), { addSuffix: true });
+    return this.leappCoreService.awsSsoIntegrationService.remainingHours(awsSsoConfiguration);
   }
 
   formValid(): boolean {

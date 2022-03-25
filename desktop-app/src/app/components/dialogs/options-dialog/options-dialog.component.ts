@@ -2,13 +2,11 @@ import { AfterViewInit, Component, Input, OnInit, ViewChild, ViewEncapsulation }
 import { FormControl, FormGroup } from "@angular/forms";
 import { AppService } from "../../../services/app.service";
 import { Router } from "@angular/router";
-import * as uuid from "uuid";
 import { MatTabGroup } from "@angular/material/tabs";
 import { constants } from "@noovolari/leapp-core/models/constants";
 import { LoggerLevel } from "@noovolari/leapp-core/services/logging-service";
 import { MessageToasterService, ToastLevel } from "../../../services/message-toaster.service";
 import { WindowService } from "../../../services/window.service";
-import { SessionType } from "@noovolari/leapp-core/models/session-type";
 import { AwsIamRoleFederatedSession } from "@noovolari/leapp-core/models/aws-iam-role-federated-session";
 import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
 import { SessionService } from "@noovolari/leapp-core/services/session/session-service";
@@ -213,11 +211,12 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
 
   manageIdpUrl(id: string): void {
     const idpUrl = this.leappCoreService.repository.getIdpUrl(id);
-    if (this.form.get("idpUrl").value !== "") {
+    const validate = this.leappCoreService.idpUrlService.validateIdpUrl(this.form.get("idpUrl").value);
+    if (validate === true) {
       if (!idpUrl) {
-        this.leappCoreService.repository.addIdpUrl({ id: uuid.v4(), url: this.form.get("idpUrl").value });
+        this.leappCoreService.idpUrlService.createIdpUrl(this.form.get("idpUrl").value);
       } else {
-        this.leappCoreService.repository.updateIdpUrl(id, this.form.get("idpUrl").value);
+        this.leappCoreService.idpUrlService.editIdpUrl(id, this.form.get("idpUrl").value);
       }
     }
     this.editingIdpUrl = false;
@@ -226,7 +225,7 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
   }
 
   editIdpUrl(id: string): void {
-    const idpUrl = this.leappCoreService.repository.getWorkspace().idpUrls.filter((u) => u.id === id)[0];
+    const idpUrl = this.leappCoreService.idpUrlService.getIdpUrls().filter((u) => u.id === id)[0];
     this.idpUrlValue = idpUrl;
     this.form.get("idpUrl").setValue(idpUrl.url);
     this.editingIdpUrl = true;
@@ -234,14 +233,16 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
 
   deleteIdpUrl(id: string): void {
     // Assumable sessions with this id
-    this.sessionService = this.leappCoreService.sessionFactory.getSessionService(SessionType.awsIamRoleFederated);
-    let sessions = this.leappCoreService.repository.getSessions().filter((s) => (s as AwsIamRoleFederatedSession).idpUrlId === id);
+    /// this.sessionService = this.leappCoreService.sessionFactory.getSessionService(SessionType.awsIamRoleFederated);
+    // let sessions = this.leappCoreService.repository.getSessions().filter((s) => (s as AwsIamRoleFederatedSession).idpUrlId === id);
 
     // Add iam Role Chained from iam role iam_federated_role
-    sessions.forEach((parent) => {
-      const childs = this.leappCoreService.repository.listIamRoleChained(parent);
-      sessions = sessions.concat(childs);
-    });
+    // sessions.forEach((parent) => {
+    //  const childs = this.leappCoreService.repository.listIamRoleChained(parent);
+    //  sessions = sessions.concat(childs);
+    // });
+
+    const sessions = this.leappCoreService.idpUrlService.getDependantSessions(id);
 
     // Get only names for display
     let sessionsNames = sessions.map(
@@ -269,8 +270,7 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
             this.leappCoreService.repository.deleteSession(session.sessionId);
             this.leappCoreService.workspaceService.deleteSession(session.sessionId);
           });
-
-          this.leappCoreService.repository.removeIdpUrl(id);
+          this.leappCoreService.idpUrlService.deleteIdpUrl(id);
         }
       },
       "Delete IdP URL",
@@ -281,11 +281,12 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
   async manageAwsProfile(id: string | number): Promise<void> {
     const profileIndex = this.leappCoreService.repository.getWorkspace().profiles.findIndex((p) => p.id === id.toString());
 
-    if (this.form.get("awsProfile").value !== "") {
+    const validate = this.leappCoreService.namedProfileService.validateNewProfileName(this.form.get("awsProfile").value);
+    if (validate === true) {
       if (profileIndex === -1) {
-        this.leappCoreService.repository.addProfile({ id: uuid.v4(), name: this.form.get("awsProfile").value });
+        this.leappCoreService.namedProfileService.createNamedProfile(this.form.get("awsProfile").value);
       } else {
-        this.leappCoreService.repository.updateProfile(id.toString(), this.form.get("awsProfile").value);
+        this.leappCoreService.namedProfileService.editNamedProfile(id.toString(), this.form.get("awsProfile").value);
 
         // eslint-disable-next-line @typescript-eslint/prefer-for-of
         for (let i = 0; i < this.leappCoreService.workspaceService.sessions.length; i++) {
@@ -308,7 +309,7 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
   }
 
   editAwsProfile(id: string): void {
-    const profile = this.leappCoreService.repository.getWorkspace().profiles.filter((u) => u.id === id)[0];
+    const profile = this.leappCoreService.namedProfileService.getNamedProfiles(false).filter((u) => u.id === id)[0];
     this.awsProfileValue = profile;
     this.form.get("awsProfile").setValue(profile.name);
     this.editingAwsProfile = true;
@@ -358,7 +359,7 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
             }
           }
 
-          this.leappCoreService.repository.removeProfile(id);
+          this.leappCoreService.namedProfileService.deleteNamedProfile(id);
         }
       },
       "Delete Profile",
