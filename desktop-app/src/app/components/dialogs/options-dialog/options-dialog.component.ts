@@ -301,6 +301,8 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
           }
         }
       }
+    } else {
+      this.toasterService.toast(validate.toString(), ToastLevel.warn);
     }
 
     this.editingAwsProfile = false;

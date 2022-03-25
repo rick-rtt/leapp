@@ -79,7 +79,8 @@
     "testTimeout": 10000,
     "collectCoverageFrom": [
       "src/**/{!(cli-native-service|leapp-cli-service),}.ts"
-    ]
+    ],
+    "testTimeout": 10000
   },
   "dirname": "oex",
   "engines": {

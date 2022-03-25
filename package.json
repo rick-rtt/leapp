@@ -37,7 +37,8 @@
     "release-core": "gushio gushio/target-release-core.js",
     "npm-install-all": "gushio gushio/npm-install-all.js",
     "lint": "eslint .",
-    "lint:fix": "npm run lint -- --fix"
+    "lint:fix": "npm run lint -- --fix",
+    "check-core-dependency": "gushio gushio/check-core-dependency.js"
   },
   "lint-staged": {
     "*.{ts,html}": "eslint --fix"
