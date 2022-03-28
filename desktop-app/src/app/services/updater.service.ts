@@ -4,7 +4,7 @@ import { UpdateDialogComponent } from "../components/dialogs/update-dialog/updat
 import compareVersions from "compare-versions";
 import { HttpClient } from "@angular/common/http";
 import md from "markdown-it";
-import { ElectronService } from "./electron.service";
+import { AppNativeService } from "./app-native.service";
 import { constants } from "@noovolari/leapp-core/models/constants";
 import { Repository } from "@noovolari/leapp-core/services/repository";
 import { WorkspaceService } from "@noovolari/leapp-core/services/workspace-service";
@@ -27,7 +27,7 @@ export class UpdaterService {
   constructor(
     private bsModalService: BsModalService,
     private httpClient: HttpClient,
-    private electronService: ElectronService,
+    private electronService: AppNativeService,
     private windowService: WindowService,
     private leappCoreService: AppProviderService
   ) {

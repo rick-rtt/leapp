@@ -7,7 +7,7 @@ import { AwsIamRoleFederatedSession } from "@noovolari/leapp-core/models/aws-iam
 import { constants } from "@noovolari/leapp-core/models/constants";
 import { MessageToasterService, ToastLevel } from "./message-toaster.service";
 import { LoggerLevel } from "@noovolari/leapp-core/services/logging-service";
-import { ElectronService } from "./electron.service";
+import { AppNativeService } from "./app-native.service";
 import { AppService } from "./app.service";
 import { Session } from "@noovolari/leapp-core/models/session";
 
@@ -17,7 +17,7 @@ export class AppAwsAuthenticationService implements IAwsAuthenticationService {
     private leappCoreService: AppProviderService,
     private appService: AppService,
     private windowService: WindowService,
-    private electronService: ElectronService,
+    private electronService: AppNativeService,
     private messageToasterService: MessageToasterService
   ) {}
 

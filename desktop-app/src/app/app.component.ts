@@ -22,7 +22,7 @@ import { SessionFactory } from "@noovolari/leapp-core/services/session-factory";
 import { RotationService } from "@noovolari/leapp-core/services/rotation-service";
 import { AppVerificationWindowService } from "./services/app-verification-window.service";
 import { WindowService } from "./services/window.service";
-import { ElectronService } from "./services/electron.service";
+import { AppNativeService } from "./services/app-native.service";
 import { AwsSsoIntegrationService } from "@noovolari/leapp-core/services/aws-sso-integration-service";
 import { AwsSsoRoleService } from "@noovolari/leapp-core/services/session/aws/aws-sso-role-service";
 import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
@@ -56,7 +56,7 @@ export class AppComponent implements OnInit {
     private router: Router,
     private updaterService: UpdaterService,
     private windowService: WindowService,
-    private electronService: ElectronService
+    private electronService: AppNativeService
   ) {
     leappCoreService.mfaCodePrompter = mfaCodePrompter;
     leappCoreService.awsAuthenticationService = awsAuthenticationService;

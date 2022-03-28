@@ -1,14 +1,14 @@
 import { Injectable } from "@angular/core";
 import { BsModalService } from "ngx-bootstrap/modal";
 import { InputDialogComponent } from "../components/dialogs/input-dialog/input-dialog.component";
-import { ElectronService } from "./electron.service";
+import { AppNativeService } from "./app-native.service";
 import { IMfaCodePrompter } from "@noovolari/leapp-core/interfaces/i-mfa-code-prompter";
 
 @Injectable({
   providedIn: "root",
 })
 export class AppMfaCodePromptService implements IMfaCodePrompter {
-  constructor(private modalService: BsModalService, private electronService: ElectronService) {}
+  constructor(private modalService: BsModalService, private electronService: AppNativeService) {}
 
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   promptForMFACode(sessionName: string, callback: any): void {

@@ -29,7 +29,7 @@ import { MessageToasterService, ToastLevel } from "../../../services/message-toa
 import { AwsSessionService } from "@noovolari/leapp-core/services/session/aws/aws-session-service";
 import { LeappBaseError } from "@noovolari/leapp-core/errors/leapp-base-error";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
-import { ElectronService } from "../../../services/electron.service";
+import { AppNativeService } from "../../../services/app-native.service";
 import { AppAwsAuthenticationService } from "../../../services/app-aws-authentication.service";
 
 @Component({
@@ -109,7 +109,7 @@ export class SessionCardComponent implements OnInit {
     private modalService: BsModalService,
     private ssmService: AppSsmService,
     private windowService: WindowService,
-    private electronService: ElectronService,
+    private electronService: AppNativeService,
     private messageToasterService: MessageToasterService,
     private leappCoreService: AppProviderService,
     private awsAuthenticationService: AppAwsAuthenticationService

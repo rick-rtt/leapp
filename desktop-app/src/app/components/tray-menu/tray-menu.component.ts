@@ -15,7 +15,7 @@ import { AwsIamRoleChainedSession } from "@noovolari/leapp-core/models/aws-iam-r
 import { WindowService } from "../../services/window.service";
 import { constants } from "@noovolari/leapp-core/models/constants";
 import { AwsCoreService } from "@noovolari/leapp-core/services/aws-core-service";
-import { ElectronService } from "../../services/electron.service";
+import { AppNativeService } from "../../services/app-native.service";
 
 @Component({
   selector: "app-tray-menu",
@@ -35,7 +35,7 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
 
   constructor(
     private appService: AppService,
-    private electronService: ElectronService,
+    private electronService: AppNativeService,
     private updaterService: UpdaterService,
     private windowService: WindowService,
     private leappCoreService: AppProviderService
