@@ -15,8 +15,6 @@ module.exports = {
     const compileFunction = require('./compile-func')
     try {
       await gushio.run(path.join(__dirname, './target-clean.js'))
-
-
       console.log('Building leapp... ')
 
       await makeDirFunction(path, '../dist/leapp-client')

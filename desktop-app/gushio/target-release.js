@@ -13,6 +13,7 @@ module.exports = {
     const shellJs = require('shelljs')
 
     const currentPath = shellJs.pwd()
+
     try {
       await gushio.run(path.join(__dirname, './target-build.js'), args)
 
