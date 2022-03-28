@@ -65,14 +65,18 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
   async generateMenu(): Promise<void> {
     const awsCliVersion = await this.leappCoreService.executeService.execute("aws --version");
     const awsSsmPluginVersion = await this.leappCoreService.executeService.execute("session-manager-plugin --version");
+    console.log(awsSsmPluginVersion);
     const issueBody = `### Description:
 > Please include a detailed description of the issue (and an image or screen recording, if applicable)
 
 
 ### Details:
-|Leapp Version | Awscli | SsmPluginVersion |
-| - | - | - |
-|${this.electronService.app.getVersion()}|${awsCliVersion}|${awsSsmPluginVersion}|`;
+| Leapp Version | ${this.electronService.app.getVersion()} |
+| - | - |
+| SsmPluginVersion | ${awsSsmPluginVersion.replace(/(\r\n|\n|\r)/gm, "")} |
+| Platform | ${process.platform}|
+| Awscli | ${awsCliVersion}
+`;
     console.log("AWS SSM Plugin version: " + awsSsmPluginVersion);
     let voices = [];
     const actives = this.repository.getSessions().filter((s) => s.status === SessionStatus.active || s.status === SessionStatus.pending);
@@ -234,7 +238,7 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
   async cleanBeforeExit(): Promise<void> {
     // Check if we are here
     this.loggingService.logger("Closing app with cleaning process...", LoggerLevel.info, this);
-    // We need the Try/Catch as we have a the possibility to call the method without sessions
+    // We need the Try/Catch as we have the possibility to call the method without sessions
     try {
       // Stop the sessions...
       const activeSessions = this.repository.listActiveAndPending();
