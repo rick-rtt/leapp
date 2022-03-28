@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from "@angular/core";
 import { compactMode } from "../../components/command-bar/command-bar.component";
-import { ElectronService } from "../../services/electron.service";
+import { AppNativeService } from "../../services/app-native.service";
 import { optionBarIds } from "../../components/sessions/sessions.component";
 
 @Component({
@@ -13,7 +13,7 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
 
   private subscription;
 
-  constructor(private electronService: ElectronService) {
+  constructor(private electronService: AppNativeService) {
     this.subscription = compactMode.subscribe((value) => {
       this.compactMode = value;
       this.electronService.ipcRenderer.send("resize-window", { compactMode: this.compactMode });

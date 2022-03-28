@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { ElectronService } from "./electron.service";
+import { AppNativeService } from "./app-native.service";
 import { environment } from "../../environments/environment";
 import { ConfirmationDialogComponent } from "../components/dialogs/confirmation-dialog/confirmation-dialog.component";
 import { BsModalService } from "ngx-bootstrap/modal";
@@ -12,7 +12,7 @@ import { IOpenExternalUrlService } from "@noovolari/leapp-core/interfaces/i-open
 export class WindowService implements IOpenExternalUrlService {
   private currentWindow: any;
 
-  constructor(private modalService: BsModalService, private electronService: ElectronService) {}
+  constructor(private modalService: BsModalService, private electronService: AppNativeService) {}
 
   /**
    * Create a new browser window

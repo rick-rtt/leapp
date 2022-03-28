@@ -9,7 +9,7 @@ import { LoggingService } from "@noovolari/leapp-core/services/logging-service";
 import { TimerService } from "@noovolari/leapp-core/services/timer-service";
 import { AwsIamRoleFederatedService } from "@noovolari/leapp-core/services/session/aws/aws-iam-role-federated-service";
 import { AzureService } from "@noovolari/leapp-core/services/session/azure/azure-service";
-import { ElectronService } from "./electron.service";
+import { AppNativeService } from "./app-native.service";
 import { AppMfaCodePromptService } from "./app-mfa-code-prompt.service";
 import { ExecuteService } from "@noovolari/leapp-core/services/execute-service";
 import { RetroCompatibilityService } from "@noovolari/leapp-core/services/retro-compatibility-service";
@@ -69,7 +69,7 @@ export class AppProviderService {
   private namedProfileInstance: NamedProfilesService;
   private remoteProceduresServerInstance: RemoteProceduresServer;
 
-  constructor(private electronService: ElectronService, private ngZone: NgZone) {}
+  constructor(private electronService: AppNativeService, private ngZone: NgZone) {}
 
   public get idpUrlService(): IdpUrlsService {
     if (!this.idpUrlServiceInstance) {

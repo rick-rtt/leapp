@@ -9,7 +9,7 @@ import { Workspace } from "@noovolari/leapp-core/models/workspace";
 import { FileService } from "@noovolari/leapp-core/services/file-service";
 import { KeychainService } from "@noovolari/leapp-core/services/keychain-service";
 import { HttpClient, HttpHandler } from "@angular/common/http";
-import { ElectronService } from "./app/services/electron.service";
+import { AppNativeService } from "./app/services/app-native.service";
 import { AppProviderService } from "./app/services/app-provider.service";
 import { MessageToasterService } from "./app/services/message-toaster.service";
 
@@ -85,7 +85,7 @@ const mustInjected = (): any[] => [
   { provide: FileService, useValue: spyFileService },
   { provide: KeychainService, useValue: spyKeychainService },
   { provide: MatSnackBar, useValue: spyMatSnackBar },
-  { provide: ElectronService, useValue: spyElectronService },
+  { provide: AppNativeService, useValue: spyElectronService },
   { provide: AppProviderService, useValue: spyLeappCoreService },
   { provide: MessageToasterService, useValue: spyMessageToasterService },
 ];

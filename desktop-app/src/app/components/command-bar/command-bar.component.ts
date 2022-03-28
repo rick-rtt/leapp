@@ -12,7 +12,7 @@ import { SessionType } from "@noovolari/leapp-core/models/session-type";
 import { WorkspaceService } from "@noovolari/leapp-core/services/workspace-service";
 import { syncAllEvent } from "../integration-bar/integration-bar.component";
 import { AppProviderService } from "../../services/app-provider.service";
-import { ElectronService } from "../../services/electron.service";
+import { AppNativeService } from "../../services/app-native.service";
 import { AppService } from "../../services/app.service";
 import { AwsSsoRoleSession } from "@noovolari/leapp-core/models/aws-sso-role-session";
 import { Repository } from "@noovolari/leapp-core/services/repository";
@@ -80,7 +80,7 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
     private bsModalService: BsModalService,
     private leappCoreService: AppProviderService,
     public appService: AppService,
-    public electronService: ElectronService,
+    public electronService: AppNativeService,
     private windowService: WindowService
   ) {
     this.workspaceService = leappCoreService.workspaceService;

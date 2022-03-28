@@ -1,6 +1,6 @@
 import { EventEmitter, Injectable } from "@angular/core";
 import { FormControl, FormGroup } from "@angular/forms";
-import { ElectronService } from "./electron.service";
+import { AppNativeService } from "./app-native.service";
 
 import { AppProviderService } from "./app-provider.service";
 import { MessageToasterService, ToastLevel } from "./message-toaster.service";
@@ -23,7 +23,7 @@ export class AppService {
   private loggingService: LoggingService;
 
   constructor(
-    private electronService: ElectronService,
+    private electronService: AppNativeService,
     private messageToasterService: MessageToasterService,
     private windowService: WindowService,
     private modalService: BsModalService,

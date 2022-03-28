@@ -3,7 +3,7 @@ import * as Keytar from "keytar";
 import { INativeService } from "@noovolari/leapp-core/interfaces/i-native-service";
 
 @Injectable({ providedIn: "root" })
-export class ElectronService implements INativeService {
+export class AppNativeService implements INativeService {
   url: any;
   log: any;
   fs: any;
