@@ -38,7 +38,7 @@ describe("StartSsmSession", () => {
     const command = getTestCommand(leappCliService);
     command.log = jest.fn();
 
-    await command.startSsmSession(session);
+    await command.startSsmSession(session, credentials);
 
     expect(sessionFactory.getSessionService).toHaveBeenCalledWith("sessionType");
 

@@ -16,10 +16,9 @@ export class ExecuteService {
    *
    * @param command - the command to launch
    * @param env - environment
-   * @returns an {Observable<any>} to use for subscribing to success or error event on the command termination:
-   *          the default unix standard is used so 0 represent a success code, everything else is an error code
+   * @returns an {Promise<string>} stdout or stderr
    */
-  execute(command: string, env?: boolean): Promise<string> {
+  execute(command: string, env?: any): Promise<string> {
     return new Promise((resolve, reject) => {
       let exec = this.nativeService.exec;
       if (command.startsWith("sudo")) {
@@ -51,11 +50,12 @@ export class ExecuteService {
    *
    * @param command - the command to launch in terminal
    * @param env - optional the environment object we can set to pass environment variables
-   * @returns an {Observable<any>} to subscribe to
+   * @param macOsTerminalType - optional to override terminal type selection on macOS
+   * @returns an {Promise<string>} stdout or stderr
    */
-  openTerminal(command: string, env?: any): Promise<string> {
+  openTerminal(command: string, env?: any, macOsTerminalType?: string): Promise<string> {
     if (this.nativeService.process.platform === "darwin") {
-      const terminalType = this.repository.getWorkspace().macOsTerminal;
+      const terminalType = macOsTerminalType ?? this.repository.getWorkspace().macOsTerminal;
       if (terminalType === constants.macOsTerminal) {
         return this.execute(
           `osascript -e "tell app \\"Terminal\\"

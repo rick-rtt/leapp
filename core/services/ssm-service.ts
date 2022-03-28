@@ -58,8 +58,9 @@ export class SsmService {
    * @param credentials - CredentialsInfo data from generate credentials method
    * @param instanceId - the instance id of the instance to start
    * @param region - aws System Manager start a session from a defined region
+   * @param macOsTerminalType - optional to override terminal type selection on macOS
    */
-  startSession(credentials: CredentialsInfo, instanceId: string, region: string): void {
+  startSession(credentials: CredentialsInfo, instanceId: string, region: string, macOsTerminalType?: string): void {
     const quote = this.executeService.getQuote();
     const env = {
       // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -70,7 +71,7 @@ export class SsmService {
       AWS_SESSION_TOKEN: credentials.sessionToken.aws_session_token,
     };
 
-    this.executeService.openTerminal(`aws ssm start-session --region ${region} --target ${quote}${instanceId}${quote}`, env).then(
+    this.executeService.openTerminal(`aws ssm start-session --region ${region} --target ${quote}${instanceId}${quote}`, env, macOsTerminalType).then(
       () => {},
       (err) => {
         throw new LeappBaseError("Start SSM error", this, LoggerLevel.error, err.message);
