@@ -5,6 +5,7 @@ import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
 import { AwsSessionService } from "@noovolari/leapp-core/services/session/aws/aws-session-service";
 import { CredentialsInfo } from "@noovolari/leapp-core/models/credentials-info";
 import { constants } from "@noovolari/leapp-core/models/constants";
+import { SessionType } from "@noovolari/leapp-core/models/session-type";
 
 export default class StartSsmSession extends LeappCommand {
   static description = "Start an AWS SSM session";
@@ -30,11 +31,7 @@ export default class StartSsmSession extends LeappCommand {
   async selectSession(): Promise<Session> {
     const availableSessions = this.leappCliService.repository
       .getSessions()
-      .filter(
-        (session: Session) =>
-          session.status === SessionStatus.inactive &&
-          this.leappCliService.sessionFactory.getSessionService(session.type) instanceof AwsSessionService
-      );
+      .filter((session: Session) => session.status === SessionStatus.inactive && session.type !== SessionType.azure);
     if (availableSessions.length === 0) {
       throw new Error("no sessions available");
     }

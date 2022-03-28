@@ -3,6 +3,7 @@ import { Config } from "@oclif/core/lib/config/config";
 import { Session } from "@noovolari/leapp-core/models/session";
 import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
 import { AwsSessionService } from "@noovolari/leapp-core/services/session/aws/aws-session-service";
+import { SessionType } from "@noovolari/leapp-core/models/session-type";
 
 export default class OpenWebConsole extends LeappCommand {
   static description = "Open an AWS Web Console";
@@ -23,7 +24,6 @@ export default class OpenWebConsole extends LeappCommand {
   }
 
   async openWebConsole(session: Session): Promise<void> {
-    // TODO: check whether the session is an aws one
     const sessionService = this.leappCliService.sessionFactory.getSessionService(session.type) as AwsSessionService;
     const credentials = await sessionService.generateCredentials(session.sessionId);
     try {
@@ -36,7 +36,9 @@ export default class OpenWebConsole extends LeappCommand {
   }
 
   private async selectSession(): Promise<Session> {
-    const availableSessions = this.leappCliService.repository.getSessions().filter((session: Session) => session.status === SessionStatus.inactive);
+    const availableSessions = this.leappCliService.repository
+      .getSessions()
+      .filter((session: Session) => session.status === SessionStatus.inactive && session.type !== SessionType.azure);
     if (availableSessions.length === 0) {
       throw new Error("no sessions available");
     }
