@@ -11,7 +11,7 @@ import { AwsIamRoleFederatedService } from "@noovolari/leapp-core/services/sessi
 import { AwsIamUserService } from "@noovolari/leapp-core/services/session/aws/aws-iam-user-service";
 import { AwsIamRoleChainedService } from "@noovolari/leapp-core/services/session/aws/aws-iam-role-chained-service";
 import { LoggerLevel, LoggingService } from "@noovolari/leapp-core/services/logging-service";
-import { LeappCoreService } from "../../../services/leapp-core.service";
+import { AppProviderService } from "../../../services/app-provider.service";
 import { constants } from "@noovolari/leapp-core/models/constants";
 import { WindowService } from "../../../services/window.service";
 import { AwsIamRoleFederatedSessionRequest } from "@noovolari/leapp-core/services/session/aws/aws-iam-role-federated-session-request";
@@ -98,7 +98,7 @@ export class CreateDialogComponent implements OnInit {
     private router: Router,
     private activatedRoute: ActivatedRoute,
     private bsModalService: BsModalService,
-    private leappCoreService: LeappCoreService,
+    private leappCoreService: AppProviderService,
     private windowService: WindowService,
     private messageToasterService: MessageToasterService
   ) {

@@ -4,7 +4,7 @@ import { IntegrationBarComponent } from "./integration-bar.component";
 import { MAT_SNACK_BAR_DATA, MatSnackBarRef } from "@angular/material/snack-bar";
 import { mustInjected } from "../../../base-injectables";
 import { RouterTestingModule } from "@angular/router/testing";
-import { LeappCoreService } from "../../services/leapp-core.service";
+import { AppProviderService } from "../../services/app-provider.service";
 import { AwsSsoIntegration } from "@noovolari/leapp-core/models/aws-sso-integration";
 
 describe("IntegrationBarComponent", () => {
@@ -36,7 +36,7 @@ describe("IntegrationBarComponent", () => {
       providers: [
         { provide: MAT_SNACK_BAR_DATA, useValue: {} },
         { provide: MatSnackBarRef, useValue: {} },
-      ].concat(mustInjected().concat([{ provide: LeappCoreService, useValue: spyLeappCoreService }])),
+      ].concat(mustInjected().concat([{ provide: AppProviderService, useValue: spyLeappCoreService }])),
     }).compileComponents();
   }));
 

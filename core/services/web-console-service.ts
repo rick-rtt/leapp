@@ -1,11 +1,18 @@
-import { IShellService } from "../interfaces/i-shell-service";
+import { IOpenExternalUrlService } from "../interfaces/i-open-external-url-service";
 import { CredentialsInfo } from "../models/credentials-info";
 import { LoggerLevel, LoggingService } from "./logging-service";
 
 export class WebConsoleService {
-  constructor(private shellService: IShellService, private loggingService: LoggingService, private fetch: any) {}
+  private secondsInAHour = 3600;
+  private sessionDurationInHours = 8;
 
-  async openWebConsole(credentialsInfo: CredentialsInfo, sessionRegion: string, sessionDuration: number = 3200): Promise<void> {
+  constructor(private shellService: IOpenExternalUrlService, private loggingService: LoggingService, private fetch: any) {}
+
+  async openWebConsole(
+    credentialsInfo: CredentialsInfo,
+    sessionRegion: string,
+    sessionDuration: number = this.sessionDurationInHours * this.secondsInAHour
+  ): Promise<void> {
     const federationUrl = "https://signin.aws.amazon.com/federation";
     const consoleHomeURL = `https://${sessionRegion}.console.aws.amazon.com/console/home?region=${sessionRegion}`;
 

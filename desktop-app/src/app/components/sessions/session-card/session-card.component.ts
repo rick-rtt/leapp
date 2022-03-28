@@ -10,7 +10,7 @@ import { EditDialogComponent } from "../../dialogs/edit-dialog/edit-dialog.compo
 import { Session } from "@noovolari/leapp-core/models/session";
 import { SessionType } from "@noovolari/leapp-core/models/session-type";
 import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
-import { LeappCoreService } from "../../../services/leapp-core.service";
+import { AppProviderService } from "../../../services/app-provider.service";
 import { LoggerLevel, LoggingService } from "@noovolari/leapp-core/services/logging-service";
 import { SessionFactory } from "@noovolari/leapp-core/services/session-factory";
 import { AppSsmService } from "../../../services/app-ssm.service";
@@ -30,7 +30,7 @@ import { AwsSessionService } from "@noovolari/leapp-core/services/session/aws/aw
 import { LeappBaseError } from "@noovolari/leapp-core/errors/leapp-base-error";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { ElectronService } from "../../../services/electron.service";
-import { AwsAuthenticationService } from "../../../services/session/aws/aws-authentication.service";
+import { AppAwsAuthenticationService } from "../../../services/app-aws-authentication.service";
 
 @Component({
   // eslint-disable-next-line @angular-eslint/component-selector
@@ -111,8 +111,8 @@ export class SessionCardComponent implements OnInit {
     private windowService: WindowService,
     private electronService: ElectronService,
     private messageToasterService: MessageToasterService,
-    private leappCoreService: LeappCoreService,
-    private awsAuthenticationService: AwsAuthenticationService
+    private leappCoreService: AppProviderService,
+    private awsAuthenticationService: AppAwsAuthenticationService
   ) {
     this.loggingService = leappCoreService.loggingService;
     this.sessionFactory = leappCoreService.sessionFactory;

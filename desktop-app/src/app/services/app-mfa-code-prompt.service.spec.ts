@@ -1,16 +1,16 @@
 import { TestBed } from "@angular/core/testing";
 
-import { MfaCodePromptService } from "./mfa-code-prompt.service";
+import { AppMfaCodePromptService } from "./app-mfa-code-prompt.service";
 import { mustInjected } from "../../base-injectables";
 
-describe("MfaCodePromptService", () => {
-  let service: MfaCodePromptService;
+describe("AppMfaCodePromptService", () => {
+  let service: AppMfaCodePromptService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [].concat(mustInjected()),
     });
-    service = TestBed.inject(MfaCodePromptService);
+    service = TestBed.inject(AppMfaCodePromptService);
   });
 
   it("should be created", () => {

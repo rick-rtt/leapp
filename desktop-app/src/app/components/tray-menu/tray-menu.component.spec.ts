@@ -2,7 +2,7 @@ import { async, ComponentFixture, TestBed } from "@angular/core/testing";
 
 import { TrayMenuComponent } from "./tray-menu.component";
 import { mustInjected } from "../../../base-injectables";
-import { LeappCoreService } from "../../services/leapp-core.service";
+import { AppProviderService } from "../../services/app-provider.service";
 
 describe("TrayMenuComponent", () => {
   let component: TrayMenuComponent;
@@ -27,7 +27,7 @@ describe("TrayMenuComponent", () => {
 
     TestBed.configureTestingModule({
       declarations: [TrayMenuComponent],
-      providers: [].concat(mustInjected().concat({ provide: LeappCoreService, useValue: spyLeappCoreService })),
+      providers: [].concat(mustInjected().concat({ provide: AppProviderService, useValue: spyLeappCoreService })),
     }).compileComponents();
   }));
 

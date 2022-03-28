@@ -10,7 +10,7 @@ import { constants } from "@noovolari/leapp-core/models/constants";
 import { AppService } from "../../services/app.service";
 import { WorkspaceService } from "@noovolari/leapp-core/services/workspace-service";
 import { AwsSsoRoleService } from "@noovolari/leapp-core/services/session/aws/aws-sso-role-service";
-import { LeappCoreService } from "../../services/leapp-core.service";
+import { AppProviderService } from "../../services/app-provider.service";
 import { AwsSsoOidcService } from "@noovolari/leapp-core/services/aws-sso-oidc.service";
 import { LoggerLevel, LoggingService } from "@noovolari/leapp-core/services/logging-service";
 import { Repository } from "@noovolari/leapp-core/services/repository";
@@ -77,7 +77,7 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
     private router: Router,
     private windowService: WindowService,
     private messageToasterService: MessageToasterService,
-    private leappCoreService: LeappCoreService
+    private leappCoreService: AppProviderService
   ) {
     this.repository = this.leappCoreService.repository;
     this.awsSsoRoleService = this.leappCoreService.awsSsoRoleService;

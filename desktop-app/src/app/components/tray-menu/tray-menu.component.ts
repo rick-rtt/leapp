@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit } from "@angular/core";
 import { AppService } from "../../services/app.service";
 import { environment } from "../../../environments/environment";
 import { UpdaterService } from "../../services/updater.service";
-import { LeappCoreService } from "src/app/services/leapp-core.service";
+import { AppProviderService } from "../../services/app-provider.service";
 import { LoggerLevel, LoggingService } from "@noovolari/leapp-core/services/logging-service";
 import { WorkspaceService } from "@noovolari/leapp-core/services/workspace-service";
 import { SessionFactory } from "@noovolari/leapp-core/services/session-factory";
@@ -38,7 +38,7 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
     private electronService: ElectronService,
     private updaterService: UpdaterService,
     private windowService: WindowService,
-    private leappCoreService: LeappCoreService
+    private leappCoreService: AppProviderService
   ) {
     this.awsCoreService = leappCoreService.awsCoreService;
     this.loggingService = leappCoreService.loggingService;

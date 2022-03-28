@@ -3,7 +3,7 @@ import { ComponentFixture, TestBed } from "@angular/core/testing";
 import { SegmentDialogComponent } from "./segment-dialog.component";
 import { mustInjected } from "../../../../base-injectables";
 import { constants } from "@noovolari/leapp-core/models/constants";
-import { LeappCoreService } from "../../../services/leapp-core.service";
+import { AppProviderService } from "../../../services/app-provider.service";
 
 describe("SegmentDialogComponent", () => {
   let component: SegmentDialogComponent;
@@ -29,7 +29,7 @@ describe("SegmentDialogComponent", () => {
 
     await TestBed.configureTestingModule({
       declarations: [SegmentDialogComponent],
-      providers: [].concat(mustInjected().concat([{ provide: LeappCoreService, useValue: spyLeappCoreService }])),
+      providers: [].concat(mustInjected().concat([{ provide: AppProviderService, useValue: spyLeappCoreService }])),
     }).compileComponents();
   });
 

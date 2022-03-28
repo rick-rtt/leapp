@@ -10,7 +10,7 @@ import { WindowService } from "../../../services/window.service";
 import { AwsIamRoleFederatedSession } from "@noovolari/leapp-core/models/aws-iam-role-federated-session";
 import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
 import { SessionService } from "@noovolari/leapp-core/services/session/session-service";
-import { LeappCoreService } from "../../../services/leapp-core.service";
+import { AppProviderService } from "../../../services/app-provider.service";
 
 @Component({
   selector: "app-options-dialog",
@@ -69,7 +69,7 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
   private sessionService: SessionService;
 
   constructor(
-    public leappCoreService: LeappCoreService,
+    public leappCoreService: AppProviderService,
     public appService: AppService,
     private windowService: WindowService,
     private toasterService: MessageToasterService,

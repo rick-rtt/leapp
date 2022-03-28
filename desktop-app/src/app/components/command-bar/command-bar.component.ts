@@ -11,7 +11,7 @@ import Segment, { GlobalFilters } from "@noovolari/leapp-core/models/Segment";
 import { SessionType } from "@noovolari/leapp-core/models/session-type";
 import { WorkspaceService } from "@noovolari/leapp-core/services/workspace-service";
 import { syncAllEvent } from "../integration-bar/integration-bar.component";
-import { LeappCoreService } from "../../services/leapp-core.service";
+import { AppProviderService } from "../../services/app-provider.service";
 import { ElectronService } from "../../services/electron.service";
 import { AppService } from "../../services/app.service";
 import { AwsSsoRoleSession } from "@noovolari/leapp-core/models/aws-sso-role-session";
@@ -78,7 +78,7 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
 
   constructor(
     private bsModalService: BsModalService,
-    private leappCoreService: LeappCoreService,
+    private leappCoreService: AppProviderService,
     public appService: AppService,
     public electronService: ElectronService,
     private windowService: WindowService

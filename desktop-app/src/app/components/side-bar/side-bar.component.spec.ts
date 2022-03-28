@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from "@angular/core/testing";
 
 import { SideBarComponent } from "./side-bar.component";
 import { mustInjected } from "../../../base-injectables";
-import { LeappCoreService } from "../../services/leapp-core.service";
+import { AppProviderService } from "../../services/app-provider.service";
 
 describe("SideBarComponent", () => {
   let component: SideBarComponent;
@@ -21,7 +21,7 @@ describe("SideBarComponent", () => {
 
     await TestBed.configureTestingModule({
       declarations: [SideBarComponent],
-      providers: [].concat(mustInjected().concat({ provide: LeappCoreService, useValue: spyLeappCoreService })),
+      providers: [].concat(mustInjected().concat({ provide: AppProviderService, useValue: spyLeappCoreService })),
     }).compileComponents();
   });
 

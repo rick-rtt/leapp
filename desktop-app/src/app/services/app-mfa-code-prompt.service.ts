@@ -7,7 +7,7 @@ import { IMfaCodePrompter } from "@noovolari/leapp-core/interfaces/i-mfa-code-pr
 @Injectable({
   providedIn: "root",
 })
-export class MfaCodePromptService implements IMfaCodePrompter {
+export class AppMfaCodePromptService implements IMfaCodePrompter {
   constructor(private modalService: BsModalService, private electronService: ElectronService) {}
 
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types

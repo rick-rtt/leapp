@@ -8,7 +8,7 @@ import { ElectronService } from "./electron.service";
 import { constants } from "@noovolari/leapp-core/models/constants";
 import { Repository } from "@noovolari/leapp-core/services/repository";
 import { WorkspaceService } from "@noovolari/leapp-core/services/workspace-service";
-import { LeappCoreService } from "./leapp-core.service";
+import { AppProviderService } from "./app-provider.service";
 import { WindowService } from "./window.service";
 
 @Injectable({
@@ -29,7 +29,7 @@ export class UpdaterService {
     private httpClient: HttpClient,
     private electronService: ElectronService,
     private windowService: WindowService,
-    private leappCoreService: LeappCoreService
+    private leappCoreService: AppProviderService
   ) {
     this.markdown = md();
     this.repository = leappCoreService.repository;

@@ -5,7 +5,7 @@ import { globalFilterGroup } from "../../command-bar/command-bar.component";
 import { NgSelectComponent } from "@ng-select/ng-select";
 import { segmentFilter } from "../../side-bar/side-bar.component";
 import Segment from "@noovolari/leapp-core/models/Segment";
-import { LeappCoreService } from "../../../services/leapp-core.service";
+import { AppProviderService } from "../../../services/app-provider.service";
 
 @Component({
   selector: "app-segment-dialog",
@@ -28,7 +28,7 @@ export class SegmentDialogComponent implements OnInit, OnDestroy {
 
   private subscription;
 
-  constructor(private appService: AppService, private leappCoreService: LeappCoreService) {
+  constructor(private appService: AppService, private leappCoreService: AppProviderService) {
     this.temporaryName = "";
     this.segments = [...this.leappCoreService.repository.getSegments()];
     this.subscription = globalFilterGroup.subscribe((value) => (this.currentFilterGroup = Object.assign({}, value)));

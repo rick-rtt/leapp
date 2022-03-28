@@ -4,7 +4,7 @@ import { CreateDialogComponent } from "./create-dialog.component";
 import { mustInjected } from "../../../../base-injectables";
 import { RouterTestingModule } from "@angular/router/testing";
 import { constants } from "@noovolari/leapp-core/models/constants";
-import { LeappCoreService } from "../../../services/leapp-core.service";
+import { AppProviderService } from "../../../services/app-provider.service";
 
 describe("CreateDialogComponent", () => {
   let component: CreateDialogComponent;
@@ -29,7 +29,7 @@ describe("CreateDialogComponent", () => {
 
     await TestBed.configureTestingModule({
       declarations: [CreateDialogComponent],
-      providers: [].concat(mustInjected().concat([{ provide: LeappCoreService, useValue: spyLeappCoreService }])),
+      providers: [].concat(mustInjected().concat([{ provide: AppProviderService, useValue: spyLeappCoreService }])),
       imports: [RouterTestingModule],
     }).compileComponents();
   });

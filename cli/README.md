@@ -52,7 +52,7 @@ USAGE
 * [`leapp session current`](#leapp-session-current)
 * [`leapp session delete`](#leapp-session-delete)
 * [`leapp session generate SESSIONID`](#leapp-session-generate-sessionid)
-* [`leapp session get_id`](#leapp-session-get_id)
+* [`leapp session get-id`](#leapp-session-get-id)
 * [`leapp session list`](#leapp-session-list)
 * [`leapp session open-web-console`](#leapp-session-open-web-console)
 * [`leapp session start`](#leapp-session-start)
@@ -458,13 +458,13 @@ EXAMPLES
   $leapp session generate 0a1b2c3d-4e5f-6a7b-8c9d-0e1f2a3b4c5d
 ```
 
-## `leapp session get_id`
+## `leapp session get-id`
 
 Get session id
 
 ```
 USAGE
-  $ leapp session get_id
+  $ leapp session get-id
 
 DESCRIPTION
   Get session id

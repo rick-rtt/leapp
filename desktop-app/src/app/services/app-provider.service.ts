@@ -10,16 +10,16 @@ import { TimerService } from "@noovolari/leapp-core/services/timer-service";
 import { AwsIamRoleFederatedService } from "@noovolari/leapp-core/services/session/aws/aws-iam-role-federated-service";
 import { AzureService } from "@noovolari/leapp-core/services/session/azure/azure-service";
 import { ElectronService } from "./electron.service";
-import { MfaCodePromptService } from "./mfa-code-prompt.service";
+import { AppMfaCodePromptService } from "./app-mfa-code-prompt.service";
 import { ExecuteService } from "@noovolari/leapp-core/services/execute-service";
 import { RetroCompatibilityService } from "@noovolari/leapp-core/services/retro-compatibility-service";
-import { AwsAuthenticationService } from "./session/aws/aws-authentication.service";
+import { AppAwsAuthenticationService } from "./app-aws-authentication.service";
 import { AwsParentSessionFactory } from "@noovolari/leapp-core/services/session/aws/aws-parent-session.factory";
 import { AwsIamRoleChainedService } from "@noovolari/leapp-core/services/session/aws/aws-iam-role-chained-service";
 import { Repository } from "@noovolari/leapp-core/services/repository";
 import { AwsSsoRoleService } from "@noovolari/leapp-core/services/session/aws/aws-sso-role-service";
 import { AwsSsoOidcService } from "@noovolari/leapp-core/services/aws-sso-oidc.service";
-import { VerificationWindowService } from "./verification-window.service";
+import { AppVerificationWindowService } from "./app-verification-window.service";
 import { WorkspaceService } from "@noovolari/leapp-core/services/workspace-service";
 import { SessionFactory } from "@noovolari/leapp-core/services/session-factory";
 import { RotationService } from "@noovolari/leapp-core/services/rotation-service";
@@ -35,11 +35,11 @@ import { NamedProfilesService } from "@noovolari/leapp-core/services/named-profi
 @Injectable({
   providedIn: "root",
 })
-export class LeappCoreService {
+export class AppProviderService {
   // Injected by app.component
-  mfaCodePrompter: MfaCodePromptService;
-  awsAuthenticationService: AwsAuthenticationService;
-  verificationWindowService: VerificationWindowService;
+  mfaCodePrompter: AppMfaCodePromptService;
+  awsAuthenticationService: AppAwsAuthenticationService;
+  verificationWindowService: AppVerificationWindowService;
   windowService: WindowService;
 
   private workspaceServiceInstance: WorkspaceService;

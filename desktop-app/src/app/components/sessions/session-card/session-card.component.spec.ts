@@ -2,7 +2,7 @@ import { async, ComponentFixture, TestBed } from "@angular/core/testing";
 
 import { SessionCardComponent } from "./session-card.component";
 import { mustInjected } from "../../../../base-injectables";
-import { LeappCoreService } from "../../../services/leapp-core.service";
+import { AppProviderService } from "../../../services/app-provider.service";
 import { RouterTestingModule } from "@angular/router/testing";
 import { SessionType } from "@noovolari/leapp-core/models/session-type";
 import { Workspace } from "@noovolari/leapp-core/models/workspace";
@@ -36,7 +36,7 @@ describe("SessionCardComponent", () => {
 
     TestBed.configureTestingModule({
       declarations: [SessionCardComponent],
-      providers: [].concat(mustInjected().concat([{ provide: LeappCoreService, useValue: spyLeappCoreService }])),
+      providers: [].concat(mustInjected().concat([{ provide: AppProviderService, useValue: spyLeappCoreService }])),
       imports: [RouterTestingModule.withRoutes([])],
     }).compileComponents();
   }));

@@ -17,7 +17,7 @@ import { SessionCardComponent } from "./session-card/session-card.component";
 import { Session } from "@noovolari/leapp-core/models/session";
 import { GlobalFilters } from "@noovolari/leapp-core/models/Segment";
 import { WorkspaceService } from "@noovolari/leapp-core/services/workspace-service";
-import { LeappCoreService } from "../../services/leapp-core.service";
+import { AppProviderService } from "../../services/app-provider.service";
 import { AwsCoreService } from "@noovolari/leapp-core/services/aws-core-service";
 import { SessionType } from "@noovolari/leapp-core/models/session-type";
 import { AwsIamRoleFederatedSession } from "@noovolari/leapp-core/models/aws-iam-role-federated-session";
@@ -73,7 +73,7 @@ export class SessionsComponent implements OnInit, OnDestroy {
     private httpClient: HttpClient,
     private modalService: BsModalService,
     private appService: AppService,
-    private leappCoreService: LeappCoreService
+    private leappCoreService: AppProviderService
   ) {
     this.workspaceService = this.leappCoreService.workspaceService;
     this.awsCoreService = this.leappCoreService.awsCoreService;

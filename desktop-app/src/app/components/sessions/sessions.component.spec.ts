@@ -3,7 +3,7 @@ import { async, ComponentFixture, TestBed } from "@angular/core/testing";
 import { SessionsComponent } from "./sessions.component";
 import { mustInjected } from "../../../base-injectables";
 import { RouterTestingModule } from "@angular/router/testing";
-import { LeappCoreService } from "../../services/leapp-core.service";
+import { AppProviderService } from "../../services/app-provider.service";
 
 describe("SessionComponent", () => {
   let component: SessionsComponent;
@@ -25,7 +25,7 @@ describe("SessionComponent", () => {
 
     TestBed.configureTestingModule({
       declarations: [SessionsComponent],
-      providers: [].concat(mustInjected().concat([{ provide: LeappCoreService, useValue: spyLeappCoreService }])),
+      providers: [].concat(mustInjected().concat([{ provide: AppProviderService, useValue: spyLeappCoreService }])),
       imports: [RouterTestingModule.withRoutes([])],
     }).compileComponents();
   }));

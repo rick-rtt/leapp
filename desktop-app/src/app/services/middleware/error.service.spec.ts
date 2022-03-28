@@ -7,7 +7,7 @@ import { LeappBaseError } from "@noovolari/leapp-core/errors/leapp-base-error";
 import { ErrorHandler } from "@angular/core";
 import { AppModule } from "../../app.module";
 import { LoggerLevel } from "@noovolari/leapp-core/services/logging-service";
-import { LeappCoreService } from "../leapp-core.service";
+import { AppProviderService } from "../app-provider.service";
 import { MessageToasterService } from "../message-toaster.service";
 
 describe("ErrorService", () => {
@@ -32,7 +32,7 @@ describe("ErrorService", () => {
       providers: [{ provide: ErrorHandler, useClass: ErrorService }].concat(
         mustInjected().concat([
           { provide: MessageToasterService, useValue: spyMessageToasterService },
-          { provide: LeappCoreService, useValue: spyLeappCoreService },
+          { provide: AppProviderService, useValue: spyLeappCoreService },
         ])
       ),
     }).inject(ErrorHandler) as any;

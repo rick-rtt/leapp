@@ -1,16 +1,16 @@
 import { TestBed } from "@angular/core/testing";
 
-import { LeappCoreService } from "./leapp-core.service";
+import { AppProviderService } from "./app-provider.service";
 import { mustInjected } from "../../base-injectables";
 
-describe("LeappCoreService", () => {
-  let service: LeappCoreService;
+describe("AppProviderService", () => {
+  let service: AppProviderService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [].concat(mustInjected()),
     });
-    service = TestBed.inject(LeappCoreService);
+    service = TestBed.inject(AppProviderService);
   });
 
   it("should be created", () => {

@@ -2,7 +2,7 @@ import { EventEmitter, Injectable } from "@angular/core";
 import { FormControl, FormGroup } from "@angular/forms";
 import { ElectronService } from "./electron.service";
 
-import { LeappCoreService } from "./leapp-core.service";
+import { AppProviderService } from "./app-provider.service";
 import { MessageToasterService, ToastLevel } from "./message-toaster.service";
 import { MatMenuTrigger } from "@angular/material/menu";
 import { WindowService } from "./window.service";
@@ -27,7 +27,7 @@ export class AppService {
     private messageToasterService: MessageToasterService,
     private windowService: WindowService,
     private modalService: BsModalService,
-    leappCoreService: LeappCoreService
+    leappCoreService: AppProviderService
   ) {
     this.triggers = [];
 

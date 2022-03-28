@@ -8,7 +8,7 @@ import Folder from "@noovolari/leapp-core/models/folder";
 import { WorkspaceService } from "@noovolari/leapp-core/services/workspace-service";
 import { Session } from "@noovolari/leapp-core/models/session";
 import { Repository } from "@noovolari/leapp-core/services/repository";
-import { LeappCoreService } from "../../services/leapp-core.service";
+import { AppProviderService } from "../../services/app-provider.service";
 import { constants } from "@noovolari/leapp-core/models/constants";
 import { integrationHighlight } from "../integration-bar/integration-bar.component";
 
@@ -44,7 +44,7 @@ export class SideBarComponent implements OnInit, OnDestroy {
   private repository: Repository;
   private workspaceService: WorkspaceService;
 
-  constructor(private bsModalService: BsModalService, private leappCoreService: LeappCoreService) {
+  constructor(private bsModalService: BsModalService, private leappCoreService: AppProviderService) {
     this.repository = leappCoreService.repository;
     this.workspaceService = leappCoreService.workspaceService;
     this.showAll = true;

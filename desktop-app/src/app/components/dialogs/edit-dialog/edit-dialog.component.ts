@@ -8,7 +8,7 @@ import { Workspace } from "@noovolari/leapp-core/models/workspace";
 import { WorkspaceService } from "@noovolari/leapp-core/services/workspace-service";
 import { KeychainService } from "@noovolari/leapp-core/services/keychain-service";
 import { constants } from "@noovolari/leapp-core/models/constants";
-import { LeappCoreService } from "../../../services/leapp-core.service";
+import { AppProviderService } from "../../../services/app-provider.service";
 import { MessageToasterService, ToastLevel } from "../../../services/message-toaster.service";
 import { WindowService } from "../../../services/window.service";
 import { Repository } from "@noovolari/leapp-core/services/repository";
@@ -52,7 +52,7 @@ export class EditDialogComponent implements OnInit {
     private messageToasterService: MessageToasterService,
     private router: Router,
     private windowService: WindowService,
-    private leappCoreService: LeappCoreService
+    private leappCoreService: AppProviderService
   ) {
     this.workspaceService = leappCoreService.workspaceService;
     this.repository = this.leappCoreService.repository;

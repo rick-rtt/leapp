@@ -1,20 +1,20 @@
 import { Injectable } from "@angular/core";
 import { IAwsAuthenticationService } from "@noovolari/leapp-core/interfaces/i-aws-authentication.service";
 import { CloudProviderType } from "@noovolari/leapp-core/models/cloud-provider-type";
-import { LeappCoreService } from "../../leapp-core.service";
-import { WindowService } from "../../window.service";
+import { AppProviderService } from "./app-provider.service";
+import { WindowService } from "./window.service";
 import { AwsIamRoleFederatedSession } from "@noovolari/leapp-core/models/aws-iam-role-federated-session";
 import { constants } from "@noovolari/leapp-core/models/constants";
-import { MessageToasterService, ToastLevel } from "../../message-toaster.service";
+import { MessageToasterService, ToastLevel } from "./message-toaster.service";
 import { LoggerLevel } from "@noovolari/leapp-core/services/logging-service";
-import { ElectronService } from "../../electron.service";
-import { AppService } from "../../app.service";
+import { ElectronService } from "./electron.service";
+import { AppService } from "./app.service";
 import { Session } from "@noovolari/leapp-core/models/session";
 
 @Injectable({ providedIn: "root" })
-export class AwsAuthenticationService implements IAwsAuthenticationService {
+export class AppAwsAuthenticationService implements IAwsAuthenticationService {
   constructor(
-    private leappCoreService: LeappCoreService,
+    private leappCoreService: AppProviderService,
     private appService: AppService,
     private windowService: WindowService,
     private electronService: ElectronService,

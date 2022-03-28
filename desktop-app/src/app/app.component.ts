@@ -4,8 +4,8 @@ import { environment } from "../environments/environment";
 import { AppService } from "./services/app.service";
 import { Router } from "@angular/router";
 import { setTheme } from "ngx-bootstrap/utils";
-import { MfaCodePromptService } from "./services/mfa-code-prompt.service";
-import { AwsAuthenticationService } from "./services/session/aws/aws-authentication.service";
+import { AppMfaCodePromptService } from "./services/app-mfa-code-prompt.service";
+import { AppAwsAuthenticationService } from "./services/app-aws-authentication.service";
 import { UpdaterService } from "./services/updater.service";
 import compareVersions from "compare-versions";
 import { LoggerLevel, LoggingService } from "@noovolari/leapp-core/services/logging-service";
@@ -17,10 +17,10 @@ import { constants } from "@noovolari/leapp-core/models/constants";
 import { FileService } from "@noovolari/leapp-core/services/file-service";
 import { AwsCoreService } from "@noovolari/leapp-core/services/aws-core-service";
 import { RetroCompatibilityService } from "@noovolari/leapp-core/services/retro-compatibility-service";
-import { LeappCoreService } from "./services/leapp-core.service";
+import { AppProviderService } from "./services/app-provider.service";
 import { SessionFactory } from "@noovolari/leapp-core/services/session-factory";
 import { RotationService } from "@noovolari/leapp-core/services/rotation-service";
-import { VerificationWindowService } from "./services/verification-window.service";
+import { AppVerificationWindowService } from "./services/app-verification-window.service";
 import { WindowService } from "./services/window.service";
 import { ElectronService } from "./services/electron.service";
 import { AwsSsoIntegrationService } from "@noovolari/leapp-core/services/aws-sso-integration-service";
@@ -48,10 +48,10 @@ export class AppComponent implements OnInit {
 
   /* Main app file: launches the Angular framework inside Electron app */
   constructor(
-    leappCoreService: LeappCoreService,
-    mfaCodePrompter: MfaCodePromptService,
-    awsAuthenticationService: AwsAuthenticationService,
-    verificationWindowService: VerificationWindowService,
+    leappCoreService: AppProviderService,
+    mfaCodePrompter: AppMfaCodePromptService,
+    awsAuthenticationService: AppAwsAuthenticationService,
+    verificationWindowService: AppVerificationWindowService,
     public appService: AppService,
     private router: Router,
     private updaterService: UpdaterService,

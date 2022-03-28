@@ -37,8 +37,40 @@ import { IVerificationWindowService } from "@noovolari/leapp-core/interfaces/i-v
 import { CliRpcAwsAuthenticationService } from "./cli-rpc-aws-authentication-service";
 
 /* eslint-disable */
-export class LeappCliService {
+export class CliProviderService {
   private cliNativeServiceInstance: CliNativeService;
+  private cliVerificationWindowServiceInstance: IVerificationWindowService;
+  private authenticationServiceInstance: AuthenticationService;
+  private cliRpcAwsAuthenticationServiceInstance: CliRpcAwsAuthenticationService;
+  private remoteProceduresClientInstance: RemoteProceduresClient;
+  private cliMfaCodePromptServiceInstance: CliMfaCodePromptService;
+  private workspaceServiceInstance: WorkspaceService;
+  private awsIamUserServiceInstance: AwsIamUserService;
+  private awsIamRoleFederatedServiceInstance: AwsIamRoleFederatedService;
+  private awsIamRoleChainedServiceInstance: AwsIamRoleChainedService;
+  private awsSsoRoleServiceInstance: AwsSsoRoleService;
+  private awsSsoOidcServiceInstance: AwsSsoOidcService;
+  private azureServiceInstance: AzureService;
+  private sessionFactoryInstance: SessionFactory;
+  private awsParentSessionFactoryInstance: AwsParentSessionFactory;
+  private fileServiceInstance: FileService;
+  private repositoryInstance: Repository;
+  private regionsServiceInstance: RegionsService;
+  private namedProfilesServiceInstance: NamedProfilesService;
+  private idpUrlsServiceInstance: IdpUrlsService;
+  private awsSsoIntegrationServiceInstance: AwsSsoIntegrationService;
+  private keyChainServiceInstance: KeychainService;
+  private loggingServiceInstance: LoggingService;
+  private timerServiceInstance: TimerService;
+  private executeServiceInstance: ExecuteService;
+  private rotationServiceInstance: RotationService;
+  private retroCompatibilityServiceInstance: RetroCompatibilityService;
+  private cloudProviderServiceInstance: CloudProviderService;
+  private awsCoreServiceInstance: AwsCoreService;
+  private azureCoreServiceInstance: AzureCoreService;
+  private cliOpenWebConsoleServiceInstance: CliOpenWebConsoleService;
+  private webConsoleServiceInstance: WebConsoleService;
+  private ssmServiceInstance: SsmService;
 
   public get cliNativeService(): CliNativeService {
     if (!this.cliNativeServiceInstance) {
@@ -47,16 +79,12 @@ export class LeappCliService {
     return this.cliNativeServiceInstance;
   }
 
-  private cliVerificationWindowServiceInstance: IVerificationWindowService;
-
   public get cliVerificationWindowService(): IVerificationWindowService {
     if (!this.cliVerificationWindowServiceInstance) {
       this.cliVerificationWindowServiceInstance = new CliRpcVerificationWindowService(this.remoteProceduresClient);
     }
     return this.cliVerificationWindowServiceInstance;
   }
-
-  private authenticationServiceInstance: AuthenticationService;
 
   public get authenticationService(): AuthenticationService {
     if (!this.authenticationServiceInstance) {
@@ -65,16 +93,12 @@ export class LeappCliService {
     return this.authenticationServiceInstance;
   }
 
-  private cliRpcAwsAuthenticationServiceInstance: CliRpcAwsAuthenticationService;
-
   public get cliRpcAwsAuthenticationService(): CliRpcAwsAuthenticationService {
     if (!this.cliRpcAwsAuthenticationServiceInstance) {
       this.cliRpcAwsAuthenticationServiceInstance = new CliRpcAwsAuthenticationService(this.remoteProceduresClient);
     }
     return this.cliRpcAwsAuthenticationServiceInstance;
   }
-
-  private remoteProceduresClientInstance: RemoteProceduresClient;
 
   public get remoteProceduresClient(): RemoteProceduresClient {
     if (!this.remoteProceduresClientInstance) {
@@ -83,8 +107,6 @@ export class LeappCliService {
     return this.remoteProceduresClientInstance;
   }
 
-  private cliMfaCodePromptServiceInstance: CliMfaCodePromptService;
-
   public get cliMfaCodePromptService(): CliMfaCodePromptService {
     if (!this.cliMfaCodePromptServiceInstance) {
       this.cliMfaCodePromptServiceInstance = new CliMfaCodePromptService(this.inquirer);
@@ -92,16 +114,12 @@ export class LeappCliService {
     return this.cliMfaCodePromptServiceInstance;
   }
 
-  private workspaceServiceInstance: WorkspaceService;
-
   public get workspaceService(): WorkspaceService {
     if (!this.workspaceServiceInstance) {
       this.workspaceServiceInstance = new WorkspaceService(this.repository);
     }
     return this.workspaceServiceInstance;
   }
-
-  private awsIamUserServiceInstance: AwsIamUserService;
 
   public get awsIamUserService(): AwsIamUserService {
     if (!this.awsIamUserServiceInstance) {
@@ -111,8 +129,6 @@ export class LeappCliService {
     return this.awsIamUserServiceInstance;
   }
 
-  private awsIamRoleFederatedServiceInstance: AwsIamRoleFederatedService;
-
   get awsIamRoleFederatedService(): AwsIamRoleFederatedService {
     if (!this.awsIamRoleFederatedServiceInstance) {
       this.awsIamRoleFederatedServiceInstance = new AwsIamRoleFederatedService(this.workspaceService, this.repository,
@@ -120,8 +136,6 @@ export class LeappCliService {
     }
     return this.awsIamRoleFederatedServiceInstance;
   }
-
-  private awsIamRoleChainedServiceInstance: AwsIamRoleChainedService;
 
   get awsIamRoleChainedService(): AwsIamRoleChainedService {
     if (!this.awsIamRoleChainedServiceInstance) {
@@ -131,8 +145,6 @@ export class LeappCliService {
     return this.awsIamRoleChainedServiceInstance;
   }
 
-  private awsSsoRoleServiceInstance: AwsSsoRoleService;
-
   get awsSsoRoleService(): AwsSsoRoleService {
     if (!this.awsSsoRoleServiceInstance) {
       this.awsSsoRoleServiceInstance = new AwsSsoRoleService(this.workspaceService, this.repository, this.fileService,
@@ -141,16 +153,12 @@ export class LeappCliService {
     return this.awsSsoRoleServiceInstance;
   }
 
-  private awsSsoOidcServiceInstance: AwsSsoOidcService;
-
   get awsSsoOidcService(): AwsSsoOidcService {
     if (!this.awsSsoOidcServiceInstance) {
       this.awsSsoOidcServiceInstance = new AwsSsoOidcService(this.cliVerificationWindowService, this.repository, true);
     }
     return this.awsSsoOidcServiceInstance;
   }
-
-  private azureServiceInstance: AzureService;
 
   get azureService(): AzureService {
     if (!this.azureServiceInstance) {
@@ -160,8 +168,6 @@ export class LeappCliService {
     return this.azureServiceInstance;
   }
 
-  private sessionFactoryInstance: SessionFactory;
-
   get sessionFactory(): SessionFactory {
     if (!this.sessionFactoryInstance) {
       this.sessionFactoryInstance = new SessionFactory(this.awsIamUserService, this.awsIamRoleFederatedService,
@@ -169,8 +175,6 @@ export class LeappCliService {
     }
     return this.sessionFactoryInstance;
   }
-
-  private awsParentSessionFactoryInstance: AwsParentSessionFactory;
 
   get awsParentSessionFactory(): AwsParentSessionFactory {
     if (!this.awsParentSessionFactoryInstance) {
@@ -180,16 +184,12 @@ export class LeappCliService {
     return this.awsParentSessionFactoryInstance;
   }
 
-  private fileServiceInstance: FileService;
-
   get fileService(): FileService {
     if (!this.fileServiceInstance) {
       this.fileServiceInstance = new FileService(this.cliNativeService);
     }
     return this.fileServiceInstance;
   }
-
-  private repositoryInstance: Repository;
 
   get repository(): Repository {
     if (!this.repositoryInstance) {
@@ -198,16 +198,12 @@ export class LeappCliService {
     return this.repositoryInstance;
   }
 
-  private regionsServiceInstance: RegionsService;
-
   get regionsService(): RegionsService {
     if (!this.regionsServiceInstance) {
       this.regionsServiceInstance = new RegionsService(this.sessionFactory, this.repository, this.workspaceService);
     }
     return this.regionsServiceInstance;
   }
-
-  private namedProfilesServiceInstance: NamedProfilesService;
 
   get namedProfilesService(): NamedProfilesService {
     if (!this.namedProfilesServiceInstance) {
@@ -216,16 +212,12 @@ export class LeappCliService {
     return this.namedProfilesServiceInstance;
   }
 
-  private idpUrlsServiceInstance: IdpUrlsService;
-
   get idpUrlsService(): IdpUrlsService {
     if (!this.idpUrlsServiceInstance) {
       this.idpUrlsServiceInstance = new IdpUrlsService(this.sessionFactory, this.repository);
     }
     return this.idpUrlsServiceInstance;
   }
-
-  private awsSsoIntegrationServiceInstance: AwsSsoIntegrationService;
 
   get awsSsoIntegrationService(): AwsSsoIntegrationService {
     if (!this.awsSsoIntegrationServiceInstance) {
@@ -235,16 +227,12 @@ export class LeappCliService {
     return this.awsSsoIntegrationServiceInstance;
   }
 
-  private keyChainServiceInstance: KeychainService;
-
   get keyChainService(): KeychainService {
     if (!this.keyChainServiceInstance) {
       this.keyChainServiceInstance = new KeychainService(this.cliNativeService);
     }
     return this.keyChainServiceInstance;
   }
-
-  private loggingServiceInstance: LoggingService;
 
   get loggingService(): LoggingService {
     if (!this.loggingServiceInstance) {
@@ -253,16 +241,12 @@ export class LeappCliService {
     return this.loggingServiceInstance;
   }
 
-  private timerServiceInstance: TimerService;
-
   get timerService(): TimerService {
     if (!this.timerServiceInstance) {
       this.timerServiceInstance = new TimerService();
     }
     return this.timerServiceInstance;
   }
-
-  private executeServiceInstance: ExecuteService;
 
   get executeService(): ExecuteService {
     if (!this.executeServiceInstance) {
@@ -271,16 +255,12 @@ export class LeappCliService {
     return this.executeServiceInstance;
   }
 
-  private rotationServiceInstance: RotationService;
-
   get rotationService(): RotationService {
     if (!this.rotationServiceInstance) {
       this.rotationServiceInstance = new RotationService(this.sessionFactory, this.repository);
     }
     return this.rotationServiceInstance;
   }
-
-  private retroCompatibilityServiceInstance: RetroCompatibilityService;
 
   get retroCompatibilityService(): RetroCompatibilityService {
     if (!this.retroCompatibilityServiceInstance) {
@@ -290,8 +270,6 @@ export class LeappCliService {
     return this.retroCompatibilityServiceInstance;
   }
 
-  private cloudProviderServiceInstance: CloudProviderService;
-
   get cloudProviderService(): CloudProviderService {
     if (!this.cloudProviderServiceInstance) {
       this.cloudProviderServiceInstance = new CloudProviderService(this.awsCoreService, this.azureCoreService,
@@ -300,16 +278,12 @@ export class LeappCliService {
     return this.cloudProviderServiceInstance;
   }
 
-  private awsCoreServiceInstance: AwsCoreService;
-
   get awsCoreService(): AwsCoreService {
     if (!this.awsCoreServiceInstance) {
       this.awsCoreServiceInstance = new AwsCoreService(this.cliNativeService);
     }
     return this.awsCoreServiceInstance;
   }
-
-  private azureCoreServiceInstance: AzureCoreService;
 
   get azureCoreService(): AzureCoreService {
     if (!this.azureCoreServiceInstance) {
@@ -318,8 +292,6 @@ export class LeappCliService {
     return this.azureCoreServiceInstance;
   }
 
-  private cliOpenWebConsoleServiceInstance: CliOpenWebConsoleService;
-
   get cliOpenWebConsoleService(): CliOpenWebConsoleService {
     if (!this.cliOpenWebConsoleServiceInstance) {
       this.cliOpenWebConsoleServiceInstance = new CliOpenWebConsoleService();
@@ -327,16 +299,12 @@ export class LeappCliService {
     return this.cliOpenWebConsoleServiceInstance;
   }
 
-  private webConsoleServiceInstance: WebConsoleService;
-
   get webConsoleService(): WebConsoleService {
     if (!this.webConsoleServiceInstance) {
       this.webConsoleServiceInstance = new WebConsoleService(this.cliOpenWebConsoleService, this.loggingService, fetch);
     }
     return this.webConsoleServiceInstance;
   }
-
-  private ssmServiceInstance: SsmService;
 
   get ssmService(): SsmService {
     if (!this.ssmServiceInstance) {

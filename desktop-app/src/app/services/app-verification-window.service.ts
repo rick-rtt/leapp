@@ -9,7 +9,7 @@ import { IVerificationWindowService } from "@noovolari/leapp-core/interfaces/i-v
 import { WindowService } from "./window.service";
 
 @Injectable({ providedIn: "root" })
-export class VerificationWindowService implements IVerificationWindowService {
+export class AppVerificationWindowService implements IVerificationWindowService {
   constructor(private windowService: WindowService) {}
 
   async openVerificationWindow(

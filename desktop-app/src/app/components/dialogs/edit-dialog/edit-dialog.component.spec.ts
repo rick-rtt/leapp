@@ -11,7 +11,7 @@ import { AwsSsoIntegration } from "@noovolari/leapp-core/models/aws-sso-integrat
 import Folder from "@noovolari/leapp-core/models/folder";
 import Segment from "@noovolari/leapp-core/models/Segment";
 import { constants } from "@noovolari/leapp-core/models/constants";
-import { LeappCoreService } from "../../../services/leapp-core.service";
+import { AppProviderService } from "../../../services/app-provider.service";
 import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
 import { SessionType } from "@noovolari/leapp-core/models/session-type";
 import { KeychainService } from "@noovolari/leapp-core/services/keychain-service";
@@ -43,7 +43,7 @@ describe("EditDialogComponent", () => {
       declarations: [EditDialogComponent],
       providers: [].concat(
         mustInjected().concat([
-          { provide: LeappCoreService, useValue: spyLeappCoreService },
+          { provide: AppProviderService, useValue: spyLeappCoreService },
           { provide: KeychainService, useValue: spyKeychainService },
         ])
       ),

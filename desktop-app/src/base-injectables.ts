@@ -10,7 +10,7 @@ import { FileService } from "@noovolari/leapp-core/services/file-service";
 import { KeychainService } from "@noovolari/leapp-core/services/keychain-service";
 import { HttpClient, HttpHandler } from "@angular/common/http";
 import { ElectronService } from "./app/services/electron.service";
-import { LeappCoreService } from "./app/services/leapp-core.service";
+import { AppProviderService } from "./app/services/app-provider.service";
 import { MessageToasterService } from "./app/services/message-toaster.service";
 
 export class MockTray {
@@ -86,7 +86,7 @@ const mustInjected = (): any[] => [
   { provide: KeychainService, useValue: spyKeychainService },
   { provide: MatSnackBar, useValue: spyMatSnackBar },
   { provide: ElectronService, useValue: spyElectronService },
-  { provide: LeappCoreService, useValue: spyLeappCoreService },
+  { provide: AppProviderService, useValue: spyLeappCoreService },
   { provide: MessageToasterService, useValue: spyMessageToasterService },
 ];
 export { mustInjected };

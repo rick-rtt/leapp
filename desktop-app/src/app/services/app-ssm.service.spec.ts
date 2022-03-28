@@ -2,14 +2,14 @@ import { TestBed } from "@angular/core/testing";
 
 import { AppSsmService } from "./app-ssm.service";
 import { mustInjected } from "../../base-injectables";
-import { LeappCoreService } from "./leapp-core.service";
+import { AppProviderService } from "./app-provider.service";
 import SpyObj = jasmine.SpyObj;
 import { CredentialsInfo } from "@noovolari/leapp-core/models/credentials-info";
 import { AppService } from "./app.service";
 
 describe("SsmService", () => {
   let service: AppSsmService;
-  let leappCoreService: SpyObj<LeappCoreService>;
+  let leappCoreService: SpyObj<AppProviderService>;
 
   beforeEach(() => {
     leappCoreService = jasmine.createSpyObj("LeappCoreService", [], {

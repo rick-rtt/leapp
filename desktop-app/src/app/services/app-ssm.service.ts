@@ -3,7 +3,7 @@ import { AppService } from "./app.service";
 import { CredentialsInfo } from "@noovolari/leapp-core/models/credentials-info";
 import { LoggingService } from "@noovolari/leapp-core/services/logging-service";
 import { ExecuteService } from "@noovolari/leapp-core/services/execute-service";
-import { LeappCoreService } from "./leapp-core.service";
+import { AppProviderService } from "./app-provider.service";
 import { SsmService } from "@noovolari/leapp-core/services/ssm-service";
 
 @Injectable({
@@ -19,7 +19,7 @@ export class AppSsmService {
   private executeService: ExecuteService;
   private coreSsmService: SsmService;
 
-  constructor(private appService: AppService, private leappCoreService: LeappCoreService) {
+  constructor(private appService: AppService, private leappCoreService: AppProviderService) {
     this.coreSsmService = leappCoreService.ssmService;
     this.loggingService = leappCoreService.loggingService;
     this.executeService = leappCoreService.executeService;
