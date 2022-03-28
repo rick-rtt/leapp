@@ -1,6 +1,6 @@
 import { LeappCommand } from "../../leapp-command";
 import { Config } from "@oclif/core/lib/config/config";
-import { IdpUrl } from "@noovolari/leapp-core/models/IdpUrl";
+import { IdpUrl } from "@noovolari/leapp-core/models/idp-url";
 
 export default class EditIdpUrl extends LeappCommand {
   static description = "Edit an identity provider URL";

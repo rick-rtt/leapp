@@ -5,13 +5,13 @@ import { AwsIamRoleChainedSession } from "../models/aws-iam-role-chained-session
 import { AwsNamedProfile } from "../models/aws-named-profile";
 import { AwsSsoIntegration } from "../models/aws-sso-integration";
 import { constants } from "../models/constants";
-import Segment from "../models/Segment";
+import Segment from "../models/segment";
 import { Session } from "../models/session";
 import { SessionStatus } from "../models/session-status";
 import { SessionType } from "../models/session-type";
 import { Workspace } from "../models/workspace";
 import { FileService } from "./file-service";
-import { IdpUrl } from "../models/IdpUrl";
+import { IdpUrl } from "../models/idp-url";
 import * as uuid from "uuid";
 import Folder from "../models/folder";
 

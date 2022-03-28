@@ -1,7 +1,7 @@
 import { LeappCommand } from "../../leapp-command";
 import { Config } from "@oclif/core/lib/config/config";
 import { Session } from "@noovolari/leapp-core/models/session";
-import { IdpUrl } from "@noovolari/leapp-core/models/IdpUrl";
+import { IdpUrl } from "@noovolari/leapp-core/models/idp-url";
 
 export default class DeleteIdpUrl extends LeappCommand {
   static description = "Delete an identity provider URL";
