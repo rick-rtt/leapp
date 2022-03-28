@@ -9,7 +9,7 @@
   "bugs": "https://github.com/Noovolari/leapp/issues",
   "dependencies": {
     "@babel/plugin-proposal-decorators": "^7.16.5",
-    "@noovolari/leapp-core": "^0.1.96 add",
+    "@noovolari/leapp-core": "0.1.96",
     "@oclif/core": "1.6.0",
     "@oclif/plugin-help": "^5.1.12",
     "@types/inquirer": "^8.2.0",
@@ -76,7 +76,10 @@
     "typescript": "4.5.5"
   },
   "jest": {
-    "testTimeout": 10000
+    "testTimeout": 10000,
+    "collectCoverageFrom": [
+      "src/**/{!(cli-native-service|leapp-cli-service),}.ts"
+    ]
   },
   "dirname": "oex",
   "engines": {
