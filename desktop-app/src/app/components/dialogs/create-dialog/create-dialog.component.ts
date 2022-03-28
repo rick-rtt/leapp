@@ -256,11 +256,11 @@ export class CreateDialogComponent implements OnInit {
    *
    */
   openAccessStrategyDocumentation(): void {
-    let url = "https://docs.leapp.cloud/configuring-session/configure-aws-iam-role-federated/";
+    let url = "https://docs.leapp.cloud/latest/configuring-session/configure-aws-iam-role-federated/";
     if (this.provider === SessionType.awsIamRoleChained) {
-      url = "https://docs.leapp.cloud/configuring-session/configure-aws-iam-role-chained/";
+      url = "https://docs.leapp.cloud/latest/configuring-session/configure-aws-iam-role-chained/";
     } else if (this.provider === SessionType.awsIamUser) {
-      url = "https://docs.leapp.cloud/configuring-session/configure-aws-iam-user/";
+      url = "https://docs.leapp.cloud/latest/configuring-session/configure-aws-iam-user/";
     }
     this.windowService.openExternalUrl(url);
   }
@@ -303,7 +303,12 @@ export class CreateDialogComponent implements OnInit {
       case SessionType.alibaba:
         return "alibaba.png";
       default:
-        return "aws-logo.svg";
+        return `aws${
+          this.repository.getColorTheme() === constants.darkTheme ||
+          (this.repository.getColorTheme() === constants.systemDefaultTheme && this.appService.isDarkMode())
+            ? "-dark"
+            : ""
+        }.png`;
     }
   }
 
