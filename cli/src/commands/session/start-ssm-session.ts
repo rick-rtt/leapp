@@ -1,7 +1,6 @@
 import { LeappCommand } from "../../leapp-command";
 import { Config } from "@oclif/core/lib/config/config";
 import { Session } from "@noovolari/leapp-core/models/session";
-import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
 import { AwsSessionService } from "@noovolari/leapp-core/services/session/aws/aws-session-service";
 import { CredentialsInfo } from "@noovolari/leapp-core/models/credentials-info";
 import { constants } from "@noovolari/leapp-core/models/constants";
@@ -30,11 +29,7 @@ export default class StartSsmSession extends LeappCommand {
   async selectSession(): Promise<Session> {
     const availableSessions = this.leappCliService.repository
       .getSessions()
-      .filter(
-        (session: Session) =>
-          session.status === SessionStatus.inactive &&
-          this.leappCliService.sessionFactory.getSessionService(session.type) instanceof AwsSessionService
-      );
+      .filter((session: Session) => this.leappCliService.sessionFactory.getSessionService(session.type) instanceof AwsSessionService);
     if (availableSessions.length === 0) {
       throw new Error("no sessions available");
     }
@@ -70,8 +65,7 @@ export default class StartSsmSession extends LeappCommand {
   }
 
   async selectSsmInstance(credentials: CredentialsInfo, region: string): Promise<string> {
-    const ssmService = this.leappCliService.ssmService;
-    const availableInstances = await ssmService.getSsmInstances(credentials, region);
+    const availableInstances = await this.leappCliService.ssmService.getSsmInstances(credentials, region);
     const answer: any = await this.leappCliService.inquirer.prompt([
       {
         name: "selectedInstance",
