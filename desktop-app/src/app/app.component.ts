@@ -104,7 +104,7 @@ export class AppComponent implements OnInit {
     // Prevent Dev Tool to show on production mode
     this.windowService.blockDevToolInProductionMode();
 
-    // Create folders if missing
+    // Create folders and files if missing
     this.updaterService.createFoldersIfMissing();
 
     // Before retrieving an actual copy of the workspace we
