@@ -1,4 +1,4 @@
-import { describe, test, expect, jest } from "@jest/globals";
+import { beforeEach, describe, test, expect, jest } from "@jest/globals";
 import { SsmService } from "./ssm-service";
 import { LoggingService } from "./logging-service";
 import { ExecuteService } from "./execute-service";
@@ -15,8 +15,16 @@ describe("SsmService", () => {
   let setConfig;
 
   beforeEach(() => {
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    credentialInfo = { sessionToken: { aws_access_key_id: "123", aws_secret_access_key: "345", aws_session_token: "678" } };
+    credentialInfo = {
+      sessionToken: {
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        aws_access_key_id: "123",
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        aws_secret_access_key: "345",
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        aws_session_token: "678",
+      },
+    };
 
     mockedCallback = jest.fn(() => {});
     setConfig = jest.spyOn(SsmService, "setConfig");
@@ -102,7 +110,8 @@ describe("SsmService", () => {
       expect(executeService.getQuote).toHaveBeenCalled();
       expect(executeService.openTerminal).toHaveBeenCalledWith(
         `aws ssm start-session --region ${region} --target ${quote}${instanceId}${quote}`,
-        env
+        env,
+        undefined
       );
       done();
     }, 100);

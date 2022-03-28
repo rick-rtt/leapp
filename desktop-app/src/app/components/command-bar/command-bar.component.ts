@@ -7,7 +7,7 @@ import { FormControl, FormGroup } from "@angular/forms";
 import { BehaviorSubject } from "rxjs";
 import { globalOrderingFilter } from "../sessions/sessions.component";
 import { Session } from "@noovolari/leapp-core/models/session";
-import Segment, { GlobalFilters } from "@noovolari/leapp-core/models/Segment";
+import Segment, { GlobalFilters } from "@noovolari/leapp-core/models/segment";
 import { SessionType } from "@noovolari/leapp-core/models/session-type";
 import { WorkspaceService } from "@noovolari/leapp-core/services/workspace-service";
 import { syncAllEvent } from "../integration-bar/integration-bar.component";

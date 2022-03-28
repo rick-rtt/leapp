@@ -2,7 +2,7 @@ import { SessionFactory } from "./session-factory";
 import { Repository } from "./repository";
 import * as uuid from "uuid";
 import { Session } from "../models/session";
-import { IdpUrl } from "../models/IdpUrl";
+import { IdpUrl } from "../models/idp-url";
 import { AwsIamRoleFederatedSession } from "../models/aws-iam-role-federated-session";
 
 export class IdpUrlsService {

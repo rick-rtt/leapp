@@ -15,7 +15,7 @@ import { ColumnDialogComponent } from "../dialogs/column-dialog/column-dialog.co
 import { BehaviorSubject } from "rxjs";
 import { SessionCardComponent } from "./session-card/session-card.component";
 import { Session } from "@noovolari/leapp-core/models/session";
-import { GlobalFilters } from "@noovolari/leapp-core/models/Segment";
+import { GlobalFilters } from "@noovolari/leapp-core/models/segment";
 import { WorkspaceService } from "@noovolari/leapp-core/services/workspace-service";
 import { AppProviderService } from "../../services/app-provider.service";
 import { AwsCoreService } from "@noovolari/leapp-core/services/aws-core-service";
