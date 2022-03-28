@@ -69,6 +69,7 @@ export class SideBarComponent implements OnInit, OnDestroy {
   }
 
   resetFilters(): void {
+    document.querySelector(".sessions").classList.remove("filtered");
     this.showAll = true;
     this.showPinned = false;
     this.selectedS.forEach((s) => (s.selected = false));

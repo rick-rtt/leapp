@@ -31,11 +31,15 @@ export class Repository {
     this._workspace = value;
   }
 
-  reloadWorkspace() {
-    const workspaceJSON = this.fileService.decryptText(
-      this.fileService.readFileSync(this.nativeService.os.homedir() + "/" + constants.lockFileDestination)
-    );
-    this._workspace = deserialize(Workspace, workspaceJSON);
+  reloadWorkspace(): void {
+    try {
+      const workspaceJSON = this.fileService.decryptText(
+        this.fileService.readFileSync(this.nativeService.os.homedir() + "/" + constants.lockFileDestination)
+      );
+      this._workspace = deserialize(Workspace, workspaceJSON);
+    } catch (_) {
+      this._workspace = new Workspace();
+    }
   }
 
   getWorkspace(): Workspace {
