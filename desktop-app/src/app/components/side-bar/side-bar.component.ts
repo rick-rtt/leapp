@@ -69,6 +69,7 @@ export class SideBarComponent implements OnInit, OnDestroy {
   }
 
   resetFilters(): void {
+    document.querySelector('.sessions').classList.remove("filtered");
     this.showAll = true;
     this.showPinned = false;
     this.selectedS.forEach((s) => (s.selected = false));
@@ -85,6 +86,7 @@ export class SideBarComponent implements OnInit, OnDestroy {
     globalFilteredSessions.next(
       this.workspaceService.sessions.filter((s: Session) => this.repository.getWorkspace().pinned.indexOf(s.sessionId) !== -1)
     );
+
   }
 
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
