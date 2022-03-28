@@ -3,7 +3,7 @@ import { globalFilteredSessions, globalHasFilter, globalResetFilter, globalSegme
 import { BehaviorSubject } from "rxjs";
 import { BsModalRef, BsModalService } from "ngx-bootstrap/modal";
 import { ConfirmationDialogComponent } from "../dialogs/confirmation-dialog/confirmation-dialog.component";
-import Segment from "@noovolari/leapp-core/models/Segment";
+import Segment from "@noovolari/leapp-core/models/segment";
 import Folder from "@noovolari/leapp-core/models/folder";
 import { WorkspaceService } from "@noovolari/leapp-core/services/workspace-service";
 import { Session } from "@noovolari/leapp-core/models/session";

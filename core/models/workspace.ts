@@ -1,5 +1,5 @@
 import { AwsNamedProfile } from "./aws-named-profile";
-import { IdpUrl } from "./IdpUrl";
+import { IdpUrl } from "./idp-url";
 import { Session } from "./session";
 import * as uuid from "uuid";
 import "reflect-metadata";
@@ -7,9 +7,7 @@ import { Type } from "class-transformer";
 import { constants } from "./constants";
 import { AwsSsoIntegration } from "./aws-sso-integration";
 import Folder from "./folder";
-import Segment from "./Segment";
-
-//TODO: Check required and optional keys for every object
+import Segment from "./segment";
 
 export class Workspace {
   @Type(() => Session)
