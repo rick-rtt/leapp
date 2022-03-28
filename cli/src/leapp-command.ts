@@ -11,7 +11,7 @@ export abstract class LeappCommand extends Command {
     this.leappCliService.awsSsoRoleService.setAwsIntegrationDelegate(this.leappCliService.awsSsoIntegrationService);
     const isDesktopAppRunning = await this.leappCliService.remoteProceduresClient.isDesktopAppRunning();
     if (!isDesktopAppRunning) {
-      this.error("Leapp app must be running to use this CLI");
+      this.error("Leapp app must be running to use this CLI. You can download it here: https://www.leapp.cloud/releases");
     }
   }
 }
