@@ -44,7 +44,7 @@ export class AppSsmService {
    * @returns - {Observable<SsmResult>} - return the list of instances capable of SSM in the selected region
    */
   async getSsmInstances(credentials: CredentialsInfo, region: string): Promise<any> {
-    return await this.coreSsmService.getSsmInstances(credentials, region, this.appService.setFilteringForEc2Calls);
+    return await this.coreSsmService.getSsmInstances(credentials, region, () => this.appService.setFilteringForEc2Calls());
   }
 
   /**
