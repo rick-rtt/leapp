@@ -2,6 +2,97 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.10.0](https://github.com/Noovolari/leapp/compare/v0.9.0...v0.10.0) (2022-03-10)
+
+
+### Features
+
+* [EC2 connect through AWS SSM](https://docs.leapp.cloud/0.10.0/built-in-features/aws-ec2-connect/): added support for iTerm2 on macOS. Thanks to [@jgrumboe](https://github.com/jgrumboe) for the [Pull Request #184](https://github.com/Noovolari/leapp/pull/184)! [#176](https://github.com/Noovolari/leapp/issues/176) [#62](https://github.com/Noovolari/leapp/issues/62)
+* now it is possible to open an AWS Web Console from a Leapp Session ([337cff2](https://github.com/Noovolari/leapp/commit/337cff2b81260e7473c6766667d9e78b66f84a24)) [#189](https://github.com/Noovolari/leapp/issues/189) [#13](https://github.com/Noovolari/leapp/issues/13)
+* added Dark Theme mode! [#224](https://github.com/Noovolari/leapp/issues/224)
+* add support for adfs as a saml identity provider ([#235](https://github.com/Noovolari/leapp/issues/235)) ([17bb29b](https://github.com/Noovolari/leapp/commit/17bb29b040f72d37f83491c5d1e1f6cc708edbab)) [#200](https://github.com/Noovolari/leapp/issues/200)
+
+### Bug Fixes
+
+* fixed retrocompatibility logic that reverted session's profile to default ([dbff233](https://github.com/Noovolari/leapp/commit/dbff233f7a94ad1062fe8f01b60cdabfba6b1d09)) [#202](https://github.com/Noovolari/leapp/issues/202)
+* fixed column filtering bug when the values aren't changed ([76b0a2f](https://github.com/Noovolari/leapp/commit/76b0a2fb51710bb6e01a2844a09145fff787f97c)) [#237](https://github.com/Noovolari/leapp/issues/237)
+* fixed a misbehavior where all SSM accessible instances were not showing Tag:Name [#232](https://github.com/Noovolari/leapp/issues/232)
+* AWS IAM Role Federated login window can now be moved [#191](https://github.com/Noovolari/leapp/issues/191)
+* fixed AWS SSO error after session expired [#108](https://github.com/Noovolari/leapp/issues/108)
+* check for credential file with correct path for window OS ([a45bd92](https://github.com/Noovolari/leapp/commit/a45bd924a30c3b1b1fa18d61f98a560ef422eff1))
+* added logout from federated role sessions, fixed ability to move the login window ([9b9264d](https://github.com/Noovolari/leapp/commit/9b9264dc65b12aeb3d05d2b600d1117b7dcab36c))
+* removed the ability to do double chained account in create modal ([64589b4](https://github.com/Noovolari/leapp/commit/64589b45d40618e441d6b14bdc7c43e9ec6ddaf0))
+
+Thank you! A huge shout out to the community members who contributed to this release of Leapp!
+
+### [0.9.0](https://github.com/Noovolari/leapp/compare/v0.8.1...v0.9.0) (2022-02-24)
+
+### Features
+
+* brand new UX/UI! ([7d8e2a9](https://github.com/Noovolari/leapp/commit/7d8e2a949edb6671885715cfb34932e7268c265b))
+* new Segment-based Session filtering ([7d8e2a9](https://github.com/Noovolari/leapp/commit/7d8e2a949edb6671885715cfb34932e7268c265b))
+
+### Bug Fixes
+
+* Maintain IAM Role Chained Configurations based on SSO Assumer session ([#209](https://github.com/Noovolari/leapp/issues/209)) ([7d8e2a9](https://github.com/Noovolari/leapp/commit/7d8e2a949edb6671885715cfb34932e7268c265b))
+* gpu_init on WSL2 - Leapp_0.8.1_amd64.deb ([#217](https://github.com/Noovolari/leapp/issues/217)) ([7d8e2a9](https://github.com/Noovolari/leapp/commit/7d8e2a949edb6671885715cfb34932e7268c265b))
+* AWS Session Expiration Issue ([#220](https://github.com/Noovolari/leapp/issues/220)) ([7d8e2a9](https://github.com/Noovolari/leapp/commit/7d8e2a949edb6671885715cfb34932e7268c265b))
+* Enhancement - easier access to commonly used profiles ([#214](https://github.com/Noovolari/leapp/issues/214))
+* Add grouping and/or prefix on integration name for session overview ([#203](https://github.com/Noovolari/leapp/issues/203))
+* Cancel connecting ([#199](https://github.com/Noovolari/leapp/issues/199))
+* The Leapp icon is larger than all other icons in the MacOSX Dock ([#196](https://github.com/Noovolari/leapp/issues/196))
+* Add a search option in the SSM session panel ([#87](https://github.com/Noovolari/leapp/issues/87))
+* SSO Sync session somewhere on the front page ([#181](https://github.com/Noovolari/leapp/issues/181))
+* Make the window resizable ([#43](https://github.com/Noovolari/leapp/issues/43))
+* Enhancement - easier access to commonly used profiles ([#214](https://github.com/Noovolari/leapp/issues/214))
+* Add grouping and/or prefix on integration name for session overview ([#203](https://github.com/Noovolari/leapp/issues/203))
+
+Thank you! A huge shout out to the community members who contributed to this release of Leapp!
+
+@dnsmichi #215 #216
+
+### [0.8.1](https://github.com/Noovolari/leapp/compare/v0.8.0...v0.8.1) (2022-01-25)
+
+### Features
+
+* added github action for bumping homebrew formula ([cc30a12](https://github.com/Noovolari/leapp/commit/cc30a12c37fbb4ae35a7c3fdbc147c75f8d28a86))
+
+### Bug Fixes
+
+* **LEAP-371:** fixed aws sso sessions synchronization logic ([fc09fce](https://github.com/Noovolari/leapp/commit/fc09fcedc51141c52159bd82a7a47adda870a1f3))
+* removed unwanted and unused pages from docs sitemap ([3d3d5b4](https://github.com/Noovolari/leapp/commit/3d3d5b4618910bc0e7049cdd87619b48a55ec417))
+
+### [0.8.0](https://github.com/Noovolari/leapp/compare/v0.7.4...v0.8.0) (2021-11-26)
+
+### Features
+
+* Added support for multiple AWS Single Sign-On through Integrations Menu
+
+### Bug Fixes
+
+* added await statement in front of AwsSsoIntegrationService login saveSecret ([67bdc18](https://github.com/Noovolari/leapp/commit/67bdc185d7e63cd14ac17ac06a8d2e21b5af33be))
+* added backslashes for windows path in updater service ([63ec0e5](https://github.com/Noovolari/leapp/commit/63ec0e555f97945af5ca6696012cc7ef722077ac))
+* fixed log path ([3c09da8](https://github.com/Noovolari/leapp/commit/3c09da8d4a91c979f49be275b0ea57dda49dac29))
+* sso role sessions maintain their region and profiles on sync ([40f023a](https://github.com/Noovolari/leapp/commit/40f023adb950070fe4c52ff4d53a7c272467cc84))
+* added check for creating .Leapp .aws directories if missing [#190](https://github.com/Noovolari/leapp/issues/190) ([25e720e](https://github.com/Noovolari/leapp/commit/25e720e3fc4eb4e329cbc604e7fa19ebd8fd7ba5))
+
+### [0.7.4](https://github.com/Noovolari/leapp/compare/v0.7.3...v0.7.4) (2021-11-15)
+
+### Features
+
+* added Sponsorship for Noovolari
+* updated electron-rebuild version
+* updated Electron and Angular versions, enabling U2F support for AWS Single Sign-On
+* implemented AWS SSO browser authentication logic
+* implemented AWS SSO OIDC logic for better concurrency management
+* add installation instructions for [Homebrew and Linuxbrew](https://docs.leapp.cloud/latest/#macos-homebrew-linux-linuxbrew) (#180) - @deiga
+
+### Bug Fixes
+
+* hiding AWS SSO BrowserWindow when login success is catched (#185)
+* added a check if the credential file not exists it creates it
+* now all named profiles sections are removed from credentials file upon logout
+
 ### [0.7.3](https://github.com/Noovolari/leapp/compare/v0.7.2...v0.7.3) (2021-10-04)
 
 ### Bug Fixes
