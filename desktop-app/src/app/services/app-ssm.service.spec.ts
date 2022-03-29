@@ -37,11 +37,10 @@ describe("SsmService", () => {
 
   it("should call getSsmInstances on core method passing a credential info object and a region", () => {
     const spyGetSsmInstances = spyOn(leappCoreService.ssmService, "getSsmInstances").and.callThrough();
-    const appService: AppService = TestBed.inject(AppService);
     const credentials: CredentialsInfo = { sessionToken: "abcdefghi" };
 
     service.getSsmInstances(credentials, "eu-west-1");
-    expect(spyGetSsmInstances).toHaveBeenCalledOnceWith(credentials, "eu-west-1", appService.setFilteringForEc2Calls);
+    expect(spyGetSsmInstances).toHaveBeenCalled();
   });
 
   it("should call startSession on core method passing a credential info object, an instance id and a region", () => {
