@@ -62,7 +62,6 @@ export class AppComponent implements OnInit {
     leappCoreService.awsAuthenticationService = awsAuthenticationService;
     leappCoreService.verificationWindowService = verificationWindowService;
     leappCoreService.windowService = windowService;
-    leappCoreService.repository.createWorkspace();
 
     this.repository = leappCoreService.repository;
     this.fileService = leappCoreService.fileService;
@@ -117,9 +116,8 @@ export class AppComponent implements OnInit {
       await this.retroCompatibilityService.adaptIntegrationPatch();
     }
 
-    let workspace;
     try {
-      workspace = this.repository.getWorkspace();
+      this.repository.getWorkspace();
     } catch {
       // eslint-disable-next-line max-len
       throw new LeappParseError(this, "We had trouble parsing your Leapp-lock.json file. It is either corrupt, obsolete, or with an error.");
@@ -127,9 +125,6 @@ export class AppComponent implements OnInit {
 
     // Check the existence of a pre-Leapp credential file and make a backup
     this.showCredentialBackupMessageIfNeeded();
-
-    console.log(this.workspaceService.sessions);
-    console.log(workspace.sessions);
 
     // All sessions start stopped when app is launched
     if (this.workspaceService.sessions.length > 0) {

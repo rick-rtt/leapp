@@ -432,14 +432,12 @@ export class SessionCardComponent implements OnInit {
   // TODO: we have to call changeNamedProfile
   async changeProfile(): Promise<void> {
     if (this.selectedProfile) {
-      console.log("", this.selectedProfile);
       try {
         this.repository.getProfileName(this.selectedProfile.value);
       } catch (e) {
         this.selectedProfile.value = this.leappCoreService.namedProfileService.createNamedProfile(this.selectedProfile.label).id;
       }
 
-      console.log("", this.selectedProfile);
       this.leappCoreService.namedProfileService.changeNamedProfile(this.session, this.selectedProfile.value);
 
       this.messageToasterService.toast("Profile has been changed!", ToastLevel.success, "Profile changed!");
