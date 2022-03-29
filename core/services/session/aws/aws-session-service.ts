@@ -16,7 +16,7 @@ export abstract class AwsSessionService extends SessionService {
   }
 
   getDependantSessions(sessionId: string): Session[] {
-    return this.repository.listIamRoleChained(this.sessionNotifier.getSessionById(sessionId));
+    return this.repository.listIamRoleChained(this.repository.getSessionById(sessionId));
   }
 
   async start(sessionId: string): Promise<void> {
@@ -24,7 +24,7 @@ export abstract class AwsSessionService extends SessionService {
       if (this.isThereAnotherPendingSessionWithSameNamedProfile(sessionId)) {
         throw new LeappBaseError("Pending session with same named profile", this, LoggerLevel.info, "Pending session with same named profile");
       }
-      this.stopAllWithSameNameProfile(sessionId);
+      await this.stopAllWithSameNameProfile(sessionId);
       this.sessionLoading(sessionId);
       const credentialsInfo = await this.generateCredentials(sessionId);
       await this.applyCredentials(sessionId, credentialsInfo);
@@ -66,7 +66,6 @@ export abstract class AwsSessionService extends SessionService {
         this.repository.deleteSession(sess.sessionId);
       }
       this.repository.deleteSession(sessionId);
-
       this.sessionNotifier.setSessions(this.repository.getSessions());
       await this.removeSecrets(sessionId);
     } catch (error) {
@@ -105,18 +104,19 @@ export abstract class AwsSessionService extends SessionService {
     return false;
   }
 
-  private stopAllWithSameNameProfile(sessionId: string) {
+  private async stopAllWithSameNameProfile(sessionId: string): Promise<void> {
     // Get profile to check
     const session = this.repository.getSessionById(sessionId);
     const profileId = (session as any).profileId;
     // Get all active sessions
     const activeSessions = this.repository.listActive();
     // Stop all that shares the same profile
-    activeSessions.forEach((sess) => {
+    for (let i = 0; i < activeSessions.length; i++) {
+      const sess = activeSessions[i];
       if ((sess as any).profileId === profileId) {
-        this.stop(sess.sessionId).then((_) => {});
+        await this.stop(sess.sessionId);
       }
-    });
+    }
   }
 
   abstract getAccountNumberFromCallerIdentity(session: Session): Promise<string>;

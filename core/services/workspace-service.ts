@@ -28,10 +28,12 @@ export class WorkspaceService implements ISessionNotifier {
     this.sessions$.next(sessions);
   }
 
+  // TODO: probably it could be removed as it is unused
   getSessions(): Session[] {
     return this.sessions$.getValue();
   }
 
+  // TODO: probably it could be removed as it is unused
   getSessionById(sessionId: string): Session {
     const sessionFiltered = this.sessions.find((session) => session.sessionId === sessionId);
     return sessionFiltered ? sessionFiltered : null;
@@ -46,6 +48,7 @@ export class WorkspaceService implements ISessionNotifier {
     this.sessions = [...this.sessions, session];
   }
 
+  // TODO: probably it could be removed as it is unused
   deleteSession(sessionId: string): void {
     this.sessions = this.sessions.filter((session) => session.sessionId !== sessionId);
   }
