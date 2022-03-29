@@ -155,6 +155,6 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
     sessions[index] = currentSession;
 
     this.repository.updateSessions(sessions);
-    this.sessionNotifier.setSessions([...sessions]);
+    this.sessionNotifier?.setSessions([...sessions]);
   }
 }

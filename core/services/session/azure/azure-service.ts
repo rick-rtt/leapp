@@ -116,7 +116,7 @@ export class AzureService extends SessionService {
       //TODO: check if session is currently active before trying to stop it?
       await this.stop(sessionId);
       this.repository.deleteSession(sessionId);
-      this.sessionNotifier.deleteSession(sessionId);
+      this.sessionNotifier?.deleteSession(sessionId);
     } catch (error) {
       throw new LeappParseError(this, error.message);
     }

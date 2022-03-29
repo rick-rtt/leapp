@@ -430,7 +430,6 @@ export class SessionCardComponent implements OnInit {
     return profileName;
   }
 
-  // TODO: we have to call changeNamedProfile
   async changeProfile(): Promise<void> {
     if (this.selectedProfile) {
       try {

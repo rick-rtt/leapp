@@ -195,8 +195,8 @@ export class AwsIamUserService extends AwsSessionService {
   ): Promise<CredentialsInfo> {
     return new Promise((resolve, reject) => {
       // TODO: think about timeout management
-      // TODO: handle condition in which mfaCodePrompter is null
-      // TODO: convert promptForMFACode into an async function (without callback...)!
+      //  handle condition in which mfaCodePrompter is null
+      //  convert promptForMFACode into an async function (without callback...)!
       this.mfaCodePrompter.promptForMFACode(session.sessionName, (value: string) => {
         if (value !== constants.confirmClosed) {
           params.SerialNumber = (session as AwsIamUserSession).mfaDevice;
@@ -263,6 +263,6 @@ export class AwsIamUserService extends AwsSessionService {
     sessions[index] = currentSession;
 
     this.repository.updateSessions(sessions);
-    this.sessionNotifier.setSessions([...sessions]);
+    this.sessionNotifier?.setSessions([...sessions]);
   }
 }

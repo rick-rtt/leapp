@@ -21,7 +21,7 @@ export abstract class SessionService {
       this.repository.updateSessions(sessions);
 
       if (this.sessionNotifier) {
-        this.sessionNotifier.setSessions([...sessions]);
+        this.sessionNotifier?.setSessions([...sessions]);
       }
     }
   }

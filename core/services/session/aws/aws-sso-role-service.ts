@@ -95,7 +95,7 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
   }
 
   async catchClosingBrowserWindow(): Promise<void> {
-    const sessions = this.sessionNotifier.listAwsSsoRoles();
+    const sessions = this.repository.listAwsSsoRoles();
     for (let i = 0; i < sessions.length; i++) {
       // Stop session
       const currentSession = sessions[i];
@@ -194,6 +194,6 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
     sessions[index] = currentSession;
 
     this.repository.updateSessions(sessions);
-    this.sessionNotifier.setSessions([...sessions]);
+    this.sessionNotifier?.setSessions([...sessions]);
   }
 }

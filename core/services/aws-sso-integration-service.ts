@@ -56,7 +56,6 @@ export class AwsSsoIntegrationService {
     return portalUrlValidationRegex.test(portalUrl) ? true : "Invalid portal URL";
   }
 
-  // TODO: understand if we want to use an object that contains params
   createIntegration(creationParams: IntegrationCreationParams): void {
     this.repository.addAwsSsoIntegration(creationParams.portalUrl, creationParams.alias, creationParams.region, creationParams.browserOpening);
   }
@@ -367,8 +366,8 @@ export class AwsSsoIntegrationService {
 
   private findOldSession(accountInfo: SSO.AccountInfo, accountRole: SSO.RoleInfo): { region: string; profileId: string } {
     //TODO: use map and filter in order to make this method more readable
-    for (let i = 0; i < this.sessionNotifier.getSessions().length; i++) {
-      const sess = this.sessionNotifier.getSessions()[i];
+    for (let i = 0; i < this.repository.getSessions().length; i++) {
+      const sess = this.repository.getSessions()[i];
 
       if (sess.type === SessionType.awsSsoRole) {
         if (

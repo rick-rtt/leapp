@@ -16,6 +16,7 @@ export class RegionsService {
 
     session.region = newRegion;
     this.repository.updateSession(session.sessionId, session);
+    // TODO: it should call iSessionNotifier, not workspaceService
     this.workspaceService.updateSession(session.sessionId, session);
 
     if (wasActive) {

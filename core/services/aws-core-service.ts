@@ -3,6 +3,7 @@ import { Session } from "../models/session";
 import { INativeService } from "../interfaces/i-native-service";
 import { LoggerLevel } from "./logging-service";
 
+// TODO: rename it. This naming is ambiguous.
 export class AwsCoreService {
   static stsEndpointsPerRegion: Map<string, string> = new Map([
     ["af-south-1", "https://sts.af-south-1.amazonaws.com"],
