@@ -14,6 +14,7 @@
 a { color: $text-color; }
 
 .option-bar {
+  cursor: initial;
   padding: $standard-padding $standard-padding $standard-padding 0;
   position: fixed;
   display: flex;
