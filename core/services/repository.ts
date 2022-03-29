@@ -172,6 +172,7 @@ export class Repository {
   }
 
   // IDP URLS
+
   getIdpUrl(idpUrlId: string): string | null {
     const workspace = this.getWorkspace();
     const idpUrlFiltered = workspace.idpUrls.find((url) => url.id === idpUrlId);
@@ -255,6 +256,7 @@ export class Repository {
   }
 
   // AWS SSO INTEGRATION
+
   listAwsSsoIntegrations(): AwsSsoIntegration[] {
     const workspace = this.getWorkspace();
     return workspace.awsSsoIntegrations;
@@ -315,6 +317,7 @@ export class Repository {
   }
 
   // PROXY CONFIGURATION
+
   getProxyConfiguration(): any {
     return this.getWorkspace().proxyConfiguration;
   }
@@ -332,6 +335,7 @@ export class Repository {
   }
 
   // SEGMENTS
+
   getSegments(): Segment[] {
     const workspace = this.getWorkspace();
     return workspace.segments;
@@ -358,6 +362,7 @@ export class Repository {
   }
 
   // FOLDERS
+
   getFolders(): Folder[] {
     const workspace = this.getWorkspace();
     return workspace.folders;
@@ -370,6 +375,7 @@ export class Repository {
   }
 
   // PINS
+
   pinSession(session: Session): void {
     const workspace = this.getWorkspace();
     if (workspace.pinned.indexOf(session.sessionId) === -1) {
@@ -388,6 +394,7 @@ export class Repository {
   }
 
   // MACOS TERMINAL
+
   updateMacOsTerminal(macOsTerminal: string): void {
     const workspace = this.getWorkspace();
     workspace.macOsTerminal = macOsTerminal;

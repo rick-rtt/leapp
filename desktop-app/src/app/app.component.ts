@@ -61,7 +61,6 @@ export class AppComponent implements OnInit {
     leappCoreService.awsAuthenticationService = awsAuthenticationService;
     leappCoreService.verificationWindowService = verificationWindowService;
     leappCoreService.windowService = windowService;
-    leappCoreService.repository.createWorkspace();
 
     this.repository = leappCoreService.repository;
     this.fileService = leappCoreService.fileService;
