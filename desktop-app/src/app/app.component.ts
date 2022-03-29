@@ -11,7 +11,6 @@ import compareVersions from "compare-versions";
 import { LoggerLevel, LoggingService } from "@noovolari/leapp-core/services/logging-service";
 import { Repository } from "@noovolari/leapp-core/services/repository";
 import { WorkspaceService } from "@noovolari/leapp-core/services/workspace-service";
-import { LeappParseError } from "@noovolari/leapp-core/errors/leapp-parse-error";
 import { TimerService } from "@noovolari/leapp-core/services/timer-service";
 import { constants } from "@noovolari/leapp-core/models/constants";
 import { FileService } from "@noovolari/leapp-core/services/file-service";
@@ -114,13 +113,6 @@ export class AppComponent implements OnInit {
 
     if (this.retroCompatibilityService.isIntegrationPatchNecessary()) {
       await this.retroCompatibilityService.adaptIntegrationPatch();
-    }
-
-    try {
-      this.repository.getWorkspace();
-    } catch {
-      // eslint-disable-next-line max-len
-      throw new LeappParseError(this, "We had trouble parsing your Leapp-lock.json file. It is either corrupt, obsolete, or with an error.");
     }
 
     // Check the existence of a pre-Leapp credential file and make a backup

@@ -33,6 +33,10 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
   private sessionServiceFactory: SessionFactory;
   private workspaceService: WorkspaceService;
 
+  private awsCliVersion: string;
+  private awsSsmPluginVersion: string;
+  private issueBody: string;
+
   constructor(
     private appService: AppService,
     private electronService: AppNativeService,
@@ -52,6 +56,7 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
       this.generateMenu();
     });
     this.generateMenu();
+    this.getMetadata();
   }
 
   getProfileId(session: Session): string {
@@ -63,21 +68,6 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
   }
 
   async generateMenu(): Promise<void> {
-    const awsCliVersion = await this.leappCoreService.executeService.execute("aws --version");
-    const awsSsmPluginVersion = await this.leappCoreService.executeService.execute("session-manager-plugin --version");
-    console.log(awsSsmPluginVersion);
-    const issueBody = `### Description:
-> Please include a detailed description of the issue (and an image or screen recording, if applicable)
-
-
-### Details:
-| Leapp Version | ${this.electronService.app.getVersion()} |
-| - | - |
-| SsmPluginVersion | ${awsSsmPluginVersion.replace(/(\r\n|\n|\r)/gm, "")} |
-| Platform | ${process.platform}|
-| Awscli | ${awsCliVersion}
-`;
-    console.log("AWS SSM Plugin version: " + awsSsmPluginVersion);
     let voices = [];
     const actives = this.repository.getSessions().filter((s) => s.status === SessionStatus.active || s.status === SessionStatus.pending);
     const allSessions = actives.concat(
@@ -175,8 +165,9 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
       {
         label: "Open Issue",
         type: "normal",
+        enabled: this.awsSsmPluginVersion && this.awsCliVersion && this.issueBody,
         click: () => {
-          this.windowService.openExternalUrl(`https://github.com/noovolari/leapp/issues/new?labels=bug&body=${encodeURIComponent(issueBody)}`);
+          this.windowService.openExternalUrl(`https://github.com/noovolari/leapp/issues/new?labels=bug&body=${encodeURIComponent(this.issueBody)}`);
         },
       },
       { type: "separator" },
@@ -257,5 +248,30 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscribed.unsubscribe();
+  }
+
+  private getMetadata() {
+    if (!this.awsCliVersion) {
+      this.leappCoreService.executeService.execute("aws --version").then((awsCliVersion: string) => {
+        this.awsCliVersion = awsCliVersion;
+        if (!this.awsSsmPluginVersion) {
+          this.leappCoreService.executeService.execute("session-manager-plugin --version").then((ssmVersion: string) => {
+            this.awsSsmPluginVersion = ssmVersion.replace(/(\r\n|\n|\r)/gm, "");
+          });
+
+          this.issueBody = `### Description:
+> Please include a detailed description of the issue (and an image or screen recording, if applicable)
+
+
+### Details:
+| Leapp Version | ${this.electronService.app.getVersion()} |
+| - | - |
+| SsmPluginVersion | ${this.awsSsmPluginVersion} |
+| Platform | ${process.platform}|
+| Awscli | ${this.awsCliVersion}
+`;
+        }
+      });
+    }
   }
 }
