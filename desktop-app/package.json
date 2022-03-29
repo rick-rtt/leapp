@@ -7,6 +7,7 @@
   },
   "description": "Leapp is a Cross-Platform Cloud access App, built on top of Electron.",
   "main": "electron/dist/electron/main.js",
+  "homepage": "https://github.com/Noovolari/leapp",
   "scripts": {
     "clean": "gushio gushio/target-clean.js",
     "postinstall": "electron-builder install-app-deps",

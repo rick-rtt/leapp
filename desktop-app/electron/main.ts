@@ -117,6 +117,9 @@ const generateMainWindow = () => {
     ipc.on('resize-window', (evt, data) => {
       if(evt.sender.getOwnerBrowserWindow().id === win.id) {
         if (data.compactMode) {
+          // Double setSize/setMinimumSize here is to address a strange behavior between mac and windows,
+          // where the first is used by windows and the last by mac. If we don't put either the first or the last
+          // couple the behaviour is not consistent.
           win.setMinimumSize(560, 680);
           win.setSize(560, 680);
           win.setResizable(false);
