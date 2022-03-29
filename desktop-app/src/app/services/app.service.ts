@@ -48,7 +48,7 @@ export class AppService {
     }
   }
 
-  // TODO: get directly from electronService
+  // TODO: get directly from AppNativeService
   /**
    * Return the app object from node
    */
@@ -56,7 +56,7 @@ export class AppService {
     return this.electronService.app;
   }
 
-  // TODO: get directly from electronService
+  // TODO: get directly from AppNativeService
   getMenu(): any {
     return this.electronService.menu;
   }

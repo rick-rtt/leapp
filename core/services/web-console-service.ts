@@ -32,7 +32,6 @@ export class WebConsoleService {
       JSON.stringify(sessionStringJSON)
     )}`;
 
-    // TODO: fetch requires puppeteer... we should refactor this
     const res = await this.fetch(`${federationUrl}${queryParametersSigninToken}`);
     const response = await res.json();
 

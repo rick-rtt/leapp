@@ -56,7 +56,6 @@ export class AwsSsoIntegrationService {
     return portalUrlValidationRegex.test(portalUrl) ? true : "Invalid portal URL";
   }
 
-  // TODO: understand if we want to use an object that contains params
   createIntegration(creationParams: IntegrationCreationParams): void {
     this.repository.addAwsSsoIntegration(creationParams.portalUrl, creationParams.alias, creationParams.region, creationParams.browserOpening);
   }
