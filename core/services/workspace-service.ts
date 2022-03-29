@@ -48,11 +48,11 @@ export class WorkspaceService implements ISessionNotifier {
     this.sessions = [...this.sessions, session];
   }
 
-  // TODO: probably it could be removed as it is unused
   deleteSession(sessionId: string): void {
     this.sessions = this.sessions.filter((session) => session.sessionId !== sessionId);
   }
 
+  // TODO: probably it could be removed as it is unused
   getIntegrations(): AwsSsoIntegration[] {
     return this.integrations$.getValue();
   }
@@ -61,18 +61,22 @@ export class WorkspaceService implements ISessionNotifier {
     this.integrations$.next(integrations);
   }
 
+  // TODO: probably it could be removed as it is unused
   listPending(): Session[] {
     return this.sessions.length > 0 ? this.sessions.filter((session) => session.status === SessionStatus.pending) : [];
   }
 
+  // TODO: probably it could be removed as it is unused
   listActive(): Session[] {
     return this.sessions.length > 0 ? this.sessions.filter((session) => session.status === SessionStatus.active) : [];
   }
 
+  // TODO: probably it could be removed as it is unused
   listAwsSsoRoles(): Session[] {
     return this.sessions.length > 0 ? this.sessions.filter((session) => session.type === SessionType.awsSsoRole) : [];
   }
 
+  // TODO: probably it could be removed as it is unused
   listIamRoleChained(parentSession?: Session): Session[] {
     let childSession = this.sessions.length > 0 ? this.sessions.filter((session) => session.type === SessionType.awsIamRoleChained) : [];
     if (parentSession) {
@@ -81,10 +85,12 @@ export class WorkspaceService implements ISessionNotifier {
     return childSession;
   }
 
-  listInActive(): Session[] {
+  // TODO: probably it could be removed as it is unused
+  listInactive(): Session[] {
     return this.sessions.length > 0 ? this.sessions.filter((session) => session.status === SessionStatus.inactive) : [];
   }
 
+  // TODO: probably it could be removed as it is unused
   listAssumable(): Session[] {
     return this.sessions.length > 0
       ? this.sessions.filter((session) => session.type !== SessionType.azure && session.type !== SessionType.awsIamRoleChained)
