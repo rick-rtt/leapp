@@ -70,19 +70,14 @@ export class SideBarComponent implements OnInit, OnDestroy {
 
   resetFilters(): void {
     document.querySelector(".sessions").classList.remove("filtered");
-    this.showAll = true;
-    this.showPinned = false;
-    this.selectedS.forEach((s) => (s.selected = false));
+    sidebarHighlight.next({showAll: true, showPinned: false, selectedSegment: -1});
     globalFilteredSessions.next(this.workspaceService.sessions);
     globalHasFilter.next(false);
     globalResetFilter.next(true);
   }
 
   showOnlyPinned(): void {
-    this.showAll = false;
-    this.showPinned = true;
-    this.selectedS.forEach((s) => (s.selected = false));
-
+    sidebarHighlight.next({showAll: false, showPinned: true, selectedSegment: -1});
     globalFilteredSessions.next(
       this.workspaceService.sessions.filter((s: Session) => this.repository.getWorkspace().pinned.indexOf(s.sessionId) !== -1)
     );
@@ -93,13 +88,10 @@ export class SideBarComponent implements OnInit, OnDestroy {
     event.preventDefault();
     event.stopPropagation();
 
-    this.showAll = false;
-    this.showPinned = false;
-    this.selectedS.forEach((s) => (s.selected = false));
-
     const selectedIndex = this.selectedS.findIndex((s) => s.name === segment.name);
     this.selectedS[selectedIndex].selected = true;
-
+    document.querySelector(".sessions").classList.remove("option-bar-opened");
+    sidebarHighlight.next({showAll: false, showPinned: false, selectedSegment: selectedIndex});
     globalSegmentFilter.next(JSON.parse(JSON.stringify(segment)));
   }
 
