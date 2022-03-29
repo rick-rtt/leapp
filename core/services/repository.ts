@@ -19,7 +19,9 @@ export class Repository {
   // Private singleton workspace
   private _workspace: Workspace;
 
-  constructor(private nativeService: INativeService, private fileService: FileService) {}
+  constructor(private nativeService: INativeService, private fileService: FileService) {
+    this.createWorkspace();
+  }
 
   // WORKSPACE
 
@@ -32,14 +34,10 @@ export class Repository {
   }
 
   reloadWorkspace(): void {
-    try {
-      const workspaceJSON = this.fileService.decryptText(
-        this.fileService.readFileSync(this.nativeService.os.homedir() + "/" + constants.lockFileDestination)
-      );
-      this._workspace = deserialize(Workspace, workspaceJSON);
-    } catch (_) {
-      this._workspace = new Workspace();
-    }
+    const workspaceJSON = this.fileService.decryptText(
+      this.fileService.readFileSync(this.nativeService.os.homedir() + "/" + constants.lockFileDestination)
+    );
+    this._workspace = deserialize(Workspace, workspaceJSON);
   }
 
   getWorkspace(): Workspace {
