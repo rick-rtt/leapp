@@ -118,7 +118,7 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
   }
 
   async applyCredentials(sessionId: string, credentialsInfo: CredentialsInfo): Promise<void> {
-    const session = this.sessionNotifier.getSessionById(sessionId);
+    const session = this.repository.getSessionById(sessionId);
     const profileName = this.repository.getProfileName((session as AwsSsoRoleSession).profileId);
     const credentialObject = {};
     credentialObject[profileName] = {
@@ -134,7 +134,7 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
   }
 
   async deApplyCredentials(sessionId: string): Promise<void> {
-    const session = this.sessionNotifier.getSessionById(sessionId);
+    const session = this.repository.getSessionById(sessionId);
     const profileName = this.repository.getProfileName((session as AwsSsoRoleSession).profileId);
     const credentialsFile = await this.fileService.iniParseSync(this.awsCoreService.awsCredentialPath());
     delete credentialsFile[profileName];
@@ -142,7 +142,7 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
   }
 
   async generateCredentials(sessionId: string): Promise<CredentialsInfo> {
-    const session: AwsSsoRoleSession = this.sessionNotifier.getSessionById(sessionId) as AwsSsoRoleSession;
+    const session: AwsSsoRoleSession = this.repository.getSessionById(sessionId) as AwsSsoRoleSession;
     const awsSsoConfiguration = this.repository.getAwsSsoIntegration(session.awsSsoConfigurationId);
     const region = awsSsoConfiguration.region;
     const portalUrl = awsSsoConfiguration.portalUrl;

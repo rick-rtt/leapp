@@ -55,7 +55,7 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
   }
 
   async applyCredentials(sessionId: string, credentialsInfo: CredentialsInfo): Promise<void> {
-    const session = this.sessionNotifier.getSessionById(sessionId);
+    const session = this.repository.getSessionById(sessionId);
     const profileName = this.repository.getProfileName((session as AwsIamRoleFederatedSession).profileId);
     const credentialObject = {};
     credentialObject[profileName] = {
@@ -71,7 +71,7 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
   }
 
   async deApplyCredentials(sessionId: string): Promise<void> {
-    const session = this.sessionNotifier.getSessionById(sessionId);
+    const session = this.repository.getSessionById(sessionId);
     const profileName = this.repository.getProfileName((session as AwsIamRoleFederatedSession).profileId);
     const credentialsFile = await this.fileService.iniParseSync(this.awsCoreService.awsCredentialPath());
     delete credentialsFile[profileName];
@@ -80,7 +80,7 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
 
   async generateCredentials(sessionId: string): Promise<CredentialsInfo> {
     // Get the session in question
-    const session = this.sessionNotifier.getSessionById(sessionId);
+    const session = this.repository.getSessionById(sessionId);
 
     // Get idpUrl
     const idpUrl = this.repository.getIdpUrl((session as AwsIamRoleFederatedSession).idpUrlId);
