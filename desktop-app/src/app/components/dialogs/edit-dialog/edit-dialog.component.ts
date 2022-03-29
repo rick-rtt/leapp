@@ -42,13 +42,13 @@ export class EditDialogComponent implements OnInit {
   });
 
   private workspaceService: WorkspaceService;
+  private keychainService: KeychainService;
   private repository: Repository;
 
   /* Setup the first account for the application */
   constructor(
     private activatedRoute: ActivatedRoute,
     private appService: AppService,
-    private keychainService: KeychainService,
     private messageToasterService: MessageToasterService,
     private router: Router,
     private windowService: WindowService,
@@ -56,6 +56,7 @@ export class EditDialogComponent implements OnInit {
   ) {
     this.workspaceService = leappCoreService.workspaceService;
     this.repository = this.leappCoreService.repository;
+    this.keychainService = this.leappCoreService.keyChainService;
   }
 
   ngOnInit(): void {
