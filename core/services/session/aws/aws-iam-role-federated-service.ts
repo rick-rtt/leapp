@@ -82,12 +82,12 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
     // Get the session in question
     const session = this.repository.getSessionById(sessionId);
 
-    // Get idpUrl
-    const idpUrl = this.repository.getIdpUrl((session as AwsIamRoleFederatedSession).idpUrlId);
-
+    let idpUrl;
     // Check if we need to authenticate
     let needToAuthenticate;
     try {
+      // Get idpUrl
+      idpUrl = this.repository.getIdpUrl((session as AwsIamRoleFederatedSession).idpUrlId);
       needToAuthenticate = await this.awsAuthenticationService.needAuthentication(idpUrl);
     } catch (err) {
       throw new LeappSamlError(this, err.message);
