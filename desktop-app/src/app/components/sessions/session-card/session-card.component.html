@@ -140,8 +140,9 @@
     </div>
     <div [ngClass]="(session.type === eSessionType.awsIamUser && session.status !== eSessionStatus.active) ? 'iam-session-selected' : ''" class="opt-bar-middle-section">
       <div class="opt-bar-middle-left-buttons">
+
         <ng-container *ngIf="session.type === eSessionType.awsSsoRole || session.type === eSessionType.awsIamRoleFederated || session.type === eSessionType.awsIamRoleChained">
-          <a class="icon-button" (click)="openAwsWebConsole($event);" matTooltip="Open Web Console">
+          <a class="icon-button open-web-console" (click)="openAwsWebConsole($event);" matTooltip="Open Web Console">
             <i class="moon-Open-Web-Console"></i>
           </a>
         </ng-container>
