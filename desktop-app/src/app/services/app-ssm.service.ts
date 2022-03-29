@@ -9,8 +9,6 @@ import { SsmService } from "@noovolari/leapp-core/services/ssm-service";
 @Injectable({
   providedIn: "root",
 })
-
-//TODO: move into core module in near future
 export class AppSsmService {
   ssmClient;
   ec2Client;

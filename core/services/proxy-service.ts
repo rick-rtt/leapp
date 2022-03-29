@@ -4,7 +4,7 @@ import { INativeService } from "../interfaces/i-native-service";
 export class ProxyService {
   constructor(private repository: Repository, private nativeService: INativeService, private timeOut: number) {}
 
-  //TODO: why not returning a promise?
+  // TODO: why not returning a promise?
   get(url: string, resCallback: (res: any) => any, errCallback: (err: any) => any): void {
     const options = this.getHttpClientOptions(url);
     const httpsRedirectClient = this.nativeService.followRedirects.https;

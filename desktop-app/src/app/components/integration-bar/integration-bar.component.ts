@@ -213,7 +213,6 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
   }
 
   async gotoWebForm(integrationId: string): Promise<void> {
-    // TODO: check if we need to put this method in IntegrationService singleton - sync method
     this.awsSsoOidcService.interrupt();
     this.modalRef.hide();
     await this.forceSync(integrationId);
@@ -239,7 +238,6 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
   }
 
   closeLoadingScreen(): void {
-    // TODO: call aws sso oidc service directly
     this.awsSsoOidcService.interrupt();
     this.loadingInBrowser = false;
     this.loadingInApp = false;

@@ -27,7 +27,6 @@ export default class LoginIntegration extends LeappCommand {
     await this.leappCliService.remoteProceduresClient.refreshSessions();
     this.log(`${sessionsDiff.sessionsToAdd.length} sessions added`);
     this.log(`${sessionsDiff.sessionsToDelete.length} sessions removed`);
-    // TODO: use with puppeteer
     // await this.leappCliService.cliVerificationWindowService.closeBrowser();
   }
 

@@ -55,6 +55,7 @@ export class NamedProfilesService {
 
       (session as any).profileId = defaultNamedProfileId;
       this.repository.updateSession(session.sessionId, session);
+      // TODO: it should call iSessionNotifier, not workspaceService
       this.workspaceService.updateSession(session.sessionId, session);
 
       if (wasActive) {

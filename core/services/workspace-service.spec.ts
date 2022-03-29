@@ -179,8 +179,8 @@ describe("WorkspaceService", () => {
 
     expect(workspaceService.getSessionById("session-id-4")).toStrictEqual(newSession);
     expect(workspaceService.getSessions().length).toBe(4);
-    expect(workspaceService.listInActive()).toStrictEqual([mockedSession2, mockedSession3]);
-    expect(workspaceService.listInActive().length).toBe(2);
+    expect(workspaceService.listInactive()).toStrictEqual([mockedSession2, mockedSession3]);
+    expect(workspaceService.listInactive().length).toBe(2);
   });
 
   test("listAwsSsoRoles() - list of sessions filtered by aws sso role type", () => {

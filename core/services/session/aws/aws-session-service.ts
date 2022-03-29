@@ -66,7 +66,7 @@ export abstract class AwsSessionService extends SessionService {
         this.repository.deleteSession(sess.sessionId);
       }
       this.repository.deleteSession(sessionId);
-      this.sessionNotifier.setSessions(this.repository.getSessions());
+      this.sessionNotifier?.deleteSession(sessionId);
       await this.removeSecrets(sessionId);
     } catch (error) {
       this.sessionError(sessionId, error);
