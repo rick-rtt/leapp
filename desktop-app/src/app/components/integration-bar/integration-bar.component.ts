@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, QueryList, TemplateRef, ViewChild, ViewChildren } from "@angular/core";
+import { Component, NgZone, OnDestroy, OnInit, QueryList, TemplateRef, ViewChild, ViewChildren } from "@angular/core";
 import { globalFilteredSessions } from "../command-bar/command-bar.component";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { Router } from "@angular/router";
@@ -77,7 +77,8 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
     private router: Router,
     private windowService: WindowService,
     private messageToasterService: MessageToasterService,
-    private leappCoreService: AppProviderService
+    private leappCoreService: AppProviderService,
+    private ngZone: NgZone
   ) {
     this.repository = this.leappCoreService.repository;
     this.awsSsoRoleService = this.leappCoreService.awsSsoRoleService;
@@ -176,7 +177,7 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
   async logout(configurationId: string): Promise<void> {
     this.logoutLoadings[configurationId] = true;
     this.selectedAwsSsoConfiguration = this.repository.getAwsSsoIntegration(configurationId);
-    await this.leappCoreService.awsSsoIntegrationService.logout(this.selectedAwsSsoConfiguration.id);
+    this.leappCoreService.awsSsoIntegrationService.logout(this.selectedAwsSsoConfiguration.id);
 
     this.loadingInBrowser = false;
     this.loadingInApp = false;
@@ -196,18 +197,17 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
         }
 
         await this.leappCoreService.awsSsoIntegrationService.syncSessions(integrationId);
-
-        if (this.modalRef) {
-          this.modalRef.hide();
-        }
-
-        this.loadingInBrowser = false;
-        this.loadingInApp = false;
       } catch (err) {
+        this.awsSsoOidcService.interrupt();
         await this.logout(integrationId);
         this.loggingService.logger(`Error during SSO Login: ${err.toString()}`, LoggerLevel.error);
         this.messageToasterService.toast(`Error during SSO Login: ${err.toString()}`, ToastLevel.error);
-        this.modalRef.hide();
+      } finally {
+        if (this.modalRef) {
+          this.modalRef.hide();
+        }
+        this.loadingInBrowser = false;
+        this.loadingInApp = false;
       }
     }
   }
@@ -290,7 +290,10 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
         // eslint-disable-next-line max-len
         this.repository.updateAwsSsoIntegration(this.selectedAwsSsoConfiguration.id, alias, region, portalUrl, browserOpening);
       }
-      this.workspaceService.setIntegrations(this.repository.listAwsSsoIntegrations());
+      this.ngZone.run(() => {
+        this.setValues();
+        this.workspaceService.setIntegrations(this.repository.listAwsSsoIntegrations());
+      });
       this.modalRef.hide();
     } else {
       this.messageToasterService.toast("Form is not valid", ToastLevel.warn, "Form validation");

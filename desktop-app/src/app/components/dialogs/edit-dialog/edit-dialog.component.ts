@@ -136,7 +136,12 @@ export class EditDialogComponent implements OnInit {
       case SessionType.alibaba:
         return "alibaba.png";
       default:
-        return "aws-logo.svg";
+        return `aws${
+          this.repository.getColorTheme() === constants.darkTheme ||
+          (this.repository.getColorTheme() === constants.systemDefaultTheme && this.appService.isDarkMode())
+            ? "-dark"
+            : ""
+        }.png`;
     }
   }
 
