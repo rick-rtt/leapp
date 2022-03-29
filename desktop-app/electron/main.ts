@@ -118,9 +118,11 @@ const generateMainWindow = () => {
       if(evt.sender.getOwnerBrowserWindow().id === win.id) {
         if (data.compactMode) {
           win.setMinimumSize(560, 680);
+          win.setSize(560, 680);
           win.setResizable(false);
           win.setMaximizable(false);
           win.setFullScreenable(false);
+          win.setMinimumSize(560, 680);
           win.setSize(560, 680);
         } else {
           win.setMinimumSize(1200, 680);
@@ -128,6 +130,8 @@ const generateMainWindow = () => {
           win.setResizable(true);
           win.setMaximizable(true);
           win.setFullScreenable(true);
+          win.setMinimumSize(1200, 680);
+          win.setSize(1200, 680);
         }
       }
     });
