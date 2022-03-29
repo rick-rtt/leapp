@@ -21,6 +21,7 @@ describe("TrayMenuComponent", () => {
       workspaceService: spyWorkspaceService,
       repository: spyRepositoryService,
       awsCoreService: { getRegions: () => [] },
+      executeService: { execute: () => ({ then: () => {} }) },
     });
 
     window.__dirname = "";
@@ -38,6 +39,7 @@ describe("TrayMenuComponent", () => {
     (component as any).subscribed = {
       unsubscribe: () => {},
     };
+    (component as any).getMetadata = () => {};
   });
 
   it("should create", () => {
