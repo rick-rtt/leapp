@@ -11,6 +11,7 @@ import { IOpenExternalUrlService } from "@noovolari/leapp-core/interfaces/i-open
 })
 export class WindowService implements IOpenExternalUrlService {
   private currentWindow: any;
+  private windowOs = "win32";
 
   constructor(private modalService: BsModalService, private electronService: AppNativeService) {}
 
@@ -31,7 +32,6 @@ export class WindowService implements IOpenExternalUrlService {
       resizable: true,
       show,
       title,
-      titleBarStyle: "hidden",
       webPreferences: {
         devTools: !environment.production,
         worldSafeExecuteJavaScript: true,
@@ -53,6 +53,12 @@ export class WindowService implements IOpenExternalUrlService {
       this.currentWindow = null;
     }
     this.currentWindow = new this.electronService.browserWindow(opts);
+    if (this.electronService.os.platform() === this.windowOs) {
+      this.electronService.menu.setApplicationMenu(null);
+    }
+    this.currentWindow.setMenuBarVisibility(false); // Hide Window Menu to make it compliant with MacOSX
+    this.currentWindow.removeMenu(); // Remove Window Menu inside App, to make it compliant with Linux
+    this.currentWindow.setMenu(null);
     return this.currentWindow;
   }
 

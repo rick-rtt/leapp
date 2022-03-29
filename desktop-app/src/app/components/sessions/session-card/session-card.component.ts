@@ -170,6 +170,7 @@ export class SessionCardComponent implements OnInit {
     });
     this.logSessionData(this.session, `Starting Session`);
     this.trigger.closeMenu();
+    document.querySelector('.table thead tr').scrollIntoView();
   }
 
   /**
