@@ -1,6 +1,6 @@
 import { jest, describe, test, expect } from "@jest/globals";
 import { IdpUrlsService } from "./idp-urls-service";
-import { IdpUrl } from "../models/IdpUrl";
+import { IdpUrl } from "../models/idp-url";
 
 describe("IdpUrlsService", () => {
   test("getIdpUrls", () => {
