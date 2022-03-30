@@ -24,7 +24,7 @@ export default class ListIdpUrls extends LeappCommand {
 
   async showIdpUrls(): Promise<void> {
     const { flags } = await this.parse(ListIdpUrls);
-    const data = this.leappCliService.idpUrlsService.getIdpUrls().map((idpUrl: any) => ({
+    const data = this.cliProviderService.idpUrlsService.getIdpUrls().map((idpUrl: any) => ({
       url: idpUrl.url,
     })) as any as Record<string, unknown>[];
 

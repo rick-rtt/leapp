@@ -3,15 +3,15 @@ import { AwsIamUserService } from "@noovolari/leapp-core/services/session/aws/aw
 import ChangeSessionProfile from "./change-profile";
 
 describe("ChangeProfile", () => {
-  const getTestCommand = (leappCliService: any = null): ChangeSessionProfile => {
+  const getTestCommand = (cliProviderService: any = null): ChangeSessionProfile => {
     const command = new ChangeSessionProfile([], {} as any);
-    (command as any).leappCliService = leappCliService;
+    (command as any).cliProviderService = cliProviderService;
     return command;
   };
 
   test("selectSession", async () => {
     const session1 = { sessionName: "sessionName" };
-    const leappCliService: any = {
+    const cliProviderService: any = {
       repository: {
         getSessions: () => [session1],
       },
@@ -33,14 +33,14 @@ describe("ChangeProfile", () => {
       },
     };
 
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
     const selectedSession = await command.selectSession();
     expect(selectedSession).toBe("selectedSession");
   });
 
   test("selectProfile", async () => {
     const profileFieldChoice = { name: "profileName1", id: "profileId1" };
-    const leappCliService: any = {
+    const cliProviderService: any = {
       repository: {
         getProfiles: jest.fn(() => [profileFieldChoice]),
         getProfileName: jest.fn(() => "profileName1"),
@@ -60,31 +60,31 @@ describe("ChangeProfile", () => {
       },
     };
 
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
 
     const session = { type: "type", profileId: "profileId2" } as any;
     const selectedProfile = await command.selectProfile(session);
 
     expect(selectedProfile).toBe("selectedProfile");
-    expect(leappCliService.repository.getProfiles).toHaveBeenCalled();
-    expect(leappCliService.repository.getProfileName).toHaveBeenCalledWith(session.profileId);
+    expect(cliProviderService.repository.getProfiles).toHaveBeenCalled();
+    expect(cliProviderService.repository.getProfileName).toHaveBeenCalledWith(session.profileId);
   });
 
   test("selectProfile - error: no profile available", async () => {
-    const leappCliService: any = {
+    const cliProviderService: any = {
       repository: {
         getProfiles: jest.fn(() => []),
         getProfileName: jest.fn(() => "profileName1"),
       },
     };
 
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
 
     const session = { type: "type", profileId: "profileId2" } as any;
 
     await expect(command.selectProfile(session)).rejects.toThrow(new Error("no profiles available"));
-    expect(leappCliService.repository.getProfiles).toHaveBeenCalled();
-    expect(leappCliService.repository.getProfileName).toHaveBeenCalledWith(session.profileId);
+    expect(cliProviderService.repository.getProfiles).toHaveBeenCalled();
+    expect(cliProviderService.repository.getProfileName).toHaveBeenCalledWith(session.profileId);
   });
 
   test("changeSessionProfile", async () => {

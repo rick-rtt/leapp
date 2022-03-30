@@ -3,9 +3,9 @@ import StopSession from "./stop";
 import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
 
 describe("StopSession", () => {
-  const getTestCommand = (leappCliService: any = null): StopSession => {
+  const getTestCommand = (cliProviderService: any = null): StopSession => {
     const command = new StopSession([], {} as any);
-    (command as any).leappCliService = leappCliService;
+    (command as any).cliProviderService = cliProviderService;
     return command;
   };
 

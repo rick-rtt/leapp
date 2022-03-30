@@ -9,10 +9,10 @@ import { AppService } from "./app.service";
 
 describe("SsmService", () => {
   let service: AppSsmService;
-  let leappCoreService: SpyObj<AppProviderService>;
+  let appProviderService: SpyObj<AppProviderService>;
 
   beforeEach(() => {
-    leappCoreService = jasmine.createSpyObj("LeappCoreService", [], {
+    appProviderService = jasmine.createSpyObj("LeappCoreService", [], {
       ssmService: {
         getSsmInstances: (_0: CredentialsInfo, _1: string, _2?: any) => {},
         startSession: (_0: CredentialsInfo, _1: string, _2: string) => {},
@@ -26,9 +26,9 @@ describe("SsmService", () => {
     });
 
     service = TestBed.inject(AppSsmService);
-    (service as any).coreSsmService = leappCoreService.ssmService;
-    (service as any).loggingService = leappCoreService.loggingService;
-    (service as any).executeService = leappCoreService.executeService;
+    (service as any).coreSsmService = appProviderService.ssmService;
+    (service as any).loggingService = appProviderService.loggingService;
+    (service as any).executeService = appProviderService.executeService;
   });
 
   it("should be created", () => {
@@ -36,7 +36,7 @@ describe("SsmService", () => {
   });
 
   it("should call getSsmInstances on core method passing a credential info object and a region", () => {
-    const spyGetSsmInstances = spyOn(leappCoreService.ssmService, "getSsmInstances").and.callThrough();
+    const spyGetSsmInstances = spyOn(appProviderService.ssmService, "getSsmInstances").and.callThrough();
     const credentials: CredentialsInfo = { sessionToken: "abcdefghi" };
 
     service.getSsmInstances(credentials, "eu-west-1");
@@ -44,7 +44,7 @@ describe("SsmService", () => {
   });
 
   it("should call startSession on core method passing a credential info object, an instance id and a region", () => {
-    const spyGetSsmStartSession = spyOn(leappCoreService.ssmService, "startSession").and.callThrough();
+    const spyGetSsmStartSession = spyOn(appProviderService.ssmService, "startSession").and.callThrough();
     const credentials: CredentialsInfo = { sessionToken: "abcdefghi" };
 
     service.startSession(credentials, "instance-id", "eu-west-1");

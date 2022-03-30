@@ -2,15 +2,15 @@ import { jest, describe, test, expect } from "@jest/globals";
 import LogoutIntegration from "./logout";
 
 describe("LogoutIntegration", () => {
-  const getTestCommand = (leappCliService: any = null, argv: string[] = []): LogoutIntegration => {
+  const getTestCommand = (cliProviderService: any = null, argv: string[] = []): LogoutIntegration => {
     const command = new LogoutIntegration(argv, {} as any);
-    (command as any).leappCliService = leappCliService;
+    (command as any).cliProviderService = cliProviderService;
     return command;
   };
 
   test("selectIntegration", async () => {
     const integration = { alias: "integration1" };
-    const leappCliService: any = {
+    const cliProviderService: any = {
       awsSsoIntegrationService: {
         getOnlineIntegrations: jest.fn(() => [integration]),
       },
@@ -29,42 +29,42 @@ describe("LogoutIntegration", () => {
       },
     };
 
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
     const selectedIntegration = await command.selectIntegration();
 
-    expect(leappCliService.awsSsoIntegrationService.getOnlineIntegrations).toHaveBeenCalled();
+    expect(cliProviderService.awsSsoIntegrationService.getOnlineIntegrations).toHaveBeenCalled();
     expect(selectedIntegration).toBe(integration);
   });
 
   test("selectIntegration, no integrations", async () => {
-    const leappCliService: any = {
+    const cliProviderService: any = {
       awsSsoIntegrationService: {
         getOnlineIntegrations: jest.fn(() => []),
       },
     };
 
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
     await expect(command.selectIntegration()).rejects.toThrow(new Error("no online integrations available"));
   });
 
   test("logout", async () => {
-    const leappCliService: any = {
+    const cliProviderService: any = {
       awsSsoIntegrationService: {
         logout: jest.fn(),
       },
       remoteProceduresClient: { refreshIntegrations: jest.fn(), refreshSessions: jest.fn() },
     };
 
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
     command.log = jest.fn();
 
     const integration = { id: "id1" } as any;
     await command.logout(integration);
 
-    expect(leappCliService.awsSsoIntegrationService.logout).toHaveBeenCalledWith(integration.id);
+    expect(cliProviderService.awsSsoIntegrationService.logout).toHaveBeenCalledWith(integration.id);
     expect(command.log).toHaveBeenLastCalledWith("logout successful");
-    expect(leappCliService.remoteProceduresClient.refreshSessions).toHaveBeenCalled();
-    expect(leappCliService.remoteProceduresClient.refreshSessions).toHaveBeenCalled();
+    expect(cliProviderService.remoteProceduresClient.refreshSessions).toHaveBeenCalled();
+    expect(cliProviderService.remoteProceduresClient.refreshSessions).toHaveBeenCalled();
   });
 
   const runCommand = async (errorToThrow: any, expectedErrorMessage: string) => {

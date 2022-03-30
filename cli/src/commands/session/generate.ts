@@ -24,7 +24,7 @@ export default class GenerateSession extends LeappCommand {
   }
 
   async generateSession(session: Session): Promise<void> {
-    const sessionService = this.leappCliService.sessionFactory.getSessionService(session.type);
+    const sessionService = this.cliProviderService.sessionFactory.getSessionService(session.type);
     if (this.isAwsSession(sessionService)) {
       const processCredential = await (sessionService as any).generateProcessCredentials(session.sessionId);
       this.log(JSON.stringify(processCredential));
@@ -34,7 +34,7 @@ export default class GenerateSession extends LeappCommand {
   }
 
   async getSession(sessionId: string): Promise<Session> {
-    const selectedSessions = this.leappCliService.repository.getSessions().filter((session: Session) => session.sessionId === sessionId);
+    const selectedSessions = this.cliProviderService.repository.getSessions().filter((session: Session) => session.sessionId === sessionId);
     if (selectedSessions.length === 0) {
       throw new Error("no sessions available");
     } else if (selectedSessions.length > 1) {

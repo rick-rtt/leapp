@@ -2,15 +2,15 @@ import { jest, describe, test, expect } from "@jest/globals";
 import DeleteIntegration from "./delete";
 
 describe("DeleteIntegration", () => {
-  const getTestCommand = (leappCliService: any = null, argv: string[] = []): DeleteIntegration => {
+  const getTestCommand = (cliProviderService: any = null, argv: string[] = []): DeleteIntegration => {
     const command = new DeleteIntegration(argv, {} as any);
-    (command as any).leappCliService = leappCliService;
+    (command as any).cliProviderService = cliProviderService;
     return command;
   };
 
   test("selectIntegration", async () => {
     const integration = { alias: "integration1" };
-    const leappCliService: any = {
+    const cliProviderService: any = {
       awsSsoIntegrationService: {
         getIntegrations: jest.fn(() => [integration]),
       },
@@ -29,26 +29,26 @@ describe("DeleteIntegration", () => {
       },
     };
 
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
     const selectedIntegration = await command.selectIntegration();
 
-    expect(leappCliService.awsSsoIntegrationService.getIntegrations).toHaveBeenCalled();
+    expect(cliProviderService.awsSsoIntegrationService.getIntegrations).toHaveBeenCalled();
     expect(selectedIntegration).toBe(integration);
   });
 
   test("selectIntegration, no integrations", async () => {
-    const leappCliService: any = {
+    const cliProviderService: any = {
       awsSsoIntegrationService: {
         getIntegrations: jest.fn(() => []),
       },
     };
 
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
     await expect(command.selectIntegration()).rejects.toThrow(new Error("no integrations available"));
   });
 
   test("delete", async () => {
-    const leappCliService: any = {
+    const cliProviderService: any = {
       awsSsoIntegrationService: {
         deleteIntegration: jest.fn(),
       },
@@ -58,16 +58,16 @@ describe("DeleteIntegration", () => {
       },
     };
 
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
     command.log = jest.fn();
 
     const integration = { id: "integration1" } as any;
     await command.delete(integration);
 
-    expect(leappCliService.awsSsoIntegrationService.deleteIntegration).toHaveBeenCalledWith(integration.id);
+    expect(cliProviderService.awsSsoIntegrationService.deleteIntegration).toHaveBeenCalledWith(integration.id);
     expect(command.log).toHaveBeenLastCalledWith("integration deleted");
-    expect(leappCliService.remoteProceduresClient.refreshIntegrations).toHaveBeenCalled();
-    expect(leappCliService.remoteProceduresClient.refreshSessions).toHaveBeenCalled();
+    expect(cliProviderService.remoteProceduresClient.refreshIntegrations).toHaveBeenCalled();
+    expect(cliProviderService.remoteProceduresClient.refreshSessions).toHaveBeenCalled();
   });
 
   const runCommand = async (errorToThrow: any, expectedErrorMessage: string) => {

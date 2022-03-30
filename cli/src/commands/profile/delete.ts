@@ -25,11 +25,11 @@ export default class DeleteNamedProfile extends LeappCommand {
   }
 
   async selectNamedProfile(): Promise<AwsNamedProfile> {
-    const namedProfiles = this.leappCliService.namedProfilesService.getNamedProfiles(true);
+    const namedProfiles = this.cliProviderService.namedProfilesService.getNamedProfiles(true);
     if (namedProfiles.length === 0) {
       throw new Error("no profiles available");
     }
-    const answer: any = await this.leappCliService.inquirer.prompt([
+    const answer: any = await this.cliProviderService.inquirer.prompt([
       {
         name: "selectedNamedProfile",
         message: `select a profile to delete`,
@@ -41,7 +41,7 @@ export default class DeleteNamedProfile extends LeappCommand {
   }
 
   getAffectedSessions(namedProfileId: string): Session[] {
-    return this.leappCliService.namedProfilesService.getSessionsWithNamedProfile(namedProfileId);
+    return this.cliProviderService.namedProfilesService.getSessionsWithNamedProfile(namedProfileId);
   }
 
   async askForConfirmation(affectedSessions: Session[]): Promise<boolean> {
@@ -49,7 +49,7 @@ export default class DeleteNamedProfile extends LeappCommand {
       return true;
     }
     const sessionsList = affectedSessions.map((session) => `- ${session.sessionName}`).join("\n");
-    const answer: any = await this.leappCliService.inquirer.prompt([
+    const answer: any = await this.cliProviderService.inquirer.prompt([
       {
         name: "confirmation",
         message: `Deleting this profile will set default to these sessions\n${sessionsList}\nDo you want to continue?`,
@@ -60,8 +60,8 @@ export default class DeleteNamedProfile extends LeappCommand {
   }
 
   async deleteNamedProfile(id: string): Promise<void> {
-    await this.leappCliService.namedProfilesService.deleteNamedProfile(id);
-    await this.leappCliService.remoteProceduresClient.refreshSessions();
+    await this.cliProviderService.namedProfilesService.deleteNamedProfile(id);
+    await this.cliProviderService.remoteProceduresClient.refreshSessions();
     this.log("profile deleted");
   }
 }

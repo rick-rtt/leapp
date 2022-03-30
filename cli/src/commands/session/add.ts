@@ -26,14 +26,14 @@ export default class AddSession extends LeappCommand {
 
   async createSession(accessMethod: AccessMethod, selectedParams: Map<string, string>): Promise<void> {
     const creationRequest = accessMethod.getSessionCreationRequest(selectedParams);
-    await this.leappCliService.sessionFactory.createSession(accessMethod.sessionType, creationRequest);
-    await this.leappCliService.remoteProceduresClient.refreshSessions();
+    await this.cliProviderService.sessionFactory.createSession(accessMethod.sessionType, creationRequest);
+    await this.cliProviderService.remoteProceduresClient.refreshSessions();
     this.log("session added");
   }
 
   async chooseCloudProvider(): Promise<CloudProviderType> {
-    const availableCloudProviders = this.leappCliService.cloudProviderService.availableCloudProviders();
-    const cloudProviderAnswer: any = await this.leappCliService.inquirer.prompt([
+    const availableCloudProviders = this.cliProviderService.cloudProviderService.availableCloudProviders();
+    const cloudProviderAnswer: any = await this.cliProviderService.inquirer.prompt([
       {
         name: "selectedProvider",
         message: "select a provider",
@@ -45,8 +45,8 @@ export default class AddSession extends LeappCommand {
   }
 
   async chooseAccessMethod(cloudProviderType: CloudProviderType): Promise<AccessMethod> {
-    const accessMethods = this.leappCliService.cloudProviderService.creatableAccessMethods(cloudProviderType);
-    const accessMethodAnswer: any = await this.leappCliService.inquirer.prompt([
+    const accessMethods = this.cliProviderService.cloudProviderService.creatableAccessMethods(cloudProviderType);
+    const accessMethodAnswer: any = await this.cliProviderService.inquirer.prompt([
       {
         name: "selectedMethod",
         message: "select an access method",
@@ -60,7 +60,7 @@ export default class AddSession extends LeappCommand {
   async chooseAccessMethodParams(selectedAccessMethod: AccessMethod): Promise<Map<string, string>> {
     const fieldValuesMap = new Map<string, string>();
     for (const field of selectedAccessMethod.accessMethodFields) {
-      const fieldAnswer: any = await this.leappCliService.inquirer.prompt([
+      const fieldAnswer: any = await this.cliProviderService.inquirer.prompt([
         {
           name: field.creationRequestField,
           message: field.message,

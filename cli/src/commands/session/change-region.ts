@@ -22,9 +22,9 @@ export default class ChangeSessionRegion extends LeappCommand {
   }
 
   async selectSession(): Promise<Session> {
-    const availableSessions = this.leappCliService.repository.getSessions();
+    const availableSessions = this.cliProviderService.repository.getSessions();
 
-    const answer: any = await this.leappCliService.inquirer.prompt([
+    const answer: any = await this.cliProviderService.inquirer.prompt([
       {
         name: "selectedSession",
         message: "select a session",
@@ -36,9 +36,9 @@ export default class ChangeSessionRegion extends LeappCommand {
   }
 
   async selectRegion(session: Session): Promise<string> {
-    const availableRegions = this.leappCliService.cloudProviderService.availableRegions(session.type);
+    const availableRegions = this.cliProviderService.cloudProviderService.availableRegions(session.type);
 
-    const answer: any = await this.leappCliService.inquirer.prompt([
+    const answer: any = await this.cliProviderService.inquirer.prompt([
       {
         name: "selectedRegion",
         message: `current region is ${session.region}, select a new region`,
@@ -50,8 +50,8 @@ export default class ChangeSessionRegion extends LeappCommand {
   }
 
   async changeSessionRegion(session: Session, newRegion: string): Promise<void> {
-    this.leappCliService.regionsService.changeRegion(session, newRegion);
-    await this.leappCliService.remoteProceduresClient.refreshSessions();
+    this.cliProviderService.regionsService.changeRegion(session, newRegion);
+    await this.cliProviderService.remoteProceduresClient.refreshSessions();
     this.log("session region changed");
   }
 }

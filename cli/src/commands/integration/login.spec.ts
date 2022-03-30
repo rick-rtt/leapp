@@ -2,15 +2,15 @@ import { jest, describe, test, expect } from "@jest/globals";
 import LoginIntegration from "./login";
 
 describe("LoginIntegration", () => {
-  const getTestCommand = (leappCliService: any = null, argv: string[] = []): LoginIntegration => {
+  const getTestCommand = (cliProviderService: any = null, argv: string[] = []): LoginIntegration => {
     const command = new LoginIntegration(argv, {} as any);
-    (command as any).leappCliService = leappCliService;
+    (command as any).cliProviderService = cliProviderService;
     return command;
   };
 
   test("selectIntegration", async () => {
     const integration = { alias: "integration1" };
-    const leappCliService: any = {
+    const cliProviderService: any = {
       awsSsoIntegrationService: {
         getOfflineIntegrations: jest.fn(() => [integration]),
       },
@@ -29,10 +29,10 @@ describe("LoginIntegration", () => {
       },
     };
 
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
     const selectedIntegration = await command.selectIntegration();
 
-    expect(leappCliService.awsSsoIntegrationService.getOfflineIntegrations).toHaveBeenCalled();
+    expect(cliProviderService.awsSsoIntegrationService.getOfflineIntegrations).toHaveBeenCalled();
     expect(selectedIntegration).toBe(integration);
   });
 

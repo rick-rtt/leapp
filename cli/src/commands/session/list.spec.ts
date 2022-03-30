@@ -5,9 +5,9 @@ import { AwsIamUserSession } from "@noovolari/leapp-core/models/aws-iam-user-ses
 import { SessionType } from "@noovolari/leapp-core/models/session-type";
 
 describe("ListSessions", () => {
-  const getTestCommand = (leappCliService: any = null): ListSessions => {
+  const getTestCommand = (cliProviderService: any = null): ListSessions => {
     const command = new ListSessions([], {} as any);
-    (command as any).leappCliService = leappCliService;
+    (command as any).cliProviderService = cliProviderService;
     return command;
   };
 

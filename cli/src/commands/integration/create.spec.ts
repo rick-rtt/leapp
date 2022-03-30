@@ -5,14 +5,14 @@ import { constants } from "@noovolari/leapp-core/models/constants";
 import { SessionType } from "@noovolari/leapp-core/models/session-type";
 
 describe("CreateSsoIntegration", () => {
-  const getTestCommand = (leappCliService: any = null, argv: string[] = []): CreateSsoIntegration => {
+  const getTestCommand = (cliProviderService: any = null, argv: string[] = []): CreateSsoIntegration => {
     const command = new CreateSsoIntegration(argv, {} as any);
-    (command as any).leappCliService = leappCliService;
+    (command as any).cliProviderService = cliProviderService;
     return command;
   };
 
   test("askConfigurationParameters", async () => {
-    const leappCliService = {
+    const cliProviderService = {
       inquirer: {
         prompt: jest.fn(async (questions) => {
           if (questions[0].name === "selectedAlias") {
@@ -33,10 +33,10 @@ describe("CreateSsoIntegration", () => {
         ]),
       },
     } as any;
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
     const actualCreationParams = await command.askConfigurationParameters();
 
-    expect(leappCliService.inquirer.prompt).toHaveBeenNthCalledWith(1, [
+    expect(cliProviderService.inquirer.prompt).toHaveBeenNthCalledWith(1, [
       {
         name: "selectedAlias",
         message: "Insert an alias",
@@ -45,7 +45,7 @@ describe("CreateSsoIntegration", () => {
       },
     ]);
 
-    expect(leappCliService.inquirer.prompt).toHaveBeenNthCalledWith(2, [
+    expect(cliProviderService.inquirer.prompt).toHaveBeenNthCalledWith(2, [
       {
         name: "selectedPortalUrl",
         message: "Insert a portal URL",
@@ -54,7 +54,7 @@ describe("CreateSsoIntegration", () => {
       },
     ]);
 
-    expect(leappCliService.inquirer.prompt).toHaveBeenNthCalledWith(3, [
+    expect(cliProviderService.inquirer.prompt).toHaveBeenNthCalledWith(3, [
       {
         name: "selectedRegion",
         message: "Select a region",
@@ -68,14 +68,14 @@ describe("CreateSsoIntegration", () => {
       },
     ]);
 
-    expect(leappCliService.inquirer.prompt).toHaveBeenCalledTimes(3);
+    expect(cliProviderService.inquirer.prompt).toHaveBeenCalledTimes(3);
     expect(actualCreationParams).toEqual({
       browserOpening: constants.inBrowser,
       alias: "alias",
       portalUrl: "portalUrl",
       region: "region",
     });
-    expect(leappCliService.cloudProviderService.availableRegions).toHaveBeenCalledWith(SessionType.aws);
+    expect(cliProviderService.cloudProviderService.availableRegions).toHaveBeenCalledWith(SessionType.aws);
   });
 
   const runCommand = async (errorToThrow: any, expectedErrorMessage: string) => {
