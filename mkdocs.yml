@@ -14,6 +14,8 @@ nav:
       - 'Concepts':
           - Sessions: 'sessions.md'
           - Integrations: 'integrations.md'
+  - 'CLI':
+      - Usage: 'cli/index.md'
   - 'Configuration':
       - Add your first configuration: 'configuration.md'
       - 'Configuring a Session':
