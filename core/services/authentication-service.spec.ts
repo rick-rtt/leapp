@@ -1,11 +1,11 @@
 import { describe, test, expect } from "@jest/globals";
 import { LeappParseError } from "../errors/leapp-parse-error";
-import { AuthenticationService } from "./authentication-service";
+import { AwsSamlAssertionExtractionService } from "./aws-saml-assertion-extraction-service";
 import { CloudProviderType } from "../models/cloud-provider-type";
 
 describe("AuthenticationService", () => {
   test("isAuthenticationUrl", () => {
-    const service = new AuthenticationService();
+    const service = new AwsSamlAssertionExtractionService();
 
     expect(service.isAuthenticationUrl(CloudProviderType.aws, "https://XX.onelogin.com/XX")).toBe(true);
     expect(service.isAuthenticationUrl(CloudProviderType.aws, "http://XX.onelogin.com/XX")).toBe(false);
@@ -28,7 +28,7 @@ describe("AuthenticationService", () => {
   });
 
   test("isSamlAssertionUrl", () => {
-    const authenticationService = new AuthenticationService();
+    const authenticationService = new AwsSamlAssertionExtractionService();
 
     expect(authenticationService.isSamlAssertionUrl(CloudProviderType.aws, "https://signin.aws.amazon.com/saml")).toBe(true);
     expect(authenticationService.isSamlAssertionUrl(CloudProviderType.aws, "https://signin.aws.amazon.com/saml?XX")).toBe(true);
@@ -40,7 +40,7 @@ describe("AuthenticationService", () => {
       uploadData: [{ bytes: "SAMLResponse=ABCDEFGHIJKLMNOPQRSTUVWXYZ&RelayState=abcdefghijklmnopqrstuvwxyz" }],
     };
 
-    const authenticationService = new AuthenticationService();
+    const authenticationService = new AwsSamlAssertionExtractionService();
     const awsSamlResponse = authenticationService.extractAwsSamlResponse(responseHookDetails as any);
     expect(awsSamlResponse).toBe("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
   });
@@ -58,7 +58,7 @@ describe("AuthenticationService", () => {
       ],
     };
 
-    const authenticationService = new AuthenticationService();
+    const authenticationService = new AwsSamlAssertionExtractionService();
     expect(() => authenticationService.extractAwsSamlResponse(responseHookDetails as any)).toThrow(new LeappParseError(authenticationService, ""));
   });
 });
