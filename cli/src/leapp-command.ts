@@ -7,7 +7,7 @@ export abstract class LeappCommand extends Command {
     super(argv, config);
   }
 
-  async init(): Promise<any> {
+  async init(): Promise<void> {
     this.cliProviderService.awsSsoRoleService.setAwsIntegrationDelegate(this.cliProviderService.awsSsoIntegrationService);
     const isDesktopAppRunning = await this.cliProviderService.remoteProceduresClient.isDesktopAppRunning();
     if (!isDesktopAppRunning) {
