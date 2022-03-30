@@ -23,7 +23,9 @@ brew install leapp
 
 ## Install Leapp CLI
 
-You can install Leapp CLI by downloading the library from [npm](https://www.npmjs.com/package/@noovolari/leapp-cli) globally
+You can install Leapp CLI by downloading the library from [npm](https://www.npmjs.com/package/@noovolari/leapp-cli) globally.
+
+All the available commands are listed in the [Leapp CLI section of the documentation](https://leapp.cloud/docs/cli/).
 
 ```
 npm install -g @noovolari/leapp-cli
