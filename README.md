@@ -59,6 +59,8 @@ Thank you for thinking about contributing to Leapp!
 Read through our [contributing guidelines](CONTRIBUTING.md)
 to learn how you can bring your value to our project by submitting your first contribution.
 
+Want to start developing with Leapp? [Check out our developing guidelines!](DEVELOPMENT.md)
+
 You can report bugs or suggest features using the GitHub issues channel; moreover, you can pick
 [a good first issue](https://github.com/noovolari/leapp/contribute) and make your first code contribution.
 

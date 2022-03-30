@@ -42,13 +42,13 @@ export class EditDialogComponent implements OnInit {
   });
 
   private workspaceService: WorkspaceService;
+  private keychainService: KeychainService;
   private repository: Repository;
 
   /* Setup the first account for the application */
   constructor(
     private activatedRoute: ActivatedRoute,
     private appService: AppService,
-    private keychainService: KeychainService,
     private messageToasterService: MessageToasterService,
     private router: Router,
     private windowService: WindowService,
@@ -56,6 +56,7 @@ export class EditDialogComponent implements OnInit {
   ) {
     this.workspaceService = leappCoreService.workspaceService;
     this.repository = this.leappCoreService.repository;
+    this.keychainService = this.leappCoreService.keyChainService;
   }
 
   ngOnInit(): void {
@@ -135,7 +136,12 @@ export class EditDialogComponent implements OnInit {
       case SessionType.alibaba:
         return "alibaba.png";
       default:
-        return "aws-logo.svg";
+        return `aws${
+          this.repository.getColorTheme() === constants.darkTheme ||
+          (this.repository.getColorTheme() === constants.systemDefaultTheme && this.appService.isDarkMode())
+            ? "-dark"
+            : ""
+        }.png`;
     }
   }
 
