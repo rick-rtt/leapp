@@ -3,9 +3,9 @@ import DeleteSession from "./delete";
 import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
 
 describe("DeleteSession", () => {
-  const getTestCommand = (leappCliService: any = null): DeleteSession => {
+  const getTestCommand = (cliProviderService: any = null): DeleteSession => {
     const command = new DeleteSession([], {} as any);
-    (command as any).leappCliService = leappCliService;
+    (command as any).cliProviderService = cliProviderService;
     return command;
   };
 
@@ -18,13 +18,13 @@ describe("DeleteSession", () => {
     };
     const remoteProceduresClient = { refreshSessions: jest.fn() };
 
-    const leappCliService: any = {
+    const cliProviderService: any = {
       sessionFactory,
       remoteProceduresClient,
     };
 
     const session: any = { sessionId: "sessionId", type: "sessionType" };
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
     command.log = jest.fn();
     await command.deleteSession(session);
 
@@ -35,7 +35,7 @@ describe("DeleteSession", () => {
   });
 
   test("selectSession", async () => {
-    const leappCliService: any = {
+    const cliProviderService: any = {
       repository: {
         getSessions: jest.fn(() => [
           { sessionName: "sessionActive", status: SessionStatus.active },
@@ -48,9 +48,9 @@ describe("DeleteSession", () => {
       },
     };
 
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
     const selectedSession = await command.selectSession();
-    expect(leappCliService.inquirer.prompt).toHaveBeenCalledWith([
+    expect(cliProviderService.inquirer.prompt).toHaveBeenCalledWith([
       {
         choices: [
           {
@@ -84,13 +84,13 @@ describe("DeleteSession", () => {
   });
 
   test("selectSession, no session available", async () => {
-    const leappCliService: any = {
+    const cliProviderService: any = {
       repository: {
         getSessions: jest.fn(() => []),
       },
     };
 
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
     await expect(command.selectSession()).rejects.toThrow(new Error("no sessions available"));
   });
 
@@ -102,21 +102,21 @@ describe("DeleteSession", () => {
     const sessionService = {
       getDependantSessions: jest.fn(() => "sessions"),
     };
-    const leappCliService: any = {
+    const cliProviderService: any = {
       sessionFactory: {
         getSessionService: jest.fn(() => sessionService),
       },
     };
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
 
     const sessions = command.getAffectedSessions(session);
     expect(sessions).toBe("sessions");
     expect(sessionService.getDependantSessions).toHaveBeenCalledWith(session.sessionId);
-    expect(leappCliService.sessionFactory.getSessionService).toHaveBeenCalledWith(session.type);
+    expect(cliProviderService.sessionFactory.getSessionService).toHaveBeenCalledWith(session.type);
   });
 
   test("askForConfirmation", async () => {
-    const leappCliService: any = {
+    const cliProviderService: any = {
       inquirer: {
         prompt: async (params: any) => {
           expect(params).toEqual([
@@ -130,7 +130,7 @@ describe("DeleteSession", () => {
         },
       },
     };
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
 
     const affectedSessions = [{ sessionName: "sess1" }, { sessionName: "sess2" }] as any;
     const confirmation = await command.askForConfirmation(affectedSessions);

@@ -116,7 +116,7 @@ describe("CreateSsoIntegration", () => {
   });
 
   test("createIntegration", async () => {
-    const leappCliService = {
+    const cliProviderService = {
       awsSsoIntegrationService: {
         createIntegration: jest.fn(),
       },
@@ -125,7 +125,7 @@ describe("CreateSsoIntegration", () => {
       },
     } as any;
 
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
     command.log = jest.fn();
     const creationParam: IntegrationCreationParams = {
       alias: "alias",
@@ -135,8 +135,8 @@ describe("CreateSsoIntegration", () => {
     };
     await command.createIntegration(creationParam);
 
-    expect(leappCliService.awsSsoIntegrationService.createIntegration).toBeCalledWith(creationParam);
+    expect(cliProviderService.awsSsoIntegrationService.createIntegration).toBeCalledWith(creationParam);
     expect(command.log).toHaveBeenCalledWith("aws sso integration created");
-    expect(leappCliService.remoteProceduresClient.refreshIntegrations).toHaveBeenCalled();
+    expect(cliProviderService.remoteProceduresClient.refreshIntegrations).toHaveBeenCalled();
   });
 });

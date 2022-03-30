@@ -2,15 +2,15 @@ import { jest, describe, test, expect } from "@jest/globals";
 import EditNamedProfile from "./edit";
 
 describe("EditNamedProfile", () => {
-  const getTestCommand = (leappCliService: any = null, argv: string[] = []): EditNamedProfile => {
+  const getTestCommand = (cliProviderService: any = null, argv: string[] = []): EditNamedProfile => {
     const command = new EditNamedProfile(argv, {} as any);
-    (command as any).leappCliService = leappCliService;
+    (command as any).cliProviderService = cliProviderService;
     return command;
   };
 
   test("selectNamedProfile", async () => {
     const namedProfile = { name: "profileName" };
-    const leappCliService: any = {
+    const cliProviderService: any = {
       namedProfilesService: {
         getNamedProfiles: jest.fn(() => [namedProfile]),
       },
@@ -29,26 +29,26 @@ describe("EditNamedProfile", () => {
       },
     };
 
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
     const selectedProfile = await command.selectNamedProfile();
 
-    expect(leappCliService.namedProfilesService.getNamedProfiles).toHaveBeenCalledWith(true);
+    expect(cliProviderService.namedProfilesService.getNamedProfiles).toHaveBeenCalledWith(true);
     expect(selectedProfile).toBe(namedProfile);
   });
 
   test("selectNamedProfile, no named profiles", async () => {
-    const leappCliService: any = {
+    const cliProviderService: any = {
       namedProfilesService: {
         getNamedProfiles: jest.fn(() => []),
       },
     };
 
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
     await expect(command.selectNamedProfile()).rejects.toThrow(new Error("no profiles available"));
   });
 
   test("getProfileName", async () => {
-    const leappCliService: any = {
+    const cliProviderService: any = {
       inquirer: {
         prompt: async (params: any) => {
           expect(params).toMatchObject([
@@ -67,27 +67,27 @@ describe("EditNamedProfile", () => {
       },
     };
 
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
     const profileName = await command.getProfileName();
     expect(profileName).toBe("profileName");
-    expect(leappCliService.namedProfilesService.validateNewProfileName).toHaveBeenCalledWith("profileName");
+    expect(cliProviderService.namedProfilesService.validateNewProfileName).toHaveBeenCalledWith("profileName");
   });
 
   test("editNamedProfile", async () => {
-    const leappCliService: any = {
+    const cliProviderService: any = {
       namedProfilesService: {
         editNamedProfile: jest.fn(),
       },
       remoteProceduresClient: { refreshSessions: jest.fn() },
     };
 
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
     command.log = jest.fn();
     await command.editNamedProfile("profileId", "profileName");
 
-    expect(leappCliService.namedProfilesService.editNamedProfile).toHaveBeenCalledWith("profileId", "profileName");
+    expect(cliProviderService.namedProfilesService.editNamedProfile).toHaveBeenCalledWith("profileId", "profileName");
     expect(command.log).toHaveBeenCalledWith("profile edited");
-    expect(leappCliService.remoteProceduresClient.refreshSessions).toHaveBeenCalled();
+    expect(cliProviderService.remoteProceduresClient.refreshSessions).toHaveBeenCalled();
   });
 
   const runCommand = async (errorToThrow: any, expectedErrorMessage: string) => {

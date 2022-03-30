@@ -2,15 +2,15 @@ import { jest, describe, test, expect } from "@jest/globals";
 import DeleteNamedProfile from "./delete";
 
 describe("DeleteNamedProfile", () => {
-  const getTestCommand = (leappCliService: any = null, argv: string[] = []): DeleteNamedProfile => {
+  const getTestCommand = (cliProviderService: any = null, argv: string[] = []): DeleteNamedProfile => {
     const command = new DeleteNamedProfile(argv, {} as any);
-    (command as any).leappCliService = leappCliService;
+    (command as any).cliProviderService = cliProviderService;
     return command;
   };
 
   test("selectNamedProfile", async () => {
     const namedProfile = { name: "profileName" };
-    const leappCliService: any = {
+    const cliProviderService: any = {
       namedProfilesService: {
         getNamedProfiles: jest.fn(() => [namedProfile]),
       },
@@ -29,39 +29,39 @@ describe("DeleteNamedProfile", () => {
       },
     };
 
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
     const selectedProfile = await command.selectNamedProfile();
 
-    expect(leappCliService.namedProfilesService.getNamedProfiles).toHaveBeenCalledWith(true);
+    expect(cliProviderService.namedProfilesService.getNamedProfiles).toHaveBeenCalledWith(true);
     expect(selectedProfile).toBe(namedProfile);
   });
 
   test("selectNamedProfile, no named profiles", async () => {
-    const leappCliService: any = {
+    const cliProviderService: any = {
       namedProfilesService: {
         getNamedProfiles: jest.fn(() => []),
       },
     };
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
 
     await expect(command.selectNamedProfile()).rejects.toThrow(new Error("no profiles available"));
   });
 
   test("getAffectedSessions", async () => {
-    const leappCliService: any = {
+    const cliProviderService: any = {
       namedProfilesService: {
         getSessionsWithNamedProfile: jest.fn(() => "sessions"),
       },
     };
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
 
     const sessions = command.getAffectedSessions("profileId");
     expect(sessions).toBe("sessions");
-    expect(leappCliService.namedProfilesService.getSessionsWithNamedProfile).toHaveBeenCalledWith("profileId");
+    expect(cliProviderService.namedProfilesService.getSessionsWithNamedProfile).toHaveBeenCalledWith("profileId");
   });
 
   test("askForConfirmation", async () => {
-    const leappCliService: any = {
+    const cliProviderService: any = {
       inquirer: {
         prompt: async (params: any) => {
           expect(params).toEqual([
@@ -75,7 +75,7 @@ describe("DeleteNamedProfile", () => {
         },
       },
     };
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
 
     const affectedSessions = [{ sessionName: "sess1" }, { sessionName: "sess2" }] as any;
     const confirmation = await command.askForConfirmation(affectedSessions);
@@ -91,20 +91,20 @@ describe("DeleteNamedProfile", () => {
   });
 
   test("deleteNamedProfile", async () => {
-    const leappCliService: any = {
+    const cliProviderService: any = {
       namedProfilesService: {
         deleteNamedProfile: jest.fn(),
       },
       remoteProceduresClient: { refreshSessions: jest.fn() },
     };
 
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
     command.log = jest.fn();
     await command.deleteNamedProfile("profileId");
 
-    expect(leappCliService.namedProfilesService.deleteNamedProfile).toHaveBeenCalledWith("profileId");
+    expect(cliProviderService.namedProfilesService.deleteNamedProfile).toHaveBeenCalledWith("profileId");
     expect(command.log).toHaveBeenCalledWith("profile deleted");
-    expect(leappCliService.remoteProceduresClient.refreshSessions).toHaveBeenCalled();
+    expect(cliProviderService.remoteProceduresClient.refreshSessions).toHaveBeenCalled();
   });
 
   const runCommand = async (errorToThrow: any, expectedErrorMessage: string) => {

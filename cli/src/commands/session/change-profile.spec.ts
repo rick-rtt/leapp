@@ -91,20 +91,20 @@ describe("ChangeProfile", () => {
     const session = {} as any;
     const newProfile = {} as any;
 
-    const leappCliService: any = {
+    const cliProviderService: any = {
       namedProfilesService: {
         changeNamedProfile: jest.fn(),
       },
       remoteProceduresClient: { refreshSessions: jest.fn() },
     };
 
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
     command.log = jest.fn();
 
     await command.changeSessionProfile(session, newProfile);
-    expect(leappCliService.namedProfilesService.changeNamedProfile).toHaveBeenCalledWith(session, newProfile);
+    expect(cliProviderService.namedProfilesService.changeNamedProfile).toHaveBeenCalledWith(session, newProfile);
     expect(command.log).toHaveBeenCalledWith("session profile changed");
-    expect(leappCliService.remoteProceduresClient.refreshSessions).toHaveBeenCalled();
+    expect(cliProviderService.remoteProceduresClient.refreshSessions).toHaveBeenCalled();
   });
 
   const runCommand = async (errorToThrow: any, expectedErrorMessage: string) => {

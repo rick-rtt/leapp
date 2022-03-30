@@ -2,15 +2,15 @@ import { jest, describe, test, expect } from "@jest/globals";
 import DeleteIdpUrl from "./delete";
 
 describe("DeleteIdpUrl", () => {
-  const getTestCommand = (leappCliService: any = null, argv: string[] = []): DeleteIdpUrl => {
+  const getTestCommand = (cliProviderService: any = null, argv: string[] = []): DeleteIdpUrl => {
     const command = new DeleteIdpUrl(argv, {} as any);
-    (command as any).leappCliService = leappCliService;
+    (command as any).cliProviderService = cliProviderService;
     return command;
   };
 
   test("selectIdpUrl", async () => {
     const ipdUrl = { url: "url1" };
-    const leappCliService: any = {
+    const cliProviderService: any = {
       idpUrlsService: {
         getIdpUrls: jest.fn(() => [ipdUrl]),
       },
@@ -29,39 +29,39 @@ describe("DeleteIdpUrl", () => {
       },
     };
 
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
     const selectedIdpUrl = await command.selectIdpUrl();
 
-    expect(leappCliService.idpUrlsService.getIdpUrls).toHaveBeenCalled();
+    expect(cliProviderService.idpUrlsService.getIdpUrls).toHaveBeenCalled();
     expect(selectedIdpUrl).toBe(ipdUrl);
   });
 
   test("selectIdpUrl, no idp urls", async () => {
-    const leappCliService: any = {
+    const cliProviderService: any = {
       idpUrlsService: {
         getIdpUrls: jest.fn(() => []),
       },
     };
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
 
     await expect(command.selectIdpUrl()).rejects.toThrow(new Error("no identity provider URLs available"));
   });
 
   test("getAffectedSessions", async () => {
-    const leappCliService: any = {
+    const cliProviderService: any = {
       idpUrlsService: {
         getDependantSessions: jest.fn(() => "sessions"),
       },
     };
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
 
     const sessions = command.getAffectedSessions("idpUrlId");
     expect(sessions).toBe("sessions");
-    expect(leappCliService.idpUrlsService.getDependantSessions).toHaveBeenCalledWith("idpUrlId");
+    expect(cliProviderService.idpUrlsService.getDependantSessions).toHaveBeenCalledWith("idpUrlId");
   });
 
   test("askForConfirmation", async () => {
-    const leappCliService: any = {
+    const cliProviderService: any = {
       inquirer: {
         prompt: async (params: any) => {
           expect(params).toEqual([
@@ -76,7 +76,7 @@ describe("DeleteIdpUrl", () => {
         },
       },
     };
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
 
     const affectedSessions = [{ sessionName: "sess1" }, { sessionName: "sess2" }] as any;
     const confirmation = await command.askForConfirmation(affectedSessions);
@@ -92,19 +92,19 @@ describe("DeleteIdpUrl", () => {
   });
 
   test("deleteIdpUrl", async () => {
-    const leappCliService: any = {
+    const cliProviderService: any = {
       idpUrlsService: {
         deleteIdpUrl: jest.fn(),
       },
       remoteProceduresClient: { refreshSessions: jest.fn() },
     };
 
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
     command.log = jest.fn();
     await command.deleteIdpUrl("idpUrl");
 
-    expect(leappCliService.idpUrlsService.deleteIdpUrl).toHaveBeenCalledWith("idpUrl");
-    expect(leappCliService.remoteProceduresClient.refreshSessions).toHaveBeenCalled();
+    expect(cliProviderService.idpUrlsService.deleteIdpUrl).toHaveBeenCalledWith("idpUrl");
+    expect(cliProviderService.remoteProceduresClient.refreshSessions).toHaveBeenCalled();
     expect(command.log).toHaveBeenCalledWith("identity provider URL deleted");
   });
 

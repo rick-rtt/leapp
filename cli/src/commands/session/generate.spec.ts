@@ -4,9 +4,9 @@ import { AwsSessionService } from "@noovolari/leapp-core/services/session/aws/aw
 import GenerateSession from "./generate";
 
 describe("GenerateSession", () => {
-  const getTestCommand = (leappCliService: any = null, argv: string[] = []): GenerateSession => {
+  const getTestCommand = (cliProviderService: any = null, argv: string[] = []): GenerateSession => {
     const command = new GenerateSession(argv, {} as any);
-    (command as any).leappCliService = leappCliService;
+    (command as any).cliProviderService = cliProviderService;
     return command;
   };
 
@@ -18,12 +18,12 @@ describe("GenerateSession", () => {
       getSessionService: jest.fn(() => sessionService),
     };
 
-    const leappCliService: any = {
+    const cliProviderService: any = {
       sessionFactory,
     };
 
     const session = { sessionId: "sessionId", type: "sessionType" } as unknown as AwsSessionService;
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
 
     command.log = jest.fn();
     command.isAwsSession = jest.fn(() => true);
@@ -42,12 +42,12 @@ describe("GenerateSession", () => {
       getSessionService: jest.fn(() => sessionService),
     };
 
-    const leappCliService: any = {
+    const cliProviderService: any = {
       sessionFactory,
     };
 
     const session = { sessionId: "sessionId", type: "sessionType" };
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
 
     command.log = jest.fn();
     command.isAwsSession = jest.fn(() => false);
@@ -56,38 +56,38 @@ describe("GenerateSession", () => {
   });
 
   test("getSession", async () => {
-    const leappCliService: any = {
+    const cliProviderService: any = {
       repository: {
         getSessions: jest.fn(() => [{ sessionId: "sessionId1" }, { sessionId: "sessionId2" }, { sessionId: "sessionId3" }]),
       },
     };
 
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
 
     const selectedSession = await command.getSession("sessionId1");
     expect(selectedSession).toEqual({ sessionId: "sessionId1" });
   });
 
   test("getSession, no session available", async () => {
-    const leappCliService: any = {
+    const cliProviderService: any = {
       repository: {
         getSessions: jest.fn(() => []),
       },
     };
 
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
 
     await expect(command.getSession("sessionId1")).rejects.toThrow(new Error("no sessions available"));
   });
 
   test("getSession, id not unique", async () => {
-    const leappCliService: any = {
+    const cliProviderService: any = {
       repository: {
         getSessions: jest.fn(() => [{ sessionId: "sessionId1" }, { sessionId: "sessionId1" }, { sessionId: "sessionId3" }]),
       },
     };
 
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
 
     await expect(command.getSession("sessionId1")).rejects.toThrow(new Error("id must be unique"));
   });

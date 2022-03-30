@@ -6,11 +6,14 @@ describe("CliVerificationWindowService", () => {
     const registerClientResponse = { clientId: "clientId", clientSecret: "clientSecret" } as any;
     const startDeviceAuthorizationResponse = { verificationUriComplete: "verUri", deviceCode: "deviceCode" } as any;
 
-    const cliVerificationWindowService = new CliAwsSsoOidcVerificationWindowService();
+    const cliAwsSsoOidcVerificationWindowService = new CliAwsSsoOidcVerificationWindowService();
     const page = { goto: jest.fn() };
-    (cliVerificationWindowService as any).getNavigationPage = async () => page;
+    (cliAwsSsoOidcVerificationWindowService as any).getNavigationPage = async () => page;
 
-    const verificationResponse = await cliVerificationWindowService.openVerificationWindow(registerClientResponse, startDeviceAuthorizationResponse);
+    const verificationResponse = await cliAwsSsoOidcVerificationWindowService.openVerificationWindow(
+      registerClientResponse,
+      startDeviceAuthorizationResponse
+    );
 
     expect(verificationResponse).toEqual({
       clientId: "clientId",
@@ -21,21 +24,21 @@ describe("CliVerificationWindowService", () => {
   });
 
   test("getNavigationPage and closeBrowser", async () => {
-    const cliVerificationWindowService = new CliAwsSsoOidcVerificationWindowService();
-    const page = await (cliVerificationWindowService as any).getNavigationPage(false);
+    const cliAwsSsoOidcVerificationWindowService = new CliAwsSsoOidcVerificationWindowService();
+    const page = await (cliAwsSsoOidcVerificationWindowService as any).getNavigationPage(false);
 
     const process = page.browser().process();
     expect(process).toBeDefined();
     expect(process?.killed).toBeFalsy();
     expect(process?.signalCode).toBeNull();
 
-    await cliVerificationWindowService.closeBrowser();
+    await cliAwsSsoOidcVerificationWindowService.closeBrowser();
     expect(process?.killed).toBeTruthy();
     expect(process?.signalCode).toEqual("SIGKILL");
   });
 
   test("closeBrowser, no opened browser", async () => {
-    const cliVerificationWindowService = new CliAwsSsoOidcVerificationWindowService();
-    await cliVerificationWindowService.closeBrowser();
+    const cliAwsSsoOidcVerificationWindowService = new CliAwsSsoOidcVerificationWindowService();
+    await cliAwsSsoOidcVerificationWindowService.closeBrowser();
   });
 });

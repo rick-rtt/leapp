@@ -3,9 +3,9 @@ import StartSession from "./start";
 import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
 
 describe("StartSession", () => {
-  const getTestCommand = (leappCliService: any = null): StartSession => {
+  const getTestCommand = (cliProviderService: any = null): StartSession => {
     const command = new StartSession([], {} as any);
-    (command as any).leappCliService = leappCliService;
+    (command as any).cliProviderService = cliProviderService;
     return command;
   };
 
@@ -19,13 +19,13 @@ describe("StartSession", () => {
     };
     const remoteProceduresClient: any = { refreshSessions: jest.fn() };
 
-    const leappCliService: any = {
+    const cliProviderService: any = {
       sessionFactory,
       remoteProceduresClient,
     };
 
     const session: any = { sessionId: "sessionId", type: "sessionType" };
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
     command.log = jest.fn();
     const processOn = jest.spyOn(process, "on").mockImplementation((event: any, callback: any): any => {
       expect(event).toBe("SIGINT");
@@ -44,7 +44,7 @@ describe("StartSession", () => {
   });
 
   test("selectSession", async () => {
-    const leappCliService: any = {
+    const cliProviderService: any = {
       repository: {
         getSessions: jest.fn(() => [
           { sessionName: "sessionActive", status: SessionStatus.active },
@@ -57,9 +57,9 @@ describe("StartSession", () => {
       },
     };
 
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
     const selectedSession = await command.selectSession();
-    expect(leappCliService.inquirer.prompt).toHaveBeenCalledWith([
+    expect(cliProviderService.inquirer.prompt).toHaveBeenCalledWith([
       {
         choices: [
           {
@@ -76,13 +76,13 @@ describe("StartSession", () => {
   });
 
   test("selectSession, no session available", async () => {
-    const leappCliService: any = {
+    const cliProviderService: any = {
       repository: {
         getSessions: jest.fn(() => []),
       },
     };
 
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
     await expect(command.selectSession()).rejects.toThrow(new Error("no sessions available"));
   });
 
