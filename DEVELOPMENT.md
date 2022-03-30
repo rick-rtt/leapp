@@ -62,19 +62,31 @@ If it is the first time you fork a repository from the GitHub console, please re
 
 ## Install dependencies
 
+At a first glance, you can see that Leapp consists of a monorepo structure that contains Leapp Core, Leapp Desktop App, and Leapp CLI.
+Each of these sub-projects contain its _package.json_ and _tsconfig.json_ file. We will deepen how the project is structured in the
+_Project Structure_ section.
+
 Inside the project root folder, run
 
 ```bash
 nvm use
 ```
 
-to set the Node.js version to the one specified in the .nvmrc; then, run
+to set the Node.js version to the one specified in the .nvmrc; then, from the root folder, run
 
 ```bash
 npm install
 ```
 
-to install all the dependencies specified in the package.json file.
+to install all the dependencies specified in the root package.json file.
+
+At this point, you can setup the entire project running a [Gushio](https://github.com/Forge-Srl/gushio) script called _setup_ from the root package.json.
+
+> Gushio* is built on top of battle-tested libraries like commander and shelljs and allows you to write a multiplatform shell script in a single JavaScript file without having to worry about package.json and dependencies installation.
+> * Gushio is pronounced like the italian word "guscio" (IPA: /'guʃʃo/) which means "shell".
+
+The _setup_ script installs node_modules dependencies for each sub-project, and builds Leapp Core and Leapp CLI. To build and run Leapp Desktop App
+in the development environment, there is a specific script - called _build-and-run-dev_ - available in Leapp Desktop App's package.json.
 
 ## System Vault
 
