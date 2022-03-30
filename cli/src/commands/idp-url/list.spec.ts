@@ -3,9 +3,9 @@ import { describe, expect, jest, test } from "@jest/globals";
 import ListIdpUrls from "./list";
 
 describe("ListIdpUrls", () => {
-  const getTestCommand = (leappCliService: any = null, argv: string[] = []): ListIdpUrls => {
+  const getTestCommand = (cliProviderService: any = null, argv: string[] = []): ListIdpUrls => {
     const command = new ListIdpUrls(argv, {} as any);
-    (command as any).leappCliService = leappCliService;
+    (command as any).cliProviderService = cliProviderService;
     return command;
   };
 
@@ -48,13 +48,13 @@ describe("ListIdpUrls", () => {
         url: "idpUrlsName",
       },
     ];
-    const leappCliService = {
+    const cliProviderService = {
       idpUrlsService: {
         getIdpUrls: () => idpUrls,
       },
     };
 
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
     const tableSpy = jest.spyOn(CliUx.ux, "table").mockImplementation(() => null);
 
     await command.showIdpUrls();

@@ -1,7 +1,7 @@
 import * as Aws from "aws-sdk";
 import { LeappAwsStsError } from "../../../errors/leapp-aws-sts-error";
 import { LeappSamlError } from "../../../errors/leapp-saml-error";
-import { IAwsAuthenticationService } from "../../../interfaces/i-aws-authentication.service";
+import { IAwsSamlAuthenticationService } from "../../../interfaces/i-aws-saml-authentication-service";
 import { ISessionNotifier } from "../../../interfaces/i-session-notifier";
 import { AwsIamRoleFederatedSession } from "../../../models/aws-iam-role-federated-session";
 import { CredentialsInfo } from "../../../models/credentials-info";
@@ -21,7 +21,7 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
     repository: Repository,
     private fileService: FileService,
     private awsCoreService: AwsCoreService,
-    private awsAuthenticationService: IAwsAuthenticationService,
+    private awsAuthenticationService: IAwsSamlAuthenticationService,
     private samlRoleSessionDuration: number
   ) {
     super(iSessionNotifier, repository);

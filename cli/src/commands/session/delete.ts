@@ -24,11 +24,11 @@ export default class DeleteSession extends LeappCommand {
   }
 
   async selectSession(): Promise<Session> {
-    const availableSessions = this.leappCliService.repository.getSessions();
+    const availableSessions = this.cliProviderService.repository.getSessions();
     if (availableSessions.length === 0) {
       throw new Error("no sessions available");
     }
-    const answer: any = await this.leappCliService.inquirer.prompt([
+    const answer: any = await this.cliProviderService.inquirer.prompt([
       {
         name: "selectedSession",
         message: "select a session",
@@ -40,14 +40,14 @@ export default class DeleteSession extends LeappCommand {
   }
 
   async deleteSession(session: Session): Promise<void> {
-    const sessionService = this.leappCliService.sessionFactory.getSessionService(session.type);
+    const sessionService = this.cliProviderService.sessionFactory.getSessionService(session.type);
     await sessionService.delete(session.sessionId);
-    await this.leappCliService.remoteProceduresClient.refreshSessions();
+    await this.cliProviderService.remoteProceduresClient.refreshSessions();
     this.log("session deleted");
   }
 
   getAffectedSessions(session: Session): Session[] {
-    const sessionService = this.leappCliService.sessionFactory.getSessionService(session.type);
+    const sessionService = this.cliProviderService.sessionFactory.getSessionService(session.type);
     return sessionService.getDependantSessions(session.sessionId);
   }
 
@@ -56,7 +56,7 @@ export default class DeleteSession extends LeappCommand {
       return true;
     }
     const sessionsList = affectedSessions.map((session) => `- ${session.sessionName}`).join("\n");
-    const answer: any = await this.leappCliService.inquirer.prompt([
+    const answer: any = await this.cliProviderService.inquirer.prompt([
       {
         name: "confirmation",
         message: `deleting this session will delete also these chained sessions\n${sessionsList}\nDo you want to continue?`,

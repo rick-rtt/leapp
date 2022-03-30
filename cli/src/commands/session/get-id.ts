@@ -26,11 +26,13 @@ export default class GetIdSession extends LeappCommand {
   }
 
   async selectSession(): Promise<Session> {
-    const availableSessions = this.leappCliService.repository.getSessions().filter((session: Session) => session.status === SessionStatus.inactive);
+    const availableSessions = this.cliProviderService.repository
+      .getSessions()
+      .filter((session: Session) => session.status === SessionStatus.inactive);
     if (availableSessions.length === 0) {
       throw new Error("no sessions available");
     }
-    const answer: any = await this.leappCliService.inquirer.prompt([
+    const answer: any = await this.cliProviderService.inquirer.prompt([
       {
         name: "selectedSession",
         message: "select a session",

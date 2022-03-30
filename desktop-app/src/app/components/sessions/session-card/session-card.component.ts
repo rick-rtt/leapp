@@ -111,17 +111,17 @@ export class SessionCardComponent implements OnInit {
     private windowService: WindowService,
     private electronService: AppNativeService,
     private messageToasterService: MessageToasterService,
-    private leappCoreService: AppProviderService,
+    private appProviderService: AppProviderService,
     private awsAuthenticationService: AppAwsAuthenticationService
   ) {
-    this.loggingService = leappCoreService.loggingService;
-    this.sessionFactory = leappCoreService.sessionFactory;
-    this.fileService = leappCoreService.fileService;
-    this.keychainService = leappCoreService.keyChainService;
-    this.workspaceService = leappCoreService.workspaceService;
-    this.repository = leappCoreService.repository;
-    this.awsCoreService = leappCoreService.awsCoreService;
-    this.azureCoreService = leappCoreService.azureCoreService;
+    this.loggingService = appProviderService.loggingService;
+    this.sessionFactory = appProviderService.sessionFactory;
+    this.fileService = appProviderService.fileService;
+    this.keychainService = appProviderService.keyChainService;
+    this.workspaceService = appProviderService.workspaceService;
+    this.repository = appProviderService.repository;
+    this.awsCoreService = appProviderService.awsCoreService;
+    this.azureCoreService = appProviderService.azureCoreService;
   }
 
   ngOnInit(): void {
@@ -170,7 +170,7 @@ export class SessionCardComponent implements OnInit {
     });
     this.logSessionData(this.session, `Starting Session`);
     this.trigger.closeMenu();
-    document.querySelector('.table thead tr').scrollIntoView();
+    document.querySelector(".table thead tr").scrollIntoView();
   }
 
   /**
@@ -435,10 +435,10 @@ export class SessionCardComponent implements OnInit {
       try {
         this.repository.getProfileName(this.selectedProfile.value);
       } catch (e) {
-        this.selectedProfile.value = this.leappCoreService.namedProfileService.createNamedProfile(this.selectedProfile.label).id;
+        this.selectedProfile.value = this.appProviderService.namedProfileService.createNamedProfile(this.selectedProfile.label).id;
       }
 
-      this.leappCoreService.namedProfileService.changeNamedProfile(this.session, this.selectedProfile.value);
+      this.appProviderService.namedProfileService.changeNamedProfile(this.session, this.selectedProfile.value);
 
       this.messageToasterService.toast("Profile has been changed!", ToastLevel.success, "Profile changed!");
       this.modalRef.hide();
@@ -542,7 +542,7 @@ export class SessionCardComponent implements OnInit {
     this.trigger.closeMenu();
     const credentials = await (this.sessionService as AwsSessionService).generateCredentials(this.session.sessionId);
     const sessionRegion = this.session.region;
-    await this.leappCoreService.webConsoleService.openWebConsole(credentials, sessionRegion);
+    await this.appProviderService.webConsoleService.openWebConsole(credentials, sessionRegion);
   }
 
   private logSessionData(session: Session, message: string): void {

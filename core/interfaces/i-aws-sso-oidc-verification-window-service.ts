@@ -1,6 +1,6 @@
 import { RegisterClientResponse, StartDeviceAuthorizationResponse, VerificationResponse } from "../services/session/aws/aws-sso-role-service";
 
-export interface IVerificationWindowService {
+export interface IAwsSsoOidcVerificationWindowService {
   openVerificationWindow(
     registerClientResponse: RegisterClientResponse,
     startDeviceAuthorizationResponse: StartDeviceAuthorizationResponse,

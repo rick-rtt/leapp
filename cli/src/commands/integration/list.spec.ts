@@ -3,9 +3,9 @@ import { CliUx } from "@oclif/core";
 import { describe, expect, jest, test } from "@jest/globals";
 
 describe("ListIntegrations", () => {
-  const getTestCommand = (leappCliService: any = null, argv: string[] = []): ListIntegrations => {
+  const getTestCommand = (cliProviderService: any = null, argv: string[] = []): ListIntegrations => {
     const command = new ListIntegrations(argv, {} as any);
-    (command as any).leappCliService = leappCliService;
+    (command as any).cliProviderService = cliProviderService;
     return command;
   };
 
@@ -51,7 +51,7 @@ describe("ListIntegrations", () => {
         accessTokenExpiration: "expiration",
       },
     ];
-    const leappCliService = {
+    const cliProviderService = {
       awsSsoIntegrationService: {
         getIntegrations: () => integrations,
         isOnline: jest.fn(() => true),
@@ -59,7 +59,7 @@ describe("ListIntegrations", () => {
       },
     };
 
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
     const tableSpy = jest.spyOn(CliUx.ux, "table").mockImplementation(() => null);
 
     await command.showIntegrations();
@@ -76,8 +76,8 @@ describe("ListIntegrations", () => {
 
     expect(tableSpy.mock.calls[0][0]).toEqual(expectedData);
 
-    expect(leappCliService.awsSsoIntegrationService.isOnline).toHaveBeenCalledWith(integrations[0]);
-    expect(leappCliService.awsSsoIntegrationService.remainingHours).toHaveBeenCalledWith(integrations[0]);
+    expect(cliProviderService.awsSsoIntegrationService.isOnline).toHaveBeenCalledWith(integrations[0]);
+    expect(cliProviderService.awsSsoIntegrationService.remainingHours).toHaveBeenCalledWith(integrations[0]);
 
     const expectedColumns = {
       integrationName: { header: "Integration Name" },

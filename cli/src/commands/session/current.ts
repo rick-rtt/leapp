@@ -64,8 +64,8 @@ export default class CurrentSession extends LeappCommand {
 
   getSessionFromProfile(profileName: string, provider: string | undefined): Session {
     const profileId =
-      profileName === constants.defaultAwsProfileName ? this.leappCliService.repository.getDefaultProfileId() : this.getProfileId(profileName);
-    let sessions = this.leappCliService.repository.listActive().filter((session: Session) => {
+      profileName === constants.defaultAwsProfileName ? this.cliProviderService.repository.getDefaultProfileId() : this.getProfileId(profileName);
+    let sessions = this.cliProviderService.repository.listActive().filter((session: Session) => {
       const anySession = session as any;
       return anySession.profileId === undefined || anySession.profileId === profileId;
     });
@@ -81,7 +81,7 @@ export default class CurrentSession extends LeappCommand {
   }
 
   getProfileId(profileName: string): string {
-    const profiles = this.leappCliService.repository.getProfiles().filter((profile: AwsNamedProfile) => profile.name === profileName);
+    const profiles = this.cliProviderService.repository.getProfiles().filter((profile: AwsNamedProfile) => profile.name === profileName);
     if (profiles.length === 0) {
       throw new Error(`AWS named profile "${profileName}" not found`);
     } else if (profiles.length > 1) {
@@ -95,7 +95,7 @@ export default class CurrentSession extends LeappCommand {
   }
 
   async getSessionData(session: Session): Promise<any> {
-    const sessionService = this.leappCliService.sessionFactory.getSessionService(session.type);
+    const sessionService = this.cliProviderService.sessionFactory.getSessionService(session.type);
     if (sessionService instanceof AwsSessionService) {
       return {
         alias: session.sessionName,

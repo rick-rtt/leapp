@@ -27,13 +27,13 @@ export default class StartSsmSession extends LeappCommand {
   }
 
   async selectSession(): Promise<Session> {
-    const availableSessions = this.leappCliService.repository
+    const availableSessions = this.cliProviderService.repository
       .getSessions()
-      .filter((session: Session) => this.leappCliService.sessionFactory.getSessionService(session.type) instanceof AwsSessionService);
+      .filter((session: Session) => this.cliProviderService.sessionFactory.getSessionService(session.type) instanceof AwsSessionService);
     if (availableSessions.length === 0) {
       throw new Error("no sessions available");
     }
-    const answer: any = await this.leappCliService.inquirer.prompt([
+    const answer: any = await this.cliProviderService.inquirer.prompt([
       {
         name: "selectedSession",
         message: "select a session",
@@ -45,15 +45,15 @@ export default class StartSsmSession extends LeappCommand {
   }
 
   async generateCredentials(session: Session): Promise<CredentialsInfo> {
-    const sessionService = this.leappCliService.sessionFactory.getSessionService(session.type) as AwsSessionService;
+    const sessionService = this.cliProviderService.sessionFactory.getSessionService(session.type) as AwsSessionService;
     return await sessionService.generateCredentials(session.sessionId);
   }
 
   async selectRegion(session: Session): Promise<string> {
     // TODO: check if is possible to filter out unavailable regions
-    const availableRegions = this.leappCliService.cloudProviderService.availableRegions(session.type);
+    const availableRegions = this.cliProviderService.cloudProviderService.availableRegions(session.type);
 
-    const answer: any = await this.leappCliService.inquirer.prompt([
+    const answer: any = await this.cliProviderService.inquirer.prompt([
       {
         name: "selectedRegion",
         message: `select region`,
@@ -65,8 +65,8 @@ export default class StartSsmSession extends LeappCommand {
   }
 
   async selectSsmInstance(credentials: CredentialsInfo, region: string): Promise<string> {
-    const availableInstances = await this.leappCliService.ssmService.getSsmInstances(credentials, region);
-    const answer: any = await this.leappCliService.inquirer.prompt([
+    const availableInstances = await this.cliProviderService.ssmService.getSsmInstances(credentials, region);
+    const answer: any = await this.cliProviderService.inquirer.prompt([
       {
         name: "selectedInstance",
         message: "select an instance",
@@ -79,12 +79,12 @@ export default class StartSsmSession extends LeappCommand {
 
   async startSsmSession(credentials: CredentialsInfo, ssmInstanceId: string, region: string): Promise<void> {
     let macOsTerminalType;
-    const process = this.leappCliService.cliNativeService.process;
+    const process = this.cliProviderService.cliNativeService.process;
     if (process.platform === "darwin") {
       const terminalProgram = process.env["TERM_PROGRAM"];
       macOsTerminalType = terminalProgram && terminalProgram.toLowerCase().includes("iterm") ? constants.macOsIterm2 : constants.macOsTerminal;
     }
-    await this.leappCliService.ssmService.startSession(credentials, ssmInstanceId, region, macOsTerminalType);
+    await this.cliProviderService.ssmService.startSession(credentials, ssmInstanceId, region, macOsTerminalType);
     this.log("started AWS SSM session");
   }
 }

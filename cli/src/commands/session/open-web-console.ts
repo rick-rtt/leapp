@@ -24,10 +24,10 @@ export default class OpenWebConsole extends LeappCommand {
   }
 
   async openWebConsole(session: Session): Promise<void> {
-    const sessionService = this.leappCliService.sessionFactory.getSessionService(session.type) as AwsSessionService;
+    const sessionService = this.cliProviderService.sessionFactory.getSessionService(session.type) as AwsSessionService;
     const credentials = await sessionService.generateCredentials(session.sessionId);
     try {
-      await this.leappCliService.webConsoleService.openWebConsole(credentials, session.region);
+      await this.cliProviderService.webConsoleService.openWebConsole(credentials, session.region);
     } catch (e) {
       console.log(e);
       throw e;
@@ -36,13 +36,13 @@ export default class OpenWebConsole extends LeappCommand {
   }
 
   private async selectSession(): Promise<Session> {
-    const availableSessions = this.leappCliService.repository
+    const availableSessions = this.cliProviderService.repository
       .getSessions()
       .filter((session: Session) => session.status === SessionStatus.inactive && session.type !== SessionType.azure);
     if (availableSessions.length === 0) {
       throw new Error("no sessions available");
     }
-    const answer: any = await this.leappCliService.inquirer.prompt([
+    const answer: any = await this.cliProviderService.inquirer.prompt([
       {
         name: "selectedSession",
         message: "select a session",

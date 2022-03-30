@@ -22,20 +22,20 @@ export default class StopSession extends LeappCommand {
   }
 
   async stopSession(session: Session): Promise<void> {
-    const sessionService = this.leappCliService.sessionFactory.getSessionService(session.type);
+    const sessionService = this.cliProviderService.sessionFactory.getSessionService(session.type);
     await sessionService.stop(session.sessionId);
-    await this.leappCliService.remoteProceduresClient.refreshSessions();
+    await this.cliProviderService.remoteProceduresClient.refreshSessions();
     this.log("session stopped");
   }
 
   async selectSession(): Promise<Session> {
-    const availableSessions = this.leappCliService.repository
+    const availableSessions = this.cliProviderService.repository
       .getSessions()
       .filter((session: Session) => session.status === SessionStatus.active || session.status === SessionStatus.pending);
     if (availableSessions.length === 0) {
       throw new Error("no active sessions available");
     }
-    const answer: any = await this.leappCliService.inquirer.prompt([
+    const answer: any = await this.cliProviderService.inquirer.prompt([
       {
         name: "selectedSession",
         message: "select a session",

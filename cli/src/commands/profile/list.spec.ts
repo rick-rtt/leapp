@@ -3,9 +3,9 @@ import { describe, expect, jest, test } from "@jest/globals";
 import ListProfiles from "./list";
 
 describe("ListProfiles", () => {
-  const getTestCommand = (leappCliService: any = null, argv: string[] = []): ListProfiles => {
+  const getTestCommand = (cliProviderService: any = null, argv: string[] = []): ListProfiles => {
     const command = new ListProfiles(argv, {} as any);
-    (command as any).leappCliService = leappCliService;
+    (command as any).cliProviderService = cliProviderService;
     return command;
   };
 
@@ -48,13 +48,13 @@ describe("ListProfiles", () => {
         name: "profileName",
       },
     ];
-    const leappCliService = {
+    const cliProviderService = {
       namedProfilesService: {
         getNamedProfiles: () => profiles,
       },
     };
 
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
     const tableSpy = jest.spyOn(CliUx.ux, "table").mockImplementation(() => null);
 
     await command.showProfiles();

@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { IAwsAuthenticationService } from "@noovolari/leapp-core/interfaces/i-aws-authentication.service";
+import { IAwsSamlAuthenticationService } from "@noovolari/leapp-core/interfaces/i-aws-saml-authentication-service";
 import { CloudProviderType } from "@noovolari/leapp-core/models/cloud-provider-type";
 import { AppProviderService } from "./app-provider.service";
 import { WindowService } from "./window.service";
@@ -12,7 +12,7 @@ import { AppService } from "./app.service";
 import { Session } from "@noovolari/leapp-core/models/session";
 
 @Injectable({ providedIn: "root" })
-export class AppAwsAuthenticationService implements IAwsAuthenticationService {
+export class AppAwsAuthenticationService implements IAwsSamlAuthenticationService {
   constructor(
     private leappCoreService: AppProviderService,
     private appService: AppService,

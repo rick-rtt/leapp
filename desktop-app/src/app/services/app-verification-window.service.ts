@@ -5,11 +5,11 @@ import {
   StartDeviceAuthorizationResponse,
   VerificationResponse,
 } from "@noovolari/leapp-core/services/session/aws/aws-sso-role-service";
-import { IVerificationWindowService } from "@noovolari/leapp-core/interfaces/i-verification-window.service";
+import { IAwsSsoOidcVerificationWindowService } from "@noovolari/leapp-core/interfaces/i-aws-sso-oidc-verification-window-service";
 import { WindowService } from "./window.service";
 
 @Injectable({ providedIn: "root" })
-export class AppVerificationWindowService implements IVerificationWindowService {
+export class AppVerificationWindowService implements IAwsSsoOidcVerificationWindowService {
   constructor(private windowService: WindowService) {}
 
   async openVerificationWindow(

@@ -2,15 +2,15 @@ import { jest, describe, test, expect } from "@jest/globals";
 import ChangeSessionRegion from "./change-region";
 
 describe("ChangeRegion", () => {
-  const getTestCommand = (leappCliService: any = null): ChangeSessionRegion => {
+  const getTestCommand = (cliProviderService: any = null): ChangeSessionRegion => {
     const command = new ChangeSessionRegion([], {} as any);
-    (command as any).leappCliService = leappCliService;
+    (command as any).cliProviderService = cliProviderService;
     return command;
   };
 
   test("selectSession", async () => {
     const session1 = { sessionName: "sessionName" };
-    const leappCliService: any = {
+    const cliProviderService: any = {
       repository: {
         getSessions: () => [session1],
       },
@@ -29,14 +29,14 @@ describe("ChangeRegion", () => {
       },
     };
 
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
     const selectedSession = await command.selectSession();
     expect(selectedSession).toBe("selectedSession");
   });
 
   test("selectRegion", async () => {
     const regionFieldChoice = { fieldName: "regionName2", fieldValue: "regionName3" };
-    const leappCliService: any = {
+    const cliProviderService: any = {
       cloudProviderService: {
         availableRegions: jest.fn(() => [regionFieldChoice]),
       },
@@ -55,33 +55,33 @@ describe("ChangeRegion", () => {
       },
     };
 
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
 
     const session = { type: "type", region: "regionName1" } as any;
     const selectedRegion = await command.selectRegion(session);
 
     expect(selectedRegion).toBe("selectedRegion");
-    expect(leappCliService.cloudProviderService.availableRegions).toHaveBeenCalledWith(session.type);
+    expect(cliProviderService.cloudProviderService.availableRegions).toHaveBeenCalledWith(session.type);
   });
 
   test("changeSessionRegion", async () => {
     const session = {} as any;
     const newRegion = {} as any;
 
-    const leappCliService: any = {
+    const cliProviderService: any = {
       regionsService: {
         changeRegion: jest.fn(),
       },
       remoteProceduresClient: { refreshSessions: jest.fn() },
     };
 
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
     command.log = jest.fn();
 
     await command.changeSessionRegion(session, newRegion);
-    expect(leappCliService.regionsService.changeRegion).toHaveBeenCalledWith(session, newRegion);
+    expect(cliProviderService.regionsService.changeRegion).toHaveBeenCalledWith(session, newRegion);
     expect(command.log).toHaveBeenCalledWith("session region changed");
-    expect(leappCliService.remoteProceduresClient.refreshSessions).toHaveBeenCalled();
+    expect(cliProviderService.remoteProceduresClient.refreshSessions).toHaveBeenCalled();
   });
 
   const runCommand = async (errorToThrow: any, expectedErrorMessage: string) => {

@@ -22,11 +22,11 @@ export default class EditNamedProfile extends LeappCommand {
   }
 
   async selectNamedProfile(): Promise<AwsNamedProfile> {
-    const namedProfiles = this.leappCliService.namedProfilesService.getNamedProfiles(true);
+    const namedProfiles = this.cliProviderService.namedProfilesService.getNamedProfiles(true);
     if (namedProfiles.length === 0) {
       throw new Error("no profiles available");
     }
-    const answer: any = await this.leappCliService.inquirer.prompt([
+    const answer: any = await this.cliProviderService.inquirer.prompt([
       {
         name: "selectedNamedProfile",
         message: `select a profile`,
@@ -38,11 +38,11 @@ export default class EditNamedProfile extends LeappCommand {
   }
 
   async getProfileName(): Promise<string> {
-    const answer: any = await this.leappCliService.inquirer.prompt([
+    const answer: any = await this.cliProviderService.inquirer.prompt([
       {
         name: "namedProfileName",
         message: `choose a new name for the profile`,
-        validate: (profileName) => this.leappCliService.namedProfilesService.validateNewProfileName(profileName),
+        validate: (profileName) => this.cliProviderService.namedProfilesService.validateNewProfileName(profileName),
         type: "input",
       },
     ]);
@@ -50,8 +50,8 @@ export default class EditNamedProfile extends LeappCommand {
   }
 
   async editNamedProfile(id: string, newName: string): Promise<void> {
-    await this.leappCliService.namedProfilesService.editNamedProfile(id, newName);
-    await this.leappCliService.remoteProceduresClient.refreshSessions();
+    await this.cliProviderService.namedProfilesService.editNamedProfile(id, newName);
+    await this.cliProviderService.remoteProceduresClient.refreshSessions();
     this.log("profile edited");
   }
 }

@@ -1,5 +1,5 @@
 import { Injectable, NgZone } from "@angular/core";
-import { AuthenticationService } from "@noovolari/leapp-core/services/authentication-service";
+import { AwsSamlAssertionExtractionService } from "@noovolari/leapp-core/services/aws-saml-assertion-extraction-service";
 import { RemoteProceduresServer } from "@noovolari/leapp-core/services/remote-procedures-server";
 import { AwsIamUserService } from "@noovolari/leapp-core/services/session/aws/aws-iam-user-service";
 import { FileService } from "@noovolari/leapp-core/services/file-service";
@@ -51,7 +51,7 @@ export class AppProviderService {
   private awsSsoOidcServiceInstance: AwsSsoOidcService;
   private awsCoreServiceInstance: AwsCoreService;
   private azureServiceInstance: AzureService;
-  private authenticationServiceInstance: AuthenticationService;
+  private authenticationServiceInstance: AwsSamlAssertionExtractionService;
   private sessionFactoryInstance: SessionFactory;
   private awsParentSessionFactoryInstance: AwsParentSessionFactory;
   private fileServiceInstance: FileService;
@@ -199,9 +199,9 @@ export class AppProviderService {
     return this.azureServiceInstance;
   }
 
-  public get authenticationService(): AuthenticationService {
+  public get authenticationService(): AwsSamlAssertionExtractionService {
     if (!this.authenticationServiceInstance) {
-      this.authenticationServiceInstance = new AuthenticationService();
+      this.authenticationServiceInstance = new AwsSamlAssertionExtractionService();
     }
     return this.authenticationServiceInstance;
   }
