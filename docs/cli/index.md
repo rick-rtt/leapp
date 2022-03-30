@@ -1,7 +1,7 @@
 Leapp's Command Line Interface.
 
 <!-- usage -->
-```sh-session
+```console
 $ npm install -g @noovolari/leapp-cli
 $ leapp COMMAND
 running command...
