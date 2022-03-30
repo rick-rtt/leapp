@@ -1,4 +1,106 @@
 # What should I know before I get started?
+If you want to start a code contribution to Leapp, whether it is a bug fix or a new feature, it is important for you to understand Leapp concepts and way to work.
+
+Inside Leapp's documentation site you can find following concepts and topics:
+
+- Sessions
+- Integrations
+- Security
+  - Short-term credentials generation
+  - System Vault for storing sensitive information (e.g. AWS IAM User access keys)
+- Built-in features
+  - EC2 connect through AWS SSM
+  - AWS Multi-profile management
+
+These concepts are implemented in Leapp Core. Leapp Core is a library that decouples Leapp's domain logic from the Client that is going to use it.
+Leapp Core is delivered as [NPM package](https://www.npmjs.com/package/@noovolari/leapp-core), and each client depends on it.
+
+A Client can be rather a GUI or a TUI represented, respectively, by Leapp Desktop App and Leapp CLI. 
+
+Leapp CLI requires the Desktop app to be installed and running.
+The Leapp CLI is delivered as an NPM package and can be installed globally, using the *npm* developer tool.
+
+# Development environment setup
+
+## Node.js and NPM
+
+Follow [this](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) official guide to install both Node.js and NPM.
+
+The latest build was released using Node.js version 16.14.0 - as specified in the .nvmrc - and NPM version 8.5.5.
+
+## NVM
+
+[Here](https://github.com/nvm-sh/nvm#installing-and-updating) you can find the official installation guide.
+
+## Git
+
+[Here](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) you can find the official installation guide.
+
+## Fork and clone through GitHub CLI
+
+Follow [this](https://github.com/cli/cli#installation) guide to install the GitHub CLI.
+
+Log into GitHub (e.g. using your GitHub personal access token) using the following command:
+
+```bash
+gh auth login
+```
+
+Once logged in, you can fork and clone the repository with the following command:
+
+```bash
+gh repo fork noovolari/leapp
+```
+
+## Fork and clone manually
+
+If it is the first time you fork a repository from the GitHub console, please refer to [this](https://docs.github.com/en/get-started/quickstart/fork-a-repo) guide.
+
+## Syncing a fork
+
+[This](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/syncing-a-fork) guide explains you how to keep your local branch up-to-date with the upstream one.
+
+## Install dependencies
+
+Inside the project root folder, run
+
+```bash
+nvm use
+```
+
+to set the Node.js version to the one specified in the .nvmrc; then, run
+
+```bash
+npm install
+```
+
+to install all the dependencies specified in the package.json file.
+
+## System Vault
+
+Skip this section if you are not using a Linux system.
+
+Leapp relies on the System Vault to save sensitive information. In Linux systems it relies on libsecret and gnome-keyring dependencies. To install them, follow [this](https://docs.leapp.cloud/latest/installation/requirements/) documentation page.
+
+## AWS CLI
+
+[Here](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) you can find the official installation guide.
+
+## AWS SSM
+
+To install the AWS SSM agent locally, follow [this](https://docs.leapp.cloud/latest/installation/requirements/) documentation page.
+
+## Azure CLI
+
+[Here](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli) you can find the official installation guide.
+
+---
+---
+---
+---
+---
+
+# What should I know before I get started?
 
 If you want to start a code contribution to Leapp, whether it is a bug fix or a new feature, it is important for you to understand Leapp concepts and way to work.
 
