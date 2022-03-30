@@ -1,5 +1,11 @@
 Leapp's Command Line Interface.
 
+!!! warning
+
+    Leapp CLI will works only if the Desktop App is installed and running.
+    Check the [installation guide](../installation/install-leapp/){: target='_blank'} to install the Desktop App.
+
+
 <!-- usage -->
 ```console
 $ npm install -g @noovolari/leapp-cli
