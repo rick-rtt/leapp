@@ -3,7 +3,7 @@ import { LeappParseError } from "../errors/leapp-parse-error";
 import { AwsSamlAssertionExtractionService } from "./aws-saml-assertion-extraction-service";
 import { CloudProviderType } from "../models/cloud-provider-type";
 
-describe("AuthenticationService", () => {
+describe("AwsSamlAssertionExtractionService", () => {
   test("isAuthenticationUrl", () => {
     const service = new AwsSamlAssertionExtractionService();
 
