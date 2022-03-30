@@ -70,16 +70,19 @@ export class RemoteProceduresServer {
   }
 
   private needAuthentication(emitFunction: EmitFunction, socket: Socket, data: RpcRequest): void {
-    this.awsAuthenticationService.needAuthentication(data.params.idpUrl).then((result: boolean) => {
-      emitFunction(socket, "message", { result });
-    });
+    this.awsAuthenticationService
+      .needAuthentication(data.params.idpUrl)
+      .then((result: boolean) => {
+        emitFunction(socket, "message", { result });
+      })
+      .catch((error) => emitFunction(socket, "message", { error: error.message }));
   }
 
   private awsSignIn(emitFunction: EmitFunction, socket: Socket, data: RpcRequest): void {
     this.awsAuthenticationService
       .awsSignIn(data.params.idpUrl, data.params.needToAuthenticate)
       .then((result: any) => emitFunction(socket, "message", { result }))
-      .catch((error) => emitFunction(socket, "message", { error }));
+      .catch((error) => emitFunction(socket, "message", { error: error.message }));
   }
 
   private openVerificationWindow(emitFunction: EmitFunction, socket: Socket, data: RpcRequest): void {
@@ -88,7 +91,7 @@ export class RemoteProceduresServer {
         emitFunction(socket, "message", { callbackId: "onWindowClose" })
       )
       .then((result: any) => emitFunction(socket, "message", { result }))
-      .catch((error) => emitFunction(socket, "message", { error }));
+      .catch((error) => emitFunction(socket, "message", { error: error.message }));
   }
 
   private refreshIntegrations(emitFunction: EmitFunction, socket: Socket): void {
@@ -99,7 +102,7 @@ export class RemoteProceduresServer {
       });
       emitFunction(socket, "message", {});
     } catch (error) {
-      emitFunction(socket, "message", { error });
+      emitFunction(socket, "message", { error: error.message });
     }
   }
 
@@ -111,7 +114,7 @@ export class RemoteProceduresServer {
       });
       emitFunction(socket, "message", {});
     } catch (error) {
-      emitFunction(socket, "message", { error });
+      emitFunction(socket, "message", { error: error.message });
     }
   }
 }
