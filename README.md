@@ -41,6 +41,7 @@ For more information about features go to [our documentation](https://docs.leapp
 - **Automatic [short-lived credentials rotation](https://docs.leapp.cloud/latest/security/credentials-generation/aws/)**
 - **Automatic provisioning of [Sessions](https://docs.leapp.cloud/latest/sessions/) from [AWS Single Sign-on](https://docs.leapp.cloud/latest/configuring-integration/configure-aws-single-sign-on-integration/)**
 - **Connect to EC2 instances straight away**
+- **Managing Leapp with its [CLI](https://docs.leapp.cloud/latest/cli/)**
 
 All the covered access methods can be found [here](https://docs.leapp.cloud/latest/configuration/).
 

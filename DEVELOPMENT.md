@@ -62,8 +62,9 @@ If it is the first time you fork a repository from the GitHub console, please re
 
 ## Install dependencies
 
-At a first glance, you can see that Leapp consists of a monorepo structure that contains Leapp Core, Leapp Desktop App, and Leapp CLI.
-Each of these sub-packages contain its _package.json_ and _tsconfig.json_ file. We will deepen how the project is structured in the
+At a first glance, you can see that Leapp consists of a monorepo structure that contains **Leapp Core**, **Leapp Desktop App**,
+and **Leapp CLI**.
+Each of these packages contain its _package.json_ and _tsconfig.json_ file. We will deepen how the project is structured in the
 _Project Structure_ section.
 
 Inside the project root folder, run
@@ -83,10 +84,22 @@ to install all the dependencies specified in the root package.json file.
 At this point, you can setup the entire project running a [Gushio](https://github.com/Forge-Srl/gushio) script called _setup_ from the root package.json.
 
 > Gushio* is built on top of battle-tested libraries like commander and shelljs and allows you to write a multiplatform shell script in a single JavaScript file without having to worry about package.json and dependencies installation.
-> * Gushio is pronounced like the italian word "guscio" (IPA: /'guʃʃo/) which means "shell".
 
-The _setup_ script installs node_modules dependencies for each sub-package, and builds Leapp Core and Leapp CLI. To build and run Leapp Desktop App
-in the development environment, there is a specific script - called _build-and-run-dev_ - available in Leapp Desktop App's package.json.
+Run the setup script using the following command:
+
+```bash
+npm run setup
+```
+
+The _setup_ script installs node_modules dependencies for each package, and builds Leapp Core and Leapp CLI. 
+To build and run Leapp Desktop App in the development environment, there is a specific script - called _build-and-run-dev_ -
+available in Leapp Desktop App's package.json.
+
+To run the _build-and-run-dev_ script, use the following command:
+
+```bash
+npm run build-and-run-dev
+```
 
 ## System Vault
 
@@ -108,28 +121,68 @@ To install the AWS SSM agent locally, follow [this](https://docs.leapp.cloud/lat
 
 # Project Structure
 
-Leapp project is structured as a monorepo and these are its sub-packages:
+Leapp project is structured as a monorepo and these are its packages:
 
-| sub-package       | folder       |
-|-------------------|--------------|
-| Leapp Core        | /core        |
-| Leapp CLI         | /cli         |
+| package       | folder       |
+|---------------|--------------|
+| Leapp Core    | /core        |
+| Leapp CLI     | /cli         |
 | Leapp Desktop App | /desktop-app |
 
 
 To facilitate and keep track of contributions, we approached a monorepo architecture; it allows maintaining different projects under the same repository.
-The Core contains the application logic; basically, it acts as a library on top of which clients, like the Desktop Application and the CLI, will run. 
+The Core contains the application logic.
+
+It acts as a library on top of which clients will run. 
 In the monorepo scenario, Desktop Application, CLI, and Core are three different projects under the same repository.
 
 ## Core
 
+As described in the introduction of this document, Leapp Core is a library that decouples Leapp's domain logic from the Client that is going to use it.
 
+The core package consists of four main folders: _errors_, _interfaces_, _models_, _services_.
+
+### Errors
+
+This folder contains errors that belong to the domain of Leapp.
+Here you can find a base implementation, i.e. the _LeappBaseError_ class; all the other errors are an implementation of
+_LeappBaseError_.
+
+```typescript
+export class LeappBaseError extends Error {
+  private readonly _context: any;
+  private readonly _severity: LoggerLevel;
+
+  constructor(name: string, context: any, severity: LoggerLevel, message?: string) {
+    super(message);
+    this.name = name;
+    this._context = context;
+    this._severity = severity;
+    Object.setPrototypeOf(this, new.target.prototype);
+  }
+
+  public get severity(): LoggerLevel {
+    return this._severity;
+  }
+
+  public get context(): any {
+    return this._context;
+  }
+}
+```
+
+As you can see from the code quote above, the _LeappBaseError_ class extends the TypeScript _Error_ class and provides
+additional information: _name_, _context_, and _severity_.
+
+If you consider it useful, you can implement a new error that extends _LeappBaseError_ one.
 
 ### Models
 
-The Models folder contains TypeScript interfaces that represents the state of Leapp, that is persisted in Leapp’s configuration file, and other interfaces that needs to be centralized and used across different logic inside the Angular project.
+The Models folder contains TypeScript interfaces that represents the state of Leapp, that is persisted in Leapp’s configuration file, 
+and other interfaces that needs to be centralized and used across different logic inside the Leapp Core package.
 
-For what concerns the state of the application, you’ll find a definition of all the supported Sessions and a Workspace object which represents the template of the configuration file.
+For what concerns the state of the application, you’ll find a definition of all the supported Sessions and a Workspace object 
+which represents the template of the configuration file.
 
 The Workspace includes:
 
@@ -201,15 +254,13 @@ AWS SSO configuration is bound to a specific region (e.g. eu-west-1, etc.) and p
 
 From this behaviour we extrapulated the concept of Integration that can be applied to other third-party services like - for example - Okta and OneLogin.
 
-The concept of Integration encapsulates the following behaviours:
+The concept of Integration encapsulates the behaviours described below.
 
-- login - logging into the Integration and get an access token to exploit its APIs;
-- sync - automatically provision all the accounts and roles that can be access by the user through the access token;
-- logout - logging out from the Integration.
-
-### Errors
-
-These folder contains Leapp standard errors, from the less specific LeappBaseError to the more specific ones. The specific errors extend LeappBaseError, inheriting attributes like name, context, and severity.
+- syncSessions
+  - logs into the Integration and gets an access token to exploit its APIs
+  - automatically provisions all the accounts and roles that can be accessed by the user through the access token
+- logout
+  - logs out from the Integration
 
 ## Desktop App
 
@@ -253,6 +304,8 @@ There is also a dialogs folder that contains, for easiness, all the dialog compo
 For us, it is best to create a new component every time we need a new dialog in the interface, just to keep things well separated and DRY.
 
 ## CLI
+
+
 
 # Build
 
