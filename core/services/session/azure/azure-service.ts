@@ -54,15 +54,21 @@ export class AzureService extends SessionService {
 
     // extract accessToken corresponding to the specific tenant (if not present, require az login)
     let accessTokenExpirationTime;
-    if (accessTokensFile) {
-      accessTokenExpirationTime = this.extractAccessTokenExpirationTime(accessTokensFile, (session as AzureSession).tenantId);
-    }
+    accessTokenExpirationTime = await this.extractAccessTokenExpirationTime(
+      accessTokensFile,
+      (session as AzureSession).tenantId,
+      (session as AzureSession).subscriptionId
+    );
 
     if (!accessTokenExpirationTime) {
       try {
         await this.executeService.execute(`az login --tenant ${(session as AzureSession).tenantId} 2>&1`);
         accessTokensFile = this.parseAccessTokens();
-        accessTokenExpirationTime = this.extractAccessTokenExpirationTime(accessTokensFile, (session as AzureSession).tenantId);
+        accessTokenExpirationTime = await this.extractAccessTokenExpirationTime(
+          accessTokensFile,
+          (session as AzureSession).tenantId,
+          (session as AzureSession).subscriptionId
+        );
       } catch (err) {
         this.sessionDeactivated(sessionId);
         throw new LeappExecuteError(this, err.message);
@@ -70,7 +76,7 @@ export class AzureService extends SessionService {
     }
 
     // if access token is expired
-    if (new Date(accessTokenExpirationTime).getTime() < Date.now()) {
+    if (!accessTokenExpirationTime || new Date(accessTokenExpirationTime).getTime() < Date.now()) {
       try {
         await this.executeService.execute(`az account get-access-token --subscription ${(session as AzureSession).subscriptionId}`);
       } catch (err) {
@@ -85,7 +91,10 @@ export class AzureService extends SessionService {
       // az configure —default location <region(location)>
       await this.executeService.execute(`az configure --default location=${(session as AzureSession).region} 2>&1`);
       // delete refresh token from accessTokens
-      this.deleteRefreshToken();
+      //(FOR VERSION >= 2.30.0)
+      if (this.accessTokenFileExists()) {
+        this.deleteRefreshToken();
+      }
     } catch (err) {
       this.sessionDeactivated(sessionId);
       throw new LeappExecuteError(this, err.message);
@@ -122,9 +131,28 @@ export class AzureService extends SessionService {
     }
   }
 
-  private extractAccessTokenExpirationTime(accessTokens: AzureSessionToken[], tenantId: string): string {
-    const correctToken = accessTokens.find((accessToken) => accessToken._authority.split("/")[1] === tenantId);
-    return correctToken ? correctToken.expiresOn : undefined;
+  private async extractAccessTokenExpirationTime(accessTokens: AzureSessionToken[], tenantId: string, subscriptionId: string): Promise<string> {
+    if (accessTokens) {
+      /////////////////////////////////////////////////////////////////////////////////////////////////////
+      //!!! FOR AZURE CLI PRIOR TO 2.30.0 https://docs.microsoft.com/en-us/cli/azure/msal-based-azure-cli//
+      console.log(accessTokens);
+      const correctToken = accessTokens.find(
+        (accessToken) => accessToken._authority.split("/")[accessToken._authority.split("/").length - 1] === tenantId
+      );
+      /////////////////////////////////////////////////////////////////////////////////////////////////////
+      return correctToken ? correctToken.expiresOn : undefined;
+    } else {
+      ///////////////////////////////////////////////////////////////////////////////////////////////
+      //!!! FOR AZURE CLI >= 2.30.0 https://docs.microsoft.com/en-us/cli/azure/msal-based-azure-cli//
+      ///////////////////////////////////////////////////////////////////////////////////////////////
+      try {
+        const result = await this.executeService.execute(`az account get-access-token --subscription ${subscriptionId}`);
+        const correctToken = JSON.parse(result);
+        return correctToken ? correctToken.expiresOn : undefined;
+      } catch (err) {
+        return undefined;
+      }
+    }
   }
 
   private deleteRefreshToken(): void {
