@@ -305,13 +305,102 @@ For us, it is best to create a new component every time we need a new dialog in 
 
 ## CLI
 
+This package consists of a CLI based on Oclif, an open CLI framework. 
+Please, refer to the [official Oclif docs](https://oclif.io/docs/introduction) to know how it works.
 
+We organized the CLI's _/src_ folder in **/commands** and **/services** sub-folders.
+
+### Commands folder
+
+Commands folder contains Leapp CLI's commands implementation. Each command takes part of a **scope**. As far as now, there are
+five scopes available:
+
+- ipd-url;
+- integration;
+- profile;
+- region;
+- session.
+
+Each command extends the **LeappCommand** class, that is an implementation of @oclif/core's **Command** class.
+
+We built the LeappCommand class to introduce some logic before the actual command is executed.
+For example, we added a logic that block the command execution if the Desktop App is not installed and running.
+
+To write a new command, from scratch, use the following command template and position it in the proper scope folder (or create a new one).
+
+```typescript
+import { LeappCommand } from "../../leapp-command";
+
+export default class HelloWorld extends LeappCommand {
+  static description = "hello world";
+  static examples = ["$leapp scope hello-world"];
+
+  constructor(argv: string[], config: Config) {
+    super(argv, config);
+  }
+
+  async run(): Promise<void> {
+    // write here the command logic
+  }
+}
+```
+
+### Services folder
+
+This folder contains an implementation for each of the following Leapp Core interfaces:
+
+- INativeService;
+- IMfaCodePrompter;
+- IAwsSamlAuthenticationService;
+- IAwsSsoOidcVerificationWindowService;
+- IOpenExternalUrlService.
+
+Moreover, you can find the CliProviderService, i.e. a class that is responsible for caching and providing instances used
+by Leapp CLI's commands. For example, it caches and provides all the Leapp Core's services instances that are needed by
+Leapp CLI's commands.
 
 # Build
 
-The package.json file contains all the build scripts, in addition to the dependencies and other project’s metadata. You can find this file in the root of the project.
+This section addresses local development, not releases.
 
-All the scripts are grouped under the “scripts” key. There you can find the “build-and-run-dev” script that you can use to build and run the Electron application locally.
+Remember that the root folder's package.json contains the _setup_ script, that can be used to setup all the packages,
+i.e. Leapp Core, Leapp CLI and Leapp Desktop App. This script does not build the Desktop App; you've to do it using 
+the `npm run build-and-run-dev` command.
+
+When developing locally, remember to make the two Clients - Desktop App and CLI - depend on the local Leapp Core build.
+
+To do that, please run the following command from the root of the project:
+
+```bash
+npm run set-core-dependency-to-local
+```
+
+## /core
+
+In /core/package.json you can find the _build_ script that you can use to build Leapp Core. The output folder is
+placed under /core/dist.
+
+You can run it using the following command from the /core folder:
+
+```bash
+npm run build
+```
+
+## /cli
+
+In /core/package.json you can find the _prepack_ script that you can use to build Leapp CLI and generate the
+oclif.manifest.json file, which is needed to make Oclif aware of the commands available.
+
+You can run it using the following command from the /cli folder:
+
+```bash
+npm run prepack
+```
+
+## /desktop-app
+
+In /desktop-app/package.json you can find the _build-and-run-dev_ script that you can use to build and run the Electron 
+application locally.
 
 If Electron is failing building the native Library `Keytar` just run the following command, before `npm run build-and-run-dev`:
 
