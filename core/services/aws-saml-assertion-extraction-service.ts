@@ -19,7 +19,7 @@ const authenticationUrlRegexes = new Map([
 ]);
 const samlAssertionRegexes = new Map([[CloudProviderType.aws, [/^https:\/\/signin\.aws\.amazon\.com\/saml/]]]);
 
-export class AuthenticationService {
+export class AwsSamlAssertionExtractionService {
   isAuthenticationUrl(cloudProvider: CloudProviderType, url: string): boolean {
     return authenticationUrlRegexes.get(cloudProvider).some((regex) => regex.test(url));
   }

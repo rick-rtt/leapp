@@ -4,9 +4,9 @@ import { AwsSessionService } from "@noovolari/leapp-core/services/session/aws/aw
 import { constants } from "@noovolari/leapp-core/models/constants";
 
 describe("StartSsmSession", () => {
-  const getTestCommand = (leappCliService: any = null): StartSsmSession => {
+  const getTestCommand = (cliProviderService: any = null): StartSsmSession => {
     const command = new StartSsmSession([], {} as any);
-    (command as any).leappCliService = leappCliService;
+    (command as any).cliProviderService = cliProviderService;
     return command;
   };
 
@@ -48,7 +48,7 @@ describe("StartSsmSession", () => {
   });
 
   test("selectSession", async () => {
-    const leappCliService: any = {
+    const cliProviderService: any = {
       repository: {
         getSessions: jest.fn(() => [{ sessionName: "awsSession", type: "aws" }, { sessionName: "azureSession" }]),
       },
@@ -60,9 +60,9 @@ describe("StartSsmSession", () => {
       },
     };
 
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
     const selectedSession = await command.selectSession();
-    expect(leappCliService.inquirer.prompt).toHaveBeenCalledWith([
+    expect(cliProviderService.inquirer.prompt).toHaveBeenCalledWith([
       {
         choices: [{ name: "awsSession", value: { sessionName: "awsSession", type: "aws" } }],
         message: "select a session",
@@ -75,23 +75,23 @@ describe("StartSsmSession", () => {
 
   test("generateCredentials", async () => {
     const awsSessionService = { generateCredentials: jest.fn(() => "credentials") };
-    const leappCliService: any = {
+    const cliProviderService: any = {
       sessionFactory: { getSessionService: jest.fn(() => awsSessionService) },
     };
 
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
 
     const session = { sessionId: "sessionId", type: "type" } as any;
     const credentials = await command.generateCredentials(session);
 
     expect(credentials).toBe("credentials");
-    expect(leappCliService.sessionFactory.getSessionService).toHaveBeenCalledWith(session.type);
+    expect(cliProviderService.sessionFactory.getSessionService).toHaveBeenCalledWith(session.type);
     expect(awsSessionService.generateCredentials).toHaveBeenCalledWith(session.sessionId);
   });
 
   test("selectRegion", async () => {
     const regionFieldChoice = { fieldName: "regionName2", fieldValue: "regionName3" };
-    const leappCliService: any = {
+    const cliProviderService: any = {
       cloudProviderService: {
         availableRegions: jest.fn(() => [regionFieldChoice]),
       },
@@ -110,19 +110,19 @@ describe("StartSsmSession", () => {
       },
     };
 
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
 
     const session = { type: "type" } as any;
     const selectedRegion = await command.selectRegion(session);
 
     expect(selectedRegion).toBe("selectedRegion");
-    expect(leappCliService.cloudProviderService.availableRegions).toHaveBeenCalledWith(session.type);
+    expect(cliProviderService.cloudProviderService.availableRegions).toHaveBeenCalledWith(session.type);
   });
 
   test("selectSsmInstance", async () => {
     // eslint-disable-next-line @typescript-eslint/naming-convention
     const instances = { Name: "instanceName", InstanceId: "instanceId" };
-    const leappCliService: any = {
+    const cliProviderService: any = {
       ssmService: { getSsmInstances: jest.fn(() => [instances]) },
       inquirer: {
         prompt: async (params: any) => {
@@ -139,49 +139,49 @@ describe("StartSsmSession", () => {
       },
     };
 
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
 
     const selectedInstance = await command.selectSsmInstance("credentials" as any, "region");
 
     expect(selectedInstance).toBe("selectedInstance");
-    expect(leappCliService.ssmService.getSsmInstances).toHaveBeenCalledWith("credentials", "region");
+    expect(cliProviderService.ssmService.getSsmInstances).toHaveBeenCalledWith("credentials", "region");
   });
 
   test("startSsmSession, macOS, iTerm", async () => {
-    const leappCliService: any = {
+    const cliProviderService: any = {
       // eslint-disable-next-line @typescript-eslint/naming-convention
       cliNativeService: { process: { platform: "darwin", env: { TERM_PROGRAM: "iTerm.app" } } },
       ssmService: { startSession: jest.fn(() => null) },
     };
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
     command.log = jest.fn();
 
     await command.startSsmSession("credentials" as any, "instanceId", "region");
-    expect(leappCliService.ssmService.startSession).toHaveBeenCalledWith("credentials", "instanceId", "region", constants.macOsIterm2);
+    expect(cliProviderService.ssmService.startSession).toHaveBeenCalledWith("credentials", "instanceId", "region", constants.macOsIterm2);
     expect(command.log).toHaveBeenCalledWith("started AWS SSM session");
   });
 
   test("startSsmSession, macOS, other terminal", async () => {
-    const leappCliService: any = {
+    const cliProviderService: any = {
       // eslint-disable-next-line @typescript-eslint/naming-convention
       cliNativeService: { process: { platform: "darwin", env: { TERM_PROGRAM: "otherTerminal.app" } } },
       ssmService: { startSession: jest.fn(() => null) },
     };
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
 
     await command.startSsmSession("credentials" as any, "instanceId", "region");
-    expect(leappCliService.ssmService.startSession).toHaveBeenCalledWith("credentials", "instanceId", "region", constants.macOsTerminal);
+    expect(cliProviderService.ssmService.startSession).toHaveBeenCalledWith("credentials", "instanceId", "region", constants.macOsTerminal);
   });
 
   test("startSsmSession, windows, iTerm", async () => {
-    const leappCliService: any = {
+    const cliProviderService: any = {
       // eslint-disable-next-line @typescript-eslint/naming-convention
       cliNativeService: { process: { platform: "win32", env: { TERM_PROGRAM: "iTerm.app" } } },
       ssmService: { startSession: jest.fn(() => null) },
     };
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
 
     await command.startSsmSession("credentials" as any, "instanceId", "region");
-    expect(leappCliService.ssmService.startSession).toHaveBeenCalledWith("credentials", "instanceId", "region", undefined);
+    expect(cliProviderService.ssmService.startSession).toHaveBeenCalledWith("credentials", "instanceId", "region", undefined);
   });
 });

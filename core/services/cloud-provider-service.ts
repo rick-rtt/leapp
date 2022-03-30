@@ -4,7 +4,7 @@ import { AccessMethodFieldType } from "../models/access-method-field-type";
 import { CloudProviderType } from "../models/cloud-provider-type";
 import { SessionType } from "../models/session-type";
 import { AwsCoreService } from "./aws-core-service";
-import { AWS_ASSUMABLE_SESSION_TYPES } from "./aws-assumable-session-types";
+import { AWS_ASSUMER_SESSION_TYPES } from "./aws-assumer-session-types";
 import { AzureCoreService } from "./azure-core-service";
 import { FieldChoice } from "./field-choice";
 import { NamedProfilesService } from "./named-profiles-service";
@@ -137,7 +137,7 @@ export class CloudProviderService {
   private getAwsAssumerSessionChoices(): FieldChoice[] {
     return this.repository
       .getSessions()
-      .filter((session) => AWS_ASSUMABLE_SESSION_TYPES.includes(session.type))
+      .filter((session) => AWS_ASSUMER_SESSION_TYPES.includes(session.type))
       .map((session) => new FieldChoice(session.sessionName, session.sessionId));
   }
 

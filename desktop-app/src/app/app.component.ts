@@ -47,7 +47,7 @@ export class AppComponent implements OnInit {
 
   /* Main app file: launches the Angular framework inside Electron app */
   constructor(
-    leappCoreService: AppProviderService,
+    appProviderService: AppProviderService,
     mfaCodePrompter: AppMfaCodePromptService,
     awsAuthenticationService: AppAwsAuthenticationService,
     verificationWindowService: AppVerificationWindowService,
@@ -57,23 +57,23 @@ export class AppComponent implements OnInit {
     private windowService: WindowService,
     private electronService: AppNativeService
   ) {
-    leappCoreService.mfaCodePrompter = mfaCodePrompter;
-    leappCoreService.awsAuthenticationService = awsAuthenticationService;
-    leappCoreService.verificationWindowService = verificationWindowService;
-    leappCoreService.windowService = windowService;
+    appProviderService.mfaCodePrompter = mfaCodePrompter;
+    appProviderService.awsAuthenticationService = awsAuthenticationService;
+    appProviderService.verificationWindowService = verificationWindowService;
+    appProviderService.windowService = windowService;
 
-    this.repository = leappCoreService.repository;
-    this.fileService = leappCoreService.fileService;
-    this.awsCoreService = leappCoreService.awsCoreService;
-    this.loggingService = leappCoreService.loggingService;
-    this.timerService = leappCoreService.timerService;
-    this.sessionServiceFactory = leappCoreService.sessionFactory;
-    this.workspaceService = leappCoreService.workspaceService;
-    this.retroCompatibilityService = leappCoreService.retroCompatibilityService;
-    this.rotationService = leappCoreService.rotationService;
-    this.awsSsoIntegrationService = leappCoreService.awsSsoIntegrationService;
-    this.awsSsoRoleService = leappCoreService.awsSsoRoleService;
-    this.remoteProceduresServer = leappCoreService.remoteProceduresServer;
+    this.repository = appProviderService.repository;
+    this.fileService = appProviderService.fileService;
+    this.awsCoreService = appProviderService.awsCoreService;
+    this.loggingService = appProviderService.loggingService;
+    this.timerService = appProviderService.timerService;
+    this.sessionServiceFactory = appProviderService.sessionFactory;
+    this.workspaceService = appProviderService.workspaceService;
+    this.retroCompatibilityService = appProviderService.retroCompatibilityService;
+    this.rotationService = appProviderService.rotationService;
+    this.awsSsoIntegrationService = appProviderService.awsSsoIntegrationService;
+    this.awsSsoRoleService = appProviderService.awsSsoRoleService;
+    this.remoteProceduresServer = appProviderService.remoteProceduresServer;
 
     this.setInitialColorSchema();
     this.setColorSchemaChangeEventListener();
@@ -135,6 +135,7 @@ export class AppComponent implements OnInit {
     // Go to initial page if no sessions are already created or
     // go to the list page if is your second visit
     this.router.navigate(["/dashboard"]);
+
     (async (): Promise<void> => this.remoteProceduresServer.startServer())();
   }
 

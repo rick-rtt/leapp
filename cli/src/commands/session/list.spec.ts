@@ -5,9 +5,9 @@ import { AwsIamUserSession } from "@noovolari/leapp-core/models/aws-iam-user-ses
 import { SessionType } from "@noovolari/leapp-core/models/session-type";
 
 describe("ListSessions", () => {
-  const getTestCommand = (leappCliService: any = null): ListSessions => {
+  const getTestCommand = (cliProviderService: any = null): ListSessions => {
     const command = new ListSessions([], {} as any);
-    (command as any).leappCliService = leappCliService;
+    (command as any).cliProviderService = cliProviderService;
     return command;
   };
 
@@ -48,7 +48,7 @@ describe("ListSessions", () => {
     const sessions = [new AwsIamUserSession("sessionName", "region", "profileId")];
     const namedProfileMap = new Map([["profileId", { id: "profileId", name: "profileName" }]]);
     const sessionTypeMap = new Map([[SessionType.awsIamUser, "sessionTypeLabel"]]);
-    const leappCliService = {
+    const cliProviderService = {
       repository: {
         getSessions: () => sessions,
       },
@@ -60,7 +60,7 @@ describe("ListSessions", () => {
       },
     };
 
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
     const tableSpy = jest.spyOn(CliUx.ux, "table").mockImplementation(() => null);
 
     await command.showSessions();

@@ -30,18 +30,18 @@ import { AwsSsoOidcService } from "@noovolari/leapp-core/services/aws-sso-oidc.s
 import { CliOpenWebConsoleService } from "./cli-open-web-console-service";
 import { WebConsoleService } from "@noovolari/leapp-core/services/web-console-service";
 import fetch from "node-fetch";
-import { AuthenticationService } from "@noovolari/leapp-core/services/authentication-service";
+import { AwsSamlAssertionExtractionService } from "@noovolari/leapp-core/services/aws-saml-assertion-extraction-service";
 import { SsmService } from "@noovolari/leapp-core/services/ssm-service";
-import { CliRpcVerificationWindowService } from "./cli-rpc-verification-window-service";
-import { IVerificationWindowService } from "@noovolari/leapp-core/interfaces/i-verification-window.service";
-import { CliRpcAwsAuthenticationService } from "./cli-rpc-aws-authentication-service";
+import { CliRpcAwsSsoOidcVerificationWindowService } from "./cli-rpc-aws-sso-oidc-verification-window-service";
+import { IAwsSsoOidcVerificationWindowService } from "@noovolari/leapp-core/interfaces/i-aws-sso-oidc-verification-window-service";
+import { CliRpcAwsSamlAuthenticationService } from "./cli-rpc-aws-saml-authentication-service";
 
 /* eslint-disable */
 export class CliProviderService {
   private cliNativeServiceInstance: CliNativeService;
-  private cliVerificationWindowServiceInstance: IVerificationWindowService;
-  private authenticationServiceInstance: AuthenticationService;
-  private cliRpcAwsAuthenticationServiceInstance: CliRpcAwsAuthenticationService;
+  private cliAwsSsoOidcVerificationWindowServiceInstance: IAwsSsoOidcVerificationWindowService;
+  private awsSamlAssertionExtractionServiceInstance: AwsSamlAssertionExtractionService;
+  private cliRpcAwsSamlAuthenticationServiceInstance: CliRpcAwsSamlAuthenticationService;
   private remoteProceduresClientInstance: RemoteProceduresClient;
   private cliMfaCodePromptServiceInstance: CliMfaCodePromptService;
   private workspaceServiceInstance: WorkspaceService;
@@ -79,25 +79,25 @@ export class CliProviderService {
     return this.cliNativeServiceInstance;
   }
 
-  public get cliVerificationWindowService(): IVerificationWindowService {
-    if (!this.cliVerificationWindowServiceInstance) {
-      this.cliVerificationWindowServiceInstance = new CliRpcVerificationWindowService(this.remoteProceduresClient);
+  public get cliAwsSsoOidcVerificationWindowService(): IAwsSsoOidcVerificationWindowService {
+    if (!this.cliAwsSsoOidcVerificationWindowServiceInstance) {
+      this.cliAwsSsoOidcVerificationWindowServiceInstance = new CliRpcAwsSsoOidcVerificationWindowService(this.remoteProceduresClient);
     }
-    return this.cliVerificationWindowServiceInstance;
+    return this.cliAwsSsoOidcVerificationWindowServiceInstance;
   }
 
-  public get authenticationService(): AuthenticationService {
-    if (!this.authenticationServiceInstance) {
-      this.authenticationServiceInstance = new AuthenticationService();
+  public get awsSamlAssertionExtractionService(): AwsSamlAssertionExtractionService {
+    if (!this.awsSamlAssertionExtractionServiceInstance) {
+      this.awsSamlAssertionExtractionServiceInstance = new AwsSamlAssertionExtractionService();
     }
-    return this.authenticationServiceInstance;
+    return this.awsSamlAssertionExtractionServiceInstance;
   }
 
-  public get cliRpcAwsAuthenticationService(): CliRpcAwsAuthenticationService {
-    if (!this.cliRpcAwsAuthenticationServiceInstance) {
-      this.cliRpcAwsAuthenticationServiceInstance = new CliRpcAwsAuthenticationService(this.remoteProceduresClient);
+  public get cliRpcAwsSamlAuthenticationService(): CliRpcAwsSamlAuthenticationService {
+    if (!this.cliRpcAwsSamlAuthenticationServiceInstance) {
+      this.cliRpcAwsSamlAuthenticationServiceInstance = new CliRpcAwsSamlAuthenticationService(this.remoteProceduresClient);
     }
-    return this.cliRpcAwsAuthenticationServiceInstance;
+    return this.cliRpcAwsSamlAuthenticationServiceInstance;
   }
 
   public get remoteProceduresClient(): RemoteProceduresClient {
@@ -132,7 +132,7 @@ export class CliProviderService {
   get awsIamRoleFederatedService(): AwsIamRoleFederatedService {
     if (!this.awsIamRoleFederatedServiceInstance) {
       this.awsIamRoleFederatedServiceInstance = new AwsIamRoleFederatedService(this.workspaceService, this.repository,
-        this.fileService, this.awsCoreService, this.cliRpcAwsAuthenticationService, constants.samlRoleSessionDuration);
+        this.fileService, this.awsCoreService, this.cliRpcAwsSamlAuthenticationService, constants.samlRoleSessionDuration);
     }
     return this.awsIamRoleFederatedServiceInstance;
   }
@@ -155,7 +155,7 @@ export class CliProviderService {
 
   get awsSsoOidcService(): AwsSsoOidcService {
     if (!this.awsSsoOidcServiceInstance) {
-      this.awsSsoOidcServiceInstance = new AwsSsoOidcService(this.cliVerificationWindowService, this.repository, true);
+      this.awsSsoOidcServiceInstance = new AwsSsoOidcService(this.cliAwsSsoOidcVerificationWindowService, this.repository, true);
     }
     return this.awsSsoOidcServiceInstance;
   }

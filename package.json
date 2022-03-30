@@ -38,7 +38,7 @@
     "npm-install-all": "gushio gushio/npm-install-all.js",
     "lint": "eslint .",
     "lint:fix": "npm run lint -- --fix",
-    "check-core-dependency": "gushio gushio/check-core-dependency.js",
+    "set-core-dependency-to-remote": "gushio gushio/set-core-dependency-to-remote.js",
     "set-core-dependency-to-local": "gushio gushio/set-core-dependency-to-local.js"
   },
   "lint-staged": {

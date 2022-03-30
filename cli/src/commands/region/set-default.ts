@@ -21,10 +21,10 @@ export default class ChangeDefaultRegion extends LeappCommand {
   }
 
   async selectDefaultRegion(): Promise<string> {
-    const defaultRegion = this.leappCliService.regionsService.getDefaultAwsRegion();
-    const availableRegions = this.leappCliService.cloudProviderService.availableRegions(SessionType.aws);
+    const defaultRegion = this.cliProviderService.regionsService.getDefaultAwsRegion();
+    const availableRegions = this.cliProviderService.cloudProviderService.availableRegions(SessionType.aws);
 
-    const answer: any = await this.leappCliService.inquirer.prompt([
+    const answer: any = await this.cliProviderService.inquirer.prompt([
       {
         name: "selectedDefaultRegion",
         message: `current default region is ${defaultRegion}, select a new default region`,
@@ -36,8 +36,8 @@ export default class ChangeDefaultRegion extends LeappCommand {
   }
 
   async changeDefaultRegion(newDefaultRegion: string): Promise<void> {
-    this.leappCliService.regionsService.changeDefaultAwsRegion(newDefaultRegion);
-    await this.leappCliService.remoteProceduresClient.refreshSessions();
+    this.cliProviderService.regionsService.changeDefaultAwsRegion(newDefaultRegion);
+    await this.cliProviderService.remoteProceduresClient.refreshSessions();
     this.log("default region changed");
   }
 }

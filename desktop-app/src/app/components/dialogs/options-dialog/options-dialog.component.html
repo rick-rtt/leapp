@@ -124,7 +124,7 @@
           <div class="form-group scrollable max-height-230">
             <table class="table option-table">
               <tbody>
-              <ng-container *ngFor="let idpUrl of leappCoreService.repository.getIdpUrls()">
+              <ng-container *ngFor="let idpUrl of appProviderService.repository.getIdpUrls()">
                 <tr *ngIf="idpUrl">
                   <td>{{idpUrl.url}}</td>
                   <td>
@@ -159,7 +159,7 @@
         <div class="form-group scrollable max-height-230">
           <table class="table option-table">
             <tbody>
-            <ng-container *ngFor="let profile of leappCoreService.repository.getProfiles()">
+            <ng-container *ngFor="let profile of appProviderService.repository.getProfiles()">
               <tr *ngIf="profile">
                 <td>{{profile.name}}</td>
                 <td>

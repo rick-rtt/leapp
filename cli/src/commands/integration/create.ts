@@ -23,7 +23,7 @@ export default class CreateSsoIntegration extends LeappCommand {
 
   async askConfigurationParameters(): Promise<IntegrationCreationParams> {
     const creationParams = { browserOpening: constants.inBrowser } as IntegrationCreationParams;
-    const aliasAnswer: any = await this.leappCliService.inquirer.prompt([
+    const aliasAnswer: any = await this.cliProviderService.inquirer.prompt([
       {
         name: "selectedAlias",
         message: "Insert an alias",
@@ -33,7 +33,7 @@ export default class CreateSsoIntegration extends LeappCommand {
     ]);
     creationParams.alias = aliasAnswer.selectedAlias;
 
-    const portalUrlAnswer: any = await this.leappCliService.inquirer.prompt([
+    const portalUrlAnswer: any = await this.cliProviderService.inquirer.prompt([
       {
         name: "selectedPortalUrl",
         message: "Insert a portal URL",
@@ -43,8 +43,8 @@ export default class CreateSsoIntegration extends LeappCommand {
     ]);
     creationParams.portalUrl = portalUrlAnswer.selectedPortalUrl;
 
-    const awsRegions = this.leappCliService.cloudProviderService.availableRegions(SessionType.aws);
-    const regionAnswer = await this.leappCliService.inquirer.prompt([
+    const awsRegions = this.cliProviderService.cloudProviderService.availableRegions(SessionType.aws);
+    const regionAnswer = await this.cliProviderService.inquirer.prompt([
       {
         name: "selectedRegion",
         message: "Select a region",
@@ -58,8 +58,8 @@ export default class CreateSsoIntegration extends LeappCommand {
   }
 
   async createIntegration(creationParams: IntegrationCreationParams): Promise<void> {
-    await this.leappCliService.awsSsoIntegrationService.createIntegration(creationParams);
-    await this.leappCliService.remoteProceduresClient.refreshIntegrations();
+    await this.cliProviderService.awsSsoIntegrationService.createIntegration(creationParams);
+    await this.cliProviderService.remoteProceduresClient.refreshIntegrations();
     this.log("aws sso integration created");
   }
 }

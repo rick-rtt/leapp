@@ -23,11 +23,11 @@ export default class ChangeSessionProfile extends LeappCommand {
   }
 
   async selectSession(): Promise<Session> {
-    const availableSessions = this.leappCliService.repository
+    const availableSessions = this.cliProviderService.repository
       .getSessions()
-      .filter((session) => this.leappCliService.sessionFactory.getSessionService(session.type) instanceof AwsSessionService);
+      .filter((session) => this.cliProviderService.sessionFactory.getSessionService(session.type) instanceof AwsSessionService);
 
-    const answer: any = await this.leappCliService.inquirer.prompt([
+    const answer: any = await this.cliProviderService.inquirer.prompt([
       {
         name: "selectedSession",
         message: "select a session",
@@ -39,14 +39,14 @@ export default class ChangeSessionProfile extends LeappCommand {
   }
 
   async selectProfile(session: Session): Promise<string> {
-    const currentProfileName = this.leappCliService.repository.getProfileName((session as any).profileId);
-    const availableProfiles = this.leappCliService.repository.getProfiles().filter((profile) => profile.id !== (session as any).profileId);
+    const currentProfileName = this.cliProviderService.repository.getProfileName((session as any).profileId);
+    const availableProfiles = this.cliProviderService.repository.getProfiles().filter((profile) => profile.id !== (session as any).profileId);
 
     if (availableProfiles.length === 0) {
       throw new Error("no profiles available");
     }
 
-    const answer: any = await this.leappCliService.inquirer.prompt([
+    const answer: any = await this.cliProviderService.inquirer.prompt([
       {
         name: "selectedProfile",
         message: `current profile is ${currentProfileName}, select a new profile`,
@@ -58,8 +58,8 @@ export default class ChangeSessionProfile extends LeappCommand {
   }
 
   async changeSessionProfile(session: Session, newProfileId: string): Promise<void> {
-    await this.leappCliService.namedProfilesService.changeNamedProfile(session, newProfileId);
-    await this.leappCliService.remoteProceduresClient.refreshSessions();
+    await this.cliProviderService.namedProfilesService.changeNamedProfile(session, newProfileId);
+    await this.cliProviderService.remoteProceduresClient.refreshSessions();
     this.log("session profile changed");
   }
 }

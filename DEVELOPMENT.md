@@ -1,17 +1,24 @@
 # What should I know before I get started?
-
 If you want to start a code contribution to Leapp, whether it is a bug fix or a new feature, it is important for you to understand Leapp concepts and way to work.
 
-In the documentation site you’ll find all the information you need. [Leapp documentation](http://docs.leapp.cloud) covers the following concepts and topics:
+Inside Leapp's documentation site you can find following concepts and topics:
 
 - Sessions
 - Integrations
 - Security
-    - Short-term credentials generation
-    - System Vault for storing sensitive information (e.g. AWS IAM User access keys)
+  - Short-term credentials generation
+  - System Vault for storing sensitive information (e.g. AWS IAM User access keys)
 - Built-in features
-    - EC2 connect through AWS SSM
-    - AWS Multi-profile management
+  - EC2 connect through AWS SSM
+  - AWS Multi-profile management
+
+These concepts are implemented in Leapp Core. Leapp Core is a library that decouples Leapp's domain logic from the Client that is going to use it.
+Leapp Core is delivered as [NPM package](https://www.npmjs.com/package/@noovolari/leapp-core), and each client depends on it.
+
+A Client can be rather a GUI or a TUI represented, respectively, by Leapp Desktop App and Leapp CLI. 
+
+Leapp CLI requires the Desktop app to be installed and running.
+The Leapp CLI is delivered as an NPM package and can be installed globally, using the *npm* developer tool.
 
 # Development environment setup
 
@@ -19,7 +26,7 @@ In the documentation site you’ll find all the information you need. [Leapp doc
 
 Follow [this](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) official guide to install both Node.js and NPM.
 
-The latest build was released using Node.js version 14.17.0 - as specified in the .nvmrc - and NPM version 8.3.0.
+The latest build was released using Node.js version 16.14.0 - as specified in the .nvmrc - and NPM version 8.5.5.
 
 ## NVM
 
@@ -55,23 +62,35 @@ If it is the first time you fork a repository from the GitHub console, please re
 
 ## Install dependencies
 
-Inside the project root folder, run 
+At a first glance, you can see that Leapp consists of a monorepo structure that contains Leapp Core, Leapp Desktop App, and Leapp CLI.
+Each of these sub-packages contain its _package.json_ and _tsconfig.json_ file. We will deepen how the project is structured in the
+_Project Structure_ section.
+
+Inside the project root folder, run
 
 ```bash
 nvm use
 ```
 
-to set the Node.js version to the one specified in the .nvmrc; then, run
+to set the Node.js version to the one specified in the .nvmrc; then, from the root folder, run
 
 ```bash
 npm install
 ```
 
-to install all the dependencies specified in the package.json file.
+to install all the dependencies specified in the root package.json file.
+
+At this point, you can setup the entire project running a [Gushio](https://github.com/Forge-Srl/gushio) script called _setup_ from the root package.json.
+
+> Gushio* is built on top of battle-tested libraries like commander and shelljs and allows you to write a multiplatform shell script in a single JavaScript file without having to worry about package.json and dependencies installation.
+> * Gushio is pronounced like the italian word "guscio" (IPA: /'guʃʃo/) which means "shell".
+
+The _setup_ script installs node_modules dependencies for each sub-package, and builds Leapp Core and Leapp CLI. To build and run Leapp Desktop App
+in the development environment, there is a specific script - called _build-and-run-dev_ - available in Leapp Desktop App's package.json.
 
 ## System Vault
 
-Skip this section if you are not using a Linux system. 
+Skip this section if you are not using a Linux system.
 
 Leapp relies on the System Vault to save sensitive information. In Linux systems it relies on libsecret and gnome-keyring dependencies. To install them, follow [this](https://docs.leapp.cloud/latest/installation/requirements/) documentation page.
 
@@ -89,47 +108,22 @@ To install the AWS SSM agent locally, follow [this](https://docs.leapp.cloud/lat
 
 # Project Structure
 
-Leapp is an application built using Electron and Angular. The first is used in order to generate executables for different OSs: macOS, Windows, and Linux distros. It serves as a wrapper for the Angular site which hosts the application logic, by serving it through a combination of [Chromium](https://www.chromium.org/Home/) and Node.js.
+Leapp project is structured as a monorepo and these are its sub-packages:
 
-If you are new to Electron, please refer to the official [documentation](https://www.electronjs.org/docs/latest).
+| sub-package       | folder       |
+|-------------------|--------------|
+| Leapp Core        | /core        |
+| Leapp CLI         | /cli         |
+| Leapp Desktop App | /desktop-app |
 
-Angular is a front-end web development framework for creating efficient and sophisticated single-page apps via HTML, Typescript, and modern SCSS. 
 
-If you are new to Angular, why not try the excellent **tour of heroes** [sample project](https://angular.io/tutorial) to get you started?
+To facilitate and keep track of contributions, we approached a monorepo architecture; it allows maintaining different projects under the same repository.
+The Core contains the application logic; basically, it acts as a library on top of which clients, like the Desktop Application and the CLI, will run. 
+In the monorepo scenario, Desktop Application, CLI, and Core are three different projects under the same repository.
 
-After you got yourself acquainted with our development tools, let’s dig into our code structure.
+## Core
 
-## Monorepo
 
-To facilitate and keep track of contributions, we will approach a monorepo architecture; it allows maintaining different projects under the same repository. The current repository is not yet organized in a monorepo fashion. It will be introduced with Leapp Core and CLI. The Core will contain the application logic; basically, it will act as a library on top of which clients, like the Desktop Application and the CLI, will run. In the monorepo scenario, Desktop Application, CLI, and Core will be three different projects under the same repository.
-
-## Electron project elements
-
-There is an **electron** folder generated by Electron at the root of the repository. It contains the **main.ts** file which drives the application setup and starts the executable by injecting the Angular application into the main BrowserWindow. This is created after the Angular project has been set up, cleaned, compressed, and distributed as a minimized site.
-
-## Angular project elements
-
-The Angular project is wrapped in the Electron one and implements the logic behind each Leapp concept. Let’s dive into the Angular project, from the UX/UI elements to the low level ones, i.e. Models and Services. 
-
-### Modules
-
-Modules are elements in an Angular project that allows using different components that are defined in the same functional scope. In Leapp we have **3 modules**.
-
-- **app.module.ts**: contains all the **global libraries ad components.** Here you can put all the external libraries that you need.
-- **layout.module.ts**: is specific for the layout component, and contains only information that is used in the layout.component.ts file. It is called inside the app module.
-- **components.module.ts**: is the module responsible for holding all the components of the application. It is called inside the app module.
-
-There is also one super simple **app.routing.module**, which contains only one route pointing to the layout which contains our **3 main components**: **sidebar**, **command-bar**, **and sessions**.
-
-### Components
-
-Inside the Component folder, there are all the different components of the applications, which are composed of a UI file in the form of an HTML template, a SCSS file, that contains the style, and finally, 2 TypeScript files: <component>.ts for the logic, and <component>.spec.ts for the unit tests.
-
-Components represent core UI/UX functionalities. If you intend to define a new functionality that must have its UI counterpart, please insert the new component here. 
-
-There is also a dialogs folder that contains, for easiness, all the dialog components of Leapp. 
-
-For us, it is best to create a new component every time we need a new dialog in the interface, just to keep things well separated and DRY.
 
 ### Models
 
@@ -199,9 +193,9 @@ There is a **three-level abstraction** implementation for this kind of service:
 
 **Integrations**
 
-To understand this concept, let’s dive into what the AWS SSO feature does. 
+To understand this concept, let’s dive into what the AWS SSO feature does.
 
-In Leapp you can work with Sessions that corresponds to AWS accounts that belong to one or more AWS Organizations. By configuring AWS SSO in the root account (or another dedicated account), you're able to manage access to all of the AWS Organization’s accounts. 
+In Leapp you can work with Sessions that corresponds to AWS accounts that belong to one or more AWS Organizations. By configuring AWS SSO in the root account (or another dedicated account), you're able to manage access to all of the AWS Organization’s accounts.
 
 AWS SSO configuration is bound to a specific region (e.g. eu-west-1, etc.) and portal URL. The last one corresponds to the endpoint used to log into AWS SSO. By logging into AWS SSO through the AWS SDK, you have access to a token that can be used to list all the accounts and roles that can be accessed by the user. AWS SSO API allows you to automatically generate temporary credentials to access accounts with a specific role. Once you’re done, you can log out from AWS SSO.
 
@@ -217,9 +211,48 @@ The concept of Integration encapsulates the following behaviours:
 
 These folder contains Leapp standard errors, from the less specific LeappBaseError to the more specific ones. The specific errors extend LeappBaseError, inheriting attributes like name, context, and severity.
 
-### Environments
+## Desktop App
 
-Here you’ll find project’s constants that will be merged soon into the Constants model to avoid misunderstandings. We’ll leave here only information related to the environment the application is running in, e.g. development or production.
+Leapp Desktop App is an application built using Electron and Angular. The first is used in order to generate executables for different OSs: macOS, Windows, and Linux distros. 
+It serves as a wrapper for the Angular site which hosts the application logic, by serving it through a combination of [Chromium](https://www.chromium.org/Home/) and Node.js.
+
+If you are new to Electron, please refer to the official [documentation](https://www.electronjs.org/docs/latest).
+
+Angular is a front-end web development framework for creating efficient and sophisticated single-page apps via HTML, Typescript, and modern SCSS. 
+
+If you are new to Angular, why not try the excellent **tour of heroes** [sample project](https://angular.io/tutorial) to get you started?
+
+After you got yourself acquainted with our development tools, let’s dig into our code structure.
+
+### Electron project elements
+
+There is an **electron** folder generated by Electron at the root of the repository. It contains the **main.ts** file which drives the application setup and starts the executable by injecting the Angular application into the main BrowserWindow. This is created after the Angular project has been set up, cleaned, compressed, and distributed as a minimized site.
+
+### Angular project elements
+
+The Angular project is wrapped in the Electron one and implements the logic behind each Leapp concept. Let’s dive into the Angular project, from the UX/UI elements to the low level ones, i.e. Models and Services. 
+
+### Angular project elements: Modules
+
+Modules are elements in an Angular project that allows using different components that are defined in the same functional scope. In Leapp we have **3 modules**.
+
+- **app.module.ts**: contains all the **global libraries ad components.** Here you can put all the external libraries that you need.
+- **layout.module.ts**: is specific for the layout component, and contains only information that is used in the layout.component.ts file. It is called inside the app module.
+- **components.module.ts**: is the module responsible for holding all the components of the application. It is called inside the app module.
+
+There is also one super simple **app.routing.module**, which contains only one route pointing to the layout which contains our **3 main components**: **sidebar**, **command-bar**, **and sessions**.
+
+### Angular project elements: Components
+
+Inside the Component folder, there are all the different components of the applications, which are composed of a UI file in the form of an HTML template, a SCSS file, that contains the style, and finally, 2 TypeScript files: <component>.ts for the logic, and <component>.spec.ts for the unit tests.
+
+Components represent core UI/UX functionalities. If you intend to define a new functionality that must have its UI counterpart, please insert the new component here. 
+
+There is also a dialogs folder that contains, for easiness, all the dialog components of Leapp. 
+
+For us, it is best to create a new component every time we need a new dialog in the interface, just to keep things well separated and DRY.
+
+## CLI
 
 # Build
 

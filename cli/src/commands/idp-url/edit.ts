@@ -22,11 +22,11 @@ export default class EditIdpUrl extends LeappCommand {
   }
 
   async selectIdpUrl(): Promise<IdpUrl> {
-    const idpUrls = this.leappCliService.idpUrlsService.getIdpUrls();
+    const idpUrls = this.cliProviderService.idpUrlsService.getIdpUrls();
     if (idpUrls.length === 0) {
       throw new Error("no identity provider URLs available");
     }
-    const answer: any = await this.leappCliService.inquirer.prompt([
+    const answer: any = await this.cliProviderService.inquirer.prompt([
       {
         name: "selectedIdpUrl",
         message: "select an identity provider URL",
@@ -38,11 +38,11 @@ export default class EditIdpUrl extends LeappCommand {
   }
 
   async getNewIdpUrl(): Promise<string> {
-    const answer: any = await this.leappCliService.inquirer.prompt([
+    const answer: any = await this.cliProviderService.inquirer.prompt([
       {
         name: "newIdpUrl",
         message: "choose a new URL",
-        validate: (url) => this.leappCliService.idpUrlsService.validateIdpUrl(url),
+        validate: (url) => this.cliProviderService.idpUrlsService.validateIdpUrl(url),
         type: "input",
       },
     ]);
@@ -50,8 +50,8 @@ export default class EditIdpUrl extends LeappCommand {
   }
 
   async editIdpUrl(id: string, newIdpUrl: string): Promise<void> {
-    await this.leappCliService.idpUrlsService.editIdpUrl(id, newIdpUrl);
-    await this.leappCliService.remoteProceduresClient.refreshSessions();
+    await this.cliProviderService.idpUrlsService.editIdpUrl(id, newIdpUrl);
+    await this.cliProviderService.remoteProceduresClient.refreshSessions();
     this.log("IdP URL edited");
   }
 }

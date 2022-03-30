@@ -20,11 +20,11 @@ export default class CreateNamedProfile extends LeappCommand {
   }
 
   async getProfileName(): Promise<string> {
-    const answer: any = await this.leappCliService.inquirer.prompt([
+    const answer: any = await this.cliProviderService.inquirer.prompt([
       {
         name: "namedProfileName",
         message: `choose a name for the profile`,
-        validate: (profileName) => this.leappCliService.namedProfilesService.validateNewProfileName(profileName),
+        validate: (profileName) => this.cliProviderService.namedProfilesService.validateNewProfileName(profileName),
         type: "input",
       },
     ]);
@@ -32,8 +32,8 @@ export default class CreateNamedProfile extends LeappCommand {
   }
 
   async createNamedProfile(profileName: string): Promise<void> {
-    this.leappCliService.namedProfilesService.createNamedProfile(profileName);
-    await this.leappCliService.remoteProceduresClient.refreshSessions();
+    this.cliProviderService.namedProfilesService.createNamedProfile(profileName);
+    await this.cliProviderService.remoteProceduresClient.refreshSessions();
     this.log("profile created");
   }
 }

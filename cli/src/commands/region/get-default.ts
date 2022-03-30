@@ -11,7 +11,7 @@ export default class GetDefaultRegion extends LeappCommand {
   }
 
   async run(): Promise<void> {
-    const defaultAwsRegion = this.leappCliService.regionsService.getDefaultAwsRegion();
+    const defaultAwsRegion = this.cliProviderService.regionsService.getDefaultAwsRegion();
     this.log(defaultAwsRegion);
   }
 }

@@ -2,15 +2,15 @@ import { jest, describe, test, expect } from "@jest/globals";
 import LoginIntegration from "./login";
 
 describe("LoginIntegration", () => {
-  const getTestCommand = (leappCliService: any = null, argv: string[] = []): LoginIntegration => {
+  const getTestCommand = (cliProviderService: any = null, argv: string[] = []): LoginIntegration => {
     const command = new LoginIntegration(argv, {} as any);
-    (command as any).leappCliService = leappCliService;
+    (command as any).cliProviderService = cliProviderService;
     return command;
   };
 
   test("selectIntegration", async () => {
     const integration = { alias: "integration1" };
-    const leappCliService: any = {
+    const cliProviderService: any = {
       awsSsoIntegrationService: {
         getOfflineIntegrations: jest.fn(() => [integration]),
       },
@@ -29,27 +29,27 @@ describe("LoginIntegration", () => {
       },
     };
 
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
     const selectedIntegration = await command.selectIntegration();
 
-    expect(leappCliService.awsSsoIntegrationService.getOfflineIntegrations).toHaveBeenCalled();
+    expect(cliProviderService.awsSsoIntegrationService.getOfflineIntegrations).toHaveBeenCalled();
     expect(selectedIntegration).toBe(integration);
   });
 
   test("selectIntegration, no integrations", async () => {
-    const leappCliService: any = {
+    const cliProviderService: any = {
       awsSsoIntegrationService: {
         getOfflineIntegrations: jest.fn(() => []),
       },
     };
 
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
     await expect(command.selectIntegration()).rejects.toThrow(new Error("no offline integrations available"));
   });
 
   test("login", async () => {
     const sessionsDiff = { sessionsToAdd: ["session1", "session2"], sessionsToDelete: ["session3"] };
-    const leappCliService: any = {
+    const cliProviderService: any = {
       awsSsoIntegrationService: {
         syncSessions: jest.fn(async () => sessionsDiff),
       },
@@ -62,19 +62,19 @@ describe("LoginIntegration", () => {
       },
     };
 
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
     command.log = jest.fn();
 
     const integration = { id: "id1" } as any;
     await command.login(integration);
 
     expect(command.log).toHaveBeenNthCalledWith(1, "waiting for browser authorization using your AWS sign-in...");
-    expect(leappCliService.awsSsoIntegrationService.syncSessions).toHaveBeenCalledWith(integration.id);
+    expect(cliProviderService.awsSsoIntegrationService.syncSessions).toHaveBeenCalledWith(integration.id);
     expect(command.log).toHaveBeenNthCalledWith(2, `${sessionsDiff.sessionsToAdd.length} sessions added`);
     expect(command.log).toHaveBeenNthCalledWith(3, `${sessionsDiff.sessionsToDelete.length} sessions removed`);
-    expect(leappCliService.remoteProceduresClient.refreshIntegrations).toHaveBeenCalled();
-    expect(leappCliService.remoteProceduresClient.refreshSessions).toHaveBeenCalled();
-    //expect(leappCliService.cliVerificationWindowService.closeBrowser).toHaveBeenCalled();
+    expect(cliProviderService.remoteProceduresClient.refreshIntegrations).toHaveBeenCalled();
+    expect(cliProviderService.remoteProceduresClient.refreshSessions).toHaveBeenCalled();
+    //expect(cliProviderService.cliVerificationWindowService.closeBrowser).toHaveBeenCalled();
   });
 
   const runCommand = async (errorToThrow: any, expectedErrorMessage: string) => {

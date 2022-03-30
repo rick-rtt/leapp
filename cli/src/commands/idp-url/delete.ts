@@ -25,11 +25,11 @@ export default class DeleteIdpUrl extends LeappCommand {
   }
 
   async selectIdpUrl(): Promise<IdpUrl> {
-    const idpUrls = this.leappCliService.idpUrlsService.getIdpUrls();
+    const idpUrls = this.cliProviderService.idpUrlsService.getIdpUrls();
     if (idpUrls.length === 0) {
       throw new Error("no identity provider URLs available");
     }
-    const answer: any = await this.leappCliService.inquirer.prompt([
+    const answer: any = await this.cliProviderService.inquirer.prompt([
       {
         name: "selectedIdUrl",
         message: "select an identity provider URL to delete",
@@ -41,7 +41,7 @@ export default class DeleteIdpUrl extends LeappCommand {
   }
 
   getAffectedSessions(idpUrlId: string): Session[] {
-    return this.leappCliService.idpUrlsService.getDependantSessions(idpUrlId);
+    return this.cliProviderService.idpUrlsService.getDependantSessions(idpUrlId);
   }
 
   async askForConfirmation(affectedSessions: Session[]): Promise<boolean> {
@@ -49,7 +49,7 @@ export default class DeleteIdpUrl extends LeappCommand {
       return true;
     }
     const sessionsList = affectedSessions.map((session) => `- ${session.sessionName}`).join("\n");
-    const answer: any = await this.leappCliService.inquirer.prompt([
+    const answer: any = await this.cliProviderService.inquirer.prompt([
       {
         name: "confirmation",
         message: `deleting this identity provider URL will delete also these sessions\n${sessionsList}\nDo you want to continue?`,
@@ -60,8 +60,8 @@ export default class DeleteIdpUrl extends LeappCommand {
   }
 
   async deleteIdpUrl(id: string): Promise<void> {
-    await this.leappCliService.idpUrlsService.deleteIdpUrl(id);
-    await this.leappCliService.remoteProceduresClient.refreshSessions();
+    await this.cliProviderService.idpUrlsService.deleteIdpUrl(id);
+    await this.cliProviderService.remoteProceduresClient.refreshSessions();
     this.log("identity provider URL deleted");
   }
 }

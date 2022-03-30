@@ -24,7 +24,7 @@ export default class ListProfiles extends LeappCommand {
 
   async showProfiles(): Promise<void> {
     const { flags } = await this.parse(ListProfiles);
-    const data = this.leappCliService.namedProfilesService.getNamedProfiles().map((profile: any) => ({
+    const data = this.cliProviderService.namedProfilesService.getNamedProfiles().map((profile: any) => ({
       name: profile.name,
     })) as any as Record<string, unknown>[];
 

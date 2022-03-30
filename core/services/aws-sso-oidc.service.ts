@@ -8,7 +8,7 @@ import {
   StartDeviceAuthorizationResponse,
   VerificationResponse,
 } from "./session/aws/aws-sso-role-service";
-import { IVerificationWindowService } from "../interfaces/i-verification-window.service";
+import { IAwsSsoOidcVerificationWindowService } from "../interfaces/i-aws-sso-oidc-verification-window-service";
 import { BrowserWindowClosing } from "../interfaces/i-browser-window-closing";
 import SSOOIDC, { CreateTokenRequest, RegisterClientRequest, StartDeviceAuthorizationRequest } from "aws-sdk/clients/ssooidc";
 
@@ -23,7 +23,7 @@ export class AwsSsoOidcService {
   private interruptOccurred: boolean;
 
   constructor(
-    private verificationWindowService: IVerificationWindowService,
+    private verificationWindowService: IAwsSsoOidcVerificationWindowService,
     private repository: Repository,
     private disableInAppBrowser: boolean = false
   ) {

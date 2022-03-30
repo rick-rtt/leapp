@@ -21,19 +21,19 @@ export default class DeleteIntegration extends LeappCommand {
   }
 
   async delete(integration: AwsSsoIntegration): Promise<void> {
-    await this.leappCliService.awsSsoIntegrationService.deleteIntegration(integration.id);
-    await this.leappCliService.remoteProceduresClient.refreshIntegrations();
-    await this.leappCliService.remoteProceduresClient.refreshSessions();
+    await this.cliProviderService.awsSsoIntegrationService.deleteIntegration(integration.id);
+    await this.cliProviderService.remoteProceduresClient.refreshIntegrations();
+    await this.cliProviderService.remoteProceduresClient.refreshSessions();
     this.log(`integration deleted`);
   }
 
   async selectIntegration(): Promise<AwsSsoIntegration> {
-    const integrations = this.leappCliService.awsSsoIntegrationService.getIntegrations();
+    const integrations = this.cliProviderService.awsSsoIntegrationService.getIntegrations();
     if (integrations.length === 0) {
       throw new Error("no integrations available");
     }
 
-    const answer: any = await this.leappCliService.inquirer.prompt([
+    const answer: any = await this.cliProviderService.inquirer.prompt([
       {
         name: "selectedIntegration",
         message: "select an integration to delete",

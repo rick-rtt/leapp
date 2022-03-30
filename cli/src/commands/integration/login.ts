@@ -22,21 +22,21 @@ export default class LoginIntegration extends LeappCommand {
 
   async login(integration: AwsSsoIntegration): Promise<void> {
     this.log("waiting for browser authorization using your AWS sign-in...");
-    const sessionsDiff = await this.leappCliService.awsSsoIntegrationService.syncSessions(integration.id);
-    await this.leappCliService.remoteProceduresClient.refreshIntegrations();
-    await this.leappCliService.remoteProceduresClient.refreshSessions();
+    const sessionsDiff = await this.cliProviderService.awsSsoIntegrationService.syncSessions(integration.id);
+    await this.cliProviderService.remoteProceduresClient.refreshIntegrations();
+    await this.cliProviderService.remoteProceduresClient.refreshSessions();
     this.log(`${sessionsDiff.sessionsToAdd.length} sessions added`);
     this.log(`${sessionsDiff.sessionsToDelete.length} sessions removed`);
-    // await this.leappCliService.cliVerificationWindowService.closeBrowser();
+    // await this.cliProviderService.cliVerificationWindowService.closeBrowser();
   }
 
   async selectIntegration(): Promise<AwsSsoIntegration> {
-    const offlineIntegrations = this.leappCliService.awsSsoIntegrationService.getOfflineIntegrations();
+    const offlineIntegrations = this.cliProviderService.awsSsoIntegrationService.getOfflineIntegrations();
     if (offlineIntegrations.length === 0) {
       throw new Error("no offline integrations available");
     }
 
-    const answer: any = await this.leappCliService.inquirer.prompt([
+    const answer: any = await this.cliProviderService.inquirer.prompt([
       {
         name: "selectedIntegration",
         message: "select an integration",

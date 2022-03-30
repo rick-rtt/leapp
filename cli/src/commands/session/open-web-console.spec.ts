@@ -4,9 +4,9 @@ import OpenWebConsole from "./open-web-console";
 import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
 
 describe("OpenWebConsole", () => {
-  const getTestCommand = (leappCliService: any = null): OpenWebConsole => {
+  const getTestCommand = (cliProviderService: any = null): OpenWebConsole => {
     const command = new OpenWebConsole([], {} as any);
-    (command as any).leappCliService = leappCliService;
+    (command as any).cliProviderService = cliProviderService;
     return command;
   };
 
@@ -34,7 +34,7 @@ describe("OpenWebConsole", () => {
       prompt: jest.fn(() => ({ selectedInstance: {} })),
     };
 
-    const leappCliService: any = {
+    const cliProviderService: any = {
       sessionFactory,
       ssmService,
       inquirer,
@@ -42,7 +42,7 @@ describe("OpenWebConsole", () => {
     };
 
     const session: any = { sessionId: "sessionId", type: "sessionType", region: "eu-west-1" };
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
     command.log = jest.fn();
 
     await command.openWebConsole(session);
@@ -81,7 +81,7 @@ describe("OpenWebConsole", () => {
       getSessions: jest.fn(() => [session, session2]),
     };
 
-    const leappCliService: any = {
+    const cliProviderService: any = {
       sessionFactory,
       ssmService,
       inquirer,
@@ -89,7 +89,7 @@ describe("OpenWebConsole", () => {
       repository,
     };
 
-    let command = getTestCommand(leappCliService);
+    let command = getTestCommand(cliProviderService);
     command.log = jest.fn();
 
     const result = await (command as any).selectSession();
@@ -109,8 +109,8 @@ describe("OpenWebConsole", () => {
 
     expect(result).toBe(session);
 
-    leappCliService.repository.getSessions = () => [];
-    command = getTestCommand(leappCliService);
+    cliProviderService.repository.getSessions = () => [];
+    command = getTestCommand(cliProviderService);
     try {
       await (command as any).selectSession();
     } catch (err) {

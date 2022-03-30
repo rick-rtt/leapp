@@ -21,19 +21,19 @@ export default class LogoutIntegration extends LeappCommand {
   }
 
   async logout(integration: AwsSsoIntegration): Promise<void> {
-    await this.leappCliService.awsSsoIntegrationService.logout(integration.id);
-    await this.leappCliService.remoteProceduresClient.refreshIntegrations();
-    await this.leappCliService.remoteProceduresClient.refreshSessions();
+    await this.cliProviderService.awsSsoIntegrationService.logout(integration.id);
+    await this.cliProviderService.remoteProceduresClient.refreshIntegrations();
+    await this.cliProviderService.remoteProceduresClient.refreshSessions();
     this.log("logout successful");
   }
 
   async selectIntegration(): Promise<AwsSsoIntegration> {
-    const onlineIntegrations = this.leappCliService.awsSsoIntegrationService.getOnlineIntegrations();
+    const onlineIntegrations = this.cliProviderService.awsSsoIntegrationService.getOnlineIntegrations();
     if (onlineIntegrations.length === 0) {
       throw new Error("no online integrations available");
     }
 
-    const answer: any = await this.leappCliService.inquirer.prompt([
+    const answer: any = await this.cliProviderService.inquirer.prompt([
       {
         name: "selectedIntegration",
         message: "select an integration",

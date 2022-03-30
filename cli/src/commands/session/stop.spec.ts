@@ -3,9 +3,9 @@ import StopSession from "./stop";
 import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
 
 describe("StopSession", () => {
-  const getTestCommand = (leappCliService: any = null): StopSession => {
+  const getTestCommand = (cliProviderService: any = null): StopSession => {
     const command = new StopSession([], {} as any);
-    (command as any).leappCliService = leappCliService;
+    (command as any).cliProviderService = cliProviderService;
     return command;
   };
 
@@ -18,24 +18,24 @@ describe("StopSession", () => {
     };
     const remoteProceduresClient = { refreshSessions: jest.fn() };
 
-    const leappCliService: any = {
+    const cliProviderService: any = {
       sessionFactory,
       remoteProceduresClient,
     };
 
     const session: any = { sessionId: "sessionId", type: "sessionType" };
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
     command.log = jest.fn();
     await command.stopSession(session);
 
     expect(sessionFactory.getSessionService).toHaveBeenCalledWith("sessionType");
     expect(sessionService.stop).toHaveBeenCalledWith("sessionId");
     expect(command.log).toHaveBeenCalledWith("session stopped");
-    expect(leappCliService.remoteProceduresClient.refreshSessions).toHaveBeenCalled();
+    expect(cliProviderService.remoteProceduresClient.refreshSessions).toHaveBeenCalled();
   });
 
   test("selectSession", async () => {
-    const leappCliService: any = {
+    const cliProviderService: any = {
       repository: {
         getSessions: jest.fn(() => [
           { sessionName: "sessionActive", status: SessionStatus.active },
@@ -48,9 +48,9 @@ describe("StopSession", () => {
       },
     };
 
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
     const selectedSession = await command.selectSession();
-    expect(leappCliService.inquirer.prompt).toHaveBeenCalledWith([
+    expect(cliProviderService.inquirer.prompt).toHaveBeenCalledWith([
       {
         choices: [
           { name: "sessionActive", value: { sessionName: "sessionActive", status: SessionStatus.active } },
@@ -65,13 +65,13 @@ describe("StopSession", () => {
   });
 
   test("selectSession, no session available", async () => {
-    const leappCliService: any = {
+    const cliProviderService: any = {
       repository: {
         getSessions: jest.fn(() => []),
       },
     };
 
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
     await expect(command.selectSession()).rejects.toThrow(new Error("no active sessions available"));
   });
 

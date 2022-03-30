@@ -2,14 +2,14 @@ import { jest, describe, test, expect } from "@jest/globals";
 import CreateNamedProfile from "./create";
 
 describe("CreateNamedProfile", () => {
-  const getTestCommand = (leappCliService: any = null, argv: string[] = []): CreateNamedProfile => {
+  const getTestCommand = (cliProviderService: any = null, argv: string[] = []): CreateNamedProfile => {
     const command = new CreateNamedProfile(argv, {} as any);
-    (command as any).leappCliService = leappCliService;
+    (command as any).cliProviderService = cliProviderService;
     return command;
   };
 
   test("getProfileName", async () => {
-    const leappCliService: any = {
+    const cliProviderService: any = {
       inquirer: {
         prompt: async (params: any) => {
           expect(params).toMatchObject([
@@ -28,27 +28,27 @@ describe("CreateNamedProfile", () => {
       },
     };
 
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
     const profileName = await command.getProfileName();
     expect(profileName).toBe("profileName");
-    expect(leappCliService.namedProfilesService.validateNewProfileName).toHaveBeenCalledWith("profileName");
+    expect(cliProviderService.namedProfilesService.validateNewProfileName).toHaveBeenCalledWith("profileName");
   });
 
   test("createNamedProfile", async () => {
-    const leappCliService: any = {
+    const cliProviderService: any = {
       namedProfilesService: {
         createNamedProfile: jest.fn(),
       },
       remoteProceduresClient: { refreshSessions: jest.fn() },
     };
 
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
     command.log = jest.fn();
     await command.createNamedProfile("profileName");
 
-    expect(leappCliService.namedProfilesService.createNamedProfile).toHaveBeenCalledWith("profileName");
+    expect(cliProviderService.namedProfilesService.createNamedProfile).toHaveBeenCalledWith("profileName");
     expect(command.log).toHaveBeenCalledWith("profile created");
-    expect(leappCliService.remoteProceduresClient.refreshSessions).toHaveBeenCalled();
+    expect(cliProviderService.remoteProceduresClient.refreshSessions).toHaveBeenCalled();
   });
 
   const runCommand = async (errorToThrow: any, expectedErrorMessage: string) => {
