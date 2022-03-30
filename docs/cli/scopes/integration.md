@@ -14,7 +14,7 @@ Leapp Integrations management
 
 Create a new AWS SSO integration
 
-```
+```console
 USAGE
   $ leapp integration create
 
@@ -29,7 +29,7 @@ EXAMPLES
 
 Delete an integration
 
-```
+```console
 USAGE
   $ leapp integration delete
 
@@ -44,7 +44,7 @@ EXAMPLES
 
 Show integrations list
 
-```
+```console
 USAGE
   $ leapp integration list [--columns <value> | -x] [--sort <value>] [--filter <value>] [--output csv|json|yaml |  |
     [--csv | --no-truncate]] [--no-header | ]
@@ -71,7 +71,7 @@ EXAMPLES
 
 Login to synchronize integration sessions
 
-```
+```console
 USAGE
   $ leapp integration login
 
@@ -86,7 +86,7 @@ EXAMPLES
 
 Logout from integration
 
-```
+```console
 USAGE
   $ leapp integration logout
 
@@ -101,7 +101,7 @@ EXAMPLES
 
 Synchronize integration sessions
 
-```
+```console
 USAGE
   $ leapp integration sync
 

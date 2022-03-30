@@ -20,7 +20,7 @@ Sessions management
 
 Add a new session
 
-```
+```console
 USAGE
   $ leapp session add
 
@@ -35,7 +35,7 @@ EXAMPLES
 
 Change a session named-profile
 
-```
+```console
 USAGE
   $ leapp session change-profile
 
@@ -50,7 +50,7 @@ EXAMPLES
 
 Change a session region
 
-```
+```console
 USAGE
   $ leapp session change-region
 
@@ -65,7 +65,7 @@ EXAMPLES
 
 Provides info about the current active session for a selected profile (if no profile is provided it uses default profile)
 
-```
+```console
 USAGE
   $ leapp session current [-i] [-p <value>] [-r aws|azure] [-f <value>]
 
@@ -90,7 +90,7 @@ EXAMPLES
 
 Delete a session
 
-```
+```console
 USAGE
   $ leapp session delete
 
@@ -105,7 +105,7 @@ EXAMPLES
 
 Generate temporary credentials for the given AWS session id
 
-```
+```console
 USAGE
   $ leapp session generate [SESSIONID]
 
@@ -123,7 +123,7 @@ EXAMPLES
 
 Get session id
 
-```
+```console
 USAGE
   $ leapp session get-id
 
@@ -138,7 +138,7 @@ EXAMPLES
 
 Show sessions list
 
-```
+```console
 USAGE
   $ leapp session list [--columns <value> | -x] [--sort <value>] [--filter <value>] [--output csv|json|yaml |  |
     [--csv | --no-truncate]] [--no-header | ]
@@ -165,7 +165,7 @@ EXAMPLES
 
 Open an AWS Web Console
 
-```
+```console
 USAGE
   $ leapp session open-web-console
 
@@ -180,7 +180,7 @@ EXAMPLES
 
 Start a session
 
-```
+```console
 USAGE
   $ leapp session start
 
@@ -195,7 +195,7 @@ EXAMPLES
 
 Start an AWS SSM session
 
-```
+```console
 USAGE
   $ leapp session start-ssm-session
 
@@ -210,7 +210,7 @@ EXAMPLES
 
 Stop a session
 
-```
+```console
 USAGE
   $ leapp session stop
 
