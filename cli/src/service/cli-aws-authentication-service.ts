@@ -1,13 +1,13 @@
 import puppeteer from "puppeteer";
-import { IAwsAuthenticationService } from "@noovolari/leapp-core/interfaces/i-aws-authentication.service";
+import { IAwsSamlAuthenticationService } from "@noovolari/leapp-core/interfaces/i-aws-saml-authentication-service";
 import { LeappModalClosedError } from "@noovolari/leapp-core/errors/leapp-modal-closed-error";
-import { AuthenticationService } from "@noovolari/leapp-core/services/authentication-service";
+import { AwsSamlAssertionExtractionService } from "@noovolari/leapp-core/services/aws-saml-assertion-extraction-service";
 import { CloudProviderType } from "@noovolari/leapp-core/models/cloud-provider-type";
 
-export class CliAwsAuthenticationService implements IAwsAuthenticationService {
+export class CliAwsAuthenticationService implements IAwsSamlAuthenticationService {
   private browser: puppeteer.Browser;
 
-  constructor(private authenticationService: AuthenticationService) {}
+  constructor(private awsSamlAssertionExtractionService: AwsSamlAssertionExtractionService) {}
 
   async needAuthentication(idpUrl: string): Promise<boolean> {
     // eslint-disable-next-line
@@ -21,10 +21,10 @@ export class CliAwsAuthenticationService implements IAwsAuthenticationService {
         }
 
         const requestUrl = request.url().toString();
-        if (this.authenticationService.isAuthenticationUrl(CloudProviderType.aws, requestUrl)) {
+        if (this.awsSamlAssertionExtractionService.isAuthenticationUrl(CloudProviderType.aws, requestUrl)) {
           resolve(true);
         }
-        if (this.authenticationService.isSamlAssertionUrl(CloudProviderType.aws, requestUrl)) {
+        if (this.awsSamlAssertionExtractionService.isSamlAssertionUrl(CloudProviderType.aws, requestUrl)) {
           resolve(false);
         }
         await request.continue();
@@ -48,9 +48,9 @@ export class CliAwsAuthenticationService implements IAwsAuthenticationService {
         }
 
         const requestUrl = request.url().toString();
-        if (this.authenticationService.isSamlAssertionUrl(CloudProviderType.aws, requestUrl)) {
+        if (this.awsSamlAssertionExtractionService.isSamlAssertionUrl(CloudProviderType.aws, requestUrl)) {
           const responseHookDetails = { uploadData: [{ bytes: { toString: () => request.postData() } } as any] };
-          resolve(this.authenticationService.extractAwsSamlResponse(responseHookDetails));
+          resolve(this.awsSamlAssertionExtractionService.extractAwsSamlResponse(responseHookDetails));
           return;
         }
 

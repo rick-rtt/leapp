@@ -1,7 +1,7 @@
-import { IAwsAuthenticationService } from "@noovolari/leapp-core/interfaces/i-aws-authentication.service";
+import { IAwsSamlAuthenticationService } from "@noovolari/leapp-core/interfaces/i-aws-saml-authentication-service";
 import { RemoteProceduresClient } from "@noovolari/leapp-core/services/remote-procedures-client";
 
-export class CliRpcAwsAuthenticationService implements IAwsAuthenticationService {
+export class CliRpcAwsSamlAuthenticationService implements IAwsSamlAuthenticationService {
   constructor(private remoteProceduresClient: RemoteProceduresClient) {}
 
   async needAuthentication(idpUrl: string): Promise<boolean> {

@@ -1,12 +1,12 @@
 import { describe, jest, expect, test } from "@jest/globals";
-import { CliVerificationWindowService } from "./cli-verification-window-service";
+import { CliAwsSsoOidcVerificationWindowService } from "./cli-aws-sso-oidc-verification-window-service";
 
 describe("CliVerificationWindowService", () => {
   test("openVerificationWindow", async () => {
     const registerClientResponse = { clientId: "clientId", clientSecret: "clientSecret" } as any;
     const startDeviceAuthorizationResponse = { verificationUriComplete: "verUri", deviceCode: "deviceCode" } as any;
 
-    const cliVerificationWindowService = new CliVerificationWindowService();
+    const cliVerificationWindowService = new CliAwsSsoOidcVerificationWindowService();
     const page = { goto: jest.fn() };
     (cliVerificationWindowService as any).getNavigationPage = async () => page;
 
@@ -21,7 +21,7 @@ describe("CliVerificationWindowService", () => {
   });
 
   test("getNavigationPage and closeBrowser", async () => {
-    const cliVerificationWindowService = new CliVerificationWindowService();
+    const cliVerificationWindowService = new CliAwsSsoOidcVerificationWindowService();
     const page = await (cliVerificationWindowService as any).getNavigationPage(false);
 
     const process = page.browser().process();
@@ -35,7 +35,7 @@ describe("CliVerificationWindowService", () => {
   });
 
   test("closeBrowser, no opened browser", async () => {
-    const cliVerificationWindowService = new CliVerificationWindowService();
+    const cliVerificationWindowService = new CliAwsSsoOidcVerificationWindowService();
     await cliVerificationWindowService.closeBrowser();
   });
 });
