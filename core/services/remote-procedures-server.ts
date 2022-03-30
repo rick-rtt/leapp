@@ -1,8 +1,8 @@
 import { Socket } from "net";
 import { constants } from "../models/constants";
 import { INativeService } from "../interfaces/i-native-service";
-import { IVerificationWindowService } from "../interfaces/i-verification-window.service";
-import { IAwsAuthenticationService } from "../interfaces/i-aws-authentication.service";
+import { IAwsSsoOidcVerificationWindowService } from "../interfaces/i-aws-sso-oidc-verification-window-service";
+import { IAwsSamlAuthenticationService } from "../interfaces/i-aws-saml-authentication-service";
 import { Repository } from "./repository";
 import { WorkspaceService } from "./workspace-service";
 
@@ -25,8 +25,8 @@ export class RemoteProceduresServer {
 
   constructor(
     private nativeService: INativeService,
-    private verificationWindowService: IVerificationWindowService,
-    private awsAuthenticationService: IAwsAuthenticationService,
+    private verificationWindowService: IAwsSsoOidcVerificationWindowService,
+    private awsAuthenticationService: IAwsSamlAuthenticationService,
     private repository: Repository,
     private workspaceService: WorkspaceService,
     private uiSafeFn: (uiSafeBlock: () => void) => void,

@@ -1,4 +1,4 @@
-import { describe, test, expect } from "@jest/globals";
+import { describe, test, expect, jest } from "@jest/globals";
 import { LeappParseError } from "../errors/leapp-parse-error";
 import { AwsSamlAssertionExtractionService } from "./aws-saml-assertion-extraction-service";
 import { CloudProviderType } from "../models/cloud-provider-type";
