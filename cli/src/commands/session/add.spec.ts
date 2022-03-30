@@ -5,14 +5,14 @@ import { IdpUrlAccessMethodField } from "@noovolari/leapp-core/models/idp-url-ac
 import { AccessMethodFieldType } from "@noovolari/leapp-core/models/access-method-field-type";
 
 describe("AddSession", () => {
-  const getTestCommand = (leappCliService: any = null, createIdpUrlCommand: any = null): AddSession => {
+  const getTestCommand = (cliProviderService: any = null, createIdpUrlCommand: any = null): AddSession => {
     const command = new AddSession([], {} as any, createIdpUrlCommand);
-    (command as any).leappCliService = leappCliService;
+    (command as any).cliProviderService = cliProviderService;
     return command;
   };
 
   test("chooseCloudProvider", async () => {
-    const leappCliService: any = {
+    const cliProviderService: any = {
       cloudProviderService: {
         availableCloudProviders: () => [CloudProviderType.aws],
       },
@@ -31,13 +31,13 @@ describe("AddSession", () => {
       },
     };
 
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
     const selectedCloudProvider = await command.chooseCloudProvider();
     expect(selectedCloudProvider).toBe("aws");
   });
 
   test("chooseAccessMethod", async () => {
-    const leappCliService: any = {
+    const cliProviderService: any = {
       cloudProviderService: {
         creatableAccessMethods: () => [{ label: "IAmUser" }],
       },
@@ -56,7 +56,7 @@ describe("AddSession", () => {
       },
     };
 
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
     const accessMethod = await command.chooseAccessMethod(CloudProviderType.aws);
     expect(accessMethod).toStrictEqual("Method");
   });
@@ -73,7 +73,7 @@ describe("AddSession", () => {
         },
       ],
     };
-    const leappCliService: any = {
+    const cliProviderService: any = {
       inquirer: {
         prompt: (params: any) => {
           expect(params).toStrictEqual([
@@ -89,7 +89,7 @@ describe("AddSession", () => {
       },
     };
 
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
     const map = await command.chooseAccessMethodParams(selectedAccessMethod);
     expect(map).toEqual(expectedMap);
   });
@@ -101,13 +101,13 @@ describe("AddSession", () => {
     const selectedAccessMethod: any = {
       accessMethodFields: [idpUrlAccessMethodField],
     };
-    const leappCliService: any = {
+    const cliProviderService: any = {
       inquirer: {
         prompt: () => ({ field: "choiceValue" }),
       },
     };
 
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
     const map = await command.chooseAccessMethodParams(selectedAccessMethod);
     expect(map).toEqual(expectedMap);
   });
@@ -119,7 +119,7 @@ describe("AddSession", () => {
     const selectedAccessMethod: any = {
       accessMethodFields: [idpUrlAccessMethodField],
     };
-    const leappCliService: any = {
+    const cliProviderService: any = {
       inquirer: {
         prompt: () => ({ field: null }),
       },
@@ -128,7 +128,7 @@ describe("AddSession", () => {
       promptAndCreateIdpUrl: async () => ({ id: "newIdpUrlId" }),
     };
 
-    const command = getTestCommand(leappCliService, createIdpUrlCommand);
+    const command = getTestCommand(cliProviderService, createIdpUrlCommand);
     const map = await command.chooseAccessMethodParams(selectedAccessMethod);
     expect(map).toEqual(expectedMap);
   });
@@ -137,7 +137,7 @@ describe("AddSession", () => {
     const selectedAccessMethod: any = {
       accessMethodFields: [{ creationRequestField: "field", message: "message", type: "type", choices: undefined }],
     };
-    const leappCliService: any = {
+    const cliProviderService: any = {
       inquirer: {
         prompt: (params: any) => {
           expect(params).toStrictEqual([
@@ -153,7 +153,7 @@ describe("AddSession", () => {
       },
     };
 
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
     const map = await command.chooseAccessMethodParams(selectedAccessMethod);
     expect(map).toEqual(new Map<string, any>([["field", "inputValue"]]));
   });
@@ -168,13 +168,13 @@ describe("AddSession", () => {
       sessionType: "sessionType",
     };
 
-    const leappCliService: any = { sessionFactory: { createSession: jest.fn() }, remoteProceduresClient: { refreshSessions: jest.fn() } };
-    const command = getTestCommand(leappCliService);
+    const cliProviderService: any = { sessionFactory: { createSession: jest.fn() }, remoteProceduresClient: { refreshSessions: jest.fn() } };
+    const command = getTestCommand(cliProviderService);
     command.log = jest.fn();
 
     await command.createSession(accessMethod, selectedParams);
-    expect(leappCliService.sessionFactory.createSession).toHaveBeenCalledWith("sessionType", "creationRequest");
-    expect(leappCliService.remoteProceduresClient.refreshSessions).toHaveBeenCalled();
+    expect(cliProviderService.sessionFactory.createSession).toHaveBeenCalledWith("sessionType", "creationRequest");
+    expect(cliProviderService.remoteProceduresClient.refreshSessions).toHaveBeenCalled();
     expect(command.log).toHaveBeenCalledWith("session added");
   });
 

@@ -2,15 +2,15 @@ import { jest, describe, test, expect } from "@jest/globals";
 import EditIdpUrl from "./edit";
 
 describe("EditIdpUrl", () => {
-  const getTestCommand = (leappCliService: any = null, argv: string[] = []): EditIdpUrl => {
+  const getTestCommand = (cliProviderService: any = null, argv: string[] = []): EditIdpUrl => {
     const command = new EditIdpUrl(argv, {} as any);
-    (command as any).leappCliService = leappCliService;
+    (command as any).cliProviderService = cliProviderService;
     return command;
   };
 
   test("selectIdpUrl", async () => {
     const idpUrl = { url: "url1" };
-    const leappCliService: any = {
+    const cliProviderService: any = {
       idpUrlsService: {
         getIdpUrls: jest.fn(() => [idpUrl]),
       },
@@ -29,26 +29,26 @@ describe("EditIdpUrl", () => {
       },
     };
 
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
     const selectedIdpUrl = await command.selectIdpUrl();
 
-    expect(leappCliService.idpUrlsService.getIdpUrls).toHaveBeenCalled();
+    expect(cliProviderService.idpUrlsService.getIdpUrls).toHaveBeenCalled();
     expect(selectedIdpUrl).toBe(idpUrl);
   });
 
   test("selectIdpUrl, no idp urls", async () => {
-    const leappCliService: any = {
+    const cliProviderService: any = {
       idpUrlsService: {
         getIdpUrls: jest.fn(() => []),
       },
     };
 
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
     await expect(command.selectIdpUrl()).rejects.toThrow(new Error("no identity provider URLs available"));
   });
 
   test("getNewIdpUrl", async () => {
-    const leappCliService: any = {
+    const cliProviderService: any = {
       inquirer: {
         prompt: async (params: any) => {
           expect(params).toMatchObject([
@@ -67,27 +67,27 @@ describe("EditIdpUrl", () => {
       },
     };
 
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
     const idpUrl = await command.getNewIdpUrl();
     expect(idpUrl).toBe("idpUrl");
-    expect(leappCliService.idpUrlsService.validateIdpUrl).toHaveBeenCalledWith("url");
+    expect(cliProviderService.idpUrlsService.validateIdpUrl).toHaveBeenCalledWith("url");
   });
 
   test("editIdpUrl", async () => {
-    const leappCliService: any = {
+    const cliProviderService: any = {
       idpUrlsService: {
         editIdpUrl: jest.fn(),
       },
       remoteProceduresClient: { refreshSessions: jest.fn() },
     };
 
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
     command.log = jest.fn();
     await command.editIdpUrl("idpUrlId", "url");
 
-    expect(leappCliService.idpUrlsService.editIdpUrl).toHaveBeenCalledWith("idpUrlId", "url");
+    expect(cliProviderService.idpUrlsService.editIdpUrl).toHaveBeenCalledWith("idpUrlId", "url");
     expect(command.log).toHaveBeenCalledWith("IdP URL edited");
-    expect(leappCliService.remoteProceduresClient.refreshSessions).toHaveBeenCalled();
+    expect(cliProviderService.remoteProceduresClient.refreshSessions).toHaveBeenCalled();
   });
 
   const runCommand = async (errorToThrow: any, expectedErrorMessage: string) => {

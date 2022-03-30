@@ -3,14 +3,14 @@ import ChangeDefaultRegion from "./set-default";
 import { SessionType } from "@noovolari/leapp-core/models/session-type";
 
 describe("ChangeDefaultRegion", () => {
-  const getTestCommand = (leappCliService: any = null, argv: string[] = []): ChangeDefaultRegion => {
+  const getTestCommand = (cliProviderService: any = null, argv: string[] = []): ChangeDefaultRegion => {
     const command = new ChangeDefaultRegion(argv, {} as any);
-    (command as any).leappCliService = leappCliService;
+    (command as any).cliProviderService = cliProviderService;
     return command;
   };
 
   test("selectDefaultRegion", async () => {
-    const leappCliService: any = {
+    const cliProviderService: any = {
       regionsService: {
         getDefaultAwsRegion: () => "region1",
       },
@@ -32,16 +32,16 @@ describe("ChangeDefaultRegion", () => {
       },
     };
 
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
     const selectedRegion = await command.selectDefaultRegion();
     expect(selectedRegion).toBe("selectedRegion");
 
-    expect(leappCliService.cloudProviderService.availableRegions).toHaveBeenCalledWith(SessionType.aws);
+    expect(cliProviderService.cloudProviderService.availableRegions).toHaveBeenCalledWith(SessionType.aws);
   });
 
   test("changeDefaultRegion", async () => {
     const newRegion = "newRegion";
-    const leappCliService: any = {
+    const cliProviderService: any = {
       regionsService: {
         changeDefaultAwsRegion: jest.fn(),
       },
@@ -50,12 +50,12 @@ describe("ChangeDefaultRegion", () => {
       },
     };
 
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
     command.log = jest.fn();
 
     await command.changeDefaultRegion(newRegion);
-    expect(leappCliService.regionsService.changeDefaultAwsRegion).toHaveBeenCalledWith(newRegion);
-    expect(leappCliService.remoteProceduresClient.refreshSessions).toHaveBeenCalled();
+    expect(cliProviderService.regionsService.changeDefaultAwsRegion).toHaveBeenCalledWith(newRegion);
+    expect(cliProviderService.remoteProceduresClient.refreshSessions).toHaveBeenCalled();
     expect(command.log).toHaveBeenCalledWith("default region changed");
   });
 

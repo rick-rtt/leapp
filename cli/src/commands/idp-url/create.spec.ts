@@ -2,9 +2,9 @@ import { jest, describe, test, expect } from "@jest/globals";
 import CreateIdpUrl from "./create";
 
 describe("CreateIdpUrl", () => {
-  const getTestCommand = (leappCliService: any = null, argv: string[] = []): CreateIdpUrl => {
+  const getTestCommand = (cliProviderService: any = null, argv: string[] = []): CreateIdpUrl => {
     const command = new CreateIdpUrl(argv, {} as any);
-    (command as any).leappCliService = leappCliService;
+    (command as any).cliProviderService = cliProviderService;
     return command;
   };
 
@@ -20,7 +20,7 @@ describe("CreateIdpUrl", () => {
   });
 
   test("getIdpUrl", async () => {
-    const leappCliService: any = {
+    const cliProviderService: any = {
       inquirer: {
         prompt: async (params: any) => {
           expect(params).toMatchObject([
@@ -39,28 +39,28 @@ describe("CreateIdpUrl", () => {
       },
     };
 
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
     const idpUrl = await command.getIdpUrl();
     expect(idpUrl).toBe("idpUrl");
-    expect(leappCliService.idpUrlsService.validateIdpUrl).toHaveBeenCalledWith("url");
+    expect(cliProviderService.idpUrlsService.validateIdpUrl).toHaveBeenCalledWith("url");
   });
 
   test("createIdpUrl", async () => {
-    const leappCliService: any = {
+    const cliProviderService: any = {
       idpUrlsService: {
         createIdpUrl: jest.fn(() => "newIdpUrl"),
       },
       remoteProceduresClient: { refreshSessions: jest.fn() },
     };
 
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
     command.log = jest.fn();
     const newIdpUrl = await command.createIdpUrl("idpUrl");
 
-    expect(leappCliService.idpUrlsService.createIdpUrl).toHaveBeenCalledWith("idpUrl");
+    expect(cliProviderService.idpUrlsService.createIdpUrl).toHaveBeenCalledWith("idpUrl");
     expect(command.log).toHaveBeenCalledWith("identity provider URL created");
     expect(newIdpUrl).toBe("newIdpUrl");
-    expect(leappCliService.remoteProceduresClient.refreshSessions).toHaveBeenCalled();
+    expect(cliProviderService.remoteProceduresClient.refreshSessions).toHaveBeenCalled();
   });
 
   const runCommand = async (errorToThrow: any, expectedErrorMessage: string) => {

@@ -8,9 +8,9 @@ const awsProvider = "aws";
 const azureProvider = "azure";
 
 describe("CurrentSession", () => {
-  const getTestCommand = (leappCliService: any = null): CurrentSession => {
+  const getTestCommand = (cliProviderService: any = null): CurrentSession => {
     const command = new CurrentSession([], {} as any);
-    (command as any).leappCliService = leappCliService;
+    (command as any).cliProviderService = cliProviderService;
     return command;
   };
 
@@ -38,13 +38,13 @@ describe("CurrentSession", () => {
       { profileId: "profileId1", type: "type2" },
       { profileId: "profileId2", type: "type2" },
     ];
-    const leappCliService: any = {
+    const cliProviderService: any = {
       repository: {
         getDefaultProfileId: jest.fn(() => "profileId1"),
         listActive: jest.fn(() => sessions),
       },
     };
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
 
     const profileName = "default";
     const provider = "provider";
@@ -55,8 +55,8 @@ describe("CurrentSession", () => {
     const sessionFromProfile = command.getSessionFromProfile(profileName, provider);
 
     expect(sessionFromProfile).toEqual({ profileId: "profileId1", type: "type1" });
-    expect(leappCliService.repository.getDefaultProfileId).toHaveBeenCalled();
-    expect(leappCliService.repository.listActive).toHaveBeenCalled();
+    expect(cliProviderService.repository.getDefaultProfileId).toHaveBeenCalled();
+    expect(cliProviderService.repository.listActive).toHaveBeenCalled();
     expect(command.getProviderAssociatedSessionTypes).toHaveBeenCalledWith(provider);
   });
 
@@ -65,12 +65,12 @@ describe("CurrentSession", () => {
       { profileId: "profileId1", type: "type1" },
       { profileId: "profileId2", type: "type2" },
     ];
-    const leappCliService: any = {
+    const cliProviderService: any = {
       repository: {
         listActive: jest.fn(() => sessions),
       },
     };
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
     command.getProfileId = jest.fn(() => "profileId1");
 
     const profileName = "profileName";
@@ -80,25 +80,25 @@ describe("CurrentSession", () => {
 
     expect(sessionFromProfile).toEqual({ profileId: "profileId1", type: "type1" });
     expect(command.getProfileId).toHaveBeenCalledWith(profileName);
-    expect(leappCliService.repository.listActive).toHaveBeenCalled();
+    expect(cliProviderService.repository.listActive).toHaveBeenCalled();
   });
 
   test("getSessionFromProfile - error: no sessions", () => {
     const sessions = [];
-    const leappCliService: any = {
+    const cliProviderService: any = {
       repository: {
         getDefaultProfileId: jest.fn(() => "defaultProfileId"),
         listActive: jest.fn(() => sessions),
       },
     };
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
 
     const profileName = "default";
     const provider = undefined;
 
     expect(() => command.getSessionFromProfile(profileName, provider)).toThrow(new Error("no active sessions available for the specified criteria"));
-    expect(leappCliService.repository.getDefaultProfileId).toHaveBeenCalled();
-    expect(leappCliService.repository.listActive).toHaveBeenCalled();
+    expect(cliProviderService.repository.getDefaultProfileId).toHaveBeenCalled();
+    expect(cliProviderService.repository.listActive).toHaveBeenCalled();
   });
 
   test("getSessionFromProfile - error: selected profile has more than one active session related for the given provider", () => {
@@ -106,13 +106,13 @@ describe("CurrentSession", () => {
       { profileId: "profileId1", type: "type1" },
       { profileId: "profileId1", type: "type1" },
     ];
-    const leappCliService: any = {
+    const cliProviderService: any = {
       repository: {
         getDefaultProfileId: jest.fn(() => "profileId1"),
         listActive: jest.fn(() => sessions),
       },
     };
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
     const sessionTypes = ["type1"];
     (command.getProviderAssociatedSessionTypes as any) = jest.fn(() => sessionTypes);
 
@@ -122,20 +122,20 @@ describe("CurrentSession", () => {
     expect(() => command.getSessionFromProfile(profileName, provider)).toThrow(
       new Error("multiple active sessions found, please specify a provider with --provider")
     );
-    expect(leappCliService.repository.getDefaultProfileId).toHaveBeenCalled();
-    expect(leappCliService.repository.listActive).toHaveBeenCalled();
+    expect(cliProviderService.repository.getDefaultProfileId).toHaveBeenCalled();
+    expect(cliProviderService.repository.listActive).toHaveBeenCalled();
     expect(command.getProviderAssociatedSessionTypes).toHaveBeenCalledWith(provider);
   });
 
   test("getSessionFromProfile - error: more than one active session from different providers", () => {
     const sessions = [{ profileId: "profileId1", type: "type1" }, { type: "type2" }];
-    const leappCliService: any = {
+    const cliProviderService: any = {
       repository: {
         getDefaultProfileId: jest.fn(() => "profileId1"),
         listActive: jest.fn(() => sessions),
       },
     };
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
 
     const profileName = "default";
     const provider = undefined;
@@ -143,8 +143,8 @@ describe("CurrentSession", () => {
     expect(() => command.getSessionFromProfile(profileName, provider)).toThrow(
       new Error("multiple active sessions found, please specify a provider with --provider")
     );
-    expect(leappCliService.repository.getDefaultProfileId).toHaveBeenCalled();
-    expect(leappCliService.repository.listActive).toHaveBeenCalled();
+    expect(cliProviderService.repository.getDefaultProfileId).toHaveBeenCalled();
+    expect(cliProviderService.repository.listActive).toHaveBeenCalled();
   });
 
   test("getProfileId", () => {
@@ -152,17 +152,17 @@ describe("CurrentSession", () => {
       { name: "profileName1", id: "profileId1" },
       { name: "profileName2", id: "profileId2" },
     ];
-    const leappCliService: any = {
+    const cliProviderService: any = {
       repository: {
         getProfiles: jest.fn(() => profiles),
       },
     };
     const profileName = "profileName1";
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
     const profileId = command.getProfileId(profileName);
 
     expect(profileId).toBe("profileId1");
-    expect(leappCliService.repository.getProfiles).toHaveBeenCalled();
+    expect(cliProviderService.repository.getProfiles).toHaveBeenCalled();
   });
 
   test("getProfileId - error: no profiles available", () => {
@@ -170,16 +170,16 @@ describe("CurrentSession", () => {
       { name: "profileName1", id: "profileId1" },
       { name: "profileName2", id: "profileId2" },
     ];
-    const leappCliService: any = {
+    const cliProviderService: any = {
       repository: {
         getProfiles: jest.fn(() => profiles),
       },
     };
     const profileName = "profileName3";
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
 
     expect(() => command.getProfileId(profileName)).toThrow(new Error(`AWS named profile "${profileName}" not found`));
-    expect(leappCliService.repository.getProfiles).toHaveBeenCalled();
+    expect(cliProviderService.repository.getProfiles).toHaveBeenCalled();
   });
 
   test("getProfileId - error: selected profile has more than one occurrence", () => {
@@ -188,16 +188,16 @@ describe("CurrentSession", () => {
       { name: "profileName1", id: "profileId2" },
       { name: "profileName2", id: "profileId3" },
     ];
-    const leappCliService: any = {
+    const cliProviderService: any = {
       repository: {
         getProfiles: jest.fn(() => profiles),
       },
     };
     const profileName = "profileName1";
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
 
     expect(() => command.getProfileId(profileName)).toThrow(new Error("selected profile has more than one occurrence"));
-    expect(leappCliService.repository.getProfiles).toHaveBeenCalled();
+    expect(cliProviderService.repository.getProfiles).toHaveBeenCalled();
   });
 
   test("getFieldRequired", () => {
@@ -212,7 +212,7 @@ describe("CurrentSession", () => {
     const sessionService = new AwsIamUserService(null, null, null, null, null, null);
     sessionService.getAccountNumberFromCallerIdentity = jest.fn(async () => "000");
 
-    const leappCliService: any = {
+    const cliProviderService: any = {
       sessionFactory: {
         getSessionService: jest.fn(() => sessionService),
       },
@@ -221,7 +221,7 @@ describe("CurrentSession", () => {
       sessionName: "sessionName",
       type: SessionType.awsIamUser,
     };
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
 
     const sessionData = await command.getSessionData(session as any);
 
@@ -230,7 +230,7 @@ describe("CurrentSession", () => {
       accountNumber: "000",
       roleArn: "none",
     });
-    expect(leappCliService.sessionFactory.getSessionService).toHaveBeenCalledWith(session.type);
+    expect(cliProviderService.sessionFactory.getSessionService).toHaveBeenCalledWith(session.type);
     expect(sessionService.getAccountNumberFromCallerIdentity).toHaveBeenCalledWith(session);
   });
 
@@ -238,7 +238,7 @@ describe("CurrentSession", () => {
     const sessionService = new AwsIamUserService(null, null, null, null, null, null);
     sessionService.getAccountNumberFromCallerIdentity = jest.fn(async () => "000");
 
-    const leappCliService: any = {
+    const cliProviderService: any = {
       sessionFactory: {
         getSessionService: jest.fn(() => sessionService),
       },
@@ -248,7 +248,7 @@ describe("CurrentSession", () => {
       type: SessionType.awsIamRoleFederated,
       roleArn: "role:arn",
     };
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
 
     const sessionData = await command.getSessionData(session as any);
 
@@ -257,12 +257,12 @@ describe("CurrentSession", () => {
       accountNumber: "000",
       roleArn: "role:arn",
     });
-    expect(leappCliService.sessionFactory.getSessionService).toHaveBeenCalledWith(session.type);
+    expect(cliProviderService.sessionFactory.getSessionService).toHaveBeenCalledWith(session.type);
     expect(sessionService.getAccountNumberFromCallerIdentity).toHaveBeenCalledWith(session);
   });
 
   test("getSessionData - azure", async () => {
-    const leappCliService: any = {
+    const cliProviderService: any = {
       sessionFactory: {
         getSessionService: jest.fn(() => new AzureService(null, null, null, null, null)),
       },
@@ -273,7 +273,7 @@ describe("CurrentSession", () => {
       subscriptionId: "subscriptionId",
       type: SessionType.azure,
     };
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
 
     const sessionData = await command.getSessionData(session as any);
 
@@ -282,20 +282,20 @@ describe("CurrentSession", () => {
       tenantId: "tenantId",
       subscriptionId: "subscriptionId",
     });
-    expect(leappCliService.sessionFactory.getSessionService).toHaveBeenCalledWith(session.type);
+    expect(cliProviderService.sessionFactory.getSessionService).toHaveBeenCalledWith(session.type);
   });
 
   test("getSessionData - error: session type not supported", async () => {
-    const leappCliService: any = {
+    const cliProviderService: any = {
       sessionFactory: {
         getSessionService: jest.fn(() => {}),
       },
     };
     const session = { type: "sessionType" };
-    const command = getTestCommand(leappCliService);
+    const command = getTestCommand(cliProviderService);
 
     await expect(() => command.getSessionData(session as any)).rejects.toThrow(new Error(`session type not supported: ${session.type}`));
-    expect(leappCliService.sessionFactory.getSessionService).toHaveBeenCalledWith(session.type);
+    expect(cliProviderService.sessionFactory.getSessionService).toHaveBeenCalledWith(session.type);
   });
 
   test("filterSessionData - matching filters", () => {
