@@ -22,10 +22,13 @@ export default class StopSession extends LeappCommand {
   }
 
   async stopSession(session: Session): Promise<void> {
-    const sessionService = this.cliProviderService.sessionFactory.getSessionService(session.type);
-    await sessionService.stop(session.sessionId);
-    await this.cliProviderService.remoteProceduresClient.refreshSessions();
-    this.log("session stopped");
+    try {
+      const sessionService = this.cliProviderService.sessionFactory.getSessionService(session.type);
+      await sessionService.stop(session.sessionId);
+      this.log("session stopped");
+    } finally {
+      await this.cliProviderService.remoteProceduresClient.refreshSessions();
+    }
   }
 
   async selectSession(): Promise<Session> {

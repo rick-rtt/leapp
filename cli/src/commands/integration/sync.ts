@@ -21,10 +21,13 @@ export default class SyncIntegration extends LeappCommand {
   }
 
   async sync(integration: AwsSsoIntegration): Promise<void> {
-    const sessionsDiff = await this.cliProviderService.awsSsoIntegrationService.syncSessions(integration.id);
-    await this.cliProviderService.remoteProceduresClient.refreshSessions();
-    this.log(`${sessionsDiff.sessionsToAdd.length} sessions added`);
-    this.log(`${sessionsDiff.sessionsToDelete.length} sessions removed`);
+    try {
+      const sessionsDiff = await this.cliProviderService.awsSsoIntegrationService.syncSessions(integration.id);
+      this.log(`${sessionsDiff.sessionsToAdd.length} sessions added`);
+      this.log(`${sessionsDiff.sessionsToDelete.length} sessions removed`);
+    } finally {
+      await this.cliProviderService.remoteProceduresClient.refreshSessions();
+    }
   }
 
   async selectIntegration(): Promise<AwsSsoIntegration> {
