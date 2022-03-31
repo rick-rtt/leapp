@@ -27,9 +27,12 @@ export default class StartSession extends LeappCommand {
       sessionService.sessionDeactivated(session.sessionId);
       process.exit(0);
     });
-    await sessionService.start(session.sessionId);
-    await this.cliProviderService.remoteProceduresClient.refreshSessions();
-    this.log("session started");
+    try {
+      await sessionService.start(session.sessionId);
+      this.log("session started");
+    } finally {
+      await this.cliProviderService.remoteProceduresClient.refreshSessions();
+    }
   }
 
   async selectSession(): Promise<Session> {

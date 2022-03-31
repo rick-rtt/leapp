@@ -40,10 +40,13 @@ export default class DeleteSession extends LeappCommand {
   }
 
   async deleteSession(session: Session): Promise<void> {
-    const sessionService = this.cliProviderService.sessionFactory.getSessionService(session.type);
-    await sessionService.delete(session.sessionId);
-    await this.cliProviderService.remoteProceduresClient.refreshSessions();
-    this.log("session deleted");
+    try {
+      const sessionService = this.cliProviderService.sessionFactory.getSessionService(session.type);
+      await sessionService.delete(session.sessionId);
+      this.log("session deleted");
+    } finally {
+      await this.cliProviderService.remoteProceduresClient.refreshSessions();
+    }
   }
 
   getAffectedSessions(session: Session): Session[] {

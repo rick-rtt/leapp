@@ -22,12 +22,14 @@ export default class LoginIntegration extends LeappCommand {
 
   async login(integration: AwsSsoIntegration): Promise<void> {
     this.log("waiting for browser authorization using your AWS sign-in...");
-    const sessionsDiff = await this.cliProviderService.awsSsoIntegrationService.syncSessions(integration.id);
-    await this.cliProviderService.remoteProceduresClient.refreshIntegrations();
-    await this.cliProviderService.remoteProceduresClient.refreshSessions();
-    this.log(`${sessionsDiff.sessionsToAdd.length} sessions added`);
-    this.log(`${sessionsDiff.sessionsToDelete.length} sessions removed`);
-    // await this.cliProviderService.cliVerificationWindowService.closeBrowser();
+    try {
+      const sessionsDiff = await this.cliProviderService.awsSsoIntegrationService.syncSessions(integration.id);
+      this.log(`${sessionsDiff.sessionsToAdd.length} sessions added`);
+      this.log(`${sessionsDiff.sessionsToDelete.length} sessions removed`);
+    } finally {
+      await this.cliProviderService.remoteProceduresClient.refreshIntegrations();
+      await this.cliProviderService.remoteProceduresClient.refreshSessions();
+    }
   }
 
   async selectIntegration(): Promise<AwsSsoIntegration> {

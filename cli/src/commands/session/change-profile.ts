@@ -58,8 +58,11 @@ export default class ChangeSessionProfile extends LeappCommand {
   }
 
   async changeSessionProfile(session: Session, newProfileId: string): Promise<void> {
-    await this.cliProviderService.namedProfilesService.changeNamedProfile(session, newProfileId);
-    await this.cliProviderService.remoteProceduresClient.refreshSessions();
-    this.log("session profile changed");
+    try {
+      await this.cliProviderService.namedProfilesService.changeNamedProfile(session, newProfileId);
+      this.log("session profile changed");
+    } finally {
+      await this.cliProviderService.remoteProceduresClient.refreshSessions();
+    }
   }
 }
