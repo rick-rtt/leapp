@@ -3,8 +3,8 @@ import { CredentialsInfo } from "../models/credentials-info";
 import { LoggerLevel, LoggingService } from "./logging-service";
 
 export class WebConsoleService {
-  private secondsInAHour = 3600;
-  private sessionDurationInHours = 8;
+  private secondsInAHour = 3200;
+  private sessionDurationInHours = 1;
 
   constructor(private shellService: IOpenExternalUrlService, private loggingService: LoggingService, private fetch: any) {}
 
