@@ -14,10 +14,10 @@ module.exports = {
       console.log("setting up core...")
 
       console.log("core: cleaning folder...")
-      await deleteFunction(path, '../core/node_modules')
-      await deleteFunction(path, '../core/package-lock.json')
+      await deleteFunction(path, '../packages/core/node_modules')
+      await deleteFunction(path, '../packages/core/package-lock.json')
 
-      shellJs.cd(path.join(__dirname, '../core'))
+      shellJs.cd(path.join(__dirname, '../packages/core'))
       let result = shellJs.exec('npm install')
 
       if (result.code !== 0) {
@@ -40,10 +40,10 @@ module.exports = {
       console.log("setting up cli...")
 
       console.log("cli: cleaning folder...")
-      await deleteFunction(path, '../cli/node_modules')
-      await deleteFunction(path, '../cli/package-lock.json')
+      await deleteFunction(path, '../packages/cli/node_modules')
+      await deleteFunction(path, '../packages/cli/package-lock.json')
 
-      shellJs.cd(path.join(__dirname, '../cli'))
+      shellJs.cd(path.join(__dirname, '../packages/cli'))
       result = shellJs.exec('npm install')
 
       if (result.code !== 0) {
@@ -65,10 +65,10 @@ module.exports = {
       console.log("setting up desktop app...")
 
       console.log("desktop app: cleaning folder...")
-      await deleteFunction(path, '../desktop-app/node_modules')
-      await deleteFunction(path, '../desktop-app/package-lock.json')
+      await deleteFunction(path, '../packages/desktop-app/node_modules')
+      await deleteFunction(path, '../packages/desktop-app/package-lock.json')
 
-      shellJs.cd(path.join(__dirname, '../desktop-app'))
+      shellJs.cd(path.join(__dirname, '../packages/desktop-app'))
       result = shellJs.exec('npm install')
 
       if (result.code !== 0) {

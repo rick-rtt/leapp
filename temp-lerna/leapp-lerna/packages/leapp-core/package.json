@@ -1,0 +1,29 @@
+{
+  "name": "@lerna-test-forge/leapp-core",
+  "version": "0.0.3",
+  "description": "> TODO: description",
+  "author": "Marco Vanetti <marco.vanetti@gmail.com>",
+  "homepage": "",
+  "license": "ISC",
+  "exports": {
+    "./*": "./lib/*.js"
+  },
+  "typesVersions": {
+    "*": {
+      "*": [
+        "lib/*"
+      ]
+    }
+  },
+  "files": [
+    "lib"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "tsc": "tsc",
+    "clean": "rm -rf ./lib",
+    "test": "echo \"Error: run tests from root\" && exit 1"
+  }
+}

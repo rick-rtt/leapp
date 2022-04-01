@@ -17,8 +17,8 @@ const updateCoreDependencyVersion = async (path, shellJs, coreName, coreVersion,
 }
 
 module.exports = async function bumpVersionFunction(path, shellJs) {
-  const corePackageJsonPath = path.join(__dirname, '../core/package.json')
+  const corePackageJsonPath = path.join(__dirname, '../packages/core/package.json')
   const corePackageJson = await fs.readJson(corePackageJsonPath)
-  await updateCoreDependencyVersion(path, shellJs, corePackageJson.name, corePackageJson.version, '../desktop-app')
-  await updateCoreDependencyVersion(path, shellJs, corePackageJson.name, corePackageJson.version, '../cli')
+  await updateCoreDependencyVersion(path, shellJs, corePackageJson.name, corePackageJson.version, '../packages/desktop-app')
+  await updateCoreDependencyVersion(path, shellJs, corePackageJson.name, corePackageJson.version, '../packages/cli')
 }

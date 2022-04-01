@@ -2,8 +2,8 @@
   <configuration default="false" name="Core Tests" type="JavaScriptTestRunnerJest">
     <node-interpreter value="project" />
     <node-options value="" />
-    <jest-package value="$PROJECT_DIR$/core/node_modules/jest" />
-    <working-dir value="$PROJECT_DIR$/core" />
+    <jest-package value="$PROJECT_DIR$/packages/core/node_modules/jest" />
+    <working-dir value="$PROJECT_DIR$/packages/core" />
     <envs />
     <scope-kind value="ALL" />
     <method v="2">

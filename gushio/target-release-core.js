@@ -10,7 +10,7 @@ module.exports = {
     const bumpDepVersionsFunction = require('./bump-dep-func')
 
     try {
-      await gushio.run(path.join(__dirname, '../core/gushio/target-release.js'))
+      await gushio.run(path.join(__dirname, '../packages/core/gushio/target-release.js'))
 
       console.log('updating leapp-core dependencies versions... ')
       await bumpDepVersionsFunction(path, shellJs)

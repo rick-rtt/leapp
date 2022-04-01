@@ -2,8 +2,8 @@
   <configuration default="false" name="CLI Tests" type="JavaScriptTestRunnerJest">
     <node-interpreter value="project" />
     <node-options value="" />
-    <jest-package value="$PROJECT_DIR$/cli/node_modules/jest" />
-    <working-dir value="$PROJECT_DIR$/cli" />
+    <jest-package value="$PROJECT_DIR$/packages/cli/node_modules/jest" />
+    <working-dir value="$PROJECT_DIR$/packages/cli" />
     <envs />
     <scope-kind value="ALL" />
     <method v="2">
