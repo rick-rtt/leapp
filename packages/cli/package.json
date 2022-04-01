@@ -91,6 +91,9 @@
     "/npm-shrinkwrap.json",
     "/oclif.manifest.json"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "homepage": "https://github.com/noovolari/leapp",
   "keywords": [
     "oclif"
