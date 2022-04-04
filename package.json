@@ -34,8 +34,7 @@
     "typescript": "4.5.5"
   },
   "scripts": {
-    "ext-install": "npm install",
-    "setup": "gushio gushio/setup.js",
+    "setup": "npm install && gushio gushio/setup-package.js core cli desktop-app",
     "release-core": "gushio gushio/target-release-core.js",
     "lint": "eslint .",
     "lint:fix": "npm run lint -- --fix"

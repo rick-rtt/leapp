@@ -129,6 +129,7 @@
   },
   "repository": "noovolari/leapp",
   "scripts": {
+    "setup": "gushio ../../gushio/setup-package.js cli",
     "clean": "gushio gushio/target-clean.js",
     "prepack": "gushio gushio/target-build.js && oclif manifest && oclif readme",
     "test": "jest",
