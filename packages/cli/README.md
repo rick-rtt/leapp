@@ -20,11 +20,11 @@ For more information about the project visit the [site](www.leapp.cloud).
 # Usage
 <!-- usage -->
 ```sh-session
-$ npm install -g @lerna-test-forge/leapp-cli
+$ npm install -g @noovolari/leapp-cli
 $ leapp COMMAND
 running command...
 $ leapp (--version)
-@lerna-test-forge/leapp-cli/0.1.7 darwin-x64 node-v16.14.0
+@noovolari/leapp-cli/0.1.7 darwin-x64 node-v16.14.0
 $ leapp --help [COMMAND]
 USAGE
   $ leapp COMMAND

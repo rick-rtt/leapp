@@ -1,3 +1,5 @@
+const deleteFunction = require("./delete-func");
+const path = require("path");
 module.exports = {
   cli: {
     name: 'setup',
@@ -11,72 +13,48 @@ module.exports = {
     const currentPath = shellJs.pwd()
 
     try {
-      console.log("setting up core...")
+      console.log("cleaning...")
 
-      console.log("core: cleaning folder...")
-      await deleteFunction(path, '../packages/core/node_modules')
-      await deleteFunction(path, '../packages/core/package-lock.json')
-
-      shellJs.cd(path.join(__dirname, '../packages/core'))
-      let result = shellJs.exec('npm install')
-
+      shellJs.cd(path.join(__dirname, '..'))
+      let result = shellJs.exec('lerna clean -y')
       if (result.code !== 0) {
         throw new Error(result.stderr)
       }
 
-      console.log("core: npm run clean...")
-      result = shellJs.exec('npm run clean')
+      const packages = ['core', 'cli', 'desktop-app']
+      for (let pkg of packages) {
+        console.log(`${pkg}: deleting package-lock.json...`)
+        await deleteFunction(path, `../packages/${pkg}/package-lock.json`)
+
+        console.log(`${pkg}: npm run clean...`)
+        shellJs.cd(path.join(__dirname, `../packages/${pkg}`))
+        result = shellJs.exec('npm run clean')
+        if (result.code !== 0) {
+          throw new Error(result.stderr)
+        }
+      }
+
+      console.log("\n\n")
+      console.log("installing dependencies...")
+      shellJs.cd(path.join(__dirname, '..'))
+      result = shellJs.exec('lerna bootstrap')
       if (result.code !== 0) {
         throw new Error(result.stderr)
       }
 
+      console.log("\n\n")
+      console.log("building...")
 
       console.log("core: npm run build...")
+      shellJs.cd(path.join(__dirname, '../packages/core'))
       result = shellJs.exec('npm run build')
       if (result.code !== 0) {
         throw new Error(result.stderr)
       }
 
-      console.log("setting up cli...")
-
-      console.log("cli: cleaning folder...")
-      await deleteFunction(path, '../packages/cli/node_modules')
-      await deleteFunction(path, '../packages/cli/package-lock.json')
-
-      shellJs.cd(path.join(__dirname, '../packages/cli'))
-      result = shellJs.exec('npm install')
-
-      if (result.code !== 0) {
-        throw new Error(result.stderr)
-      }
-
-      console.log("cli: npm run clean...")
-      result = shellJs.exec('npm run clean')
-      if (result.code !== 0) {
-        throw new Error(result.stderr)
-      }
-
       console.log("cli: npm run prepack...")
+      shellJs.cd(path.join(__dirname, '../packages/cli'))
       result = shellJs.exec('npm run prepack')
-      if (result.code !== 0) {
-        throw new Error(result.stderr)
-      }
-
-      console.log("setting up desktop app...")
-
-      console.log("desktop app: cleaning folder...")
-      await deleteFunction(path, '../packages/desktop-app/node_modules')
-      await deleteFunction(path, '../packages/desktop-app/package-lock.json')
-
-      shellJs.cd(path.join(__dirname, '../packages/desktop-app'))
-      result = shellJs.exec('npm install')
-
-      if (result.code !== 0) {
-        throw new Error(result.stderr)
-      }
-
-      console.log("desktop app: npm run clean...")
-      result = shellJs.exec('npm run clean')
       if (result.code !== 0) {
         throw new Error(result.stderr)
       }

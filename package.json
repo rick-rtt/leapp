@@ -37,11 +37,8 @@
     "ext-install": "npm install",
     "setup": "gushio gushio/setup.js",
     "release-core": "gushio gushio/target-release-core.js",
-    "npm-install-all": "gushio gushio/npm-install-all.js",
     "lint": "eslint .",
-    "lint:fix": "npm run lint -- --fix",
-    "set-core-dependency-to-remote": "gushio gushio/set-core-dependency-to-remote.js",
-    "set-core-dependency-to-local": "gushio gushio/set-core-dependency-to-local.js"
+    "lint:fix": "npm run lint -- --fix"
   },
   "lint-staged": {
     "*.{ts,html}": "eslint --fix"

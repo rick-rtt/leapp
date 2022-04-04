@@ -5,15 +5,6 @@ const updateCoreDependencyVersion = async (path, shellJs, coreName, coreVersion,
   await fs.writeJson(packageJsonPath, packageJson, {spaces: 2})
 
   shellJs.cd(path.join(__dirname, modulePath))
-  let result = shellJs.exec('npm cache clean --force')
-  if (result.code !== 0) {
-    throw new Error(result.stderr)
-  }
-
-  result = shellJs.exec('npm install')
-  if (result.code !== 0) {
-    throw new Error(result.stderr)
-  }
 }
 
 module.exports = async function bumpVersionFunction(path, shellJs) {

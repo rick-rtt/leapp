@@ -17,8 +17,8 @@ module.exports = {
 
       await gushio.run(path.join(__dirname, './target-build.js'))
 
-      shellJs.cd(path.join(__dirname, '../dist'))
-      const result = shellJs.exec('npm publish --access public')
+      shellJs.cd(path.join(__dirname, '..'))
+      const result = shellJs.exec('npm publish')
       if (result.code !== 0) {
         throw new Error(result.stderr)
       }
