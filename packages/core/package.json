@@ -1,5 +1,5 @@
 {
-  "name": "@noovolari/leapp-core",
+  "name": "@lerna-test-forge/leapp-core",
   "version": "0.1.104",
   "author": "besharp <info@besharp.it>",
   "description": "Leapp's core module",
