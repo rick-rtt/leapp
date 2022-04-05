@@ -2,7 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-## [0.11.0](https://github.com/Noovolari/leapp/compare/v0.10.0...v0.11.0) (2022-03-31)
+## [0.11.1](https://github.com/Noovolari/leapp/compare/v0.11.0...v0.11.1) (2022-04-05)
+
+### Bug Fixes
+
+* fixed SAML Authentication flow with Okta IdP ([#248](https://github.com/Noovolari/leapp/issues/248)) ([a6bae73](https://github.com/Noovolari/leapp/commit/a6bae732c14f196c21a9de6d2f0525be6d456ba3))
+
+### [0.11.0](https://github.com/Noovolari/leapp/compare/v0.10.0...v0.11.0) (2022-03-31)
 
 ### Features
 
