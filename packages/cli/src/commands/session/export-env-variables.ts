@@ -30,7 +30,7 @@ export default class ExportEnvVariablesSession extends LeappCommand {
   async run(): Promise<void> {
     try {
       const { flags } = await this.parse(ExportEnvVariablesSession);
-      const selectedSession = await this.getSessionFromProfile(flags.profile);
+      const selectedSession = this.getSessionFromProfile(flags.profile);
       const credentialVariables = await this.generateCredentialVariables(selectedSession);
       this.printSetVariablesCommand(credentialVariables);
     } catch (error) {

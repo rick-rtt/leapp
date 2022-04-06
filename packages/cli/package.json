@@ -79,7 +79,10 @@
     "testTimeout": 10000,
     "collectCoverageFrom": [
       "src/**/{!(cli-native-service),}.ts"
-    ]
+    ],
+    "moduleNameMapper": {
+      "^@noovolari/leapp-core/(.*)$": "@noovolari/leapp-core/dist/$1"
+    }
   },
   "dirname": "oex",
   "engines": {

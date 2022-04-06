@@ -4,6 +4,45 @@ import ExportEnvVariablesSession from "./export-env-variables";
 import { constants } from "@noovolari/leapp-core/models/constants";
 
 describe("ExportEnvVariablesSession", () => {
+  test("run", async () => {
+    const profile = {
+      flags: {
+        profile: "profile",
+      },
+    };
+    const exportEnvVariablesSession = new ExportEnvVariablesSession(null, null);
+    (exportEnvVariablesSession as any).parse = jest.fn(async () => profile);
+    (exportEnvVariablesSession as any).getSessionFromProfile = jest.fn(() => "session");
+    (exportEnvVariablesSession as any).generateCredentialVariables = jest.fn(async () => "variables");
+    (exportEnvVariablesSession as any).printSetVariablesCommand = jest.fn();
+
+    await exportEnvVariablesSession.run();
+
+    await expect((exportEnvVariablesSession as any).parse).toHaveBeenCalledWith(ExportEnvVariablesSession);
+    expect(exportEnvVariablesSession.getSessionFromProfile).toHaveBeenCalledWith("profile");
+    await expect(exportEnvVariablesSession.generateCredentialVariables).toHaveBeenCalledWith("session");
+    expect(exportEnvVariablesSession.printSetVariablesCommand).toHaveBeenCalledWith("variables");
+  });
+
+  test("run - error", async () => {
+    const exportEnvVariablesSession = new ExportEnvVariablesSession(null, null);
+    (exportEnvVariablesSession as any).parse = jest.fn(async () => {
+      throw new Error("error");
+    });
+
+    await expect(exportEnvVariablesSession.run()).rejects.toThrow(new Error("error"));
+  });
+
+  test("run - unknown error", async () => {
+    const exportEnvVariablesSession = new ExportEnvVariablesSession(null, null);
+    (exportEnvVariablesSession as any).parse = jest.fn(async () => {
+      // eslint-disable-next-line
+      throw "error";
+    });
+
+    await expect(exportEnvVariablesSession.run()).rejects.toThrow("Unknown error: error");
+  });
+
   test("generateCredentialVariables", async () => {
     const session = { type: "sessionType", sessionId: "sessionId", region: "sessionRegion" } as any;
 
@@ -54,10 +93,10 @@ describe("ExportEnvVariablesSession", () => {
     const exportEnvVariablesSession = new ExportEnvVariablesSession(null, null);
     (exportEnvVariablesSession as any).cliProviderService = cliProviderService;
 
-    expect(cliProviderService.sessionFactory.getSessionService).toHaveBeenCalledWith(session.type);
     await expect(exportEnvVariablesSession.generateCredentialVariables(session)).rejects.toThrow(
       new Error("session type not supported: sessionType")
     );
+    expect(cliProviderService.sessionFactory.getSessionService).toHaveBeenCalledWith(session.type);
   });
 
   test("printSetVariablesCommand - win32", () => {
@@ -70,7 +109,7 @@ describe("ExportEnvVariablesSession", () => {
     ];
     const cliProviderService = {
       cliNativeService: {
-        process: jest.fn(() => process),
+        process,
       },
     };
 
@@ -80,9 +119,8 @@ describe("ExportEnvVariablesSession", () => {
 
     exportEnvVariablesSession.printSetVariablesCommand(envVariables);
 
-    expect(cliProviderService.cliNativeService.process).toHaveBeenCalled();
     expect(exportEnvVariablesSession.log).toHaveBeenCalledWith(
-      'SET "AWS_ACCESS_KEY_ID=aws_access_key" & SET "AWS_SECRET_ACCESS_KEY=aws_secret_access_key"'
+      'SET "AWS_ACCESS_KEY_ID=aws_access_key_id" & SET "AWS_SECRET_ACCESS_KEY=aws_secret_access_key"'
     );
   });
 
@@ -96,7 +134,7 @@ describe("ExportEnvVariablesSession", () => {
     ];
     const cliProviderService = {
       cliNativeService: {
-        process: jest.fn(() => process),
+        process,
       },
     };
 
@@ -106,9 +144,8 @@ describe("ExportEnvVariablesSession", () => {
 
     exportEnvVariablesSession.printSetVariablesCommand(envVariables);
 
-    expect(cliProviderService.cliNativeService.process).toHaveBeenCalled();
     expect(exportEnvVariablesSession.log).toHaveBeenCalledWith(
-      "export AWS_ACCESS_KEY_ID='aws_access_key'; export AWS_SECRET_ACCESS_KEY='aws_secret_access_key'"
+      "export AWS_ACCESS_KEY_ID='aws_access_key_id'; export AWS_SECRET_ACCESS_KEY='aws_secret_access_key'"
     );
   });
 
@@ -152,7 +189,7 @@ describe("ExportEnvVariablesSession", () => {
 
     const profileName = "otherProfileName";
 
-    expect(exportEnvVariablesSession.getSessionFromProfile(profileName)).toThrow(
+    expect(() => exportEnvVariablesSession.getSessionFromProfile(profileName)).toThrow(
       new Error(`no active aws session available for "${profileName}" named profile`)
     );
     expect(exportEnvVariablesSession.getProfileId).toHaveBeenCalledWith("otherProfileName");
@@ -186,7 +223,7 @@ describe("ExportEnvVariablesSession", () => {
 
     const profileName = "profileName";
 
-    expect(exportEnvVariablesSession.getProfileId(profileName)).toThrow(new Error(`AWS named profile "${profileName}" not found`));
+    expect(() => exportEnvVariablesSession.getProfileId(profileName)).toThrow(new Error(`AWS named profile "${profileName}" not found`));
     expect(cliProviderService.repository.getProfiles).toHaveBeenCalled();
   });
 
@@ -202,7 +239,7 @@ describe("ExportEnvVariablesSession", () => {
 
     const profileName = "profileName";
 
-    expect(exportEnvVariablesSession.getProfileId(profileName)).toThrow(new Error("selected profile has more than one occurrence"));
+    expect(() => exportEnvVariablesSession.getProfileId(profileName)).toThrow(new Error("selected profile has more than one occurrence"));
     expect(cliProviderService.repository.getProfiles).toHaveBeenCalled();
   });
 });

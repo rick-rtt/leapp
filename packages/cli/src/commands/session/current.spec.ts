@@ -21,15 +21,15 @@ describe("CurrentSession", () => {
     const dataFilter = "dataFilter";
     command.getSessionData = jest.fn(async () => "sessionData");
     command.filterSessionData = jest.fn(() => "filterSessionData");
-    command.formatSessionData = jest.fn();
+    command.formatSessionData = jest.fn(() => "  currentSessionData  ");
     command.log = jest.fn();
 
-    const currentSessionData = await command.currentSession(session as any, dataFormat, dataFilter as any);
+    await command.currentSession(session as any, dataFormat, dataFilter as any);
 
     expect(command.getSessionData).toHaveBeenCalledWith(session);
     expect(command.filterSessionData).toHaveBeenCalledWith("sessionData", dataFilter);
     expect(command.formatSessionData).toHaveBeenCalledWith("filterSessionData", dataFormat);
-    expect(command.log).toHaveBeenCalledWith(currentSessionData);
+    expect(command.log).toHaveBeenCalledWith("currentSessionData");
   });
 
   test("getSessionFromProfile - default, with provider", () => {
