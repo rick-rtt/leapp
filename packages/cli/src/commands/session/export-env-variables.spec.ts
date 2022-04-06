@@ -1,7 +1,6 @@
 import { describe, jest, test, expect } from "@jest/globals";
 import { AwsSessionService } from "@noovolari/leapp-core/services/session/aws/aws-session-service";
 import ExportEnvVariablesSession from "./export-env-variables";
-import { constants } from "@noovolari/leapp-core/models/constants";
 
 describe("ExportEnvVariablesSession", () => {
   test("run", async () => {
@@ -149,21 +148,7 @@ describe("ExportEnvVariablesSession", () => {
     );
   });
 
-  test("getSessionFromProfile - default profile case", () => {
-    const activeSessions = [{ name: "session1", profileId: "profileId" }];
-    const cliProviderService = { repository: { getDefaultProfileId: jest.fn(() => "profileId"), listActive: jest.fn(() => activeSessions) } };
-    const exportEnvVariablesSession = new ExportEnvVariablesSession(null, null);
-    (exportEnvVariablesSession as any).cliProviderService = cliProviderService;
-
-    const profileName = constants.defaultAwsProfileName;
-    const session = exportEnvVariablesSession.getSessionFromProfile(profileName);
-
-    expect(cliProviderService.repository.getDefaultProfileId).toHaveBeenCalled();
-    expect(cliProviderService.repository.listActive).toHaveBeenCalled();
-    expect(session).toEqual(activeSessions[0]);
-  });
-
-  test("getSessionFromProfile - other profileId", () => {
+  test("getSessionFromProfile", () => {
     const activeSessions = [{ name: "session1", profileId: "otherProfileId" }];
     const cliProviderService = { repository: { listActive: jest.fn(() => activeSessions) } };
     const exportEnvVariablesSession = new ExportEnvVariablesSession(null, null);

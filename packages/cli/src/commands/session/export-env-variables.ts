@@ -65,11 +65,10 @@ export default class ExportEnvVariablesSession extends LeappCommand {
   }
 
   getSessionFromProfile(profileName: string): Session {
-    const profileId =
-      profileName === constants.defaultAwsProfileName ? this.cliProviderService.repository.getDefaultProfileId() : this.getProfileId(profileName);
+    const profileId = this.getProfileId(profileName);
     const sessions = this.cliProviderService.repository.listActive().filter((session: Session) => (session as any).profileId === profileId);
     if (sessions.length === 0) {
-      throw new Error(`no active aws session available for "${profileName ?? constants.defaultAwsProfileName}" named profile`);
+      throw new Error(`no active aws session available for "${profileName}" named profile`);
     }
     return sessions[0];
   }
