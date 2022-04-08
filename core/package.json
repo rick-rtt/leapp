@@ -70,12 +70,5 @@
   "bugs": {
     "url": "https://github.com/Noovolari/leapp/issues"
   },
-  "homepage": "https://github.com/Noovolari/leapp",
-  "jest": {
-    "testMatch": [
-      "**/*.spec.ts",
-      "!dist/",
-      "!node_modules/"
-    ]
-  }
+  "homepage": "https://github.com/Noovolari/leapp"
 }
