@@ -1,8 +1,8 @@
 {
   "name": "Leapp",
-  "version": "0.13.0",
+  "version": "0.13.1",
   "author": {
-    "name": "beSharp",
+    "name": "besharp",
     "email": "info@besharp.it"
   },
   "description": "Leapp is a Cross-Platform Cloud access App, built on top of Electron.",
