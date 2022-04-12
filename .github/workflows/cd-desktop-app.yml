@@ -25,8 +25,6 @@ jobs:
           rm -Rf ./release/.cache
           rm -Rf ./release/builder-debug.yml
           rm -Rf ./release/builder-effective-config.yaml
-          TAG_VERSION=${GITHUB_REF#refs/*/}
-          TAG_VERSION=${TAG_VERSION:1}
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -38,4 +36,6 @@ jobs:
       - name: Release Draft to S3
         run: |
           cd desktop-app
+          TAG_VERSION=${GITHUB_REF#refs/*/}
+          TAG_VERSION=${TAG_VERSION:1}
           aws s3 cp ./release/ "${{ env.S3_BUCKET }}/$TAG_VERSION/" --recursive
