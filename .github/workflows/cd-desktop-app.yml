@@ -39,3 +39,23 @@ jobs:
           TAG_VERSION=${GITHUB_REF#refs/*/}
           TAG_VERSION=${TAG_VERSION:1}
           aws s3 cp ./release/ "${{ env.S3_BUCKET }}/$TAG_VERSION/" --recursive
+
+  publish-draft:
+    runs-on: ubuntu-latest
+    environment: prod
+    needs: [ build ]
+    steps:
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-west-1
+
+      - name: Move Draft to Latest
+        run: |
+          cd desktop-app
+          TAG_VERSION=${GITHUB_REF#refs/*/}
+          TAG_VERSION=${TAG_VERSION:1}
+          aws s3 cp "${{ env.S3_BUCKET }}/$TAG_VERSION/" "${{ env.S3_BUCKET }}/latest" --recursive
