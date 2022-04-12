@@ -3,35 +3,34 @@ name: CI/CD Desktop App
 on:
   push:
     branches: [ master ]
+    tags:
+      - 'pippo-v[0-9]+.[0-9]+.[0-9]+'
 
   workflow_dispatch:
 
 env:
-  API_KEY: XXXXXXXXXXXX
   GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
-
     steps:
       - uses: actions/checkout@v3
-
-      - name: Run a multi-line script
-        run: |
-          echo Add other actions to build,
-          echo test, and deploy your project.
 
       - name: Build Desktop App
         run: |
           cd desktop-app
-          mkdir -p temp
-          cd temp
-          touch testtt
+          npm install
+          npm run release-linux
+          rm -Rf ./release/linux-unpacked
+          rm -Rf ./release/.cache
+          rm -Rf ./release/builder-debug.yml
+          rm -Rf ./release/builder-effective-config.yaml
+          cp -r ./release/ ./temp/
 
       - name: Move to Temp
         run: |
-          cd desktop-app
-          cd ./temp
+          cd desktop-app/temp
           ls
+
