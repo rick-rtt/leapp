@@ -2,13 +2,14 @@ name: CI/CD Desktop App
 
 on:
   push:
+    tags:
+     - 'v[0-9]+.[0-9]+.[0-9]+'
 
 env:
   GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
 jobs:
   build:
-#    if: github.event.base_ref == 'refs/heads/master'
     runs-on: ubuntu-latest
 
     steps:
