@@ -19,13 +19,6 @@ jobs:
       - name: Build Desktop App
         run: |
           cd desktop-app
-#          npm install
-#          npm run release-linux
-#          rm -Rf ./release/linux-unpacked
-#          rm -Rf ./release/.cache
-#          rm -Rf ./release/builder-debug.yml
-#          rm -Rf ./release/builder-effective-config.yaml
-#          cp -r ./release/ ./temp/
           NEW_PACKAGE_VERSION=$(node -p -e "require('./package.json').version")
           TAG_VERSION=${GITHUB_REF#refs/*/}
           echo $NEW_PACKAGE_VERSION
@@ -35,5 +28,4 @@ jobs:
 
       - name: Move to Temp
         run: |
-          cd desktop-app/temp
           ls
