@@ -19,12 +19,20 @@ jobs:
       - name: Build Desktop App
         run: |
           cd desktop-app
-          NEW_PACKAGE_VERSION=$(node -p -e "require('./package.json').version")
+          npm install
+          npm run release-linux
+          rm -Rf ./release/linux-unpacked
+          rm -Rf ./release/.cache
+          rm -Rf ./release/builder-debug.yml
+          rm -Rf ./release/builder-effective-config.yaml
           TAG_VERSION=${GITHUB_REF#refs/*/}
-          echo $NEW_PACKAGE_VERSION
-          echo $TAG_VERSION
-          echo ${{ env.S3_BUCKET }}
+          TAG_VERSION=${TAG_VERSION:1}
 
-      - name: Move to Temp
+      - name: Release Draft to S3
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: |
-          ls
+          cd desktop-app
+          aws s3 cp ./release/ "${{ env.S3_BUCKET }}/$TAG_VERSION/" --recursive
