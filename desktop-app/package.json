@@ -22,7 +22,7 @@
     "build-and-run-dev": "gushio gushio/target-build-and-run.js aot",
     "release-mac": "gushio gushio/target-release.js 'configuration production' mac",
     "release-linux": "gushio gushio/target-release.js 'configuration production' linux",
-    "release-win": "gushio gushio/target-release.js 'configuration\\production' win",
+    "release-win": "gushio gushio/target-release.js 'configuration production' win",
     "release-all": "gushio gushio/target-release.js 'configuration production' all"
   },
   "build": {
