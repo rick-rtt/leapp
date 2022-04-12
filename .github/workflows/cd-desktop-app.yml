@@ -25,7 +25,6 @@ jobs:
           echo $TAG_VERSION
           echo ${{ env.S3_BUCKET }}
 
-
       - name: Move to Temp
         run: |
           ls
