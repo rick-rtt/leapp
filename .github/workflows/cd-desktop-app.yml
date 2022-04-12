@@ -24,13 +24,13 @@ jobs:
           cd desktop-app
           npm install
 
-          if [ "$RUNNER_OS" == "Linux" ]; then
+          if ( "$RUNNER_OS" == "Linux" ); then
             npm run release-linux
             rm -Rf ./release/linux-unpacked
             rm -Rf ./release/.cache
             rm -Rf ./release/builder-debug.yml
             rm -Rf ./release/builder-effective-config.yaml
-          elif [ "$RUNNER_OS" == "Windows" ]; then
+          elif ( "$RUNNER_OS" == "Windows" ); then
             npm run release-win
             rm -Rf ./release/win-unpacked
             rm -Rf ./release/.cache
