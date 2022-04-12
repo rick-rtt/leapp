@@ -23,7 +23,6 @@ jobs:
         run: |
           cd desktop-app
           npm install
-
           if [ "$RUNNER_OS" == "Linux" ]; then
             npm run release-linux
             rm -Rf ./release/linux-unpacked
