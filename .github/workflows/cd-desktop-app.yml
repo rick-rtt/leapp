@@ -3,10 +3,11 @@ name: CI/CD Desktop App
 on:
   push:
     tags:
-     - 'v[0-9]+.[0-9]+.[0-9]+'
+      - 'v[0-9]+.[0-9]+.[0-9]+'
 
 env:
   GH_TOKEN: ${{ secrets.GH_TOKEN }}
+  S3_BUCKET: s3://noovolari-leapp-website-distribution-test
 
 jobs:
   build:
@@ -25,9 +26,14 @@ jobs:
           rm -Rf ./release/builder-debug.yml
           rm -Rf ./release/builder-effective-config.yaml
           cp -r ./release/ ./temp/
+          NEW_PACKAGE_VERSION=$(node -p -e "require('./package.json').version")
+          TAG_VERSION=${GITHUB_REF#refs/*/}
+          echo $NEW_PACKAGE_VERSION
+          echo $TAG_VERSION
+          echo ${{ env.S3_BUCKET }}
+
 
       - name: Move to Temp
         run: |
           cd desktop-app/temp
           ls
-
