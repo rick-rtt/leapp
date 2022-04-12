@@ -23,6 +23,7 @@ jobs:
         run: |
           cd desktop-app
           npm install
+
           if [ "$RUNNER_OS" == "Linux" ]; then
             npm run release-linux
             rm -Rf ./release/linux-unpacked
@@ -39,6 +40,7 @@ jobs:
                echo "$RUNNER_OS not supported"
                exit 1
           fi
+
         shell: bash
 
       - name: Configure AWS Credentials
