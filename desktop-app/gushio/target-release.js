@@ -15,7 +15,6 @@ module.exports = {
     const currentPath = shellJs.pwd()
 
     try {
-      console.log('args ', args);
       await gushio.run(path.join(__dirname, './target-build.js'), args)
 
       console.log('Packaging leapp... ')
