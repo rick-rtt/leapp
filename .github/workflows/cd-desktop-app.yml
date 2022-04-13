@@ -102,6 +102,7 @@ jobs:
           security find-identity -v
           echo "security set-key-partition-list"
           security set-key-partition-list -S apple-tool:,apple:,codesign:, -s -k jenkins $KEY_CHAIN
+
           rm -fr *.p12
 
           npm install
