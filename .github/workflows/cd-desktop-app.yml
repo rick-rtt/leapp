@@ -10,6 +10,7 @@ env:
   WIN_CSC_KEY_PASSWORD: ${{ secrets.WIN_CSC_KEY_PASSWORD }}
   S3_BUCKET: s3://noovolari-leapp-website-distribution-test
   CERTIFICATE_OSX_P12: ${{ secrets.CERTIFICATE_OSX_P12 }}
+  CERTIFICATE_APPLICATION_OSX_P12: ${{ secrets.CERTIFICATE_APPLICATION_OSX_P12 }}
   DECODE_PASSWORD: ${{ secrets.DECODE_PASSWORD }}
 
 jobs:
