@@ -90,6 +90,8 @@ jobs:
           security default-keychain -s $KEY_CHAIN
           echo "security unlock-keychain"
           security unlock-keychain -p jenkins $KEY_CHAIN
+          echo "this is the value of KEY_CHAIN $KEY_CHAIN"
+          echo "this is the value of certificate p12 $CERTIFICATE_P12"
           echo "security import"
           security import $CERTIFICATE_P12 -k $KEY_CHAIN -P '' -T /usr/bin/codesign;
           echo "security find-identity"
