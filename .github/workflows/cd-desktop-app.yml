@@ -78,11 +78,14 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Build macOS Desktop App
+        env:
+          APPLE_NOTARISATION_PASSWORD: ${{ secrets.APPLE_NOTARISATION_PASSWORD }}
         run: |
           cd desktop-app
 
           KEY_CHAIN=build.keychain
           CERTIFICATE_P12=certificate.p12
+
           echo "Recreate the certificate from the secure environment variable"
 
           echo "security create-keychain"
