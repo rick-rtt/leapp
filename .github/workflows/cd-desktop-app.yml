@@ -113,7 +113,7 @@ jobs:
   publish-draft:
     runs-on: ubuntu-latest
     environment: prod
-    needs: [ build-linux, build-win ]
+    needs: [ build-linux, build-win, build-macos ]
     steps:
 
       - name: Configure AWS Credentials
