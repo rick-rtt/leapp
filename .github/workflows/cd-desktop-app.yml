@@ -82,6 +82,9 @@ jobs:
           KEY_CHAIN=build.keychain
           CERTIFICATE_P12=certificate.p12
           echo "Recreate the certificate from the secure environment variable"
+          echo "test print"
+          echo ${{ env.CERTIFICATE_OSX_P12 }}
+          echo "end print test"
           echo $CERTIFICATE_OSX_P12 | base64 --decode > $CERTIFICATE_P12
           echo "security create-keychain"
           security create-keychain -p jenkins $KEY_CHAIN
