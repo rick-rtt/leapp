@@ -9,6 +9,10 @@ exports.default = async function notarizing(context) {
 
   const appName = context.packager.appInfo.productFilename;
 
+  if( process.env.APPLE_NOTARISATION_PASSWORD ) {
+    console.log('apple notarization password set');
+  }
+
   return await notarize({
     appBundleId: 'com.noovolari.leapp',
     appPath: `${appOutDir}/${appName}.app`,
