@@ -10,7 +10,7 @@ env:
   WIN_CSC_KEY_PASSWORD: ${{ secrets.WIN_CSC_KEY_PASSWORD }}
   S3_BUCKET: s3://noovolari-leapp-website-distribution-test
   CERTIFICATE_OSX_P12: ${{ secrets.CERTIFICATE_OSX_P12 }}
-  DECODE_PASSWORD: $ {{ secrets.DECODE_PASSWORD }}
+  DECODE_PASSWORD: ${{ secrets.DECODE_PASSWORD }}
 
 jobs:
   build-win:
@@ -96,7 +96,7 @@ jobs:
           echo "security unlock-keychain"
           security unlock-keychain -p jenkins $KEY_CHAIN
           echo "security import"
-          security import $CERTIFICATE_P12 -k $KEY_CHAIN -P "" -T /usr/bin/codesign;
+          security import $CERTIFICATE_P12 -k $KEY_CHAIN -P '${{ env.DECODE_PASSWORD }}' -T /usr/bin/codesign;
           echo "security find-identity"
           security find-identity -v
           echo "security set-key-partition-list"
