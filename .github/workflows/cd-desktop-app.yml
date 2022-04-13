@@ -82,6 +82,7 @@ jobs:
         with:
             mac_certs: ${{ secrets.CERTIFICATE_OSX_P12 }}
             mac_certs_password: ${{ secrets.DECODE_PASSWORD }}
+            github_token: ${{ secrets.GH_TOKEN }}
 
       - name: Build macOS Desktop App
         env:
