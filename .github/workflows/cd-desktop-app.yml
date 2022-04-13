@@ -81,7 +81,7 @@ jobs:
           KEY_CHAIN=build.keychain
           CERTIFICATE_P12=certificate.p12
           echo "Recreate the certificate from the secure environment variable"
-          echo $CERTIFICATE_OSX_P12 | base64 --decode > $CERTIFICATE_P12
+          echo ${{ CERTIFICATE_OSX_P12 }} | base64 --decode > $CERTIFICATE_P12
           echo "security create-keychain"
           security create-keychain -p jenkins $KEY_CHAIN
           echo "security list-keychains"
@@ -90,8 +90,6 @@ jobs:
           security default-keychain -s $KEY_CHAIN
           echo "security unlock-keychain"
           security unlock-keychain -p jenkins $KEY_CHAIN
-          echo "this is the value of KEY_CHAIN $KEY_CHAIN"
-          echo "this is the value of certificate p12 $CERTIFICATE_P12"
           echo "security import"
           security import $CERTIFICATE_P12 -k $KEY_CHAIN -P '' -T /usr/bin/codesign;
           echo "security find-identity"
