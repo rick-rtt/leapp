@@ -77,13 +77,15 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Certificate Step
+        uses: samuelmeuli/action-electron-builder@v1
+        with:
+            mac_certs: ${{ secrets.CERTIFICATE_OSX_P12 }}
+            mac_certs_password: ${{ secrets.DECODE_PASSWORD }}
+
       - name: Build macOS Desktop App
         env:
           APPLE_NOTARISATION_PASSWORD: ${{ secrets.APPLE_NOTARISATION_PASSWORD }}
-        uses: samuelmeuli/action-electron-builder@v1
-        with:
-          mac_certs: ${{ secrets.CERTIFICATE_OSX_P12 }}
-          mac_certs_password: ${{ secrets.DECODE_PASSWORD }}
         run: |
           cd desktop-app
 
