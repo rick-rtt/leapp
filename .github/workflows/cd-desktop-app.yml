@@ -86,6 +86,8 @@ jobs:
 
           echo "security create-keychain"
 
+          DECODE_PASSWORD=${{ env.DECODE_PASSWORD }}
+
           $CERTIFICATE_OSX_P12 | base64 --decode > $CERTIFICATE_P12
 
           security create-keychain -p jenkins $KEY_CHAIN
@@ -96,7 +98,7 @@ jobs:
           echo "security unlock-keychain"
           security unlock-keychain -p jenkins $KEY_CHAIN
           echo "security import"
-          security import $CERTIFICATE_P12 -k $KEY_CHAIN -P ${env.DECODE_PASSWORD} -T /usr/bin/codesign;
+          security import $CERTIFICATE_P12 -k $KEY_CHAIN -P $DECODE_PASSWORD -T /usr/bin/codesign;
           echo "security find-identity"
           security find-identity -v
           echo "security set-key-partition-list"
