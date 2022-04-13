@@ -73,6 +73,7 @@ jobs:
 
   build-macos:
     runs-on: macos-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v3
 
@@ -101,7 +102,6 @@ jobs:
           security find-identity -v
           echo "security set-key-partition-list"
           security set-key-partition-list -S apple-tool:,apple:,codesign:, -s -k jenkins $KEY_CHAIN
-
           rm -fr *.p12
 
           npm install
@@ -112,6 +112,20 @@ jobs:
           rm -Rf ./release/.cache
           rm -Rf ./release/builder-debug.yml
           rm -Rf ./release/builder-effective-config.yaml
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-west-1
+
+      - name: Release Draft to S3
+        run: |
+          cd desktop-app
+          TAG_VERSION=${GITHUB_REF#refs/*/}
+          TAG_VERSION=${TAG_VERSION:1}
+          aws s3 cp ./release/ "${{ env.S3_BUCKET }}/$TAG_VERSION/" --recursive
 
   publish-draft:
     runs-on: ubuntu-latest
@@ -132,3 +146,21 @@ jobs:
           TAG_VERSION=${TAG_VERSION:1}
           aws s3 rm "${{ env.S3_BUCKET }}/latest" --recursive
           aws s3 cp "${{ env.S3_BUCKET }}/$TAG_VERSION/" "${{ env.S3_BUCKET }}/latest" --recursive
+
+  publish-changelog:
+    runs-on: ubuntu-latest
+    environment: prod
+    needs: [ publish-draft ]
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-west-1
+
+      - name: Publish Changelog
+        run: |
+          aws s3 cp CHANGELOG.md "${{ env.S3_BUCKET }}/"
