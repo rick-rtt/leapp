@@ -86,7 +86,7 @@ jobs:
 
           echo "security create-keychain"
 
-          $CERTIFICATE_OSX_P12 | base64 --decode > $CERTIFICATE_P12
+          echo "${{ env.CERTIFICATE_OSX_P12 }}" | base64 --decode > $CERTIFICATE_P12
 
           security create-keychain -p jenkins $KEY_CHAIN
           echo "security list-keychains"
