@@ -24,7 +24,7 @@ jobs:
         id: set-variable
         run: |
           LAST_COMMIT_TAG=$(git tag --contains $(git log --format="%H" -n 1))
-          echo "::set-output name=test::$LAST_COMMIT_TAG"
+          echo "::set-output name=tag::$LAST_COMMIT_TAG"
 
   build-win:
       runs-on: macos-latest
