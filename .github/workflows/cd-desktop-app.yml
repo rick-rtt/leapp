@@ -30,13 +30,13 @@ jobs:
       - name: Test output in steps
         id: main
         run: |
-          git log
+          git log --format="%H" -n 1
           OUTPUT=$(git tag --contains $(git log --format="%H" -n 1 ))  &&
           echo "$OUTPUT" &&
           echo "::set-output name=OUTPUT::$OUTPUT"
 
       - name: If set
-        if: steps.main.outputs.OUTPUT == 'v1.1.10'
+        if: steps.main.outputs.OUTPUT == 'v1.1.11'
         run: |
           echo "this is a valid tag"
 
