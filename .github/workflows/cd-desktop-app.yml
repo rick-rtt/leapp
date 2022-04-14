@@ -30,6 +30,7 @@ jobs:
       - name: Test output in steps
         id: main
         run: |
+          git fetch --prune --unshallow
           COMMIT_ID=$(git log --format="%H" -n 1)
           git log --format="%H" -n 1
           echo "$COMMIT_ID"
