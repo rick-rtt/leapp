@@ -31,17 +31,17 @@ jobs:
           echo "Commit ID: $COMMIT_ID"
           TAG=$(git describe --exact-match $COMMIT_ID)
           echo "Tag: $TAG"
-          if [[ $TAG =~ "^v[0-9]+\.[0-9]+.[0-9]+$" ]]; then IS_VALID_TAG="true"; else IS_VALID_TAG="false"; fi
+          if [[ $TAG =~ "^v[0-9]+\.[0-9]+.[0-9]+$" ]]; then IS_VALID_TAG=1; else IS_VALID_TAG=0; fi
           echo "Is valid tag? $IS_VALID_TAG"
           echo "::set-output name=VALID_TAG::$IS_VALID_TAG"
 
       - name: If valid tag set
-        if: steps.validator.outputs.VALID_TAG == "true"
+        if: steps.validator.outputs.VALID_TAG == 1
         run: |
           echo "this is a valid tag"
 
       - name: If not valid tag set
-        if: steps.validator.outputs.VALID_TAG == "false"
+        if: steps.validator.outputs.VALID_TAG == 0
         run: |
           echo "this is NOT a valid tag!"
 
