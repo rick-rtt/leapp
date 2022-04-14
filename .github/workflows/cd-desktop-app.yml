@@ -16,7 +16,7 @@ env:
 jobs:
   first:
     outputs:
-      tag: ${{ steps.set-variable.outputs.test }}
+      var1: ${{ steps.set-variable.outputs.tag }}
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v2
@@ -30,7 +30,7 @@ jobs:
       runs-on: macos-latest
 
       needs: [ first ]
-      if: ${{needs.first.outputs.tag}}
+
       steps:
         - uses: actions/checkout@v3
 
