@@ -19,21 +19,14 @@ jobs:
       var1: ${{ steps.set-variable.outputs.tag }}
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v2
-      - with:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
           fetch-depth: 0
-
-      - name: Set Last Commit Tag
-        id: set-variable
-        run: |
-          LAST_COMMIT_TAG=$(git tag --contains $(git log --format="%H" -n 1))
-          echo "${LAST_COMMIT_TAG}"
-          echo "::set-output name=tag::$LAST_COMMIT_TAG"
 
       - name: Test output in steps
         id: main
         run: |
-
           COMMIT_ID=$(git rev-parse HEAD)
           git rev-parse HEAD
           echo "$COMMIT_ID"
@@ -43,7 +36,7 @@ jobs:
           echo "::set-output name=VARIAB::$OUTPUT"
 
       - name: If set
-        if: steps.main.outputs.VARIAB == 'v1.1.20'
+        if: steps.main.outputs.VARIAB == 'v1.1.21'
         run: |
           echo "this is a valid tag"
 
