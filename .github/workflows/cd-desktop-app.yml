@@ -30,8 +30,8 @@ jobs:
       - name: Test output in steps
         id: main
         run: |
-          git log --format="%H" -n 1
-          OUTPUT=$(git tag --contains $(git log --format="%H" -n 1 ))  &&
+          COMMIT_ID=$(git log --format="%H" -n 1) &&
+          OUTPUT=$(git tag --contains $COMMIT_ID)  &&
           echo "$OUTPUT" &&
           echo "::set-output name=OUTPUT::$OUTPUT"
 
