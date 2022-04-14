@@ -16,7 +16,6 @@ env:
 jobs:
   build-win:
     runs-on: macos-latest
-
     steps:
       - uses: actions/checkout@v3
 
@@ -73,7 +72,7 @@ jobs:
           TAG_VERSION=${TAG_VERSION:1}
           aws s3 cp ./release/ "${{ env.S3_BUCKET }}/$TAG_VERSION/" --recursive
 
-  build-macos:
+  build-macos-arm:
     runs-on: macos-latest
     timeout-minutes: 30
     steps:
@@ -90,7 +89,6 @@ jobs:
           CERTIFICATE_APPLICATION_P12=certificate-application.p12
 
           echo "Recreate the certificate from the secure environment variable"
-
           echo "security create-keychain"
 
           echo "${{ env.CERTIFICATE_OSX_P12 }}" | base64 --decode > $CERTIFICATE_P12
@@ -110,7 +108,6 @@ jobs:
           security find-identity -v
           echo "security set-key-partition-list"
           security set-key-partition-list -S apple-tool:,apple:,codesign:, -s -k jenkins $KEY_CHAIN
-
           rm -fr *.p12
 
           npm install
@@ -121,6 +118,73 @@ jobs:
           rm -Rf ./release/.cache
           rm -Rf ./release/builder-debug.yml
           rm -Rf ./release/builder-effective-config.yaml
+
+          rm "./release/Leapp-$NEW_PACKAGE_VERSION-mac.zip"
+          zip "./release/Leapp-$NEW_PACKAGE_VERSION-mac.zip" "./release/Leapp-$NEW_PACKAGE_VERSION.dmg"
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-west-1
+
+      - name: Release Draft to S3
+        run: |
+          cd desktop-app
+          TAG_VERSION=${GITHUB_REF#refs/*/}
+          TAG_VERSION=${TAG_VERSION:1}
+          aws s3 cp ./release/ "${{ env.S3_BUCKET }}/$TAG_VERSION/" --recursive
+
+  build-macos-x64:
+    runs-on: macos-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Build macOS Desktop App
+        env:
+          APPLE_NOTARISATION_PASSWORD: ${{ secrets.APPLE_NOTARISATION_PASSWORD }}
+        run: |
+          cd desktop-app
+
+          KEY_CHAIN=build.keychain
+          CERTIFICATE_P12=certificate.p12
+          CERTIFICATE_APPLICATION_P12=certificate-application.p12
+
+          echo "Recreate the certificate from the secure environment variable"
+          echo "security create-keychain"
+
+          echo "${{ env.CERTIFICATE_OSX_P12 }}" | base64 --decode > $CERTIFICATE_P12
+          echo "${{ env.CERTIFICATE_APPLICATION_OSX_P12 }}" | base64 --decode > $CERTIFICATE_APPLICATION_P12
+
+          security create-keychain -p jenkins $KEY_CHAIN
+          echo "security list-keychains"
+          security list-keychains -s login.keychain build.keychain
+          echo "security default-keychain"
+          security default-keychain -s $KEY_CHAIN
+          echo "security unlock-keychain"
+          security unlock-keychain -p jenkins $KEY_CHAIN
+          echo "security import"
+          security import $CERTIFICATE_P12 -k $KEY_CHAIN -P '${{ env.DECODE_PASSWORD }}' -T /usr/bin/codesign;
+          security import $CERTIFICATE_APPLICATION_P12 -k $KEY_CHAIN -P '${{ env.DECODE_PASSWORD }}' -T /usr/bin/codesign;
+          echo "security find-identity"
+          security find-identity -v
+          echo "security set-key-partition-list"
+          security set-key-partition-list -S apple-tool:,apple:,codesign:, -s -k jenkins $KEY_CHAIN
+          rm -fr *.p12
+
+          npm install
+
+          npm run release-mac
+          rm -Rf ./release/mac
+          rm -Rf ./release/mac-unpacked
+          rm -Rf ./release/.cache
+          rm -Rf ./release/builder-debug.yml
+          rm -Rf ./release/builder-effective-config.yaml
+
+          rm "./release/Leapp-$NEW_PACKAGE_VERSION-mac.zip"
+          zip "./release/Leapp-$NEW_PACKAGE_VERSION-mac.zip" "./release/Leapp-$NEW_PACKAGE_VERSION.dmg"
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
