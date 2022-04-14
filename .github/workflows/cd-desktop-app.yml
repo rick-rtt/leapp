@@ -14,9 +14,9 @@ env:
   DECODE_PASSWORD: ${{ secrets.DECODE_PASSWORD }}
 
 jobs:
-  first:
+  tag-validation:
     outputs:
-      var1: ${{ steps.set-variable.outputs.tag }}
+      validator: ${{ steps.validator.outputs.VALID_TAG }}
     runs-on: macos-latest
     steps:
       - name: Checkout
@@ -48,9 +48,8 @@ jobs:
 
   build-win:
       runs-on: macos-latest
-
-      needs: [ first ]
-
+      needs: [ tag-validation ]
+      if: needs.tag-validation.outputs.validator == 1
       steps:
         - uses: actions/checkout@v3
 
@@ -85,7 +84,8 @@ jobs:
 
   build-linux:
     runs-on: ubuntu-latest
-    needs: [ first ]
+    needs: [ tag-validation ]
+    if: needs.tag-validation.outputs.validator == 1
     steps:
       - uses: actions/checkout@v3
 
@@ -115,7 +115,8 @@ jobs:
 
   build-macos-arm:
     runs-on: macos-latest
-    needs: [ first ]
+    needs: [ tag-validation ]
+    if: needs.tag-validation.outputs.validator == 1
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v3
@@ -181,6 +182,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: prod
     needs: [ build-linux, build-win, build-macos-arm ]
+    if: needs.tag-validation.outputs.validator == 1
     steps:
 
       - name: Configure AWS Credentials
@@ -201,6 +203,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: prod
     needs: [ publish-draft ]
+    if: needs.tag-validation.outputs.validator == 1
     steps:
       - uses: actions/checkout@v3
 
