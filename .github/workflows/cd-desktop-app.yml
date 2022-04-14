@@ -23,7 +23,7 @@ jobs:
       - name: Set Last Commit Tag
         run: |
           echo "tag before: ${{ env.LAST_COMMIT_TAG }}"
-          echo "LAST_COMMIT_TAG=ciaone" >> $LAST_COMMIT_TAG
+          echo "LAST_COMMIT_TAG=ciaone" >> $GITHUB_ENV
           echo "tag after: ${{ env.LAST_COMMIT_TAG }}"
 
       - name: Build Win Desktop App
