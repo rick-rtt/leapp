@@ -30,13 +30,15 @@ jobs:
       - name: Test output in steps
         id: main
         run: |
-          COMMIT_ID=$(git log --format="%H" -n 1) &&
-          OUTPUT=$(git tag --contains $COMMIT_ID)  &&
-          echo "$OUTPUT" &&
-          echo "::set-output name=OUTPUT::$OUTPUT"
+          COMMIT_ID=$(git log --format="%H" -n 1)
+          git log --format="%H" -n 1
+          OUTPUT=$(git tag --contains $COMMIT_ID)
+          git tag --contains $COMMIT_ID
+          echo "$OUTPUT"
+          echo "::set-output name=VARIAB::$OUTPUT"
 
       - name: If set
-        if: steps.main.outputs.OUTPUT == 'v1.1.12'
+        if: steps.main.outputs.VARIAB == 'v1.1.12'
         run: |
           echo "this is a valid tag"
 
