@@ -37,6 +37,7 @@ jobs:
 
       - name: If valid tag set
         if: ${{ steps.validator.outputs.VALID_TAG }} == "true"
+
         run: |
           echo "this is a valid tag"
 
