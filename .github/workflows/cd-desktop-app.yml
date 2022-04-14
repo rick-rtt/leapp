@@ -36,7 +36,7 @@ jobs:
           echo "::set-output name=OUTPUT::$OUTPUT"
 
       - name: If set
-        if: steps.main.outputs.OUTPUT == 'v1.1.11'
+        if: steps.main.outputs.OUTPUT == 'v1.1.12'
         run: |
           echo "this is a valid tag"
 
