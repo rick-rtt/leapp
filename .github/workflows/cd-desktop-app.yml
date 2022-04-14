@@ -33,8 +33,8 @@ jobs:
           COMMIT_ID=$(git log --format="%H" -n 1)
           git log --format="%H" -n 1
           echo "$COMMIT_ID"
-          OUTPUT=$(git tag --contains $COMMIT_ID)
-          git tag --contains $COMMIT_ID
+          OUTPUT=$(git describe --exact-match $COMMIT_ID)
+          git describe --exact-match $COMMIT_ID
           echo "$OUTPUT"
           echo "::set-output name=VARIAB::$OUTPUT"
 
