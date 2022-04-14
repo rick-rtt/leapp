@@ -23,7 +23,7 @@ jobs:
       - name: Set Last Commit Tag
         run: |
           echo "tag before: ${{ env.LAST_COMMIT_TAG }}"
-          echo "something else" > ${{ env.LAST_COMMIT_TAG }}
+          ${{ env.LAST_COMMIT_TAG }}=something
           echo "tag after: ${{ env.LAST_COMMIT_TAG }}"
 
       - name: Build Win Desktop App
