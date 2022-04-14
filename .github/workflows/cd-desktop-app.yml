@@ -20,6 +20,9 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v2
+      - with:
+          fetch-depth: 0
+
       - name: Set Last Commit Tag
         id: set-variable
         run: |
@@ -30,9 +33,9 @@ jobs:
       - name: Test output in steps
         id: main
         run: |
-          git fetch --prune --unshallow
-          COMMIT_ID=$(git log --format="%H" -n 1)
-          git log --format="%H" -n 1
+
+          COMMIT_ID=$(git rev-parse HEAD)
+          git rev-parse HEAD
           echo "$COMMIT_ID"
           OUTPUT=$(git describe --exact-match $COMMIT_ID)
           git describe --exact-match $COMMIT_ID
@@ -40,7 +43,7 @@ jobs:
           echo "::set-output name=VARIAB::$OUTPUT"
 
       - name: If set
-        if: steps.main.outputs.VARIAB == 'v1.1.19'
+        if: steps.main.outputs.VARIAB == 'v1.1.20'
         run: |
           echo "this is a valid tag"
 
