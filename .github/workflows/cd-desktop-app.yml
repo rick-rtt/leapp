@@ -120,6 +120,7 @@ jobs:
           rm -Rf ./release/builder-effective-config.yaml
 
 
+
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
