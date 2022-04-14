@@ -30,8 +30,8 @@ jobs:
       - name: Test output in steps
         id: main
         run: |
-          OUTPUT=$(git tag --contains $(git log --format="%H" -n 1)) &&
-          echo "$OUTPUT"
+          OUTPUT=v1.1.4 &&
+          echo "$OUTPUT" &&
           echo "::set-output name=OUTPUT::$OUTPUT"
 
       - name: If set
