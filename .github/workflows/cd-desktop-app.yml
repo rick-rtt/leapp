@@ -2,7 +2,7 @@ name: CI/CD Desktop App
 
 on:
   push:
-    tags:
+    tags-ignore:
       - 'v[0-9]+.[0-9]+.[0-9]+'
 
 env:
@@ -119,8 +119,6 @@ jobs:
           rm -Rf ./release/builder-debug.yml
           rm -Rf ./release/builder-effective-config.yaml
 
-          rm "./release/Leapp-$NEW_PACKAGE_VERSION-mac.zip"
-          zip "./release/Leapp-$NEW_PACKAGE_VERSION-mac.zip" "./release/Leapp-$NEW_PACKAGE_VERSION.dmg"
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -139,7 +137,7 @@ jobs:
   publish-draft:
     runs-on: ubuntu-latest
     environment: prod
-    needs: [ build-linux, build-win, build-macos-arm ]
+    needs: [ build-linux, build-win, build-m1acos-arm ]
     steps:
 
       - name: Configure AWS Credentials
