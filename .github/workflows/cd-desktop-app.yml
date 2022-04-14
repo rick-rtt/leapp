@@ -24,8 +24,19 @@ jobs:
         id: set-variable
         run: |
           LAST_COMMIT_TAG=$(git tag --contains $(git log --format="%H" -n 1))
-          echo "tag is $LAST_COMMIT_TAG"
+          echo "${LAST_COMMIT_TAG}"
           echo "::set-output name=tag::$LAST_COMMIT_TAG"
+
+      - name: Test output in steps
+        id: main
+        run: |
+          OUTPUT=$(git tag --contains $(git log --format="%H" -n 1)) &&
+          echo "::set-output name=OUTPUT::$OUTPUT"
+
+      - name: If set
+        if: steps.main.outputs.OUTPUT =~ "^v[0-9]+\.[0-9]+.[0-9]+$"
+        run: |
+          echo "this is a valid tag"
 
   build-win:
       runs-on: macos-latest
