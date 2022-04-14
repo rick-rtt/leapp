@@ -24,11 +24,14 @@ jobs:
       - name: Set Last Commit Tag
         id: set-variable
         run: |
-          echo "::set-output name=test::abcdefz"
+          LAST_COMMIT_TAG=""
+          git log --format="%H" -n 1 > $LAST_COMMIT_TAG
+          echo "::set-output name=test::$LAST_COMMIT_TAG"
 
   build-win:
       runs-on: macos-latest
       needs: [ first ]
+
       steps:
         - uses: actions/checkout@v3
 
