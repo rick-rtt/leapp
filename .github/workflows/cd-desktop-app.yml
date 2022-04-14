@@ -12,13 +12,11 @@ env:
   CERTIFICATE_OSX_P12: ${{ secrets.CERTIFICATE_OSX_P12 }}
   CERTIFICATE_APPLICATION_OSX_P12: ${{ secrets.CERTIFICATE_APPLICATION_OSX_P12 }}
   DECODE_PASSWORD: ${{ secrets.DECODE_PASSWORD }}
+  LAST_COMMIT_TAG: ""
 
 jobs:
   build-win:
     runs-on: macos-latest
-    if: ${{ git tag --contains $LAST_COMMIT_TAG }} != ""
-    env:
-      LAST_COMMIT_TAG: ""
     steps:
       - uses: actions/checkout@v3
 
@@ -54,7 +52,6 @@ jobs:
 
   build-linux:
     runs-on: ubuntu-latest
-    if: ${{ git tag --contains $LAST_COMMIT_TAG }} != ""
     steps:
       - uses: actions/checkout@v3
 
@@ -85,7 +82,6 @@ jobs:
   build-macos-arm:
     runs-on: macos-latest
     timeout-minutes: 30
-    if: ${{ git tag --contains $LAST_COMMIT_TAG }} != ""
     steps:
       - uses: actions/checkout@v3
 
@@ -149,7 +145,6 @@ jobs:
   publish-draft:
     runs-on: ubuntu-latest
     environment: prod
-    if: ${{ git tag --contains $LAST_COMMIT_TAG }} != ""
     needs: [ build-linux, build-win, build-macos-arm ]
     steps:
 
@@ -170,7 +165,6 @@ jobs:
   publish-changelog:
     runs-on: ubuntu-latest
     environment: prod
-    if: ${{ git tag --contains $LAST_COMMIT_TAG }} != ""
     needs: [ publish-draft ]
     steps:
       - uses: actions/checkout@v3
