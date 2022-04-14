@@ -12,17 +12,24 @@ env:
   CERTIFICATE_OSX_P12: ${{ secrets.CERTIFICATE_OSX_P12 }}
   CERTIFICATE_APPLICATION_OSX_P12: ${{ secrets.CERTIFICATE_APPLICATION_OSX_P12 }}
   DECODE_PASSWORD: ${{ secrets.DECODE_PASSWORD }}
-  LAST_COMMIT_TAG: ${{ git log --format="%H" -n 1 }}
 
 jobs:
   build-win:
     runs-on: macos-latest
     if: ${{ git tag --contains $LAST_COMMIT_TAG }} != ""
+    env:
+      LAST_COMMIT_TAG: ""
     steps:
       - uses: actions/checkout@v3
 
+      - name: Set Last Commit Tag
+        run: |
+          git log --format="%H" -n 1 > ${{ env.LAST_COMMIT_TAG }}
+          echo "tag: ${{ env.LAST_COMMIT_TAG }}"
+
       - name: Build Win Desktop App
         run: |
+          echo "tag: ${{ env.LAST_COMMIT_TAG }}"
           cd desktop-app
           npm install
           npm run release-win
