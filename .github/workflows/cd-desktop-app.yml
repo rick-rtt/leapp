@@ -36,13 +36,12 @@ jobs:
           echo "::set-output name=VALID_TAG::$IS_VALID_TAG"
 
       - name: If valid tag set
-        if: ${{ steps.validator.outputs.VALID_TAG }} == "true"
-
+        if: steps.validator.outputs.VALID_TAG == "true"
         run: |
           echo "this is a valid tag"
 
       - name: If not valid tag set
-        if: ${{ steps.validator.outputs.VALID_TAG }} == "false"
+        if: steps.validator.outputs.VALID_TAG == "false"
         run: |
           echo "this is NOT a valid tag!"
 
