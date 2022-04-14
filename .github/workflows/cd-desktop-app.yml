@@ -40,7 +40,7 @@ jobs:
           echo "::set-output name=VARIAB::$OUTPUT"
 
       - name: If set
-        if: steps.main.outputs.VARIAB == 'v1.1.14'
+        if: steps.main.outputs.VARIAB == 'v1.1.19'
         run: |
           echo "this is a valid tag"
 
