@@ -30,7 +30,7 @@ jobs:
           COMMIT_ID=$(git rev-parse HEAD)
           echo "Commit ID: $COMMIT_ID"
           TAG=$(git describe --exact-match $COMMIT_ID)
-          echo "Tag: $TAG"
+          echo "$TAG"
           if [[ $TAG =~ "^v[0-9]+\.[0-9]+.[0-9]+$" ]]; then IS_VALID_TAG=1; else IS_VALID_TAG=0; fi
           echo "Is valid tag? $IS_VALID_TAG"
 
