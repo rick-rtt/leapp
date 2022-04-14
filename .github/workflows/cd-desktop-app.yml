@@ -24,21 +24,25 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Test output in steps
-        id: main
+      - name: Check Tag Validity
+        id: validator
         run: |
           COMMIT_ID=$(git rev-parse HEAD)
-          git rev-parse HEAD
-          echo "$COMMIT_ID"
-          OUTPUT=$(git describe --exact-match $COMMIT_ID)
-          git describe --exact-match $COMMIT_ID
-          echo "$OUTPUT"
-          echo "::set-output name=VARIAB::$OUTPUT"
+          echo "Commit ID: $COMMIT_ID"
+          TAG=$(git describe --exact-match $COMMIT_ID)
+          echo "Tag: $TAG"
+          if [[ $TAG =~ "^v[0-9]+\.[0-9]+.[0-9]+$" ]]; then IS_VALID_TAG=1; else IS_VALID_TAG=0; fi
+          echo "::set-output name=VALID_TAG::$IS_VALID_TAG"
 
-      - name: If set
-        if: steps.main.outputs.VARIAB == 'v1.1.21'
+      - name: If valid tag set
+        if: steps.validator.outputs.VALID_TAG
         run: |
           echo "this is a valid tag"
+
+      - name: If not valid tag set
+        if: steps.validator.outputs.VALID_TAG == 0
+        run: |
+          echo "this is NOT a valid tag!"
 
   build-win:
       runs-on: macos-latest
