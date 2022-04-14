@@ -12,7 +12,7 @@ env:
   CERTIFICATE_OSX_P12: ${{ secrets.CERTIFICATE_OSX_P12 }}
   CERTIFICATE_APPLICATION_OSX_P12: ${{ secrets.CERTIFICATE_APPLICATION_OSX_P12 }}
   DECODE_PASSWORD: ${{ secrets.DECODE_PASSWORD }}
-  LAST_COMMIT_TAG: ""
+  LAST_COMMIT_TAG: "pippo"
 
 jobs:
   build-win:
@@ -22,8 +22,9 @@ jobs:
 
       - name: Set Last Commit Tag
         run: |
-          git log --format="%H" -n 1 > ${{ env.LAST_COMMIT_TAG }}
-          echo "tag: ${{ env.LAST_COMMIT_TAG }}"
+          echo "tag before: ${{ env.LAST_COMMIT_TAG }}"
+          echo "something else" > ${{ env.LAST_COMMIT_TAG }}
+          echo "tag after: ${{ env.LAST_COMMIT_TAG }}"
 
       - name: Build Win Desktop App
         run: |
