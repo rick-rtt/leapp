@@ -24,7 +24,7 @@ jobs:
         id: set-variable
         run: |
           LAST_COMMIT_TAG=""
-          git log --format="%H" -n 1 > $LAST_COMMIT_TAG
+          LAST_COMMIT_TAG < git log --format="%H" -n 1
           echo "::set-output name=test::$LAST_COMMIT_TAG"
 
   build-win:
