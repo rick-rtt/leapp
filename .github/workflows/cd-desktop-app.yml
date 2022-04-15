@@ -51,7 +51,7 @@ jobs:
           echo "Not a Desktop App Release Tag or Invalid one Found - Exiting..."
 
   build-win:
-      runs-on: windows-latest
+      runs-on: ubuntu-latest
       needs: [ tag-validation ]
       if: needs.tag-validation.outputs.validator == 1
       steps:
