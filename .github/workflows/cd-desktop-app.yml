@@ -19,6 +19,8 @@ jobs:
       validator: ${{ steps.validator.outputs.VALID_TAG }}
     runs-on: macos-latest
     steps:
+      - uses: actions/checkout@v3
+
       - name: Checkout
         uses: actions/checkout@v3
         with:
@@ -28,6 +30,9 @@ jobs:
       - name: Check Tag Validity
         id: validator
         run: |
+          TAG_VERSION=${GITHUB_REF#refs/*/}
+          TAG_VERSION=${TAG_VERSION:1}
+          echo "TAG from github_ref: $TAG_VERSION"
           git fetch
           LOG=$(git log --format="%H" -n 1)
           echo "LOG: $LOG"
