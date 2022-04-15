@@ -25,6 +25,7 @@ jobs:
       - name: Check Tag Validity
         id: validator
         run: |
+          git fetch --prune --unshallow
           RELEASE_VERSION=${GITHUB_REF#refs/*/}
           echo "RELEASE_VERSION: $RELEASE_VERSION"
           TAG=${{ github.ref_name }}
