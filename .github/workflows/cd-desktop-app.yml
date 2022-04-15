@@ -25,10 +25,10 @@ jobs:
           depth: 0
 
       - name: Github Context
-        uses: actions/checkout@v3
         run: |
           git fetch --prune --unshallow
           LOG=$(git log --format="%H" -n 1)
+          echo "LOG: $LOG"
           TAG=$(git tag --contains $LOG)
           echo "TAG: $TAG"
 
