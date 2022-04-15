@@ -25,7 +25,11 @@ jobs:
       - name: Github Context
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
-        run: echo "$GITHUB_CONTEXT"
+          EVENT_JSON_FILENAME: ${{ github.event_path }}
+        run: |
+          echo "$GITHUB_CONTEXT"
+          echo "------"
+          echo "$EVENT_JSON_FILENAME"
 
       - name: Check Tag Validity
         id: validator
