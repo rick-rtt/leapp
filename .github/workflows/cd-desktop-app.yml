@@ -27,6 +27,7 @@ jobs:
 
       - name: Github Context
         run: |
+          git fetch --unshallow
           LOG=$(git log --format="%H" -n 1)
           echo "LOG: $LOG"
           TAG=$(git tag --contains $LOG)
