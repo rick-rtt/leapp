@@ -27,9 +27,10 @@ jobs:
           GITHUB_CONTEXT: ${{ toJson(github) }}
           EVENT_JSON_FILENAME: ${{ github.event_path }}
         run: |
-          echo "$GITHUB_CONTEXT"
-          echo "------"
-          echo "$EVENT_JSON_FILENAME"
+          LOG=$(git log --format="%H" -n 1)
+          TAG=$(git tag --contains $LOG)
+          echo "TAG: $TAG"
+
 
       - name: Check Tag Validity
         id: validator
