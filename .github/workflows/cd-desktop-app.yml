@@ -165,7 +165,8 @@ jobs:
 
           TAG_VERSION=${GITHUB_REF#refs/*/}
           TAG_VERSION=${TAG_VERSION:1}
-          rm "./release/Leapp-$TAG_VERSION-mac-arm64.zip"
+          rm "./release/Leapp-$TAG_VERSION-arm64-mac.zip"
+          rm "./release/Leapp-$TAG_VERSION-arm64-mac.zip.blockmap"
           zip "./release/Leapp-$TAG_VERSION-mac-arm64.zip" "./release/Leapp-$TAG_VERSION.dmg"
 
       - name: Configure AWS Credentials
@@ -234,6 +235,7 @@ jobs:
           TAG_VERSION=${GITHUB_REF#refs/*/}
           TAG_VERSION=${TAG_VERSION:1}
           rm "./release/Leapp-$TAG_VERSION-mac.zip"
+          rm "./release/Leapp-$TAG_VERSION-mac.zip.blockmap"
           zip "./release/Leapp-$TAG_VERSION-mac.zip" "./release/Leapp-$TAG_VERSION.dmg"
 
       - name: Configure AWS Credentials
