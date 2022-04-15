@@ -27,6 +27,8 @@ jobs:
       - name: Check Tag Validity
         id: validator
         run: |
+          RELEASE_VERSION=${GITHUB_REF#refs/*/}
+          echo "RELEASE_VERSION: $RELEASE_VERSION"
           TAG=${{ github.ref_name }}
           echo "TAG: $TAG"
           REGEX="^v[0-9]+\.[0-9]+.[0-9]+"
