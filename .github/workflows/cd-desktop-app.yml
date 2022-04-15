@@ -17,10 +17,9 @@ jobs:
   tag-validation:
     outputs:
       validator: ${{ steps.validator.outputs.VALID_TAG }}
+      tag-version: ${{ steps.validator.outputs.TAG_VERSION }}
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v3
-
       - name: Checkout
         uses: actions/checkout@v3
         with:
@@ -30,9 +29,6 @@ jobs:
       - name: Check Tag Validity
         id: validator
         run: |
-          TAG_VERSION=${GITHUB_REF#refs/*/}
-          TAG_VERSION=${TAG_VERSION:1}
-          echo "TAG from github_ref: $TAG_VERSION"
           git fetch
           LOG=$(git log --format="%H" -n 1)
           echo "LOG: $LOG"
@@ -41,6 +37,7 @@ jobs:
           REGEX="^v[0-9]+\.[0-9]+.[0-9]+"
           if [[ $TAG =~ $REGEX ]]; then IS_VALID_TAG=1; else IS_VALID_TAG=0; fi;
           echo "::set-output name=VALID_TAG::$IS_VALID_TAG"
+          echo "::set-output name=TAG_VERSION::$TAG"
 
       - name: If valid tag set
         if: steps.validator.outputs.VALID_TAG == 1
@@ -61,7 +58,9 @@ jobs:
 
         - name: Read exported variable
           run: |
+            TAG_VERSION=${ needs.tag-validation.outputs.tag-version:1 }
             echo "OUTPUT: ${{ needs.first.outputs.var1 }}"
+            echo "TAG_VERSION: $TAG_VERSION"
 
         - name: Build Win Desktop App
           run: |
@@ -84,8 +83,7 @@ jobs:
         - name: Release Draft to S3
           run: |
             cd desktop-app
-            TAG_VERSION=${GITHUB_REF#refs/*/}
-            TAG_VERSION=${TAG_VERSION:1}
+            TAG_VERSION=${ needs.tag-validation.outputs.tag-version:1 }
             aws s3 cp ./release/ "${{ env.S3_BUCKET }}/$TAG_VERSION/" --recursive
 
   build-linux:
