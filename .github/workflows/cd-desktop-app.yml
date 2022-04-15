@@ -19,10 +19,14 @@ jobs:
       validator: ${{ steps.validator.outputs.VALID_TAG }}
     runs-on: macos-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          depth: 1
+          ref: master
 
       - name: Github Context
         run: |
-          git fetch --prune --unshallow
           LOG=$(git log --format="%H" -n 1)
           echo "LOG: $LOG"
           TAG=$(git tag --contains $LOG)
