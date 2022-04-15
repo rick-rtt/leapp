@@ -35,18 +35,17 @@ jobs:
           echo "TAG: $TAG"
           REGEX="^v[0-9]+\.[0-9]+.[0-9]+"
           if [[ $TAG =~ $REGEX ]]; then IS_VALID_TAG=1; else IS_VALID_TAG=0; fi;
-          echo "Is valid tag? $IS_VALID_TAG"
           echo "::set-output name=VALID_TAG::$IS_VALID_TAG"
 
       - name: If valid tag set
         if: steps.validator.outputs.VALID_TAG == 1
         run: |
-          echo "Valid Tag"
+          echo "Valid Tag Found - Building Desktop App..."
 
       - name: If not valid tag set
         if: steps.validator.outputs.VALID_TAG != 1
         run: |
-          echo "Invalid Tag - Not a Release Tag"
+          echo "Not a Desktop App Release Tag or Invalid one Found - Exiting..."
 
   build-win:
       runs-on: macos-latest
@@ -254,7 +253,7 @@ jobs:
   publish-draft:
     runs-on: ubuntu-latest
     environment: prod
-    needs: [ build-linux, build-win, build-macos-arm ]
+    needs: [ build-linux, build-win, build-macos-arm, build-macos-x64 ]
     if: needs.tag-validation.outputs.validator == 1
     steps:
 
