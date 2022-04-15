@@ -25,21 +25,13 @@ jobs:
           depth: 1
           ref: master
 
-      - name: Github Context
+      - name: Check Tag Validity
+        id: validator
         run: |
           git fetch
           LOG=$(git log --format="%H" -n 1)
           echo "LOG: $LOG"
           TAG=$(git tag --contains $LOG)
-          echo "TAG: $TAG"
-
-
-      - name: Check Tag Validity
-        id: validator
-        run: |
-          RELEASE_VERSION=${GITHUB_REF#refs/tags/}
-          echo "RELEASE_VERSION: $RELEASE_VERSION"
-          TAG=${{ github.ref_name }}
           echo "TAG: $TAG"
           REGEX="^v[0-9]+\.[0-9]+.[0-9]+"
           if [[ $TAG =~ $REGEX ]]; then IS_VALID_TAG=1; else IS_VALID_TAG=0; fi;
