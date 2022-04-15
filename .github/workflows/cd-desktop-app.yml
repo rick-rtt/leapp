@@ -12,6 +12,7 @@ env:
   CERTIFICATE_OSX_P12: ${{ secrets.CERTIFICATE_OSX_P12 }}
   CERTIFICATE_APPLICATION_OSX_P12: ${{ secrets.CERTIFICATE_APPLICATION_OSX_P12 }}
   DECODE_PASSWORD: ${{ secrets.DECODE_PASSWORD }}
+  KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
 
 jobs:
   tag-validation:
@@ -56,7 +57,7 @@ jobs:
       steps:
         - uses: actions/checkout@v3
 
-        - name: Read exported variable
+        - name: Read exported variables
           run: |
             TAG_VERSION=${{ needs.tag-validation.outputs.tag-version }}
             TAG_VERSION=${TAG_VERSION:1}
@@ -84,7 +85,8 @@ jobs:
         - name: Release Draft to S3
           run: |
             cd desktop-app
-            TAG_VERSION=${ needs.tag-validation.outputs.tag-version:1 }
+            TAG_VERSION=${{ needs.tag-validation.outputs.tag-version }}
+            TAG_VERSION=${TAG_VERSION:1}
             aws s3 cp ./release/ "${{ env.S3_BUCKET }}/$TAG_VERSION/" --recursive
 
   build-linux:
@@ -114,7 +116,7 @@ jobs:
       - name: Release Draft to S3
         run: |
           cd desktop-app
-          TAG_VERSION=${GITHUB_REF#refs/*/}
+          TAG_VERSION=${{ needs.tag-validation.outputs.tag-version }}
           TAG_VERSION=${TAG_VERSION:1}
           aws s3 cp ./release/ "${{ env.S3_BUCKET }}/$TAG_VERSION/" --recursive
 
@@ -142,20 +144,20 @@ jobs:
           echo "${{ env.CERTIFICATE_OSX_P12 }}" | base64 --decode > $CERTIFICATE_P12
           echo "${{ env.CERTIFICATE_APPLICATION_OSX_P12 }}" | base64 --decode > $CERTIFICATE_APPLICATION_P12
 
-          security create-keychain -p jenkins $KEY_CHAIN
+          security create-keychain -p ${{ env.KEYCHAIN_PASSWORD }} $KEY_CHAIN
           echo "security list-keychains"
           security list-keychains -s login.keychain build.keychain
           echo "security default-keychain"
           security default-keychain -s $KEY_CHAIN
           echo "security unlock-keychain"
-          security unlock-keychain -p jenkins $KEY_CHAIN
+          security unlock-keychain -p ${{ env.KEYCHAIN_PASSWORD }} $KEY_CHAIN
           echo "security import"
           security import $CERTIFICATE_P12 -k $KEY_CHAIN -P '${{ env.DECODE_PASSWORD }}' -T /usr/bin/codesign;
           security import $CERTIFICATE_APPLICATION_P12 -k $KEY_CHAIN -P '${{ env.DECODE_PASSWORD }}' -T /usr/bin/codesign;
           echo "security find-identity"
           security find-identity -v
           echo "security set-key-partition-list"
-          security set-key-partition-list -S apple-tool:,apple:,codesign:, -s -k jenkins $KEY_CHAIN
+          security set-key-partition-list -S apple-tool:,apple:,codesign:, -s -k ${{ env.KEYCHAIN_PASSWORD }} $KEY_CHAIN
           rm -fr *.p12
 
           npm install
@@ -167,7 +169,7 @@ jobs:
           rm -Rf ./release/builder-debug.yml
           rm -Rf ./release/builder-effective-config.yaml
 
-          TAG_VERSION=${GITHUB_REF#refs/*/}
+          TAG_VERSION=${{ needs.tag-validation.outputs.tag-version }}
           TAG_VERSION=${TAG_VERSION:1}
           rm "./release/Leapp-$TAG_VERSION-arm64-mac.zip"
           rm "./release/Leapp-$TAG_VERSION-arm64-mac.zip.blockmap"
@@ -183,7 +185,7 @@ jobs:
       - name: Release Draft to S3
         run: |
           cd desktop-app
-          TAG_VERSION=${GITHUB_REF#refs/*/}
+          TAG_VERSION=${{ needs.tag-validation.outputs.tag-version }}
           TAG_VERSION=${TAG_VERSION:1}
           aws s3 cp ./release/ "${{ env.S3_BUCKET }}/$TAG_VERSION/" --recursive
 
@@ -211,20 +213,20 @@ jobs:
           echo "${{ env.CERTIFICATE_OSX_P12 }}" | base64 --decode > $CERTIFICATE_P12
           echo "${{ env.CERTIFICATE_APPLICATION_OSX_P12 }}" | base64 --decode > $CERTIFICATE_APPLICATION_P12
 
-          security create-keychain -p jenkins $KEY_CHAIN
+          security create-keychain -p ${{ env.KEYCHAIN_PASSWORD }} $KEY_CHAIN
           echo "security list-keychains"
           security list-keychains -s login.keychain build.keychain
           echo "security default-keychain"
           security default-keychain -s $KEY_CHAIN
           echo "security unlock-keychain"
-          security unlock-keychain -p jenkins $KEY_CHAIN
+          security unlock-keychain -p ${{ env.KEYCHAIN_PASSWORD }} $KEY_CHAIN
           echo "security import"
           security import $CERTIFICATE_P12 -k $KEY_CHAIN -P '${{ env.DECODE_PASSWORD }}' -T /usr/bin/codesign;
           security import $CERTIFICATE_APPLICATION_P12 -k $KEY_CHAIN -P '${{ env.DECODE_PASSWORD }}' -T /usr/bin/codesign;
           echo "security find-identity"
           security find-identity -v
           echo "security set-key-partition-list"
-          security set-key-partition-list -S apple-tool:,apple:,codesign:, -s -k jenkins $KEY_CHAIN
+          security set-key-partition-list -S apple-tool:,apple:,codesign:, -s -k ${{ env.KEYCHAIN_PASSWORD }} $KEY_CHAIN
           rm -fr *.p12
 
           npm install
@@ -236,7 +238,7 @@ jobs:
           rm -Rf ./release/builder-debug.yml
           rm -Rf ./release/builder-effective-config.yaml
 
-          TAG_VERSION=${GITHUB_REF#refs/*/}
+          TAG_VERSION=${{ needs.tag-validation.outputs.tag-version }}
           TAG_VERSION=${TAG_VERSION:1}
           rm "./release/Leapp-$TAG_VERSION-mac.zip"
           rm "./release/Leapp-$TAG_VERSION-mac.zip.blockmap"
@@ -252,7 +254,7 @@ jobs:
       - name: Release Draft to S3
         run: |
           cd desktop-app
-          TAG_VERSION=${GITHUB_REF#refs/*/}
+          TAG_VERSION=${{ needs.tag-validation.outputs.tag-version }}
           TAG_VERSION=${TAG_VERSION:1}
           aws s3 cp ./release/ "${{ env.S3_BUCKET }}/$TAG_VERSION/" --recursive
 
@@ -272,7 +274,7 @@ jobs:
 
       - name: Move Draft to Latest
         run: |
-          TAG_VERSION=${GITHUB_REF#refs/*/}
+          TAG_VERSION=${{ needs.tag-validation.outputs.tag-version }}
           TAG_VERSION=${TAG_VERSION:1}
           aws s3 rm "${{ env.S3_BUCKET }}/latest" --recursive
           aws s3 cp "${{ env.S3_BUCKET }}/$TAG_VERSION/" "${{ env.S3_BUCKET }}/latest" --recursive
