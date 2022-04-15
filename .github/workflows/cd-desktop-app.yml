@@ -27,10 +27,8 @@ jobs:
       - name: Check Tag Validity
         id: validator
         run: |
-          COMMIT_ID=$(git rev-parse HEAD)
-          echo "Commit ID: $COMMIT_ID"
-          TAG=$(git describe --exact-match $COMMIT_ID)
-          echo "$TAG"
+          TAG=${{ github.ref_name }}
+          echo "TAG: $TAG"
           REGEX="^v[0-9]+\.[0-9]+.[0-9]+"
           if [[ $TAG =~ $REGEX ]]; then IS_VALID_TAG=1; else IS_VALID_TAG=0; fi;
           echo "Is valid tag? $IS_VALID_TAG"
@@ -39,12 +37,12 @@ jobs:
       - name: If valid tag set
         if: steps.validator.outputs.VALID_TAG == 1
         run: |
-          echo "this is a valid tag"
+          echo "Valid Tag"
 
       - name: If not valid tag set
         if: steps.validator.outputs.VALID_TAG != 1
         run: |
-          echo "this is NOT a valid tag!"
+          echo "Invalid Tag - Not a Release Tag"
 
   build-win:
       runs-on: macos-latest
@@ -154,7 +152,6 @@ jobs:
           rm -fr *.p12
 
           npm install
-
           npm run release-mac
           rm -Rf ./release/mac
           rm -Rf ./release/mac-unpacked
@@ -162,7 +159,10 @@ jobs:
           rm -Rf ./release/builder-debug.yml
           rm -Rf ./release/builder-effective-config.yaml
 
-
+          TAG_VERSION=${GITHUB_REF#refs/*/}
+          TAG_VERSION=${TAG_VERSION:1}
+          rm "./release/Leapp-$TAG_VERSION-mac.zip"
+          zip "./release/Leapp-$TAG_VERSION-mac.zip" "./release/Leapp-$TAG_VERSION.dmg"
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
