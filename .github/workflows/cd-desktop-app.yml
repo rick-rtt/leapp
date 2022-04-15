@@ -173,7 +173,7 @@ jobs:
           TAG_VERSION=${TAG_VERSION:1}
           rm "./release/Leapp-$TAG_VERSION-arm64-mac.zip"
           rm "./release/Leapp-$TAG_VERSION-arm64-mac.zip.blockmap"
-          zip "./release/Leapp-$TAG_VERSION-mac-arm64.zip" "./release/Leapp-$TAG_VERSION.dmg"
+          zip "./release/Leapp-$TAG_VERSION-mac-arm64.zip" "./release/Leapp-$TAG_VERSION-arm64.dmg"
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
