@@ -16,6 +16,9 @@ env:
 
 jobs:
   tag-validation:
+    outputs:
+      validator: ${{ steps.validator.outputs.VALID_TAG }}
+      tag-version: ${{ steps.validator.outputs.TAG_VERSION }}
     runs-on: macos-latest
     steps:
       - name: Checkout
