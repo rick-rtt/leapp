@@ -51,23 +51,31 @@ jobs:
           echo "Not a Desktop App Release Tag or Invalid one Found - Exiting..."
 
   build-win:
-      runs-on: macos-latest
-      needs: [ tag-validation ]
-      if: needs.tag-validation.outputs.validator == 1
-      steps:
-        - uses: actions/checkout@v3
+    runs-on: macos-latest
+    needs: [ tag-validation ]
+    if: needs.tag-validation.outputs.validator == 1
+    steps:
+      - uses: actions/checkout@v3
 
-        - name: Read exported variables
-          run: |
-            TAG_VERSION=${{ needs.tag-validation.outputs.tag-version }}
-            TAG_VERSION=${TAG_VERSION:1}
-            echo "OUTPUT: ${{ needs.first.outputs.var1 }}"
-            echo "TAG_VERSION: $TAG_VERSION"
+      - name: Read exported variables
+        run: |
+          TAG_VERSION=${{ needs.tag-validation.outputs.tag-version }}
+          TAG_VERSION=${TAG_VERSION:1}
+          echo "OUTPUT: ${{ needs.first.outputs.var1 }}"
+          echo "TAG_VERSION: $TAG_VERSION"
 
 
-        - name: Auto-create GitHub Release
-          uses: ncipollo/release-action@v1
-          with:
-            token: ${{ secrets.GH_TOKEN }}
-            body: "Full changelog & Downloads ⇒ https://www.leapp.cloud/releases"
-            tag: ${{ needs.tag-validation.outputs.tag-version }}
+  publish-github-release:
+    runs-on: ubuntu-latest
+    needs: [ build-win, tag-validation ]
+    if: needs.tag-validation.outputs.validator == 1
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Create GitHub Release
+        uses: ncipollo/release-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          body: "Full changelog & Downloads ⇒ https://www.leapp.cloud/releases"
+          tag: ${{ needs.tag-validation.outputs.tag-version }}
+
