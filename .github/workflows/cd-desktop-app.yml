@@ -79,8 +79,14 @@ jobs:
             rm "./release/Leapp-$TAG_VERSION-win.zip"
             zip "./release/Leapp-$TAG_VERSION-win.zip" "./release/Leapp Setup $TAG_VERSION.exe"
 
+        - name: Auto-create GitHub Release
+          uses: ncipollo/release-action@v1
+          with:
+            token: ${{ secrets.GITHUB_TOKEN }}
+            body: "Full changelog & Downloads ⇒ https://www.leapp.cloud/releases"
+
         - name: Upload Artifact
           uses: actions/upload-artifact@v3
           with:
             name: test
-            path: desktop-app/release/Leapp-7.5.94-win.zip
+            path: desktop-app/release/Leapp-7.5.93-win.zip
