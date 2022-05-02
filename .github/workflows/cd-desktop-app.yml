@@ -83,4 +83,4 @@ jobs:
           uses: actions/upload-artifact@v3
           with:
             name: test
-            path: desktop-app/release/Leapp-7.5.96-win.zip
+            path: desktop-app/release/Leapp-7.5.94-win.zip
