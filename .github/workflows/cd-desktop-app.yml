@@ -86,13 +86,6 @@ jobs:
             aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
             aws-region: eu-west-1
 
-        - name: Release Draft to S3
-          run: |
-            cd desktop-app
-            TAG_VERSION=${{ needs.tag-validation.outputs.tag-version }}
-            TAG_VERSION=${TAG_VERSION:1}
-            aws s3 cp ./release/ "${{ env.S3_BUCKET }}/$TAG_VERSION/" --recursive
-
         - name: Upload Artifact
           uses: actions/upload-artifact@v3
           with:
