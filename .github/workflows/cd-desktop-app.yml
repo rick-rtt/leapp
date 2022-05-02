@@ -64,29 +64,10 @@ jobs:
             echo "OUTPUT: ${{ needs.first.outputs.var1 }}"
             echo "TAG_VERSION: $TAG_VERSION"
 
-        - name: Build Win Desktop App
-          run: |
-            echo "tag: ${{ env.LAST_COMMIT_TAG }}"
-            cd desktop-app
-            npm install
-            npm run release-win
-            rm -Rf ./release/win-unpacked
-            rm -Rf ./release/.cache
-            rm -Rf ./release/builder-debug.yml
-            rm -Rf ./release/builder-effective-config.yaml
-            TAG_VERSION=${{ needs.tag-validation.outputs.tag-version }}
-            TAG_VERSION=${TAG_VERSION:1}
-            rm "./release/Leapp-$TAG_VERSION-win.zip"
-            zip "./release/Leapp-$TAG_VERSION-win.zip" "./release/Leapp Setup $TAG_VERSION.exe"
 
         - name: Auto-create GitHub Release
           uses: ncipollo/release-action@v1
           with:
             token: ${{ secrets.GITHUB_TOKEN }}
             body: "Full changelog & Downloads ⇒ https://www.leapp.cloud/releases"
-
-        - name: Upload Artifact
-          uses: actions/upload-artifact@v3
-          with:
-            name: test
-            path: desktop-app/release/Leapp-7.5.93-win.zip
+            tag: ${{ needs.tag-validation.outputs.tag-version }}
