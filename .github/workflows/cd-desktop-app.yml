@@ -13,10 +13,9 @@ env:
   CERTIFICATE_APPLICATION_OSX_P12: ${{ secrets.CERTIFICATE_APPLICATION_OSX_P12 }}
   DECODE_PASSWORD: ${{ secrets.DECODE_PASSWORD }}
   KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
-  ABSURD_SECRET: ${{ secrets.ABSURD_SECRET }}
 
 jobs:
-  test:
+  tag-validation:
     runs-on: macos-latest
     steps:
       - name: Checkout
@@ -28,4 +27,86 @@ jobs:
       - name: Check Tag Validity
         id: validator
         run: |
-          echo $ABSURD_SECRET | sed -e 's/\(.\)/\1 /g'
+          git fetch
+          LOG=$(git log --format="%H" -n 1)
+          echo "LOG: $LOG"
+          TAG=$(git tag --contains $LOG)
+          echo "TAG: $TAG"
+          REGEX="^v[0-9]+\.[0-9]+.[0-9]+"
+          if [[ $TAG =~ $REGEX ]]; then IS_VALID_TAG=1; else IS_VALID_TAG=0; fi;
+          echo "::set-output name=VALID_TAG::$IS_VALID_TAG"
+          echo "::set-output name=TAG_VERSION::$TAG"
+
+      - name: If valid tag set
+        if: steps.validator.outputs.VALID_TAG == 1
+        run: |
+          echo "Valid Tag Found - Building Desktop App..."
+
+      - name: If not valid tag set
+        if: steps.validator.outputs.VALID_TAG != 1
+        run: |
+          echo "Not a Desktop App Release Tag or Invalid one Found - Exiting..."
+
+  build-win:
+      runs-on: macos-latest
+      needs: [ tag-validation ]
+      if: needs.tag-validation.outputs.validator == 1
+      steps:
+        - uses: actions/checkout@v3
+
+        - name: Read exported variables
+          run: |
+            TAG_VERSION=${{ needs.tag-validation.outputs.tag-version }}
+            TAG_VERSION=${TAG_VERSION:1}
+            echo "OUTPUT: ${{ needs.first.outputs.var1 }}"
+            echo "TAG_VERSION: $TAG_VERSION"
+
+        - name: Build Win Desktop App
+          run: |
+            echo "tag: ${{ env.LAST_COMMIT_TAG }}"
+            cd desktop-app
+            npm install
+            npm run release-win
+            rm -Rf ./release/win-unpacked
+            rm -Rf ./release/.cache
+            rm -Rf ./release/builder-debug.yml
+            rm -Rf ./release/builder-effective-config.yaml
+            TAG_VERSION=${{ needs.tag-validation.outputs.tag-version }}
+            TAG_VERSION=${TAG_VERSION:1}
+            rm "./release/Leapp-$TAG_VERSION-win.zip"
+            zip "./release/Leapp-$TAG_VERSION-win.zip" "./release/Leapp Setup $TAG_VERSION.exe"
+
+        - name: Configure AWS Credentials
+          uses: aws-actions/configure-aws-credentials@v1
+          with:
+            aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            aws-region: eu-west-1
+
+        - name: Release Draft to S3
+          run: |
+            cd desktop-app
+            TAG_VERSION=${{ needs.tag-validation.outputs.tag-version }}
+            TAG_VERSION=${TAG_VERSION:1}
+            aws s3 cp ./release/ "${{ env.S3_BUCKET }}/$TAG_VERSION/" --recursive
+
+  publish-draft:
+    runs-on: ubuntu-latest
+    environment: prod
+    needs: [ build-linux, build-win, build-macos-arm, build-macos-x64 ]
+    if: needs.tag-validation.outputs.validator == 1
+    steps:
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-west-1
+
+      - name: Move Draft to Latest
+        run: |
+          TAG_VERSION=${{ needs.tag-validation.outputs.tag-version }}
+          TAG_VERSION=${TAG_VERSION:1}
+          aws s3 rm "${{ env.S3_BUCKET }}/latest" --recursive
+          aws s3 cp "${{ env.S3_BUCKET }}/$TAG_VERSION/" "${{ env.S3_BUCKET }}/latest" --recursive
