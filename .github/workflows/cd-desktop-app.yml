@@ -70,7 +70,6 @@ jobs:
     needs: [ build-win, tag-validation ]
     if: needs.tag-validation.outputs.validator == 1
     steps:
-      - uses: actions/checkout@v3
 
       - name: Create GitHub Release
         uses: ncipollo/release-action@v1
