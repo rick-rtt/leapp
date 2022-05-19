@@ -75,6 +75,6 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           token: ${{ secrets.GH_TOKEN }}
-          body: "Full changelog & Downloads ⇒ https://www.leapp.cloud/releases"
+          body: "Full changelog & Downloads ⇒ https://www.leapp.cloud/releases dfghffhddhfhffhgddfghdfghghfdgdfh"
           tag: ${{ needs.tag-validation.outputs.tag-version }}
 
